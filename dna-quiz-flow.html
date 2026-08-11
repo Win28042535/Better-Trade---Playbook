@@ -127,35 +127,53 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* NAV / BUTTONS — nav pinned to bottom (equal-height screens); primary CTA capped so it stays a consistent proportion, never full-bleed on wide screens */
 .q-nav{display:flex;gap:12px;margin-top:auto;padding-top:32px;align-items:center;justify-content:space-between;}
 .q-nav .btn-primary{flex:0 0 auto;}
-.q-nav .btn-plain{flex:0 0 auto;}
-.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font);font-weight:var(--w-head);cursor:pointer;white-space:nowrap;transition:box-shadow .18s var(--ease),filter .18s var(--ease),transform .18s var(--ease);border:2px solid transparent;line-height:1;}
+.q-nav .btn-tertiary{flex:0 0 auto;}
+/* ============================================================================
+   BUTTON SYSTEM (2026-08-11) — 3 tiers by fill weight, each usable with or
+   without an icon (an icon is just optional inline content — no separate CSS
+   case for that). ALL THREE share the exact same motion (see the hover block
+   below) so hierarchy comes from COLOR/WEIGHT alone, never from how it moves.
+     Primary   — solid dark fill, no border   → the ONE main action on a screen
+     Secondary — solid white fill, plain border → a supporting/alternate action
+     Tertiary  — no fill, no border → the least-emphasized action (e.g. ย้อนกลับ)
+   .btn-outline and .btn-plain are RETIRED — folded into .btn-secondary and
+   .btn-tertiary respectively, so there's exactly one class per tier, not two
+   overlapping ones. The old spectrum-animated border (previously baked
+   straight into .btn-secondary) is now a separate opt-in ACCENT, not part of
+   the tier definition — stack the existing `.spec-bd` utility on top of any
+   tier's button when one specific CTA needs to visually shout.
+   ============================================================================ */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 24px;border-radius:var(--rpill);font-family:var(--font);font-weight:var(--w-head);font-size:var(--fs-sub);cursor:pointer;white-space:nowrap;border:1.5px solid transparent;line-height:1;transition:box-shadow .18s var(--ease),filter .18s var(--ease),transform .18s var(--ease),background-color .18s var(--ease),border-color .18s var(--ease),color .18s var(--ease);}
 .btn svg{width:16px;height:16px;transition:transform .2s cubic-bezier(.4,0,.2,1);}
-.btn-primary{flex:1;min-height:48px;padding:0 24px;border-radius:var(--rpill);background:var(--ink);color:var(--cloud);border-color:var(--ink);font-size:var(--fs-sub);box-shadow:var(--shadow-primary);}
-.btn-secondary{min-height:44px;padding:0 22px;border-radius:var(--rpill);background:linear-gradient(var(--white),var(--white)) padding-box,var(--spectrum-conic) border-box;color:var(--ink);font-size:var(--fs-label);box-shadow:var(--shadow-action);animation:specSpin 4s linear infinite;}
 .btn:disabled{opacity:.38;cursor:not-allowed;box-shadow:none;filter:none;}
-.btn-plain{background:none;border:none;box-shadow:none;color:var(--muted);font-family:var(--font);font-size:var(--fs-label);font-weight:var(--w-head);display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:0 4px;min-height:48px;flex-shrink:0;transition:color .18s var(--ease);}
-.btn-plain svg{width:15px;height:15px;transition:transform .2s cubic-bezier(.4,0,.2,1);}
+.btn-primary{flex:1;background:var(--ink);color:var(--cloud);border-color:var(--ink);box-shadow:var(--shadow-primary);}
+.btn-secondary{background:var(--white);color:var(--ink);border-color:var(--line-strong);box-shadow:var(--shadow-action);}
+.btn-tertiary{background:none;color:var(--muted);border-color:transparent;box-shadow:none;padding:0 16px;}
 /* ── button hover system ── adapted from a jakobhoeg/21st.dev "expandIcon" button reference (icon
    nudges in its direction of travel on hover, fill darkens slightly). Icons stay visible always —
    unlike the reference's hide-until-hover reveal, hiding by default would mean touch users (this
    app's primary audience) never see the icon at all, since touch has no hover to reveal it; hover
    here only ADDS a nudge on top of the icon that's already there. Scoped to hover:hover+pointer:fine
-   so tapping on touch can never leave a "stuck" hover state (a common mobile web bug). */
+   so tapping on touch can never leave a "stuck" hover state (a common mobile web bug).
+   ONE shared motion for all 3 tiers — lift + a per-tier emphasis cue. Icon direction is tagged on
+   the icon ITSELF (.ic-fwd/.ic-back, via ic()'s 2nd arg), not on the button tier — so an arrow means
+   the same thing whether it's sitting on a primary, secondary, or tertiary button. */
 @media (hover:hover) and (pointer:fine){
-  .btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px);}
-  .btn-primary:hover svg{transform:translateX(3px);}
-  .btn-secondary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(17,19,24,0.14);}
-  .btn-secondary:hover svg{transform:translateX(2px);}
-  .btn-outline:hover{background:var(--accent);border-color:var(--line-strong);}
-  .btn-plain:hover{color:var(--ink);}
-  .btn-plain:hover svg{transform:translateX(-3px);}
+  .btn:hover{transform:translateY(-1px);}
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-secondary:hover{border-color:var(--line);box-shadow:0 6px 18px rgba(17,19,24,0.14);}
+  .btn-tertiary:hover{color:var(--ink);}
+  .btn:hover svg{transform:scale(1.1);}
+  .btn:hover svg.ic-fwd{transform:translateX(3px);}
+  .btn:hover svg.ic-back{transform:translateX(-3px);}
   .q-opt:hover{border-color:var(--line-strong);transform:translateY(-1px);}
   .int-opt:hover{border-color:var(--line-strong);transform:translateY(-1px);}
   .tab-item:hover{color:var(--ink);}
   .dd-tab:hover{border-color:var(--line-strong);color:var(--ink);}
-  .pcv-btn:hover{border-color:var(--line-strong);}
+  .pcv-btn:hover{border-color:var(--line-strong);transform:translateY(-1px);}
   .pcv-btn:hover svg{transform:scale(1.1);}
 }
+.btn:active,.pcv-btn:active{transform:scale(.97);}
 
 /* CONSENT — Steady-Hand pattern: kicker · two-tone headline · body · round cards · CTA · caption */
 .consent{flex:1;padding:60px var(--sp-edge) 32px;display:flex;flex-direction:column;align-items:center;text-align:center;}
@@ -312,7 +330,6 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .efin-t{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);}
 .efin-d{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.55;margin-bottom:14px;}
 .efin-acts{display:flex;flex-direction:column;gap:8px;}
-.btn-outline{min-height:44px;padding:0 20px;border-radius:var(--rpill);background:var(--white);border:1.5px solid var(--line-strong);color:var(--ink);font-size:var(--fs-label);}
 
 /* PDF download bar */
 .pdf-bar{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--r2);background:var(--ink);color:var(--cloud);margin-bottom:18px;}
@@ -539,9 +556,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pcv-wrap.touched .pcv-hint{opacity:0;}
 .pcv-ctas{display:flex;gap:9px;margin-top:16px;}
 .pcv-btn{flex:1;min-height:44px;padding:0 16px;border-radius:var(--rpill);border:1.5px solid var(--line);background:var(--white);color:var(--ink);font-family:var(--font);font-size:var(--fs-label);font-weight:var(--w-head);display:inline-flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;transition:border-color .18s,transform .12s var(--ease);}
-.pcv-btn svg{transition:transform .2s cubic-bezier(.4,0,.2,1);}
-.pcv-btn:active{transform:scale(.97);}
-.pcv-btn svg{width:15px;height:15px;}
+.pcv-btn svg{transition:transform .2s cubic-bezier(.4,0,.2,1);width:15px;height:15px;}
 .pcv-btn.on{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,var(--spectrum) border-box;}
 .hero-cardwrap{max-width:236px;margin:8px auto 18px;}
 .hero-sig-c{font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--muted);line-height:1.55;text-align:center;max-width:32ch;margin:0 auto 20px;}
@@ -618,9 +633,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .sw.on{background:var(--focus);}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .18s var(--ease);box-shadow:0 1px 3px rgba(0,0,0,0.25);}
 .sw.on::after{transform:translateX(18px);}
-.demo-reset{width:100%;margin-top:16px;min-height:46px;border:1px solid var(--line);border-radius:var(--rpill);background:var(--white);font-family:var(--font);font-size:14px;font-weight:400;color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:border-color .18s;}
-.demo-reset:hover{border-color:var(--line-strong);}
-.demo-reset svg{width:16px;height:16px;}
+/* .demo-reset now composes with .btn.btn-secondary (call site) for its fill/border/motion — this
+   rule only supplies the dev-panel-specific layout (full-width, spaced from the row above it). */
+.demo-reset{width:100%;margin-top:16px;}
 .demo-stub{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.4;}
 
 .fade{animation:fade .32s var(--ease);}
@@ -968,7 +983,7 @@ function renderSplash(){
       '<p class="sp-sub">โลกการลงทุนใบใหม่ เริ่มจากรู้จักตัวเอง — พบตัวตนนักลงทุน 1 ใน 12 แบบที่เป็นคุณ</p></div>'+
     '<div class="sp-stage"><div class="fan-stage" id="fanStage">'+slides+'</div></div>'+
     '<div class="sp-preview-note">พรีวิวการ์ดตัวตนนักลงทุน '+ic('lc-sparkles')+' 12 แบบ</div>'+
-    '<div class="sp-cta"><button class="btn btn-primary" id="spStart">ค้นหาตัวตนของคุณ '+ic('lc-arrow-right')+'</button></div>'+
+    '<div class="sp-cta"><button class="btn btn-primary" id="spStart">ค้นหาตัวตนของคุณ '+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
     '<div class="sp-cap">เริ่มทำแบบทดสอบถือว่ายอมรับ<b> การเก็บข้อมูลเพื่อพัฒนาระบบ (PDPA)</b> ✦ ไม่เปิดเผยรายบุคคล</div>'+
   '</div>';
   paintFan();
@@ -1051,7 +1066,7 @@ function renderConsent(){
       '<div class="round-card"><div class="rc-top"><span class="rc-dot" style="background:var(--pink)"></span><span class="rc-kicker">ส่วนที่ 3</span></div><div class="rc-title">ยืนยันตัวตน</div><div class="rc-meta">1 ข้อ · ~30 วิ</div></div>'+
     '</div>'+
     '<div class="consent-check-row"><label class="consent-check'+(st.consent?' on':'')+'" id="cc"><span class="cc-box">'+ic('lc-check')+'</span><span class="cc-text">ฉันยินยอมให้เก็บคำตอบและพฤติกรรมการเล่นของฉันไว้ <b>เพื่อทดสอบและปรับปรุงระบบ</b> (PDPA) — ไม่เปิดเผยรายบุคคลต่อสาธารณะ ขอลบข้อมูลได้ทุกเมื่อ · ข้อมูลถูกเก็บบนเซิร์ฟเวอร์ต่างประเทศ (สิงคโปร์) เพื่อการทดสอบภายในเท่านั้น</span></label></div>'+
-    '<div class="consent-btn"><button class="btn btn-primary" id="startBtn"'+(st.consent?'':' disabled')+'>เริ่มทำแบบทดสอบ '+ic('lc-arrow-right')+'</button></div>'+
+    '<div class="consent-btn"><button class="btn btn-primary" id="startBtn"'+(st.consent?'':' disabled')+'>เริ่มทำแบบทดสอบ '+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
     '<div class="consent-caption">ตอบตามใจจริง ไม่มีคำตอบผิด · <b>ใช้เวลาไม่ถึง 4 นาที</b></div>'+
   '</div>';
   root.querySelector('#cc').onclick=function(){st.consent=!st.consent;renderConsent();};
@@ -1081,7 +1096,7 @@ function renderQuiz(){
     q.opts.forEach(function(o,oi){opts+='<button class="q-opt'+(sel===oi?' sel':'')+'" data-i="'+oi+'"><span class="opt-key">'+o.k+'</span><span class="opt-text">'+o.t+'</span></button>';});
     opts+='</div>';
   }
-  var nextLabel=isInterests?('วิเคราะห์ตัวตน '+ic('lc-arrow-right')):('ถัดไป '+ic('lc-arrow-right'));
+  var nextLabel=isInterests?('วิเคราะห์ตัวตน '+ic('lc-arrow-right','ic-fwd')):('ถัดไป '+ic('lc-arrow-right','ic-fwd'));
   var dotColor=sec===1?'var(--yellow)':(sec===2?'var(--violet)':'var(--pink)');
   /* section title/count moved entirely into the topbar (was a whole eyebrow+title+purpose block
      inside the body) — the body now goes straight to icon → question → answers → CTA, all more
@@ -1103,7 +1118,7 @@ function renderQuiz(){
     '<div class="q-head"><div class="q-icon-bare">'+ic(q.icon)+'</div>'+
       '<div class="q-title">'+q.q+'</div>'+(q.cat?('<div class="q-sub">'+q.cat.replace(/·/g,'✦')+'</div>'):'')+'</div>'+
     opts+
-    '<div class="q-nav"><button class="btn-plain" id="backBtn">'+ic('lc-arrow-left')+'ย้อนกลับ</button>'+
+    '<div class="q-nav"><button class="btn btn-tertiary" id="backBtn">'+ic('lc-arrow-left','ic-back')+'ย้อนกลับ</button>'+
       '<button class="btn btn-primary" id="nextBtn"'+(nextDisabled?' disabled':'')+'>'+nextLabel+'</button></div>'+
   '</div>';
   var nextBtn=root.querySelector('#nextBtn');
@@ -1249,7 +1264,7 @@ function renderBook(){
     '</div></div></section>'+
     '<div class="efin-banner"><div class="efin-hd"><div class="efin-ic">'+ic('lc-sparkles')+'</div><div class="efin-t">ให้ efin AI ช่วยแนะนำแบบคุณ</div></div>'+
       '<div class="efin-d">คัดลอกคำถามที่ปรับตามตัวตน '+h.th+' ของคุณไปคุยกับ efin AI ต่อได้ทันที</div>'+
-      '<div class="efin-acts"><button class="btn btn-primary">'+ic('lc-message-circle')+'คัดลอกคำถามไปถาม efin AI</button><button class="btn btn-outline">เปิดหน้า efin AI</button></div></div>'+
+      '<div class="efin-acts"><button class="btn btn-primary">'+ic('lc-message-circle')+'คัดลอกคำถามไปถาม efin AI</button><button class="btn btn-secondary">เปิดหน้า efin AI</button></div></div>'+
     '<div class="pdf-bar"><div class="pdf-ic">'+ic('lc-download')+'</div><div class="pdf-tx"><div class="pdf-t">ดาวน์โหลด Playbook PDF</div><div class="pdf-s">สิทธิ์ Ultimate ✦ ตัวตน '+h.th+'</div></div><button class="pdf-btn">'+ic('lc-download')+'ดาวน์โหลด</button></div>'+
     '<section class="card mb"><div class="s-pad" style="padding-bottom:0">'+
       '<div class="s-ey">'+ic('lc-sparkles')+'AI Insight</div><h2 class="s-h">คุณเป็นนักลงทุนแบบไหน</h2>'+
@@ -1282,7 +1297,7 @@ function renderBook(){
     '<section class="card mb"><div class="s-pad"><div class="s-ey" style="display:flex;justify-content:space-between"><span style="display:inline-flex;align-items:center;gap:6px">'+ic('lc-message-circle')+'สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:14px">เจาะราย·สินทรัพย์</h2>'+ddTabs(h)+'</div></section>'+
     '<section class="card"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">'+ic('lc-route')+'เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2><p class="s-sub">Master Class ขึ้นไป — เส้นทางจากตัวตนที่วัดได้จริง</p></div>'+
       '<div class="route-steps">'+routeStep('done','','ทำ DNA Quiz','ตอบครบ 10 ข้อ เสร็จแล้ว — ได้ตัวตน '+h.th)+routeStep('act','2','ทำครบ 6 ด้าน','เสร็จแล้ว 2 จาก 6 — เหลืออีก 4 ด้านในบูธ')+routeStep('fut','3','รับ Playbook ส่วนตัวสมบูรณ์','เมื่อครบ 6 ด้าน รับกลยุทธ์เฉพาะตัวตน + Confidence เต็ม')+routeStep('fut','4','ติดตามบน efin.finance','Playbook sync ขึ้นแอปหลังงาน พร้อม AI ติดตามพอร์ต')+'</div>'+
-      '<div class="route-cta-w"><button class="btn btn-primary">'+ic('lc-play-circle')+'ไปเล่นกิจกรรมต่อ'+ic('lc-arrow-right')+'</button></div>'+
+      '<div class="route-cta-w"><button class="btn btn-primary">'+ic('lc-play-circle')+'ไปเล่นกิจกรรมต่อ'+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
     '</section>'+
     '<section class="card mb-lg"><div class="s-pad"><div class="klib-row" id="klibRow"><div class="klib-ic">'+ic('lc-library')+'</div><div class="klib-tx"><div class="klib-t">คลังความรู้</div><div class="klib-s">41 บทความที่คัดมาสำหรับ '+h.th+' ✦ จัดเป็น 6 หมวด</div></div>'+ic('lc-chevron-right','klib-cv')+'</div>'+
       '<div class="klib-list">'+
@@ -1345,7 +1360,7 @@ function sidesHTML(r){
   var sides=[
    {num:ic('lc-check'),chip:'เสร็จ',cc:'done',t:'ความเสี่ยงที่วัดได้จริง',s:'จาก: แบบทดสอบความเสี่ยง',show:true,body:'<p>Gap ระหว่างความเสี่ยงที่บอก ('+r.declared+') กับที่พฤติกรรมสะท้อน ('+r.revealed+') อยู่ที่ '+gapTxt+' คะแนน '+(Math.abs(r.gap)<=1.5?'— คุณ self-aware ระดับสูง':'— รู้ตัวเลขนี้ช่วยวางแผนได้แม่นขึ้น')+'</p><div class="side-loc">'+ic('lc-map-pin')+'บูธ 1 — โซนสินทุน</div>'},
    {num:ic('lc-check'),chip:'เสร็จ',cc:'done',t:'สิ่งที่คุณถูกกระตุ้นตัดสินใจ',s:'จาก: ข้อมูลการลงทุนของตน',body:'<p>ลำดับตัวกระตุ้นที่แท้จริง: ① ข่าวบริษัท ② อารมณ์ตลาด ③ คำแนะนำผู้เชี่ยวชาญ</p><div class="side-loc">'+ic('lc-map-pin')+'บูธ 2 — โซนคริปโต</div>'},
-   {num:'3',chip:'รอทำ',cc:'act',t:'ทัศนคติต่อความกลัวและ FOMO',s:'จาก: จิตวิทยาการลงทุน',body:'<p>วัดว่าคุณตอบสนองต่อแรงดึงดูดราคาขึ้นอย่างไร — ยังไม่ได้เล่น เมื่อทำแล้วผลจะปรากฏที่นี่</p><div class="side-loc" style="margin-bottom:12px">'+ic('lc-map-pin')+'บูธ 3 — โซนทอง</div><button class="btn btn-secondary side-cta">'+ic('lc-play-circle')+'ไปเล่นกิจกรรม'+ic('lc-arrow-right')+'</button>'},
+   {num:'3',chip:'รอทำ',cc:'act',t:'ทัศนคติต่อความกลัวและ FOMO',s:'จาก: จิตวิทยาการลงทุน',body:'<p>วัดว่าคุณตอบสนองต่อแรงดึงดูดราคาขึ้นอย่างไร — ยังไม่ได้เล่น เมื่อทำแล้วผลจะปรากฏที่นี่</p><div class="side-loc" style="margin-bottom:12px">'+ic('lc-map-pin')+'บูธ 3 — โซนทอง</div><button class="btn btn-secondary side-cta">'+ic('lc-play-circle')+'ไปเล่นกิจกรรม'+ic('lc-arrow-right','ic-fwd')+'</button>'},
    {num:ic('lc-lock'),chip:'ล็อก',cc:'lck',t:'การจัดสรรพอร์ตที่แท้จริง',s:'จาก: พฤติกรรมการจัดสรร',body:'<p>สัดส่วนสินทรัพย์จริงในพอร์ต — รอเล่นกิจกรรมบูธ 4 ก่อน</p><div class="side-lh">'+ic('lc-info')+'เล่นกิจกรรมบูธ 4 (โซนสินทรัพย์ทางเลือก) เพื่อปลดล็อก</div>'},
    {num:ic('lc-lock'),chip:'ล็อก',cc:'lck',t:'สุขภาพแรก',s:'จาก: จุดรับรางวัล efin',body:'<div class="side-lh">'+ic('lc-info')+'เช็คอินบูธ efin.finance เพื่อปลดล็อก + รับของรางวัล</div>'},
    {num:ic('lc-lock'),chip:'ล็อก',cc:'lck',t:'สุขภาพกับการเงิน',s:'จาก: บูธ 5 โซนสุขภาพ',body:'<p>สุขภาพในฐานะสินทรัพย์ทางการเงิน — ป้องกันพอร์ตจากค่าใช้จ่ายที่ไม่คาดคิด</p><div class="side-lh">'+ic('lc-lock')+'ทำด้านที่ 5 ก่อน</div>'}
@@ -1392,7 +1407,7 @@ function buildDemo(){
     '<div class="demo-lbl">ผลเกมย้อนเวลาพอร์ต → สิ่งที่ทำจริง</div><select class="demo-sel" id="demoCrisis"><option>ตอนวิกฤต "คงเส้น" (ถือ)</option><option>ตอนวิกฤต "ขายหนี" (ตัดขาย)</option><option>ตอนวิกฤต "ช้อนซื้อ" (เก็บเพิ่ม)</option></select>'+
     '<div class="demo-lbl">วิกฤตรอบที่ 2 (สวนขั้วกัน = ยังไม่นิ่ง)</div><select class="demo-sel" id="demoCrisis2"><option>เหมือนรอบแรก</option><option>สวนทางรอบแรก</option></select>'+
     '<div class="demo-stub">* เกมในงานยังไม่ออกแบบ — 2 ช่องนี้เป็น stub</div>'+
-    '<button class="demo-reset" id="demoReset">'+ic('lc-refresh-cw')+'รีเซ็ตเกมหลักที่เล่น</button>'+
+    '<button class="btn btn-secondary demo-reset" id="demoReset">'+ic('lc-refresh-cw')+'รีเซ็ตเกมหลักที่เล่น</button>'+
   '</div>';
   document.body.appendChild(wrap);
   var panel=document.getElementById('demoPanel');
