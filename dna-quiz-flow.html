@@ -456,7 +456,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .q-scroll{position:relative;z-index:1;}
 
 /* ══ COLLECTIBLE PERSONA CARD ══ full-bleed dark art · overlays · flip back */
-.pc3d{perspective:1300px;width:100%;}
+.pc3d{perspective:900px;width:100%;}
 .pc-tilt{position:relative;width:100%;aspect-ratio:5/7;transform-style:preserve-3d;transition:transform .5s var(--ease);will-change:transform;}
 .pc-flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .7s var(--ease);}
 .pc3d.flipped .pc-flip{transform:rotateY(180deg);}
@@ -844,9 +844,11 @@ function bindViewer(){
   var wrap=document.getElementById('pcvWrap');if(!wrap)return;
   var tilt=document.getElementById('pcvTilt'),pc3d=document.getElementById('pcv');
   var glyph=wrap.querySelector('.pc-face.front .pcE-glyph'),halo=wrap.querySelector('.pc-face.front .pcE-halo');
-  var TILT=15,HOVER_SCALE=1.04;
+  var TILT=16,HOVER_SCALE=1.05;
   var dragT=false,px=0,py=0,startX=0,startY=0,moved=false,rx=0,ry=0,lastTapAt=0;
-  function apply(rx,ry,scale){tilt.style.transform='rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) scale3d('+scale+','+scale+','+scale+')';if(glyph)glyph.style.transform='translate('+(ry*0.55).toFixed(1)+'px,'+(-rx*0.5).toFixed(1)+'px)';if(halo)halo.style.transform='translate('+(ry*-0.28).toFixed(1)+'px,'+(rx*0.28).toFixed(1)+'px)';}
+  // glyph parallaxes WITH the tilt (foreground, lifts toward the cursor) while the halo drifts the
+  // opposite way (background) — the split creates a real sense of layered depth on the flat face.
+  function apply(rx,ry,scale){tilt.style.transform='rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) scale3d('+scale+','+scale+','+scale+')';if(glyph)glyph.style.transform='translate('+(ry*0.95).toFixed(1)+'px,'+(-rx*0.9).toFixed(1)+'px) scale('+(1+Math.min(Math.abs(rx)+Math.abs(ry),32)*0.0016).toFixed(3)+')';if(halo)halo.style.transform='translate('+(ry*-0.5).toFixed(1)+'px,'+(rx*0.5).toFixed(1)+'px)';}
   function resetTilt(){tilt.style.transition='transform .4s var(--ease)';apply(0,0,1);}
   function syncFlipBtn(){var on=pc3d.classList.contains('flipped'),btn=document.getElementById('pcvFlip');btn.classList.toggle('on',on);btn.querySelector('span').textContent=on?'ดูด้านหน้า':'พลิกดูนิยาม';}
   function tapFlip(clientX){var rect=pc3d.getBoundingClientRect();var wantBack=(clientX-rect.left)>=rect.width/2;var isBack=pc3d.classList.contains('flipped');if(wantBack!==isBack){wrap.classList.add('touched');pc3d.classList.toggle('flipped');syncFlipBtn();}}
@@ -861,7 +863,7 @@ function bindViewer(){
     var rect=pc3d.getBoundingClientRect();
     var tx=((e.clientY-rect.top)/rect.height-0.5)*(TILT*2)*-1;
     var ty=((e.clientX-rect.left)/rect.width-0.5)*(TILT*2);
-    tilt.style.transition='transform .12s linear';
+    tilt.style.transition='transform .18s ease-out';
     apply(tx,ty,HOVER_SCALE);
   });
   pc3d.addEventListener('mouseleave',resetTilt);
