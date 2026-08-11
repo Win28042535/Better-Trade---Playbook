@@ -9,7 +9,10 @@
   --ink:#111318; --ink-soft:#20242a; --muted:#687078;
   --paper:#f7f8f7; --cloud:#eef1f6; --white:#ffffff; --graphite:#30343a;
   --accent:rgba(17,19,24,0.06);
-  --line:rgba(17,19,24,0.18); --line-soft:rgba(17,19,24,0.16); --line-strong:rgba(17,19,24,0.34); --line-header:rgba(17,19,24,0.12);
+  /* System border intensity halved (2026-08-11, per direction "สีอ่อน 50%") — every card/chip/input/
+     divider border in the app inherits from these 4 tokens, so lightening them here softens boundary
+     lines app-wide in one place rather than per-component. */
+  --line:rgba(17,19,24,0.09); --line-soft:rgba(17,19,24,0.08); --line-strong:rgba(17,19,24,0.17); --line-header:rgba(17,19,24,0.06);
   --focus:#2b6cff; --popover:rgba(255,255,255,0.96);
   --cyan:#61e8ed; --violet:#9c91ff; --pink:#f178d8; --yellow:#f2ea83;
   --spectrum:linear-gradient(90deg,#61e8ed,#9c91ff,#f178d8,#f2ea83,#61e8ed);
@@ -227,7 +230,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 
 .card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);overflow:hidden;position:relative;}
 /* system frame — thin-line + corner-bracket ornament (echoes the character-card frame) */
-.card::after{content:"";position:absolute;inset:6px;pointer-events:none;z-index:4;--b:rgba(17,19,24,0.32);--L:12px;--t:1px;background:linear-gradient(var(--b),var(--b)) top left/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) top left/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) top right/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) top right/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) bottom left/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) bottom left/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) bottom right/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) bottom right/var(--t) var(--L) no-repeat;}
+.card::after{content:"";position:absolute;inset:6px;pointer-events:none;z-index:4;--b:rgba(17,19,24,0.16);--L:12px;--t:1px;background:linear-gradient(var(--b),var(--b)) top left/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) top left/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) top right/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) top right/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) bottom left/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) bottom left/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) bottom right/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) bottom right/var(--t) var(--L) no-repeat;}
 .card.mb{margin-bottom:18px;}
 .card.mb-lg{margin-bottom:44px;}
 .s-pad{padding:22px 20px;}
