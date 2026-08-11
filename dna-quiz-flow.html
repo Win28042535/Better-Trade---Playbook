@@ -496,76 +496,85 @@ var FAM={
    strengths:['กล้าได้กล้าเสีย มองหาการเติบโตสูง','จับเทรนด์ใหม่ได้ก่อนตลาด'],
    watchouts:['พอร์ตเหวี่ยงแรง ต้องทนความผันผวนให้ไหว','กระจุกตัวสูง ควรมีแผนจำกัดขาดทุน']}
 };
-/* 12 personas — content ported verbatim from "Playbook Final.html" (Better Trade 2026
-   event-companion app build, Aug 2026): en/th/sig(=its "essence")/legend/legendWhy/assets/
-   radar/skills come from that source. Key slugs, fam letter, accent/rgb and card visuals are
-   kept from this quiz app so app plumbing (S2 vote targets, PICON glyphs, demo persona
-   picker) needs no changes. Mapping (old slug → new persona, matched by family + legend):
-   guardian→Safe Harbor, harvester→Dividend Farmer, steadyhand→Steady Tide,
+/* 12 personas. en/th/sig are the OFFICIAL name + definition from
+   "ชิ่อ+นิยาม_Investment_Personality_Character_BetterTrade_Concise_v2.pdf"
+   (its "ชื่อใหม่"/"คำอธิบายบุคลิกการลงทุน (ใหม่)" columns — the authoritative source,
+   verified verbatim 2026-08-11). Do NOT use that PDF's "ชื่อเก่า" column (e.g. "The Safe
+   Harbor", "The Dividend Farmer" …) — those are superseded names that "Playbook Final.html"
+   (a separate, newer event-companion app) still uses; a prior pass here briefly and
+   mistakenly copied those old names in from that file — reverted.
+   legend/legendWhy/assets/radar/skills are ported from "Playbook Final.html" (Better Trade
+   2026 event-companion app build, Aug 2026) — the PDF doesn't cover those fields, so no
+   conflict; kept per user instruction to adopt that source's data. Key slugs, fam letter,
+   accent/rgb and card visuals stay as this quiz app's own IDs (S2 vote targets, PICON
+   glyphs, demo persona picker all key off these slugs, unaffected either way). Mapping used
+   for legend/assets/radar/skills (old slug → Playbook Final persona, matched by family +
+   legend): guardian→Safe Harbor, harvester→Dividend Farmer, steadyhand→Steady Tide,
    diamondhand→Dragon Hoarder, analyst→Eagle Eye, planner→Chess Master,
    explorer→Global Nomad, sage→Philosopher King, maverick→Rocket Rider,
    waverider→Trend Surfer, contrarian→Contrarian, collector→Legacy Builder.
-   riskLevel = source's skills[0] ("ใจกล้า"/boldness), clamped ≥1. radar[6] axis order is now
-   [หุ้นไทย, ต่างประเทศ, กองทุน, คริปโต, ทอง, สุขภาพ] (see RADAR_AXES) — replaces the old
-   [หุ้น, ต่างปท., กองทุน, ตราสาร, ทอง, อสังหา] order. strengths/watchouts moved to FAM (below). */
+   riskLevel = that source's skills[0] ("ใจกล้า"/boldness), clamped ≥1. radar[6] axis order
+   is [หุ้นไทย, ต่างประเทศ, กองทุน, คริปโต, ทอง, สุขภาพ] (see RADAR_AXES) — replaces the old
+   [หุ้น, ต่างปท., กองทุน, ตราสาร, ทอง, อสังหา] order. strengths/watchouts moved to FAM (below,
+   also from Playbook Final — the official PDF doesn't define per-persona strengths/watchouts). */
 var HEROES={
- guardian:{fam:'G',en:'The Safe Harbor',th:'ท่าเรือปลอดภัย',
-   sig:'คุณให้ความมั่นคงมาก่อน นอนหลับสบายสำคัญกว่ากำไรหวือหวา',
+ guardian:{fam:'G',en:'The Guardian',th:'นักลงทุนสายรักษาทุน',
+   sig:'ให้ความสำคัญกับความมั่นคง ชอบเตรียมพร้อม และหลีกเลี่ยงความเสี่ยงที่ไม่จำเป็น',
    assets:[{icon:'lc-file-text',t:'ตราสารหนี้'},{icon:'lc-file-text',t:'เงินฝาก'},{icon:'lc-coins',t:'ทองคำ'},{icon:'lc-pie-chart',t:'กองทุนรวม'}],
    legend:'Ray Dalio',legendWhy:'สมดุลทุกสภาวะ พอร์ตทนทานทุกพายุ',
    skills:[1,9,6],riskLevel:1,radar:[40,20,70,10,80,55]},
- harvester:{fam:'G',en:'The Dividend Farmer',th:'ชาวนาปันผล',
-   sig:'คุณชอบสินทรัพย์ที่จ่ายผลตอบแทนกลับมาเรื่อยๆ',
+ harvester:{fam:'G',en:'The Harvester',th:'นักลงทุนสายเก็บเกี่ยว',
+   sig:'ชอบสร้างสิ่งที่ค่อยๆ เติบโต และให้ผลตอบแทนสม่ำเสมอในระยะยาว',
    assets:[{icon:'lc-trending-up',t:'ปันผล'},{icon:'lc-building-2',t:'อสังหา/REIT'},{icon:'lc-landmark',t:'หุ้นไทย'}],
    legend:'Benjamin Graham',legendWhy:'ลงทุนในคุณค่า เก็บกระแสเงินสดสม่ำเสมอ',
    skills:[3,9,6],riskLevel:3,radar:[75,15,55,10,45,50]},
- steadyhand:{fam:'G',en:'The Steady Tide',th:'กระแสน้ำสม่ำเสมอ',
-   sig:'คุณเชื่อในความสม่ำเสมอ ลงทุนทีละนิดอย่างมีวินัย',
+ steadyhand:{fam:'G',en:'The Steady Hand',th:'นักลงทุนสายสม่ำเสมอ',
+   sig:'เชื่อในวินัยและความสม่ำเสมอ มากกว่าการเร่งผลลัพธ์ในระยะสั้น',
    assets:[{icon:'lc-pie-chart',t:'กองทุนรวม'},{icon:'lc-landmark',t:'หุ้นไทย'},{icon:'lc-file-text',t:'ตราสารหนี้'}],
    legend:'John Bogle',legendWhy:'DCA ต้นทุนต่ำ ลงเรื่อยๆ อยู่ยาว',
    skills:[3,10,8],riskLevel:3,radar:[55,30,85,15,40,55]},
- diamondhand:{fam:'G',en:'The Dragon Hoarder',th:'มังกรสะสมทรัพย์',
-   sig:'คุณสะสมของดีแล้วถือยาว ไม่หวั่นไหวกับความผันผวนระยะสั้น',
+ diamondhand:{fam:'G',en:'The Diamond Hand',th:'นักลงทุนสายถือยาว',
+   sig:'เมื่อเชื่อมั่นแล้ว จะอดทนและให้เวลา ไม่หวั่นไหวง่ายกับความผันผวนระยะสั้น',
    assets:[{icon:'lc-landmark',t:'หุ้นไทย'},{icon:'lc-pie-chart',t:'กองทุนรวม'},{icon:'lc-coins',t:'ทองคำ'}],
    legend:'Warren Buffett',legendWhy:'ถือของดีไว้นานที่สุด ปล่อยให้ดอกเบี้ยทบต้นทำงาน',
    skills:[3,10,7],riskLevel:3,radar:[80,25,40,10,50,45]},
- analyst:{fam:'N',en:'The Eagle Eye',th:'นกอินทรีย์จับสัญญาณ',
-   sig:'คุณเจาะข้อมูลจนเข้าใจทะลุ ค่อยลงมือ',
+ analyst:{fam:'N',en:'The Analyst',th:'นักลงทุนสายหาข้อมูล',
+   sig:'ต้องเข้าใจข้อมูลและเหตุผลก่อนตัดสินใจ ไม่เชื่อตามคนอื่นง่ายๆ',
    assets:[{icon:'lc-landmark',t:'หุ้นไทย'},{icon:'lc-pie-chart',t:'กองทุนรวม'},{icon:'lc-globe',t:'หุ้นต่างประเทศ'}],
    legend:'Peter Lynch',legendWhy:'มองหาโอกาสจากธุรกิจที่เข้าใจลึก',
    skills:[5,8,5],riskLevel:5,radar:[85,45,50,20,35,45]},
- planner:{fam:'N',en:'The Chess Master',th:'ปรมาจารย์หมากรุก',
-   sig:'คุณวางระบบทั้งพอร์ต เผื่อไว้ทุกสถานการณ์',
+ planner:{fam:'N',en:'The Planner',th:'นักลงทุนสายวางแผน',
+   sig:'มองภาพรวม วางแผนล่วงหน้า และเตรียมทางเลือกไว้หลายสถานการณ์',
    assets:[{icon:'lc-pie-chart',t:'กองทุนรวม'},{icon:'lc-globe',t:'หุ้นต่างประเทศ'},{icon:'lc-file-text',t:'ตราสารหนี้'},{icon:'lc-coins',t:'ทองคำ'}],
    legend:'David Swensen',legendWhy:'asset allocation ระดับกองทุนมหาวิทยาลัย',
    skills:[5,9,10],riskLevel:5,radar:[60,70,80,30,55,60]},
- explorer:{fam:'N',en:'The Global Nomad',th:'นักเดินทางไร้พรมแดน',
-   sig:'คุณกระจายการลงทุนไปทั่วโลก ที่นี่ร่วงที่อื่นอาจรุ่ง',
+ explorer:{fam:'N',en:'The Explorer',th:'นักลงทุนสายสำรวจ',
+   sig:'เปิดรับสิ่งใหม่ ไม่ยึดติดกับความคุ้นเคย และชอบมองหาโอกาสใหม่ๆ',
    assets:[{icon:'lc-globe',t:'หุ้นต่างประเทศ'},{icon:'lc-coins',t:'ทองคำ'},{icon:'lc-bitcoin',t:'คริปโต'}],
    legend:'Jim Rogers',legendWhy:'มองหาของดีข้ามพรมแดน ไม่ยึดตลาดเดียว',
    skills:[5,7,9],riskLevel:5,radar:[40,90,55,45,60,45]},
- sage:{fam:'N',en:'The Philosopher King',th:'ราชันนักปราชญ์',
-   sig:'คุณยอมให้พอร์ตโตช้าลงบ้าง เพื่อชีวิตที่สมดุล',
+ sage:{fam:'N',en:'The Sage',th:'นักลงทุนสายสมดุลชีวิต',
+   sig:'ให้คุณค่ากับชีวิต สุขภาพ ความรู้และความสัมพันธ์ไม่แพ้เรื่องเงิน',
    assets:[{icon:'lc-pie-chart',t:'กองทุนรวม'},{icon:'lc-landmark',t:'หุ้นไทย'},{icon:'lc-coins',t:'ทองคำ'}],
    legend:'Naval Ravikant',legendWhy:'ลงทุนทั้งเงิน สุขภาพ ความรู้ และเวลา',
    skills:[4,9,5],riskLevel:4,radar:[55,55,60,35,45,90]},
- maverick:{fam:'V',en:'The Rocket Rider',th:'นักบินจรวด',
-   sig:'คุณกล้าเดิมพันกับสิ่งที่เชื่อว่าจะโตแบบก้าวกระโดด',
+ maverick:{fam:'V',en:'The Maverick',th:'นักลงทุนสายบุกเบิก',
+   sig:'ชอบโอกาสใหม่ กล้าลองก่อนคนอื่น และพร้อมรับความไม่แน่นอนเพื่อผลลัพธ์ที่มากกว่า',
    assets:[{icon:'lc-globe',t:'หุ้นต่างประเทศ'},{icon:'lc-bitcoin',t:'คริปโต'},{icon:'lc-landmark',t:'หุ้นไทย'}],
    legend:'Cathie Wood',legendWhy:'ลงทุนในนวัตกรรมที่เปลี่ยนโลก',
    skills:[9,5,3],riskLevel:9,radar:[45,75,30,80,25,35]},
- waverider:{fam:'V',en:'The Trend Surfer',th:'นักโต้คลื่นกระแส',
-   sig:'คุณอ่านจังหวะตลาดแล้วขยับไว ไม่รอจนพลาดโอกาส',
+ waverider:{fam:'V',en:'The Wave Rider',th:'นักลงทุนสายโต้คลื่น',
+   sig:'ไวต่อการเปลี่ยนแปลง จับกระแสได้ดีและพร้อมปรับทิศตามสถานการณ์',
    assets:[{icon:'lc-landmark',t:'หุ้นไทย'},{icon:'lc-bitcoin',t:'คริปโต'},{icon:'lc-globe',t:'หุ้นต่างประเทศ'}],
    legend:'Paul Tudor Jones',legendWhy:'อ่านโมเมนตัม เข้า-ออกอย่างมีวินัย',
    skills:[8,6,4],riskLevel:8,radar:[70,55,25,75,20,35]},
- contrarian:{fam:'V',en:'The Contrarian',th:'นักเดินทวนกระแส',
-   sig:'คุณมองเห็นโอกาสตอนที่คนอื่นเทขาย',
+ contrarian:{fam:'V',en:'The Contrarian',th:'นักลงทุนสายสวนกระแส',
+   sig:'ไม่ตามเสียงส่วนใหญ่ ตั้งคำถามกับกระแส และใช้เหตุผลของตัวเอง',
    assets:[{icon:'lc-landmark',t:'หุ้นไทย'},{icon:'lc-globe',t:'หุ้นต่างประเทศ'},{icon:'lc-coins',t:'ทองคำ'}],
    legend:'Howard Marks',legendWhy:'สวนตลาดในจังหวะที่คนอื่นกลัว',
    skills:[7,8,4],riskLevel:7,radar:[65,60,35,55,55,40]},
- collector:{fam:'V',en:'The Legacy Builder',th:'ผู้สร้างมรดก',
-   sig:'คุณมองไกลกว่าผลกำไรระยะสั้น ลงทุนเพื่ออนาคตที่ยั่งยืน',
+ collector:{fam:'V',en:'The Collector',th:'นักลงทุนสายสะสม',
+   sig:'สนใจเรื่องเฉพาะทาง และมองเห็นคุณค่าในสิ่งที่คนทั่วไปมองข้าม',
    assets:[{icon:'lc-globe',t:'หุ้นต่างประเทศ'},{icon:'lc-pie-chart',t:'กองทุนรวม'},{icon:'lc-landmark',t:'หุ้นไทย'}],
    legend:'Andrew Carnegie',legendWhy:'สร้างคุณค่าที่ยั่งยืน ส่งต่อโอกาสให้คนรุ่นต่อไป',
    skills:[8,10,9],riskLevel:8,radar:[60,68,66,45,52,58]}
