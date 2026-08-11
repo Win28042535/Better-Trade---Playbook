@@ -6,17 +6,33 @@ real payload ~840KB once unwrapped from the bundler's bootstrap shell — see ex
 at the bottom). This supersedes the prior "Name and Define Personality Character BetterTrade"
 PDF-sourced persona data that [`dna-quiz-flow.html`](dna-quiz-flow.html) originally shipped with.
 
-**What's already ported into `dna-quiz-flow.html` (done):** section 1–2 below (FAMILIES + HEROES,
-including radar/skills/legend/assets), applied to the "คู่มือลงทุนของคุณ" (book/result) page,
-keeping the current Design DNA (editorial CSS cards, Trirong serif, Lucide icons, spectrum
-accents) untouched — only content/copy changed, not visual system. The 12 hero **key slugs**
-(guardian/harvester/steadyhand/diamondhand/analyst/planner/explorer/sage/maverick/waverider/
-contrarian/collector) were kept as internal IDs so quiz-scoring (S2 vote targets), the demo
-persona picker, and PICON glyphs needed no code changes — only their content fields were
-refreshed. Mapping used (by family + legend-match): guardian→Safe Harbor, harvester→Dividend
-Farmer, steadyhand→Steady Tide, diamondhand→Dragon Hoarder, analyst→Eagle Eye, planner→Chess
-Master, explorer→Global Nomad, sage→Philosopher King, maverick→Rocket Rider, waverider→Trend
-Surfer, contrarian→Contrarian, collector→Legacy Builder.
+**What's already ported into `dna-quiz-flow.html` (done):** section 1–2 below (FAMILIES + HEROES
+strengths/watchouts/legend/legendWhy/assets/radar/skills), applied to the "คู่มือลงทุนของคุณ"
+(book/result) page, keeping the current Design DNA (editorial CSS cards, Trirong serif, Lucide
+icons, spectrum accents) untouched — only content/copy changed, not visual system. The 12 hero
+**key slugs** (guardian/harvester/steadyhand/diamondhand/analyst/planner/explorer/sage/maverick/
+waverider/contrarian/collector) were kept as internal IDs so quiz-scoring (S2 vote targets), the
+demo persona picker, and PICON glyphs needed no code changes. Mapping used (by family +
+legend-match): guardian→Safe Harbor, harvester→Dividend Farmer, steadyhand→Steady Tide,
+diamondhand→Dragon Hoarder, analyst→Eagle Eye, planner→Chess Master, explorer→Global Nomad,
+sage→Philosopher King, maverick→Rocket Rider, waverider→Trend Surfer, contrarian→Contrarian,
+collector→Legacy Builder.
+
+**⚠️ IMPORTANT correction (2026-08-11, verified against the official reference docs):** persona
+**en / th / sig** (name + one-line definition) must come from
+`ชิ่อ+นิยาม_Investment_Personality_Character_BetterTrade_Concise_v2.pdf`, **NOT** from
+Playbook Final.html. That PDF has 4 columns — ชื่อใหม่ (current name), คำอธิบาย...(ใหม่)
+(current definition), ชื่อเก่า (deprecated old name), คำอธิบาย...(เดิม) (old definition) — and
+Playbook Final.html's persona names turn out to be exactly that "ชื่อเก่า" column (The Safe
+Harbor, The Dividend Farmer, The Eagle Eye, etc.), not the current names. A same-day pass
+reverted en/th/sig to the PDF's ชื่อใหม่/คำอธิบาย(ใหม่) columns — The Guardian, The Harvester,
+The Steady Hand, The Diamond Hand, The Analyst, The Planner, The Explorer, The Sage, The
+Maverick, The Wave Rider, The Contrarian, The Collector — while legend/assets/radar/skills stay
+from Playbook Final (the PDF doesn't define those). **Rule: en/th/sig always from the PDF,
+other fields from Playbook Final.**
+
+Quiz questions were also verified the same day against `คำถาม DNA 10-8-2026.docx` — this app's
+S1(risk×3)/S2(DNA×7)/S3(interest-picker×1) already matched it word-for-word, no changes needed.
 
 **What's captured here but NOT yet built (reference-only, for later design passes):**
 sections 3–10 below — the source app is a full 5-tab event-companion app (Home / Passport /
