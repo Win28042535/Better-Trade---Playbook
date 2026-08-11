@@ -1040,7 +1040,9 @@ function renderConsent(){
 function getQ(i){return i<3?S1[i]:(i<10?S2[i-3]:S3_Q);}
 function getAns(i){return i<3?st.s1[i]:st.s2[i-3];}
 function setAns(i,v){if(i<3)st.s1[i]=v;else st.s2[i-3]=v;}
-function toggleInterest(oi){var pos=st.s3.indexOf(oi);if(pos>-1){st.s3.splice(pos,1);}else{if(st.s3.length>=3)return;st.s3.push(oi);}renderQuiz();}
+/* NOTE: intentionally does not re-render — the caller (renderQuiz's .int-opt handler) repaints
+   the affected buttons/count locally instead, so a tap never replays the screen's fade-in. */
+function toggleInterest(oi){var pos=st.s3.indexOf(oi);if(pos>-1){st.s3.splice(pos,1);}else{if(st.s3.length>=3)return;st.s3.push(oi);}}
 
 function renderQuiz(){
   var idx=st.idx,q=getQ(idx),isInterests=(idx===10);
@@ -1083,15 +1085,35 @@ function renderQuiz(){
     '<div class="q-nav"><button class="btn-plain" id="backBtn">'+ic('lc-arrow-left')+'ย้อนกลับ</button>'+
       '<button class="btn btn-primary" id="nextBtn"'+(nextDisabled?' disabled':'')+'>'+nextLabel+'</button></div>'+
   '</div>';
+  var nextBtn=root.querySelector('#nextBtn');
+  /* Selecting an option must NOT trigger a full renderQuiz() — that tore down and rebuilt the whole
+     screen (icon/title/options/nav) on every single tap, replaying the .fade slide-in each time,
+     which read as constant jerky flicker while answering. A tap only needs a local class/text
+     update; the full fade-transition re-render is reserved for an actual question change (next/back). */
   if(isInterests){
-    root.querySelectorAll('.int-opt').forEach(function(b){b.onclick=function(){toggleInterest(parseInt(b.dataset.i,10));};});
+    var intBtns=root.querySelectorAll('.int-opt'),intCountEl=root.querySelector('.int-count b');
+    var paintInterests=function(){
+      var n=st.s3.length;
+      intBtns.forEach(function(b){
+        var oi=parseInt(b.dataset.i,10),s=st.s3.indexOf(oi)>-1,dis=!s&&n>=3;
+        b.classList.toggle('sel',s);b.classList.toggle('disabled',dis);
+      });
+      if(intCountEl)intCountEl.textContent=n;
+      nextBtn.disabled=(n===0);
+    };
+    intBtns.forEach(function(b){b.onclick=function(){toggleInterest(parseInt(b.dataset.i,10));paintInterests();};});
   }else{
-    root.querySelectorAll('.q-opt').forEach(function(b){b.onclick=function(){setAns(idx,parseInt(b.dataset.i,10));renderQuiz();};});
+    var optBtns=root.querySelectorAll('.q-opt');
+    optBtns.forEach(function(b){b.onclick=function(){
+      setAns(idx,parseInt(b.dataset.i,10));
+      optBtns.forEach(function(x){x.classList.toggle('sel',x===b);});
+      nextBtn.disabled=false;
+    };});
   }
   var goBack=function(){if(st.idx===0){st.phase='splash';render();}else{st.idx--;render();}};
   root.querySelector('#qBack').onclick=goBack;
   root.querySelector('#backBtn').onclick=goBack;
-  root.querySelector('#nextBtn').onclick=function(){
+  nextBtn.onclick=function(){
     if(isInterests){if(st.s3.length===0)return;compute();st.phase='reveal';render();return;}
     if(getAns(idx)===null)return;
     st.idx++;render();
