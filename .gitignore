@@ -9,3 +9,7 @@ desktop.ini
 # Temp
 *.tmp
 *.log
+
+# Raw bundler export (29MB, superseded by playbook-final-extracted.html +
+# PLAYBOOK-2026-DATA-BASELINE.md — keep locally as source, don't bloat the repo)
+Playbook Final.html
