@@ -22,6 +22,24 @@
   --r1:4px; --r2:8px; --rpill:48px;
   --shadow-action:0 1px 4px rgba(17,19,24,0.10);
   --shadow-primary:0 1px 4px rgba(17,19,24,0.24);
+  /* ============================================================================
+     SPACING SYSTEM (2026-08-11) — a defined scale + a named rule per USE-CASE, so
+     "how much space here" is a lookup, not an eyeballed number. Everything below
+     is one of these 10 values; when a new spot needs space, pick the CASE it
+     matches (not a raw px), so the app stays on one rhythm as it grows.
+     Base scale: 2 · 4 · 6 · 9 · 10 · 14 · 18 · 20 · 22 · 44
+     ============================================================================ */
+  --sp-hairline:2px;    /* optical nudge only (e.g. an icon's baseline offset) — never a "real" gap between two things */
+  --sp-stack-tight:4px; /* a title/value → the ONE caption line directly under it (same idea, smaller type: q-title→q-sub, s-h→s-sub's lead-in) */
+  --sp-glue:6px;        /* an icon ↔ its own label/kicker sitting right next to it — tight enough to read as ONE glued unit, not two items */
+  --sp-list:9px;        /* gap between repeated rows in ONE list/stack (quiz options, risk/confidence bars, allocation legend, strength chips) */
+  --sp-inline:10px;       /* two distinct-but-related items sharing a row (row icon + its text, avatar + label, a stat's icon + value) */
+  --sp-stack:14px;      /* a section's own eyebrow/heading → the body content that follows it (inside one card) */
+  --sp-card-gap:18px;   /* one whole card → the next card down the page (.card.mb) */
+  --sp-card-pad:20px;   /* a card's own inner edge padding — the gutter between a card's border and its content */
+  --sp-edge:20px;       /* the SCREEN's own outer gutter before any card starts — unified across quiz/book/splash/consent (was 14–24px ad hoc per screen) */
+  --sp-block:22px;      /* one labeled sub-section to the next INSIDE the same card (identity → radar → interests → traits → allocation) */
+  --sp-chapter:44px;    /* a whole "chapter" boundary — e.g. the hero identity block to the first data card below it (.card.mb-lg) */
   --font:'FC Minimal','Noto Sans Thai','Thonburi','DB Helvethaica X',system-ui,-apple-system,'Segoe UI',sans-serif;
   --serif:'Trirong','Bodoni MT','Didot',Georgia,'Times New Roman',serif; /* Didone display serif — matches the printed character-card art. English display + numerals ONLY; Thai stays on --font (FC Minimal). Trirong embedded (OFL); Bodoni MT = local-first fallback */
   --mono:'Courier New',ui-monospace,'FC Minimal','Noto Sans Thai',monospace; /* FC Minimal covers Thai (loopless/on-brand) — Courier New has NO Thai glyphs, so Thai-in-mono must fall to FC Minimal, never the browser's looped system default */
@@ -77,7 +95,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .progline-seg i{position:absolute;top:0;left:0;bottom:0;border-radius:2px;transition:width .3s var(--ease);display:block;}
 
 /* ── QUIZ ── every quiz screen is one equal-height canvas: content flows from the top, the nav is pinned to the bottom (margin-top:auto), and a min-height keeps all screens the same size regardless of how much they contain */
-.q-scroll{flex:1;min-height:620px;padding:8px 22px 34px;display:flex;flex-direction:column;}
+.q-scroll{flex:1;min-height:620px;padding:8px var(--sp-edge) 34px;display:flex;flex-direction:column;}
 .q-head{margin:22px 0 24px;}
 /* question mark — a bare colored icon, no frame/box, purely typographic company for the headline */
 .q-icon-bare{display:flex;align-items:center;margin-bottom:14px;color:var(--qc,var(--violet));}
@@ -87,7 +105,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    → CTA read as the whole story with nothing competing above them. */
 .q-title{font-size:26px;font-weight:var(--w-head);line-height:1.26;letter-spacing:0;color:var(--ink);margin-bottom:10px;}
 .q-sub{font-size:12.5px;font-weight:var(--w-body);color:var(--muted);line-height:1.5;margin-top:4px;text-wrap:pretty;}
-.q-opts{display:flex;flex-direction:column;gap:9px;}
+.q-opts{display:flex;flex-direction:column;gap:var(--sp-list);}
 .q-opt{display:grid;grid-template-columns:34px 1fr;gap:13px;align-items:center;padding:15px 16px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
 .q-opt.sel{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,var(--spectrum) border-box;}
 .opt-key{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--fs-label);font-weight:var(--w-head);background:var(--accent);color:var(--muted);flex-shrink:0;transition:background .18s,color .18s;font-family:var(--mono);}
@@ -97,7 +115,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* SCREEN 3 — multi-select interests (≤3), same visual family as q-opt */
 .int-count{font-family:var(--font);font-size:12px;font-weight:var(--w-body);color:var(--muted);margin-bottom:12px;}
 .int-count b{color:var(--ink);}
-.int-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.int-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-list);}
 .int-opt{display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),opacity .18s,transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
 .int-opt.sel{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,var(--spectrum) border-box;}
 .int-opt.disabled{opacity:.4;cursor:not-allowed;}
@@ -140,7 +158,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 }
 
 /* CONSENT — Steady-Hand pattern: kicker · two-tone headline · body · round cards · CTA · caption */
-.consent{flex:1;padding:60px 22px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;}
+.consent{flex:1;padding:60px var(--sp-edge) 32px;display:flex;flex-direction:column;align-items:center;text-align:center;}
 /* reveal/analysis scene — the blue wash that was pulled off the quiz + identity card now lives HERE, as a soft glow rising behind the sparkle icon (this is the one "magic" beat in the flow, so the accent earns its place) */
 .reveal-scene{background:radial-gradient(125% 62% at 50% 20%,rgba(101,152,255,0.20) 0%,rgba(156,145,255,0.10) 38%,var(--paper) 72%);}
 .reveal-icon{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;}
@@ -171,7 +189,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .consent-caption b{font-weight:var(--w-label);color:var(--ink);}
 
 /* ── BOOK — scene-based: hairlines, not shadows ── */
-.scroll{flex:1;padding:12px 14px 96px;display:flex;flex-direction:column;}
+.scroll{flex:1;padding:12px var(--sp-edge) 96px;display:flex;flex-direction:column;}
 /* fixed bottom tab bar — pinned within the app frame (max-width:inherit copies .shell's own responsive max-width so it never spans wider than the app on tablet/pc); stub navigation only, no destinations exist yet besides this page */
 .book-tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:inherit;z-index:90;display:flex;justify-content:space-around;align-items:center;background:var(--popover);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line-header);padding:8px 4px calc(8px + env(safe-area-inset-bottom,0px));}
 .tab-item{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;font-family:var(--font);cursor:pointer;color:var(--muted);padding:4px 12px;}
@@ -198,7 +216,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* HERO CARD — spectrum border is the one accent this scene earns */
 .hero-sec{margin-bottom:44px;}
 .hero-gw{padding:2px;border-radius:calc(var(--r2) + 3px);background:var(--spectrum);}
-.hero-in{background:var(--white);border-radius:var(--r2);padding:22px 20px;}
+.hero-in{background:var(--white);border-radius:var(--r2);padding:var(--sp-block) var(--sp-card-pad);}
 .fam-badge{display:inline-flex;align-items:center;gap:7px;font-family:var(--font);font-size:10.5px;font-weight:400;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:18px;}
 .fam-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .hero-lay{display:flex;gap:15px;align-items:flex-start;}
@@ -211,7 +229,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .hero-en{font-size:10px;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;font-family:var(--mono);}
 .hero-th{font-size:27px;font-weight:var(--w-head);color:var(--ink);line-height:1.1;letter-spacing:0;margin-bottom:6px;}
 .hero-sig{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.6;margin-bottom:14px;}
-.str-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.str-grid{display:flex;flex-direction:column;gap:var(--sp-list);margin-bottom:var(--sp-stack);}
 .str-box{border-radius:var(--r1);padding:10px 12px;background:var(--accent);}
 .str-hd{display:flex;align-items:center;gap:6px;font-family:var(--font);font-size:10px;font-weight:400;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px;color:var(--ink);}
 .str-box.wn .str-hd{color:var(--muted);}
@@ -231,9 +249,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);overflow:hidden;position:relative;}
 /* system frame — thin-line + corner-bracket ornament (echoes the character-card frame) */
 .card::after{content:"";position:absolute;inset:6px;pointer-events:none;z-index:4;--b:rgba(17,19,24,0.16);--L:12px;--t:1px;background:linear-gradient(var(--b),var(--b)) top left/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) top left/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) top right/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) top right/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) bottom left/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) bottom left/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) bottom right/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) bottom right/var(--t) var(--L) no-repeat;}
-.card.mb{margin-bottom:18px;}
-.card.mb-lg{margin-bottom:44px;}
-.s-pad{padding:22px 20px;}
+.card.mb{margin-bottom:var(--sp-card-gap);}
+.card.mb-lg{margin-bottom:var(--sp-chapter);}
+.s-pad{padding:var(--sp-block) var(--sp-card-pad);}
 .s-ey{font-family:var(--font);font-size:10.5px;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
 .s-ey svg{width:12px;height:12px;color:var(--ink);}
 .s-h{font-size:20px;font-weight:var(--w-head);letter-spacing:0;color:var(--ink);margin-bottom:4px;}
@@ -247,8 +265,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .risk-match .ld{width:6px;height:6px;}
 .risk-desc{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--ink);line-height:1.65;margin-bottom:14px;}
 .risk-slbl{font-family:var(--font);font-size:10px;font-weight:400;color:var(--muted);letter-spacing:0.06em;margin-bottom:9px;text-transform:uppercase;}
-.risk-bars{display:flex;flex-direction:column;gap:9px;}
-.risk-row{display:flex;align-items:center;gap:9px;}
+.risk-bars{display:flex;flex-direction:column;gap:var(--sp-list);}
+.risk-row{display:flex;align-items:center;gap:var(--sp-inline);}
 .risk-rl{width:86px;flex-shrink:0;font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);}
 .risk-tr{flex:1;height:1px;background:var(--line-soft);overflow:visible;position:relative;}
 .risk-fi{height:1px;background:var(--ink);position:absolute;left:0;top:0;}
@@ -264,17 +282,17 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .conf-mv{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
 .conf-sc{margin-left:auto;text-align:right;font-family:var(--serif);font-size:34px;font-weight:400;color:var(--ink);line-height:1;letter-spacing:-0.01em;}
 .conf-su{font-size:12px;font-weight:400;color:var(--muted);font-family:var(--mono);}
-.conf-bars{display:flex;flex-direction:column;gap:8px;}
-.conf-row{display:flex;align-items:center;gap:9px;}
+.conf-bars{display:flex;flex-direction:column;gap:var(--sp-list);}
+.conf-row{display:flex;align-items:center;gap:var(--sp-inline);}
 .conf-rl{width:62px;flex-shrink:0;font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);}
 .conf-tr{flex:1;height:1px;background:var(--line-soft);position:relative;}
 .conf-fi{height:1px;background:var(--ink);position:absolute;left:0;top:0;}
 .conf-vl{width:36px;text-align:right;font-size:11px;font-weight:400;color:var(--ink);font-family:var(--serif);}
 .conf-note{font-size:11px;font-weight:var(--w-body);color:var(--muted);line-height:1.55;margin-top:14px;}
-.radar-sec{padding:20px 18px 22px;border-top:1px solid var(--line-soft);}
+.radar-sec{padding:var(--sp-block) var(--sp-card-pad);border-top:1px solid var(--line-soft);}
 .radar-ww{display:flex;justify-content:center;margin-top:14px;}
 /* interests — real data (the ≤3 picks from Section 3 of the quiz), NOT a fabricated per-category %. All 10 categories always show; picked ones are ranked #1–3 and filled in, the rest stay quiet. */
-.int-sec{padding:20px 18px 22px;border-top:1px solid var(--line-soft);}
+.int-sec{padding:var(--sp-block) var(--sp-card-pad);border-top:1px solid var(--line-soft);}
 .int-sec-list{display:flex;flex-direction:column;gap:2px;margin-top:14px;}
 .int-sec-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line-soft);}
 .int-sec-row:last-child{border-bottom:none;}
@@ -333,7 +351,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .ex-tag{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:var(--w-label);letter-spacing:.04em;color:var(--muted);background:var(--accent);border-radius:20px;padding:3px 9px;text-transform:uppercase;}
 
 /* trait score bars — thicker filled bars (distinct from the hairline risk/confidence bars) */
-.trait-sec,.alloc-sec{padding:20px 18px 22px;border-top:1px solid var(--line-soft);}
+.trait-sec,.alloc-sec{padding:var(--sp-block) var(--sp-card-pad);border-top:1px solid var(--line-soft);}
 .trait-hd{display:flex;align-items:center;gap:8px;margin-bottom:2px;}
 .trait-list{display:flex;flex-direction:column;gap:13px;margin-top:16px;}
 .trait-row{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;}
@@ -346,8 +364,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* recommended allocation — 4 buckets summing to 100%, a stacked bar + legend */
 .alloc-bar{display:flex;height:14px;border-radius:8px;overflow:hidden;margin:16px 0 14px;}
 .alloc-seg{height:100%;}
-.alloc-legend{display:flex;flex-direction:column;gap:9px;}
-.alloc-row{display:flex;align-items:center;gap:9px;font-size:12.5px;}
+.alloc-legend{display:flex;flex-direction:column;gap:var(--sp-list);}
+.alloc-row{display:flex;align-items:center;gap:var(--sp-inline);font-size:12.5px;}
 .alloc-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
 .alloc-l{flex:1;color:var(--ink);}
 .alloc-p{font-family:var(--serif);color:var(--ink);}
@@ -379,7 +397,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .donut-track{stroke:var(--line-soft);}
 .donut-arc{stroke:var(--ink);}
 .donut-txt{fill:var(--ink);}
-.sides-hd{padding:22px 20px 4px;}
+.sides-hd{padding:var(--sp-block) var(--sp-card-pad) var(--sp-stack-tight);}
 .side-item{border-top:1px solid var(--line-soft);}
 .side-row{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;user-select:none;}
 .side-num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:400;flex-shrink:0;font-family:var(--mono);}
@@ -423,7 +441,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    viewport — on short/awkward viewports that silently ate the caption and, worse, could eat the
    CTA itself. -x keeps the corner-bleed asset scatter from causing a horizontal scrollbar; -y left
    open means if content is ever taller than the screen the page just scrolls, never traps content. */
-.splash{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;padding:24px 22px 18px;overflow-x:hidden;min-height:100vh;min-height:100dvh;}
+.splash{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;padding:24px var(--sp-edge) 18px;overflow-x:hidden;min-height:100vh;min-height:100dvh;}
 .sp-scatter{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
 /* depth-tiered scatter: near = bigger/sharper/stronger shadow/higher z · far = smaller/blurred/faint/behind. Parallax = near drifts more (--dx/--dy larger) */
 .sp-el{position:absolute;width:var(--w,88px);opacity:var(--op,.85);z-index:var(--z,1);filter:drop-shadow(0 var(--sh,10px) var(--shb,22px) rgba(17,19,24,var(--sha,0.16))) blur(var(--bl,0px)) saturate(var(--sat,1));animation:spDrift var(--d,9s) var(--ease) infinite alternate;animation-delay:var(--dl,0s);will-change:transform;}
