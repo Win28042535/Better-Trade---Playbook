@@ -537,7 +537,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 :root[data-view="tablet"] .shell{max-width:600px;}
 :root[data-view="pc"] .shell{max-width:680px;}
 :root[data-view="mobile"] .shell{max-width:400px;}
-@media(min-width:480px){:root[data-view="mobile"] .shell{border-radius:30px;border:1px solid var(--line);box-shadow:0 30px 70px rgba(17,19,24,0.18);overflow:hidden;}}
+/* Phone-frame preview on desktop (data-view=mobile at ≥480px): the frame is stretched to the
+   viewport height by body's flex align-stretch, so it MUST scroll its own content internally like a
+   real phone. Using overflow:hidden here clipped every screen taller than one viewport (the whole
+   Book below the identity card, the quiz's ถัดไป button) into an unreachable void. overflow-y:auto
+   makes the frame the scroll container; scrollbar hidden to preserve the device look. */
+@media(min-width:480px){:root[data-view="mobile"] .shell{border-radius:30px;border:1px solid var(--line);box-shadow:0 30px 70px rgba(17,19,24,0.18);overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
+:root[data-view="mobile"] .shell::-webkit-scrollbar{display:none;}}
 /* splash on larger canvases: SMALLER hero logo, and a MORE prominent subtitle (it's the line that
    states what you're here to do — find your 1-of-12 type), roomier side padding */
 :root[data-view="tablet"] .sp-hero-logo,:root[data-view="pc"] .sp-hero-logo{width:min(58%,280px);}
