@@ -199,8 +199,17 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    clustering together with dead space on both sides — "เต็มความกว้างเท่าคอนเทนต์". justify-content is
    moot once both children fill 100% of the row, so it's dropped here (still overridden below on
    mobile for the sticky variant, where it's equally moot but harmless to leave explicit). */
-.q-nav{display:flex;gap:12px;width:100%;max-width:460px;margin:auto auto 0;padding-top:32px;align-items:center;}
-.q-nav .btn-primary,.q-nav .btn-tertiary{flex:1;}
+/* Desktop/tablet: back and next split to the two ends via justify-content:space-between, each sized
+   to its own content (flex:0 0 auto) — separated onto their own sides, not stretched to fill and not
+   clustered in the middle. The row is capped at 460px centered, the SAME column the option cards use
+   (.q-opts/.int-grid), so "left side" and "right side" mean the left/right edge of the content column
+   the user is actually reading — back sits directly under the leftmost option edge, next under the
+   rightmost. (A full-width 760 split was tried and looked wrong: it flung the buttons ~520px apart to
+   the edges of the wider reading area, disconnected from the narrower centered options.)
+   Mobile overrides this below to justify-content:flex-end — there the pair stays together as one
+   right-aligned group on the full-bleed sticky bar, which reads better one-handed than an edge split. */
+.q-nav{display:flex;gap:12px;width:100%;max-width:460px;margin:auto auto 0;padding-top:32px;align-items:center;justify-content:space-between;}
+.q-nav .btn-primary,.q-nav .btn-tertiary{flex:0 0 auto;}
 /* Mobile: pin the nav to the viewport bottom so the CTA is always reachable even when a question's
    answers run long enough to push it past the fold. margin-top:auto already parks it at the bottom of
    the (tall) q-scroll; position:sticky;bottom:0 additionally holds it at the visible bottom WHILE the
@@ -215,7 +224,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    which correctly expands it to the full bleed edge on both sides. justify-content:space-between
    (not center) puts "ถัดไป" flush against the right edge — easiest one-handed reach on a phone —
    while pc/tablet above keep the roomy centered pair from the Animated Hero redesign. */
-:root[data-view="mobile"] .q-nav{position:sticky;bottom:0;z-index:6;width:auto;max-width:none;margin-left:calc(-1*var(--sp-edge));margin-right:calc(-1*var(--sp-edge));padding:14px var(--sp-edge) calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper) 45%,color-mix(in srgb,var(--paper) 50%,transparent) 75%,transparent);}
+:root[data-view="mobile"] .q-nav{position:sticky;bottom:0;z-index:6;width:auto;max-width:none;margin-left:calc(-1*var(--sp-edge));margin-right:calc(-1*var(--sp-edge));padding:14px var(--sp-edge) calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper) 45%,color-mix(in srgb,var(--paper) 50%,transparent) 75%,transparent);justify-content:flex-end;}
 /* ============================================================================
    BUTTON SYSTEM (2026-08-11) — 3 tiers by fill weight, each usable with or
    without an icon (an icon is just optional inline content — no separate CSS
