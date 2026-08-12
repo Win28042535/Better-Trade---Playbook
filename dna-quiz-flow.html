@@ -116,7 +116,17 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .spec-bd-dark::before{background-image:radial-gradient(circle .6px at center,rgba(255,255,255,.4),transparent 100%);}
 .spec-bd .spec-label{position:relative;background:linear-gradient(to top,var(--ink),var(--muted));-webkit-background-clip:text;background-clip:text;color:transparent;}
 .spec-bd-dark .spec-label{background:linear-gradient(to top,var(--cloud),var(--muted));-webkit-background-clip:text;background-clip:text;color:transparent;}
-.spec-comet{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
+/* .spec-bd svg.spec-comet (2 classes + type = specificity 0,2,1) is deliberately more specific than
+   ANY of the file's icon-sizing rules (.btn svg / .tb-pill svg / .reveal-icon svg etc., each just
+   1 class + type = 0,1,1) — every one of those contexts a .spec-bd sits inside was silently winning
+   the cascade and shrinking this SVG down to that context's icon size (16px on .btn, 12px on
+   .tb-pill, 32px on .reveal-icon) instead of the full button it's meant to cover. Confirmed via
+   getBoundingClientRect: the comet's <svg> measured 16×16px on the splash CTA, not the button's
+   actual ~350×52 — the path/animation/dasharray math was all correct, but the SVG viewport itself was
+   being squashed to icon-size by an unrelated rule elsewhere, so the stroke was rendering into a tiny
+   invisible corner instead of across the frame. This is the actual bug the "still not fixed" reports
+   were catching — not a mechanism problem. */
+.spec-bd svg.spec-comet{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
 .spec-comet path{fill:none;stroke:var(--violet);stroke-width:3px;stroke-linecap:round;filter:drop-shadow(0 0 4px var(--cyan));animation:cometDash 3s linear infinite;}
 @keyframes cometDash{to{stroke-dashoffset:calc(-1 * var(--spec-perim,300));}}
 
