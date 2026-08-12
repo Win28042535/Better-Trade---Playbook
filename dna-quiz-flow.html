@@ -109,9 +109,19 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    FILL is decoupled from the border via --spec-fill (default white) so the identical border+motion
    can carry either fill: .spec-bd alone = white fill/ink text (unchanged from before); stack
    .spec-bd-dark alongside it for dark fill/cloud text — same ring, same travelling glow, inverted
-   fill colors. */
+   fill colors.
+   2026-08-13 — given the exact star-button.tsx source directly, ported the two decorative pieces
+   that were still missing (the mechanism above was already right, verified against a screenshot):
+   (1) the faint scattered star/dot texture inside the border area (`::before`, a tiled dot pattern —
+   theirs is one hand-placed SVG at fixed coordinates, ours is a repeating radial-gradient so it works
+   at any button size without per-instance coordinates); (2) the label's black→muted gradient-text
+   fill (`.spec-label`), inverted to cloud→muted on `.spec-bd-dark`, matching their light/dark swap. */
 .spec-bd{position:relative;overflow:hidden;border:2px solid transparent;background:var(--spec-fill,linear-gradient(var(--white),var(--white))) padding-box,var(--ring-idle) border-box;}
 .spec-bd-dark{--spec-fill:linear-gradient(var(--ink),var(--ink));color:var(--cloud);}
+.spec-bd::before{content:"";position:absolute;inset:0;border-radius:inherit;background-image:radial-gradient(circle .6px at center,rgba(17,19,24,.4),transparent 100%);background-size:10px 9px;pointer-events:none;opacity:.7;}
+.spec-bd-dark::before{background-image:radial-gradient(circle .6px at center,rgba(255,255,255,.4),transparent 100%);}
+.spec-bd .spec-label{position:relative;background:linear-gradient(to top,var(--ink),var(--muted));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.spec-bd-dark .spec-label{background:linear-gradient(to top,var(--cloud),var(--muted));-webkit-background-clip:text;background-clip:text;color:transparent;}
 .spec-bd::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(36px circle at center,var(--cyan) 0%,var(--violet) 45%,transparent 78%);offset-path:border-box;offset-distance:0%;pointer-events:none;animation:cometTravel 3s linear infinite;}
 @keyframes cometTravel{to{offset-distance:100%;}}
 
@@ -142,15 +152,24 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 
 /* ── QUIZ ── every quiz screen is one equal-height canvas: content flows from the top, the nav is pinned to the bottom (margin-top:auto), and a min-height keeps all screens the same size regardless of how much they contain */
 .q-scroll{flex:1;min-height:620px;padding:8px var(--sp-edge) 34px;display:flex;flex-direction:column;}
-.q-head{margin:22px 0 24px;}
-/* question mark — a bare colored icon, no frame/box, purely typographic company for the headline */
-.q-icon-bare{display:flex;align-items:center;margin-bottom:14px;color:var(--qc,var(--violet));}
-.q-icon-bare svg{width:var(--ic-lg);height:var(--ic-lg);}
-/* section title/count now live in the topbar (.tb-title/.tb-sub) — the body starts straight at the
-   icon, no eyebrow/kicker/chapter-opener above the question anymore, so icon → question → answers
-   → CTA read as the whole story with nothing competing above them. */
-.q-title{font-size:var(--fs-heading);font-weight:var(--w-head);line-height:1.26;letter-spacing:0;color:var(--ink);margin-bottom:10px;}
-.q-sub{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.5;margin-top:4px;text-wrap:pretty;}
+/* Quiz layout — re-centered against 21st.dev "Animated Hero" (badge → 2-weight headline → centered
+   subtext → centered CTAs), kept in our own DNA: question/answers/CTA stay the actual hero of the
+   screen (per direction — the centering is a layout device, not a content change), the icon becomes
+   a clearly-reserved placeholder slot instead of a bare inline glyph, and the "font-weight play" is
+   automatic (see emphasizeQ() near renderQuiz) rather than hand-authored per question. */
+.q-head{margin:22px 0 24px;text-align:center;}
+/* Icon PLACEHOLDER — sized 60px (within the 48-64px range asked for) so a future custom icon has
+   real room without another layout pass; the soft --accent disc marks it as an intentional reserved
+   slot (same background already used for every other icon-chip in the app), not a floating glyph. */
+.q-icon-bare{display:flex;align-items:center;justify-content:center;margin:0 auto 16px;width:60px;height:60px;border-radius:50%;background:var(--accent);color:var(--qc,var(--violet));}
+.q-icon-bare svg{width:32px;height:32px;}
+/* section title/count live in the topbar (.tb-title/.tb-sub) — the body starts straight at the icon,
+   no eyebrow/kicker/chapter-opener above the question, so icon → question → answers → CTA read as
+   the whole story with nothing competing above them. */
+.q-title{font-size:var(--fs-title);font-weight:var(--w-head);line-height:1.2;letter-spacing:0;color:var(--ink);margin-bottom:10px;}
+.q-title b{font-weight:var(--w-label);color:var(--qc,var(--ink));}
+.q-sub{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.5;margin:4px auto 0;text-wrap:pretty;max-width:400px;}
+.q-opts,.int-grid{width:100%;max-width:460px;margin:0 auto;}
 .q-opts{display:flex;flex-direction:column;gap:var(--sp-list);}
 .q-opt{display:grid;grid-template-columns:34px 1fr;gap:13px;align-items:center;padding:15px 16px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
 .q-opt.sel{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,var(--spectrum) border-box;}
@@ -159,7 +178,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .opt-text{font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--ink);line-height:1.5;}
 
 /* SCREEN 3 — multi-select interests (≤3), same visual family as q-opt */
-.int-count{font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);margin-bottom:12px;}
+.int-count{font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);margin:0 auto 12px;text-align:center;max-width:460px;}
 .int-count b{color:var(--ink);}
 .int-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-list);}
 .int-opt{display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),opacity .18s,transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
@@ -171,7 +190,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .int-t{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--ink);line-height:1.35;}
 
 /* NAV / BUTTONS — nav pinned to bottom (equal-height screens); primary CTA capped so it stays a consistent proportion, never full-bleed on wide screens */
-.q-nav{display:flex;gap:12px;margin-top:auto;padding-top:32px;align-items:center;justify-content:space-between;}
+.q-nav{display:flex;gap:12px;width:100%;max-width:460px;margin:auto auto 0;padding-top:32px;align-items:center;justify-content:center;}
 .q-nav .btn-primary{flex:0 0 auto;}
 .q-nav .btn-tertiary{flex:0 0 auto;}
 /* ============================================================================
@@ -1075,7 +1094,7 @@ function renderSplash(){
       '<p class="sp-sub">โลกการลงทุนใบใหม่ เริ่มจากรู้จักตัวเอง — พบตัวตนนักลงทุน 1 ใน 12 แบบที่เป็นคุณ</p></div>'+
     '<div class="sp-stage"><div class="fan-stage" id="fanStage">'+slides+'</div></div>'+
     '<div class="sp-preview-note">พรีวิวการ์ดตัวตนนักลงทุน '+ic('lc-sparkles')+' 12 แบบ</div>'+
-    '<div class="sp-cta"><button class="btn btn-primary spec-bd spec-bd-dark" id="spStart">ค้นหาตัวตนของคุณ '+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
+    '<div class="sp-cta"><button class="btn btn-primary spec-bd spec-bd-dark" id="spStart"><span class="spec-label">ค้นหาตัวตนของคุณ</span> '+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
     '<div class="sp-cap">เริ่มทำแบบทดสอบถือว่ายอมรับ<b> การเก็บข้อมูลเพื่อพัฒนาระบบ (PDPA)</b> ✦ ไม่เปิดเผยรายบุคคล</div>'+
   '</div>';
   paintFan();
@@ -1172,6 +1191,13 @@ function setAns(i,v){if(i<3)st.s1[i]=v;else st.s2[i-3]=v;}
    the affected buttons/count locally instead, so a tap never replays the screen's fade-in. */
 function toggleInterest(oi){var pos=st.s3.indexOf(oi);if(pos>-1){st.s3.splice(pos,1);}else{if(st.s3.length>=3)return;st.s3.push(oi);}}
 
+/* Automatic font-weight emphasis for q-title (the "This is something **new**" device from the hero
+   reference) — bolds the trailing clause after the LAST space, since Thai text has no spaces
+   *within* a phrase, only *between* phrases, so this reliably grabs the closing clause (usually the
+   actual crux of the question: "...คุณรับได้แค่ไหน?") without any hand-authored markup per question.
+   A question with no space at all (a handful of the shorter ones) just renders as one plain weight —
+   graceful fallback, not an error case. */
+function emphasizeQ(s){var i=s.lastIndexOf(' ');return i<0?s:s.slice(0,i+1)+'<b>'+s.slice(i+1)+'</b>';}
 function renderQuiz(){
   var idx=st.idx,q=getQ(idx),isInterests=(idx===10);
   var sec=idx<3?1:(idx<10?2:3);
@@ -1208,7 +1234,7 @@ function renderQuiz(){
   progline+
   '<div class="q-scroll fade">'+
     '<div class="q-head"><div class="q-icon-bare">'+ic(q.icon)+'</div>'+
-      '<div class="q-title">'+q.q+'</div>'+(q.cat?('<div class="q-sub">'+q.cat.replace(/·/g,'✦')+'</div>'):'')+'</div>'+
+      '<div class="q-title">'+emphasizeQ(q.q)+'</div>'+(q.cat?('<div class="q-sub">'+q.cat.replace(/·/g,'✦')+'</div>'):'')+'</div>'+
     opts+
     '<div class="q-nav"><button class="btn btn-tertiary" id="backBtn">'+ic('lc-arrow-left','ic-back')+'ย้อนกลับ</button>'+
       '<button class="btn btn-primary" id="nextBtn"'+(nextDisabled?' disabled':'')+'>'+nextLabel+'</button></div>'+
@@ -1336,7 +1362,7 @@ function renderBook(){
   var offset=(113*(1-2/6)).toFixed(1);
   root.innerHTML=
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
-  '<header class="topbar"><img class="tb-logo" src="'+LOGO_IMG.bt+'" alt="Better Trade" style="margin-right:auto"><button class="tb-pill spec-bd">'+ic('lc-upload')+'PDF</button></header>'+
+  '<header class="topbar"><img class="tb-logo" src="'+LOGO_IMG.bt+'" alt="Better Trade" style="margin-right:auto"><button class="tb-pill spec-bd">'+ic('lc-upload')+'<span class="spec-label">PDF</span></button></header>'+
   '<nav class="toc"><button class="toc-p active">'+ic('lc-user')+'ตัวตน</button><button class="toc-p">'+ic('lc-sparkles')+'Confidence</button><button class="toc-p">'+ic('lc-pie-chart')+'6 ด้าน</button><button class="toc-p">'+ic('lc-route')+'เส้นทาง</button></nav>'+
   '<main class="scroll">'+
     '<div class="prog-wrap"><div class="page-scatter">'+
