@@ -84,24 +84,35 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .shell{width:100%;max-width:430px;min-height:100vh;min-height:100dvh;background:var(--paper);position:relative;display:flex;flex-direction:column;}
 
 /* spectrum border technique — the one accent per scene */
-/* CTA spectrum border — motion redesigned against the 21st.dev "Star Button" reference (badtz-ui):
-   that component keeps its border a plain, quiet line at rest and sends exactly ONE small radial
-   light travelling around the button's actual edge via CSS offset-path — constant speed on any
-   rounded shape, because it follows the real outline instead of sweeping by angle from a center
-   point (our previous conic-gradient version was angle-based, so it visibly sped up/slowed down
-   going around a wide pill's short vs long sides). Adapted, not copied: the travelling light is our
-   own --spectrum hues (cyan→violet→pink→yellow) instead of the reference's flat lightColor, and
-   there's no starfield background — that part of the reference is a stylistic flourish for its dark
-   sci-fi look, not this app's editorial one.
-   The ring itself is now just --ring-idle (a plain faint line, no gradient, no animation) — 100% of
-   the "this is moving" signal lives in the one travelling dot, same as the reference.
+/* CTA spectrum border — motion checked against the actual badtz-ui star-button.tsx source (not just
+   the demo screenshot this time). What it really does: a light div the same size as `--light-width`
+   (110px default — noticeably BIGGER than the button itself), filled with
+   `radial-gradient(ellipse at center, color, transparent, transparent)` — a soft glow with no hard
+   edge and no mask — whose offset-anchor (its own center) is dragged around an explicit rectangle
+   path the size of the button, computed once in JS via offsetWidth/offsetHeight.
+   Our first pass got the mechanism right (offset-path + animated offset-distance) but the light
+   itself was wrong on two counts: (1) a 12px dot with a hard mask edge, when the reference is a
+   large, soft, edge-less glow roughly 2-3× the button's own size — that's *why* it read as a tiny
+   sharp point circling instead of a glow sweeping past; (2) no reason to blur/drop-shadow a shape
+   that's supposed to fade via gradient stops, not filters.
+   Fixed to match: dropped the mask and filter, sized the radial-gradient itself (26px circle, no
+   hard stop until `transparent`) so the falloff IS the shape, same as the reference's gradient-only
+   approach. Two deliberate deviations, both justified: (a) our own --violet→--cyan glow instead of
+   their flat lightColor — kept per direction; (b) offset-path:border-box instead of their
+   JS-computed literal rectangle path — our buttons genuinely resize across mobile/tablet/pc
+   (`.btn-primary{flex:1}` stretches with the row), so a path baked in once on mount would drift out
+   of sync on the next breakpoint; `border-box` re-derives from actual layout on every frame, no
+   resize listener needed. Their rectangle path also has hard 90° corners, which would look wrong
+   cutting through our fully-rounded pills — border-box correctly follows the rounded edge instead.
+   The ring itself stays --ring-idle (a plain faint line, no gradient, no animation) — 100% of the
+   "this is moving" signal lives in the one travelling glow, same as the reference.
    FILL is decoupled from the border via --spec-fill (default white) so the identical border+motion
    can carry either fill: .spec-bd alone = white fill/ink text (unchanged from before); stack
-   .spec-bd-dark alongside it for dark fill/cloud text — same ring, same travelling light, inverted
+   .spec-bd-dark alongside it for dark fill/cloud text — same ring, same travelling glow, inverted
    fill colors. */
 .spec-bd{position:relative;border:2px solid transparent;background:var(--spec-fill,linear-gradient(var(--white),var(--white))) padding-box,var(--ring-idle) border-box;}
 .spec-bd-dark{--spec-fill:linear-gradient(var(--ink),var(--ink));color:var(--cloud);}
-.spec-bd::after{content:"";position:absolute;inset:-2px;border-radius:inherit;background:var(--spectrum);-webkit-mask:radial-gradient(circle 6px at center,#000 60%,transparent 100%);mask:radial-gradient(circle 6px at center,#000 60%,transparent 100%);filter:blur(1px) drop-shadow(0 0 5px rgba(156,145,255,.55));offset-path:border-box;offset-distance:0%;pointer-events:none;animation:cometTravel 3s linear infinite;}
+.spec-bd::after{content:"";position:absolute;inset:-2px;border-radius:inherit;background:radial-gradient(26px circle at center,color-mix(in srgb,var(--violet) 65%,white) 0%,color-mix(in srgb,var(--cyan) 40%,transparent) 55%,transparent 80%);offset-path:border-box;offset-distance:0%;pointer-events:none;animation:cometTravel 3s linear infinite;}
 @keyframes cometTravel{to{offset-distance:100%;}}
 
 /* Lucide icons — stroke-only per Design DNA §07; fill/stroke inherit to all children */
@@ -141,15 +152,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .q-title{font-size:var(--fs-heading);font-weight:var(--w-head);line-height:1.26;letter-spacing:0;color:var(--ink);margin-bottom:10px;}
 .q-sub{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.5;margin-top:4px;text-wrap:pretty;}
 .q-opts{display:flex;flex-direction:column;gap:var(--sp-list);}
-.q-opt{position:relative;overflow:hidden;display:grid;grid-template-columns:34px 1fr;gap:13px;align-items:center;padding:15px 16px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
+.q-opt{display:grid;grid-template-columns:34px 1fr;gap:13px;align-items:center;padding:15px 16px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
 .q-opt.sel{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,var(--spectrum) border-box;}
-/* Hover spotlight — adapted from 21st.dev "Spotlight Card": a glow that follows the real cursor
-   position (--mx/--my, written on mousemove — see the delegated listener near `var root=`) instead
-   of the reference's larger, fully-saturated rainbow bloom. Ours stays in the same cyan→violet
-   family but small (120px) and low-alpha (12/9%) with a tight falloff, so it reads as a quiet tint
-   under the cursor, not an obvious rainbow — desktop/pointer-fine only (see hover media block
-   below), since touch has no cursor position to track. */
-.q-opt::before,.int-opt::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--cyan) 12%,transparent),color-mix(in srgb,var(--violet) 9%,transparent) 55%,transparent 75%);opacity:0;transition:opacity .25s var(--ease);pointer-events:none;}
 .opt-key{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--fs-label);font-weight:var(--w-head);background:var(--accent);color:var(--muted);flex-shrink:0;transition:background .18s,color .18s;font-family:var(--font);}
 .q-opt.sel .opt-key{background:var(--ink);color:var(--cloud);}
 .opt-text{font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--ink);line-height:1.5;}
@@ -158,7 +162,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .int-count{font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);margin-bottom:12px;}
 .int-count b{color:var(--ink);}
 .int-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-list);}
-.int-opt{position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),opacity .18s,transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
+.int-opt{display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),opacity .18s,transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
 .int-opt.sel{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,var(--spectrum) border-box;}
 .int-opt.disabled{opacity:.4;cursor:not-allowed;}
 .int-ic{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--muted);flex-shrink:0;transition:background .18s,color .18s;}
@@ -217,7 +221,6 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
   .btn:hover svg.ic-back{transform:translateX(-3px);}
   .q-opt:hover{border-color:var(--line-strong);transform:translateY(-1px);}
   .int-opt:hover{border-color:var(--line-strong);transform:translateY(-1px);}
-  .q-opt:hover::before,.int-opt:hover::before{opacity:1;}
   .tab-item:hover{color:var(--ink);}
   .dd-tab:hover{border-color:var(--line-strong);color:var(--ink);}
   .pcv-btn:hover{border-color:var(--line-strong);transform:translateY(-1px);}
@@ -255,6 +258,22 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .consent-btn .btn-primary{width:100%;}
 .consent-caption{font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);margin-top:14px;line-height:1.6;}
 .consent-caption b{font-weight:var(--w-label);color:var(--ink);}
+
+/* Reveal-screen orb — adapted from 21st.dev "Siri Wave" (a raw-WebGL/GLSL metaball shader: dots that
+   merge, scatter and gather). A hand-written WebGL+GLSL shader is a different order of engineering
+   than this file's CSS-only components, so the DNA borrowed is the RESULT, not the renderer: several
+   soft, differently-timed blurred blobs drifting inside one circular window, blending in and out of
+   each other like they're the same fluid mass — same idea already used for the splash's floating
+   brand assets (`.sp-el`/spDrift), just smaller, clipped to a circle, and in our spectrum hues so it
+   echoes `.reveal-icon` above it (same "spectrum-glow, round" family, not the same slot — this one
+   sits at the very bottom of the screen via margin-top:auto, the icon stays at the top). */
+.siri-orb{position:relative;width:120px;height:120px;margin:auto auto 0;flex-shrink:0;border-radius:50%;overflow:hidden;isolation:isolate;background:color-mix(in srgb,var(--ink) 4%,transparent);}
+.siri-b{position:absolute;width:62%;height:62%;border-radius:50%;filter:blur(13px);opacity:.75;animation:siriDrift ease-in-out infinite alternate;}
+.siri-b1{background:var(--cyan);top:6%;left:10%;animation-duration:5.5s;}
+.siri-b2{background:var(--violet);top:16%;left:42%;animation-duration:6.5s;animation-delay:-1.2s;}
+.siri-b3{background:var(--pink);top:46%;left:8%;animation-duration:7s;animation-delay:-2.6s;}
+.siri-b4{background:var(--yellow);top:40%;left:38%;animation-duration:5s;animation-delay:-3.4s;}
+@keyframes siriDrift{0%{transform:translate(0,0) scale(1);}50%{transform:translate(7px,-9px) scale(1.18);}100%{transform:translate(-6px,7px) scale(.88);}}
 
 /* ── BOOK — scene-based: hairlines, not shadows ── */
 .scroll{flex:1;padding:12px var(--sp-edge) 96px;display:flex;flex-direction:column;}
@@ -1103,17 +1122,6 @@ var TOTAL=11; /* S1(3) + S2(7) + S3(1 multi-select) */
 var st={phase:'splash',spidx:0,idx:0,consent:false,s1:[null,null,null],s2:[null,null,null,null,null,null,null],s3:[]};
 var RESULT=null;
 var root=document.getElementById('root');
-/* Hover spotlight coordinates (--mx/--my consumed by .q-opt::before/.int-opt::before above) — one
-   delegated listener for the app's lifetime rather than re-binding per option on every re-render.
-   Setting these on touch devices is harmless: the glow itself only reveals inside the existing
-   hover:hover+pointer:fine media guard, so touch never triggers it either way. */
-root.addEventListener('mousemove',function(e){
-  var el=e.target.closest('.q-opt,.int-opt');
-  if(!el)return;
-  var r=el.getBoundingClientRect();
-  el.style.setProperty('--mx',(e.clientX-r.left)+'px');
-  el.style.setProperty('--my',(e.clientY-r.top)+'px');
-});
 function ic(id,cls){return '<svg viewBox="0 0 24 24" class="lucide'+(cls?' '+cls:'')+'"><use href="#'+id+'"/></svg>';}
 
 function render(){
@@ -1241,6 +1249,7 @@ function renderReveal(){
     '<div class="consent-kicker">วิเคราะห์คำตอบทั้งหมดของคุณเสร็จแล้ว</div>'+
     '<div class="consent-h"><span class="ch-1">ตัวตนนักลงทุนของคุณ</span><span class="ch-2">กำลังจะปรากฏ&hellip;</span></div>'+
     '<div class="consent-btn"><button class="btn btn-primary" id="revealBtn">'+ic('lc-sparkles')+'แตะเพื่อเปิดตัวตนของคุณ</button></div>'+
+    '<div class="siri-orb" aria-hidden="true"><span class="siri-b siri-b1"></span><span class="siri-b siri-b2"></span><span class="siri-b siri-b3"></span><span class="siri-b siri-b4"></span></div>'+
   '</div>';
   root.querySelector('#rvBack').onclick=function(){st.idx=10;st.phase='quiz';render();};
   root.querySelector('#revealBtn').onclick=function(){st.phase='book';render();};
