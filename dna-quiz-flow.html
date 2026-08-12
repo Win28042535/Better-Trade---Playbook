@@ -19,9 +19,6 @@
   --focus:#2b6cff; --popover:rgba(255,255,255,0.96);
   --cyan:#61e8ed; --violet:#9c91ff; --pink:#f178d8; --yellow:#f2ea83;
   --spectrum:linear-gradient(90deg,#61e8ed,#9c91ff,#f178d8,#f2ea83,#61e8ed);
-  /* Liquid-metal-inspired CTA border sweep (2026-08-11, ref: 21st.dev "Liquid Metal Button" — same
-     border box, redesigned gradient stops, see .spec-bd below for why). */
-  --spectrum-conic:conic-gradient(from var(--spin-angle,0deg),var(--ring-idle) 0deg,var(--ring-idle) 250deg,#61e8ed 274deg,#9c91ff 305deg,#f178d8 334deg,#f2ea83 356deg,var(--ring-idle) 360deg);
   --ease:cubic-bezier(0.22,1,0.36,1);
   /* Radius scale (2026-08-12) — 8/12/16/24 is the full ladder; the system only ever
      names the two rungs actually in use. 12 and 24 stay reserved for future needs. */
@@ -87,25 +84,25 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .shell{width:100%;max-width:430px;min-height:100vh;min-height:100dvh;background:var(--paper);position:relative;display:flex;flex-direction:column;}
 
 /* spectrum border technique — the one accent per scene */
-/* CTA spectrum border — redesigned against the 21st.dev "Liquid Metal Button" reference (that one is
-   an actual WebGL/canvas shader — too heavy for this single-file, touch-first, booth-kiosk app, so
-   only its MOTION QUALITY is borrowed, in CSS, with our own spectrum hues instead of chrome/silver).
-   The old version kept all 4 hues fully lit around the whole ring at once — rotating a fully-saturated
-   symmetric wheel barely reads as "moving" at a glance (this is what "ยังไม่เล่น" was actually about:
-   the animation WAS running, it just didn't look like it). The fix: most of the ring stays a faint,
-   near-invisible line, with ONE bright multi-hue arc (~86° of the 360°, cyan→violet→pink→yellow)
-   sweeping around it — like a glint of light travelling over a liquid-metal edge. One bright, moving
-   thing against a quiet ring reads as motion unmistakably; a fully-lit wheel does not.
-   Still the same underlying technique: a conic gradient whose start-angle (--spin-angle, an animatable
-   @property) rotates 0→360°. @property is what lets the angle interpolate — without it the browser
-   would snap 0→360 with no motion. Only the border sweeps; shape/text are untouched.
+/* CTA spectrum border — motion redesigned against the 21st.dev "Star Button" reference (badtz-ui):
+   that component keeps its border a plain, quiet line at rest and sends exactly ONE small radial
+   light travelling around the button's actual edge via CSS offset-path — constant speed on any
+   rounded shape, because it follows the real outline instead of sweeping by angle from a center
+   point (our previous conic-gradient version was angle-based, so it visibly sped up/slowed down
+   going around a wide pill's short vs long sides). Adapted, not copied: the travelling light is our
+   own --spectrum hues (cyan→violet→pink→yellow) instead of the reference's flat lightColor, and
+   there's no starfield background — that part of the reference is a stylistic flourish for its dark
+   sci-fi look, not this app's editorial one.
+   The ring itself is now just --ring-idle (a plain faint line, no gradient, no animation) — 100% of
+   the "this is moving" signal lives in the one travelling dot, same as the reference.
    FILL is decoupled from the border via --spec-fill (default white) so the identical border+motion
    can carry either fill: .spec-bd alone = white fill/ink text (unchanged from before); stack
-   .spec-bd-dark alongside it for dark fill/cloud text — same ring, same sweep, inverted colors. */
-@property --spin-angle{syntax:"<angle>";initial-value:0deg;inherits:false;}
-.spec-bd{border:2px solid transparent;background:var(--spec-fill,linear-gradient(var(--white),var(--white))) padding-box,var(--spectrum-conic) border-box;animation:specSpin 3s linear infinite;}
+   .spec-bd-dark alongside it for dark fill/cloud text — same ring, same travelling light, inverted
+   fill colors. */
+.spec-bd{position:relative;border:2px solid transparent;background:var(--spec-fill,linear-gradient(var(--white),var(--white))) padding-box,var(--ring-idle) border-box;}
 .spec-bd-dark{--spec-fill:linear-gradient(var(--ink),var(--ink));color:var(--cloud);}
-@keyframes specSpin{to{--spin-angle:360deg;}}
+.spec-bd::after{content:"";position:absolute;inset:-2px;border-radius:inherit;background:var(--spectrum);-webkit-mask:radial-gradient(circle 6px at center,#000 60%,transparent 100%);mask:radial-gradient(circle 6px at center,#000 60%,transparent 100%);filter:blur(1px) drop-shadow(0 0 5px rgba(156,145,255,.55));offset-path:border-box;offset-distance:0%;pointer-events:none;animation:cometTravel 3s linear infinite;}
+@keyframes cometTravel{to{offset-distance:100%;}}
 
 /* Lucide icons — stroke-only per Design DNA §07; fill/stroke inherit to all children */
 .lucide{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;}
@@ -144,8 +141,15 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .q-title{font-size:var(--fs-heading);font-weight:var(--w-head);line-height:1.26;letter-spacing:0;color:var(--ink);margin-bottom:10px;}
 .q-sub{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.5;margin-top:4px;text-wrap:pretty;}
 .q-opts{display:flex;flex-direction:column;gap:var(--sp-list);}
-.q-opt{display:grid;grid-template-columns:34px 1fr;gap:13px;align-items:center;padding:15px 16px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
+.q-opt{position:relative;overflow:hidden;display:grid;grid-template-columns:34px 1fr;gap:13px;align-items:center;padding:15px 16px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
 .q-opt.sel{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,var(--spectrum) border-box;}
+/* Hover spotlight — adapted from 21st.dev "Spotlight Card": a glow that follows the real cursor
+   position (--mx/--my, written on mousemove — see the delegated listener near `var root=`) instead
+   of the reference's larger, fully-saturated rainbow bloom. Ours stays in the same cyan→violet
+   family but small (120px) and low-alpha (12/9%) with a tight falloff, so it reads as a quiet tint
+   under the cursor, not an obvious rainbow — desktop/pointer-fine only (see hover media block
+   below), since touch has no cursor position to track. */
+.q-opt::before,.int-opt::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--cyan) 12%,transparent),color-mix(in srgb,var(--violet) 9%,transparent) 55%,transparent 75%);opacity:0;transition:opacity .25s var(--ease);pointer-events:none;}
 .opt-key{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--fs-label);font-weight:var(--w-head);background:var(--accent);color:var(--muted);flex-shrink:0;transition:background .18s,color .18s;font-family:var(--font);}
 .q-opt.sel .opt-key{background:var(--ink);color:var(--cloud);}
 .opt-text{font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--ink);line-height:1.5;}
@@ -154,7 +158,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .int-count{font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);margin-bottom:12px;}
 .int-count b{color:var(--ink);}
 .int-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-list);}
-.int-opt{display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),opacity .18s,transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
+.int-opt{position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),opacity .18s,transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
 .int-opt.sel{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,var(--spectrum) border-box;}
 .int-opt.disabled{opacity:.4;cursor:not-allowed;}
 .int-ic{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--muted);flex-shrink:0;transition:background .18s,color .18s;}
@@ -192,7 +196,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    border layer when the two are combined. This compound selector re-asserts it with higher
    specificity (2 classes) so .spec-bd's animated border always wins, on any tier, regardless of
    source order — e.g. class="btn btn-primary spec-bd spec-bd-dark". */
-.btn.spec-bd{border:2px solid transparent;background:var(--spec-fill,linear-gradient(var(--white),var(--white))) padding-box,var(--spectrum-conic) border-box;}
+.btn.spec-bd{border:2px solid transparent;background:var(--spec-fill,linear-gradient(var(--white),var(--white))) padding-box,var(--ring-idle) border-box;}
 /* ── button hover system ── adapted from a jakobhoeg/21st.dev "expandIcon" button reference (icon
    nudges in its direction of travel on hover, fill darkens slightly). Icons stay visible always —
    unlike the reference's hide-until-hover reveal, hiding by default would mean touch users (this
@@ -213,6 +217,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
   .btn:hover svg.ic-back{transform:translateX(-3px);}
   .q-opt:hover{border-color:var(--line-strong);transform:translateY(-1px);}
   .int-opt:hover{border-color:var(--line-strong);transform:translateY(-1px);}
+  .q-opt:hover::before,.int-opt:hover::before{opacity:1;}
   .tab-item:hover{color:var(--ink);}
   .dd-tab:hover{border-color:var(--line-strong);color:var(--ink);}
   .pcv-btn:hover{border-color:var(--line-strong);transform:translateY(-1px);}
@@ -1098,6 +1103,17 @@ var TOTAL=11; /* S1(3) + S2(7) + S3(1 multi-select) */
 var st={phase:'splash',spidx:0,idx:0,consent:false,s1:[null,null,null],s2:[null,null,null,null,null,null,null],s3:[]};
 var RESULT=null;
 var root=document.getElementById('root');
+/* Hover spotlight coordinates (--mx/--my consumed by .q-opt::before/.int-opt::before above) — one
+   delegated listener for the app's lifetime rather than re-binding per option on every re-render.
+   Setting these on touch devices is harmless: the glow itself only reveals inside the existing
+   hover:hover+pointer:fine media guard, so touch never triggers it either way. */
+root.addEventListener('mousemove',function(e){
+  var el=e.target.closest('.q-opt,.int-opt');
+  if(!el)return;
+  var r=el.getBoundingClientRect();
+  el.style.setProperty('--mx',(e.clientX-r.left)+'px');
+  el.style.setProperty('--my',(e.clientY-r.top)+'px');
+});
 function ic(id,cls){return '<svg viewBox="0 0 24 24" class="lucide'+(cls?' '+cls:'')+'"><use href="#'+id+'"/></svg>';}
 
 function render(){
