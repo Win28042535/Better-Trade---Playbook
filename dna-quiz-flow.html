@@ -89,36 +89,36 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .shell{width:100%;max-width:430px;min-height:100vh;min-height:100dvh;background:var(--paper);position:relative;display:flex;flex-direction:column;}
 
 /* spectrum border technique — the one accent per scene */
-/* CTA spectrum border (.spec-bd) — a faithful port of badtz-ui's star-button.tsx, in vanilla CSS/JS.
-   Structure mirrors the source exactly:
-   - the ring is a plain faint --ring-idle line (their static border), no gradient, no animation;
-   - ::before is the scattered star/dot texture inside the frame (their fixed-coordinate SVG → a
-     tiled repeating radial-gradient so it works at any button size);
-   - .spec-label gives the text their ink→muted gradient-text fill (inverted on .spec-bd-dark);
-   - ::after is the ONE travelling light, and this is the piece the earlier passes got wrong.
-   THE KEY FIX (the reason it looked like "a circle orbiting the middle" before): the light must ride
-   the button's actual OUTLINE. The reference does this by writing an explicit `path()` the size of
-   the button (offsetWidth/offsetHeight) and animating the light's offset-distance around it. Earlier
-   we used `offset-path:border-box` to avoid JS — but a bare <coord-box> offset-path doesn't trace the
-   frame reliably here, so the light fell back to orbiting a small default circle. So we now do exactly
-   what the source does: JS (layoutSpecComets → setSpecPath, near renderQuiz) writes a per-button
-   `--spec-path` rounded-rectangle path from the element's live padding-box size, recomputed on resize
-   via ResizeObserver so it stays correct across breakpoints. Unlike the reference's hard-cornered
-   rectangle, ours is a proper rounded-rect (r = half the short side) so it follows our fully-rounded
-   pills — and degenerates cleanly to a circle when the element is square (the reveal-icon).
-   overflow:hidden on .spec-bd clips the oversized soft glow to the button silhouette, so what shows is
-   a highlight hugging the frame as it travels the outline — not a floating ball.
-   Deviation from source kept per direction: our own cyan→violet spectrum glow instead of their flat
-   lightColor. FILL is decoupled via --spec-fill (default white → ink text) so stacking .spec-bd-dark
-   flips to dark fill / cloud text with the identical ring + travelling light. */
+/* CTA spectrum border (.spec-bd) — rebuilt around the actual constraint that broke every earlier CSS
+   attempt: a soft glow positioned by offset-path can only ever sit INSIDE the border, never ON it.
+   overflow:hidden clips at the padding edge (i.e. just inside the 2px border), so no matter how the
+   glow was sized, it always read as "a blob near the edge on the inside", not "the border lit up" —
+   that's why it kept looking like a floating circle no matter how much it was resized.
+   The fix: stop trying to fake it with a positioned shape, and draw the light directly ON the frame
+   instead — an SVG <path> stroked along the button's own rounded-rect outline, with stroke-dasharray/
+   stroke-dashoffset drawing one moving arc-length of that stroke (exactly the technique browsers use
+   for "drawing" animations). The stroke IS the path, so there's no gap between "where the light is"
+   and "where the border is" to begin with — it hugs the frame by construction, at any button size,
+   with no separate blob to size or clip.
+   JS (layoutSpecComets → setSpecPath, near renderQuiz) writes each .spec-bd's own <path> `d` (a
+   rounded-rect matching its live padding-box, r = half the short side — a stadium for pills, a circle
+   for the square reveal-icon) plus its exact perimeter as --spec-perim, recomputed on resize via
+   ResizeObserver. --spec-perim sizes stroke-dasharray (one ~20%-of-perimeter arc + the remaining gap)
+   and is also the animation's dashoffset travel distance, so the loop repeats with no visible seam
+   regardless of the button's size.
+   The plain ring underneath is still --ring-idle (static, no animation) — the moving arc is the only
+   thing that reads as "this is animating", same principle as every earlier pass, just finally landing
+   ON the frame instead of near it. FILL stays decoupled via --spec-fill so .spec-bd-dark flips to dark
+   fill / cloud text with the identical ring + comet. */
 .spec-bd{position:relative;overflow:hidden;border:2px solid transparent;background:var(--spec-fill,linear-gradient(var(--white),var(--white))) padding-box,var(--ring-idle) border-box;}
 .spec-bd-dark{--spec-fill:linear-gradient(var(--ink),var(--ink));color:var(--cloud);}
 .spec-bd::before{content:"";position:absolute;inset:0;border-radius:inherit;background-image:radial-gradient(circle .6px at center,rgba(17,19,24,.4),transparent 100%);background-size:10px 9px;pointer-events:none;opacity:.7;}
 .spec-bd-dark::before{background-image:radial-gradient(circle .6px at center,rgba(255,255,255,.4),transparent 100%);}
 .spec-bd .spec-label{position:relative;background:linear-gradient(to top,var(--ink),var(--muted));-webkit-background-clip:text;background-clip:text;color:transparent;}
 .spec-bd-dark .spec-label{background:linear-gradient(to top,var(--cloud),var(--muted));-webkit-background-clip:text;background-clip:text;color:transparent;}
-.spec-bd::after{content:"";position:absolute;inset:0;width:var(--spec-glow,64px);height:var(--spec-glow,64px);border-radius:50%;background:radial-gradient(circle at center,var(--cyan) 0%,var(--violet) 42%,transparent 72%);offset-path:var(--spec-path,none);offset-distance:0%;pointer-events:none;animation:cometTravel 3s linear infinite;}
-@keyframes cometTravel{to{offset-distance:100%;}}
+.spec-comet{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
+.spec-comet path{fill:none;stroke:var(--violet);stroke-width:3px;stroke-linecap:round;filter:drop-shadow(0 0 4px var(--cyan));animation:cometDash 3s linear infinite;}
+@keyframes cometDash{to{stroke-dashoffset:calc(-1 * var(--spec-perim,300));}}
 
 /* Lucide icons — stroke-only per Design DNA §07; fill/stroke inherit to all children */
 .lucide{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;}
@@ -185,9 +185,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .int-t{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--ink);line-height:1.35;}
 
 /* NAV / BUTTONS — nav pinned to bottom (equal-height screens); primary CTA capped so it stays a consistent proportion, never full-bleed on wide screens */
-.q-nav{display:flex;gap:12px;width:100%;max-width:460px;margin:auto auto 0;padding-top:32px;align-items:center;justify-content:center;}
-.q-nav .btn-primary{flex:0 0 auto;}
-.q-nav .btn-tertiary{flex:0 0 auto;}
+/* Both nav buttons now split the row evenly (flex:1 each) instead of sizing to their own content and
+   clustering together with dead space on both sides — "เต็มความกว้างเท่าคอนเทนต์". justify-content is
+   moot once both children fill 100% of the row, so it's dropped here (still overridden below on
+   mobile for the sticky variant, where it's equally moot but harmless to leave explicit). */
+.q-nav{display:flex;gap:12px;width:100%;max-width:460px;margin:auto auto 0;padding-top:32px;align-items:center;}
+.q-nav .btn-primary,.q-nav .btn-tertiary{flex:1;}
 /* Mobile: pin the nav to the viewport bottom so the CTA is always reachable even when a question's
    answers run long enough to push it past the fold. margin-top:auto already parks it at the bottom of
    the (tall) q-scroll; position:sticky;bottom:0 additionally holds it at the visible bottom WHILE the
@@ -202,7 +205,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    which correctly expands it to the full bleed edge on both sides. justify-content:space-between
    (not center) puts "ถัดไป" flush against the right edge — easiest one-handed reach on a phone —
    while pc/tablet above keep the roomy centered pair from the Animated Hero redesign. */
-:root[data-view="mobile"] .q-nav{position:sticky;bottom:0;z-index:6;width:auto;max-width:none;margin-left:calc(-1*var(--sp-edge));margin-right:calc(-1*var(--sp-edge));padding:14px var(--sp-edge) calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper) 76%,transparent);justify-content:space-between;}
+:root[data-view="mobile"] .q-nav{position:sticky;bottom:0;z-index:6;width:auto;max-width:none;margin-left:calc(-1*var(--sp-edge));margin-right:calc(-1*var(--sp-edge));padding:14px var(--sp-edge) calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper) 45%,color-mix(in srgb,var(--paper) 50%,transparent) 75%,transparent);}
 /* ============================================================================
    BUTTON SYSTEM (2026-08-11) — 3 tiers by fill weight, each usable with or
    without an icon (an icon is just optional inline content — no separate CSS
@@ -1140,22 +1143,33 @@ var RESULT=null;
 var root=document.getElementById('root');
 function ic(id,cls){return '<svg viewBox="0 0 24 24" class="lucide'+(cls?' '+cls:'')+'"><use href="#'+id+'"/></svg>';}
 
-/* --- CTA travelling-light path (see the .spec-bd comment in the stylesheet) ---
-   Ports star-button.tsx's JS: write each .spec-bd its own rounded-rect offset path sized to its live
-   padding box, so the glow rides the real button outline. r = half the short side → a stadium for
-   pills, a circle when square (the reveal-icon). Recomputed on any size change via ResizeObserver, so
-   it survives breakpoint resizes (.btn-primary{flex:1} stretches with the row) without a manual hook.
-   --spec-glow is ALSO written here, sized off the element's own height, instead of one fixed px value
-   for every instance — a 64px glow on the ~34px tb-pill (or even the 52px primary CTA) was taller
-   than the button itself, so instead of a highlight sliding past, it read as a static-looking blob
-   filling half the shape (confirmed from a real screenshot: the "PDF" pill and the reveal-icon both
-   showed a big circle parked on one side, not a slim light tracing the frame). Clamped so tiny/huge
-   elements don't get a degenerately small or oversized glow. */
+/* --- CTA comet: SVG stroke drawn on the button's own rounded-rect outline (see the .spec-bd comment
+   in the stylesheet for why this replaced the earlier offset-path+blob approach) ---
+   ensureCometSVG lazily injects one <svg class="spec-comet"><path/></svg> as each .spec-bd's first
+   real child (after any ::before, before its icon/text — so it paints under the label). setSpecPath
+   then (re)computes that path's `d` from the element's live padding-box size — r = half the short
+   side, a stadium for pills, a circle for the square reveal-icon — plus its exact perimeter, written
+   as --spec-perim for the dashoffset keyframe's travel distance. stroke-dasharray is [~22% of
+   perimeter, ~78%] so exactly one arc is visible and the loop has no seam, at any button size.
+   Recomputed on resize via ResizeObserver so it survives breakpoint stretches (.btn-primary{flex:1}). */
+function ensureCometSVG(el){
+  if(el.querySelector(':scope > svg.spec-comet'))return el.querySelector(':scope > svg.spec-comet path');
+  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('class','spec-comet');
+  var path=document.createElementNS('http://www.w3.org/2000/svg','path');
+  svg.appendChild(path);
+  el.insertBefore(svg,el.firstChild);
+  return path;
+}
 function setSpecPath(el){
   var w=el.clientWidth,h=el.clientHeight;if(!w||!h)return;
   var r=Math.min(w,h)/2;
-  el.style.setProperty('--spec-path',"path('M "+r+" 0 H "+(w-r)+" A "+r+" "+r+" 0 0 1 "+w+" "+r+" V "+(h-r)+" A "+r+" "+r+" 0 0 1 "+(w-r)+" "+h+" H "+r+" A "+r+" "+r+" 0 0 1 0 "+(h-r)+" V "+r+" A "+r+" "+r+" 0 0 1 "+r+" 0 Z')");
-  el.style.setProperty('--spec-glow',Math.max(18,Math.min(44,Math.round(h*0.62)))+'px');
+  var d="M "+r+" 0 H "+(w-r)+" A "+r+" "+r+" 0 0 1 "+w+" "+r+" V "+(h-r)+" A "+r+" "+r+" 0 0 1 "+(w-r)+" "+h+" H "+r+" A "+r+" "+r+" 0 0 1 0 "+(h-r)+" V "+r+" A "+r+" "+r+" 0 0 1 "+r+" 0 Z";
+  var perim=2*w+2*h-8*r+2*Math.PI*r;
+  var path=ensureCometSVG(el);
+  path.setAttribute('d',d);
+  path.style.strokeDasharray=(perim*0.22).toFixed(1)+' '+(perim*0.78).toFixed(1);
+  el.style.setProperty('--spec-perim',perim.toFixed(1));
 }
 var _specRO=(typeof ResizeObserver!=='undefined')?new ResizeObserver(function(es){es.forEach(function(e){setSpecPath(e.target);});}):null;
 function layoutSpecComets(){
