@@ -13,12 +13,15 @@
      divider border in the app inherits from these 4 tokens, so lightening them here softens boundary
      lines app-wide in one place rather than per-component. */
   --line:rgba(17,19,24,0.09); --line-soft:rgba(17,19,24,0.08); --line-strong:rgba(17,19,24,0.17); --line-header:rgba(17,19,24,0.06);
+  /* the last 3 black-alpha values in the file that weren't already part of the line/shadow scale —
+     each has exactly one use-site, named here so nothing app-facing is a bare rgba() (2026-08-12). */
+  --ring-idle:rgba(17,19,24,0.14); --card-frame:rgba(17,19,24,0.16); --shadow-cta-ink:rgba(17,19,24,0.18);
   --focus:#2b6cff; --popover:rgba(255,255,255,0.96);
   --cyan:#61e8ed; --violet:#9c91ff; --pink:#f178d8; --yellow:#f2ea83;
   --spectrum:linear-gradient(90deg,#61e8ed,#9c91ff,#f178d8,#f2ea83,#61e8ed);
   /* Liquid-metal-inspired CTA border sweep (2026-08-11, ref: 21st.dev "Liquid Metal Button" — same
      border box, redesigned gradient stops, see .spec-bd below for why). */
-  --spectrum-conic:conic-gradient(from var(--spin-angle,0deg),rgba(17,19,24,0.14) 0deg,rgba(17,19,24,0.14) 250deg,#61e8ed 274deg,#9c91ff 305deg,#f178d8 334deg,#f2ea83 356deg,rgba(17,19,24,0.14) 360deg);
+  --spectrum-conic:conic-gradient(from var(--spin-angle,0deg),var(--ring-idle) 0deg,var(--ring-idle) 250deg,#61e8ed 274deg,#9c91ff 305deg,#f178d8 334deg,#f2ea83 356deg,var(--ring-idle) 360deg);
   --ease:cubic-bezier(0.22,1,0.36,1);
   /* Radius scale (2026-08-12) — 8/12/16/24 is the full ladder; the system only ever
      names the two rungs actually in use. 12 and 24 stay reserved for future needs. */
@@ -71,6 +74,10 @@
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{font-size:16px;}
+/* --focus is the app's one semantic keyboard-a11y color — separate job from "selected" (which stays
+   ink/spectrum everywhere else). :focus-visible only shows for keyboard/switch nav, so touch/mouse
+   users on the kiosk never see it — this doesn't compete with the touch-first visual language. */
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
 /* min-height declared twice on purpose: 100vh first (universal fallback), 100dvh second (real mobile
    browsers report 100vh as the LARGEST possible viewport — address bar collapsed — so a page sized to
    100vh is actually TALLER than what's visible whenever the address bar is showing, pushing the CTA/
@@ -304,7 +311,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 
 .card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);overflow:hidden;position:relative;}
 /* system frame — thin-line + corner-bracket ornament (echoes the character-card frame) */
-.card::after{content:"";position:absolute;inset:6px;pointer-events:none;z-index:4;--b:rgba(17,19,24,0.16);--L:12px;--t:1px;background:linear-gradient(var(--b),var(--b)) top left/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) top left/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) top right/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) top right/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) bottom left/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) bottom left/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) bottom right/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) bottom right/var(--t) var(--L) no-repeat;}
+.card::after{content:"";position:absolute;inset:6px;pointer-events:none;z-index:4;--b:var(--card-frame);--L:12px;--t:1px;background:linear-gradient(var(--b),var(--b)) top left/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) top left/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) top right/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) top right/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) bottom left/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) bottom left/var(--t) var(--L) no-repeat,linear-gradient(var(--b),var(--b)) bottom right/var(--L) var(--t) no-repeat,linear-gradient(var(--b),var(--b)) bottom right/var(--t) var(--L) no-repeat;}
 .card.mb{margin-bottom:var(--sp-card-gap);}
 .card.mb-lg{margin-bottom:var(--sp-chapter);}
 .s-pad{padding:var(--sp-block) var(--sp-card-pad);}
@@ -526,7 +533,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .sp-cta{position:relative;z-index:2;width:100%;margin-top:auto;padding-top:24px;}
 /* the ONE action on this screen that matters — taller than a normal CTA, and a soft brand-colored
    glow underneath (a "beacon", not a border) so it visually out-ranks the fan carousel above it */
-.sp-cta .btn-primary{width:100%;min-height:56px;font-size:var(--fs-sub);box-shadow:0 12px 28px -6px color-mix(in srgb,var(--violet) 45%,transparent),0 4px 10px rgba(17,19,24,0.18);}
+.sp-cta .btn-primary{width:100%;min-height:56px;font-size:var(--fs-sub);box-shadow:0 12px 28px -6px color-mix(in srgb,var(--violet) 45%,transparent),0 4px 10px var(--shadow-cta-ink);}
 .sp-cap{position:relative;z-index:2;font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);margin-top:12px;text-align:center;line-height:1.5;}
 /* brand logos */
 .sp-logo{display:block;height:24px;width:auto;margin:0 auto 16px;opacity:.92;}
@@ -534,7 +541,16 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .tb-logo{height:22px;width:auto;object-fit:contain;}
 .q-scroll{position:relative;z-index:1;}
 
-/* ══ COLLECTIBLE PERSONA CARD ══ full-bleed dark art · overlays · flip back */
+/* ══ COLLECTIBLE PERSONA CARD ══ full-bleed dark art · overlays · flip back
+   Ink-on-card scale (2026-08-12) — deliberately literal, not CSS vars: this is the card's own
+   illustrated palette (same exception as its font sizes above), tuned per-role rather than reused
+   across the app. Kept here as one documented list instead of scattered bare rgba() so it reads as
+   an intentional 14-value scale, not drift: 0.05 dot-texture · 0.09/0.15 face shadow · 0.12 stat
+   track fill · 0.13 inner frame hairline · 0.2 divider-chip border · 0.22 divider line / back frame ·
+   0.28 rank-badge shadow · 0.30 glyph drop-shadow · 0.34 outer frame border · 0.40 secondary ink
+   (spark icon, tag separator) · 0.5 borders/dividers (corner tick, medal spark, divider-chip text,
+   bullet glyph) · 0.6 body ink (divider-chip label, back eyebrow/title/stat-label/legend) · 0.72
+   back bullet-list body text. */
 .pc3d{perspective:900px;width:100%;}
 .pc-tilt{position:relative;width:100%;aspect-ratio:5/7;transform-style:preserve-3d;transition:transform .5s var(--ease);will-change:transform;}
 .pc-flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .7s var(--ease);}
@@ -558,12 +574,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pcE-name{position:absolute;top:54px;left:14px;right:14px;text-align:center;z-index:3;}
 .pcE-en{font-family:var(--serif);font-weight:600;font-size:20px;line-height:1.0;color:#15171d;letter-spacing:-0.01em;}
 @supports(width:1cqw){.pcE-en{font-size:clamp(20px,10cqw,32px);}}
-.pcE-th{font-family:var(--font);font-weight:var(--w-head);font-size:12.5px;color:rgba(17,19,24,0.64);margin-top:4px;}
+.pcE-th{font-family:var(--font);font-weight:var(--w-head);font-size:12.5px;color:rgba(17,19,24,0.6);margin-top:4px;}
 .pcE-art{position:absolute;top:30%;left:10%;right:10%;height:36%;display:flex;align-items:center;justify-content:center;z-index:1;}
 .pcE-halo{position:absolute;width:74%;aspect-ratio:1;border-radius:50%;background:conic-gradient(from 205deg,#61e8ed,#9c91ff,#f178d8,#f2ea83,#61e8ed);filter:saturate(1.1);opacity:.92;-webkit-mask:radial-gradient(closest-side,#000 60%,transparent 76%);mask:radial-gradient(closest-side,#000 60%,transparent 76%);transition:transform .3s var(--ease);}
 .pcE-glyph{position:relative;z-index:2;transition:transform .3s var(--ease);}
 .pcE-glyph svg{width:64px;height:64px;color:#14161c;stroke-width:1.2;filter:drop-shadow(0 6px 15px rgba(17,19,24,0.30));}
-.pcE-spk{position:absolute;color:rgba(17,19,24,0.42);z-index:2;font-size:11px;}
+.pcE-spk{position:absolute;color:rgba(17,19,24,0.4);z-index:2;font-size:11px;}
 .pcE-wedge{position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(180deg,rgba(159,194,255,0) 0%,rgba(159,194,255,0.30) 46%,rgba(101,152,255,0.36) 100%);clip-path:polygon(0 24%,50% 0,100% 24%,100% 100%,0 100%);z-index:1;}
 .pcE-info{position:absolute;left:20px;right:20px;bottom:18px;text-align:center;z-index:2;}
 .pcE-def{font-family:var(--font);font-weight:var(--w-head);font-size:12.5px;line-height:1.5;color:#15171d;}
@@ -571,7 +587,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pcE-div i{height:1px;flex:1;background:rgba(17,19,24,0.22);}
 .pcE-div span{font-family:var(--font);font-size:9px;font-weight:var(--w-label);letter-spacing:0.06em;text-transform:uppercase;color:rgba(17,19,24,0.6);white-space:nowrap;padding:2px 10px;border:1px solid rgba(17,19,24,0.2);border-radius:var(--rpill);}
 .pcE-tags{font-family:var(--font);font-size:11px;color:#15171d;line-height:1.7;}
-.pcE-tags .tsep{color:rgba(17,19,24,0.38);margin:0 4px;}
+.pcE-tags .tsep{color:rgba(17,19,24,0.4);margin:0 4px;}
 /* ══ EDITORIAL CARD (back — dossier) ══ */
 .pcb{position:absolute;inset:0;background:#f4f1e9;color:#15171d;padding:20px 18px;display:flex;flex-direction:column;overflow-y:auto;}
 .pcb::before{content:"";position:absolute;inset:9px;border:1px solid rgba(17,19,24,0.22);border-radius:9px;pointer-events:none;}
