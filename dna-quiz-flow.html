@@ -84,35 +84,35 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .shell{width:100%;max-width:430px;min-height:100vh;min-height:100dvh;background:var(--paper);position:relative;display:flex;flex-direction:column;}
 
 /* spectrum border technique — the one accent per scene */
-/* CTA spectrum border — motion checked against the actual badtz-ui star-button.tsx source (not just
-   the demo screenshot this time). What it really does: a light div the same size as `--light-width`
-   (110px default — noticeably BIGGER than the button itself), filled with
-   `radial-gradient(ellipse at center, color, transparent, transparent)` — a soft glow with no hard
-   edge and no mask — whose offset-anchor (its own center) is dragged around an explicit rectangle
-   path the size of the button, computed once in JS via offsetWidth/offsetHeight.
-   Our first pass got the mechanism right (offset-path + animated offset-distance) but the light
-   itself was wrong on two counts: (1) a 12px dot with a hard mask edge, when the reference is a
-   large, soft, edge-less glow roughly 2-3× the button's own size — that's *why* it read as a tiny
-   sharp point circling instead of a glow sweeping past; (2) no reason to blur/drop-shadow a shape
-   that's supposed to fade via gradient stops, not filters.
-   Fixed to match: dropped the mask and filter, sized the radial-gradient itself (26px circle, no
-   hard stop until `transparent`) so the falloff IS the shape, same as the reference's gradient-only
-   approach. Two deliberate deviations, both justified: (a) our own --violet→--cyan glow instead of
-   their flat lightColor — kept per direction; (b) offset-path:border-box instead of their
-   JS-computed literal rectangle path — our buttons genuinely resize across mobile/tablet/pc
+/* CTA spectrum border — checked against a real screenshot of the star-button demo this time (not
+   just the source), because the previous pass still read as "a soft ball floating past the button,"
+   not border motion. The screenshot showed why: the button has `overflow-hidden`, so the oversized
+   light div (their own source: ~2-3× the button's size) never actually appears as a free floating
+   circle — most of it is clipped away by the button's own rounded silhouette, and only the sliver
+   that overlaps the button shows. That sliver reads as a WIDE, soft highlight hugging one whole edge
+   at a time (spans maybe half the pill's width when centered on a straight side), not a dot and not
+   a ball — because it's clipped TO the shape, not floating ON TOP of it.
+   Our previous version had the right glow (radial-gradient, no mask/filter) but no clipping and an
+   inset:-2px box, so it visibly extended past the border on every side — exactly the "floating ball"
+   look. Fixed: `overflow:hidden` on `.spec-bd`, and the glow pseudo now sits at inset:0 (flush with
+   the padding edge, i.e. just inside the border) with `border-radius:inherit` — between the two, the
+   glow can now only ever show up to the button's own rounded outline, so it hugs the edge instead of
+   floating beyond it.
+   Two deliberate deviations from their source stay: (a) our own cyan→violet glow instead of their
+   flat lightColor — kept per direction, using the app's spectrum palette; (b) offset-path:border-box
+   instead of their JS-computed literal rectangle path — our buttons resize across mobile/tablet/pc
    (`.btn-primary{flex:1}` stretches with the row), so a path baked in once on mount would drift out
-   of sync on the next breakpoint; `border-box` re-derives from actual layout on every frame, no
-   resize listener needed. Their rectangle path also has hard 90° corners, which would look wrong
-   cutting through our fully-rounded pills — border-box correctly follows the rounded edge instead.
+   of sync on the next breakpoint, and their path's hard 90° corners would look wrong cutting through
+   our fully-rounded pills anyway.
    The ring itself stays --ring-idle (a plain faint line, no gradient, no animation) — 100% of the
    "this is moving" signal lives in the one travelling glow, same as the reference.
    FILL is decoupled from the border via --spec-fill (default white) so the identical border+motion
    can carry either fill: .spec-bd alone = white fill/ink text (unchanged from before); stack
    .spec-bd-dark alongside it for dark fill/cloud text — same ring, same travelling glow, inverted
    fill colors. */
-.spec-bd{position:relative;border:2px solid transparent;background:var(--spec-fill,linear-gradient(var(--white),var(--white))) padding-box,var(--ring-idle) border-box;}
+.spec-bd{position:relative;overflow:hidden;border:2px solid transparent;background:var(--spec-fill,linear-gradient(var(--white),var(--white))) padding-box,var(--ring-idle) border-box;}
 .spec-bd-dark{--spec-fill:linear-gradient(var(--ink),var(--ink));color:var(--cloud);}
-.spec-bd::after{content:"";position:absolute;inset:-2px;border-radius:inherit;background:radial-gradient(26px circle at center,color-mix(in srgb,var(--violet) 65%,white) 0%,color-mix(in srgb,var(--cyan) 40%,transparent) 55%,transparent 80%);offset-path:border-box;offset-distance:0%;pointer-events:none;animation:cometTravel 3s linear infinite;}
+.spec-bd::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(36px circle at center,var(--cyan) 0%,var(--violet) 45%,transparent 78%);offset-path:border-box;offset-distance:0%;pointer-events:none;animation:cometTravel 3s linear infinite;}
 @keyframes cometTravel{to{offset-distance:100%;}}
 
 /* Lucide icons — stroke-only per Design DNA §07; fill/stroke inherit to all children */
@@ -259,21 +259,32 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .consent-caption{font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);margin-top:14px;line-height:1.6;}
 .consent-caption b{font-weight:var(--w-label);color:var(--ink);}
 
-/* Reveal-screen orb — adapted from 21st.dev "Siri Wave" (a raw-WebGL/GLSL metaball shader: dots that
-   merge, scatter and gather). A hand-written WebGL+GLSL shader is a different order of engineering
-   than this file's CSS-only components, so the DNA borrowed is the RESULT, not the renderer: several
-   soft, differently-timed blurred blobs drifting inside one circular window, blending in and out of
-   each other like they're the same fluid mass — same idea already used for the splash's floating
-   brand assets (`.sp-el`/spDrift), just smaller, clipped to a circle, and in our spectrum hues so it
-   echoes `.reveal-icon` above it (same "spectrum-glow, round" family, not the same slot — this one
-   sits at the very bottom of the screen via margin-top:auto, the icon stays at the top). */
-.siri-orb{position:relative;width:120px;height:120px;margin:auto auto 0;flex-shrink:0;border-radius:50%;overflow:hidden;isolation:isolate;background:color-mix(in srgb,var(--ink) 4%,transparent);}
-.siri-b{position:absolute;width:62%;height:62%;border-radius:50%;filter:blur(13px);opacity:.75;animation:siriDrift ease-in-out infinite alternate;}
-.siri-b1{background:var(--cyan);top:6%;left:10%;animation-duration:5.5s;}
-.siri-b2{background:var(--violet);top:16%;left:42%;animation-duration:6.5s;animation-delay:-1.2s;}
-.siri-b3{background:var(--pink);top:46%;left:8%;animation-duration:7s;animation-delay:-2.6s;}
-.siri-b4{background:var(--yellow);top:40%;left:38%;animation-duration:5s;animation-delay:-3.4s;}
-@keyframes siriDrift{0%{transform:translate(0,0) scale(1);}50%{transform:translate(7px,-9px) scale(1.18);}100%{transform:translate(-6px,7px) scale(.88);}}
+/* Reveal-screen wave — rebuilt against a real screenshot of the "Siri Wave" demo (a raw-WebGL/GLSL
+   metaball shader), not the text description alone: it isn't scattered circular blobs in a round
+   window — it's ONE flat horizontal lens/eye silhouette with a bright core line through the middle
+   and chromatic colour bands blooming above/below/either side of that line, all soft-blended
+   together. A hand-written WebGL+GLSL shader is a different order of engineering than this file's
+   CSS components, so the DNA borrowed is the RESULT (that lens shape + banded glow + gentle
+   breathing pulse), not the renderer.
+   The lens shape comes for free from the container itself: border-radius:50% on a wide-short box
+   renders as an ellipse matching its own aspect ratio, and overflow:hidden clips every band to that
+   ellipse — so the "eye" outline isn't drawn, it's just what's left after clipping. Each band is an
+   oversized radial-gradient positioned off one edge (top/bottom/left/right) so only its inward-facing
+   curve shows once clipped, exactly like the reference's colour separation top vs bottom vs sides.
+   Recoloured to the app's own --cyan/--violet/--pink/--yellow (design.md's spectrum palette) instead
+   of the reference's green/blue/orange, with a white core for the bright centre line. Sits at the
+   bottom of the screen via margin-top:auto so it echoes `.reveal-icon` above it as the same
+   "spectrum-glow" family without occupying its slot. */
+.siri-wave{position:relative;width:180px;height:48px;margin:auto auto 0;flex-shrink:0;border-radius:50%;overflow:hidden;isolation:isolate;filter:blur(6px);animation:swBreathe 4s ease-in-out infinite;}
+.sw-band{position:absolute;border-radius:50%;filter:blur(3px);animation:swPulse 4s ease-in-out infinite;}
+.sw-top{width:90%;height:75%;top:-32%;left:5%;background:radial-gradient(ellipse at center,var(--cyan),transparent 72%);}
+.sw-bottom{width:90%;height:75%;top:57%;left:5%;background:radial-gradient(ellipse at center,var(--yellow),transparent 72%);animation-delay:-2s;}
+.sw-l{width:55%;height:95%;top:2%;left:-18%;background:radial-gradient(ellipse at center,var(--violet),transparent 72%);animation-delay:-1s;}
+.sw-r{width:55%;height:95%;top:2%;left:63%;background:radial-gradient(ellipse at center,var(--pink),transparent 72%);animation-delay:-3s;}
+.sw-core{position:absolute;width:82%;height:34%;top:33%;left:9%;border-radius:50%;background:radial-gradient(ellipse at center,#fff,transparent 76%);opacity:.85;filter:blur(2px);animation:swCore 4s ease-in-out infinite;}
+@keyframes swBreathe{0%,100%{transform:scaleY(1);}50%{transform:scaleY(.8);}}
+@keyframes swPulse{0%,100%{transform:scale(1);opacity:.8;}50%{transform:scale(1.18);opacity:1;}}
+@keyframes swCore{0%,100%{transform:scaleX(1);}50%{transform:scaleX(1.14);}}
 
 /* ── BOOK — scene-based: hairlines, not shadows ── */
 .scroll{flex:1;padding:12px var(--sp-edge) 96px;display:flex;flex-direction:column;}
@@ -1249,7 +1260,7 @@ function renderReveal(){
     '<div class="consent-kicker">วิเคราะห์คำตอบทั้งหมดของคุณเสร็จแล้ว</div>'+
     '<div class="consent-h"><span class="ch-1">ตัวตนนักลงทุนของคุณ</span><span class="ch-2">กำลังจะปรากฏ&hellip;</span></div>'+
     '<div class="consent-btn"><button class="btn btn-primary" id="revealBtn">'+ic('lc-sparkles')+'แตะเพื่อเปิดตัวตนของคุณ</button></div>'+
-    '<div class="siri-orb" aria-hidden="true"><span class="siri-b siri-b1"></span><span class="siri-b siri-b2"></span><span class="siri-b siri-b3"></span><span class="siri-b siri-b4"></span></div>'+
+    '<div class="siri-wave" aria-hidden="true"><span class="sw-band sw-top"></span><span class="sw-band sw-bottom"></span><span class="sw-band sw-l"></span><span class="sw-band sw-r"></span><span class="sw-core"></span></div>'+
   '</div>';
   root.querySelector('#rvBack').onclick=function(){st.idx=10;st.phase='quiz';render();};
   root.querySelector('#revealBtn').onclick=function(){st.phase='book';render();};
