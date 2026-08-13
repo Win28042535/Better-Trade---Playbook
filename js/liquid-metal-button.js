@@ -119,15 +119,23 @@ export function createLiquidMetalButton(opts = {}) {
         rim = 8,
         metalShiftRed = 0.3,
         metalShiftBlue = 0.3,
+        icon = '',
         onClick,
     } = opts;
 
     injectStyleOnce();
 
     const isIcon = viewMode === 'icon';
+    // A leading `icon` (raw SVG markup, e.g. a lucide symbol's outerHTML) sits before the label —
+    // added for header-pill instances ("สแกน QR") that need an icon + text combo, which the
+    // original kit didn't support (only a label-only mode or the hardcoded sparkles-only icon
+    // mode). Its width has to be added to the auto-measured W or the icon+gap would overflow the
+    // pill's own auto-sized width, since measureLabel only ever measured the text.
+    const iconSidePx = icon ? Math.round(fontSize * 0.85) : 0;
+    const iconGapPx = icon ? 6 : 0; // matches labelLayer's own flex `gap:6px` below
     const W = isIcon
         ? height
-        : (fixedWidth ?? Math.round(measureLabel(label, fontSize, fontWeight, fontFamily) + paddingX * 2));
+        : (fixedWidth ?? Math.round(measureLabel(label, fontSize, fontWeight, fontFamily) + paddingX * 2 + iconSidePx + iconGapPx));
     const H = height;
 
     let isHovered = false;
@@ -162,6 +170,15 @@ export function createLiquidMetalButton(opts = {}) {
         svg.style.cssText =
             `color:${textColor};filter:drop-shadow(0px 1px 2px rgba(0,0,0,0.5));transition:all 0.8s ${EASE};`;
     } else {
+        if (icon) {
+            const iconWrap = document.createElement('span');
+            iconWrap.innerHTML = icon;
+            iconWrap.style.cssText =
+                `display:inline-flex;flex:0 0 auto;color:${textColor};transition:all 0.8s ${EASE};`;
+            const iconSvg = iconWrap.querySelector('svg');
+            if (iconSvg) iconSvg.style.cssText = `width:${iconSidePx}px;height:${iconSidePx}px;display:block;`;
+            labelLayer.appendChild(iconWrap);
+        }
         const span = document.createElement('span');
         span.textContent = label;
         span.style.cssText =
