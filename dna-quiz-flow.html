@@ -741,6 +741,33 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .gr-result{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);line-height:1.6;}
 .games-note{margin-top:12px;display:flex;align-items:center;gap:6px;font-size:var(--fs-eyebrow);color:var(--muted);}
 .games-note svg{width:var(--ic-sm);height:var(--ic-sm);}
+
+/* ══ PROFILE TAB ══ ported from Playbook Final's Profile screen (identity + QR + info rows + footer
+   disclaimer), re-skinned to our DNA. Data (userName/userOrg/profileRows/footer) verbatim. */
+.prof-t{font-size:var(--fs-heading);font-weight:var(--w-head);color:var(--ink);letter-spacing:0;}
+.prof-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad);text-align:center;}
+.prof-av{width:66px;height:66px;margin:0 auto 10px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--ink);}
+.prof-av svg{width:32px;height:32px;}
+.prof-name{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);}
+.prof-org{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:2px;}
+.prof-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:10px;}
+.prof-vf{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--rpill);background:color-mix(in srgb,var(--cyan) 15%,transparent);color:var(--ink);font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
+.prof-vf svg{width:14px;height:14px;}
+.prof-tier{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--rpill);background:var(--ink);color:var(--cloud);font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
+.prof-tier svg{width:14px;height:14px;}
+.prof-qr{margin-top:16px;padding:16px;border-radius:var(--r1);border:1px dashed var(--line-strong);background:var(--paper);}
+.pq-lbl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
+.pq-box{width:148px;height:148px;margin:0 auto;border-radius:var(--r1);background:var(--white);border:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;color:var(--ink);}
+.pq-box svg{width:92px;height:92px;}
+.pq-note{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;margin:11px auto 0;max-width:300px;}
+.prof-rows{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:16px var(--sp-card-pad);display:flex;flex-direction:column;gap:11px;}
+.pr-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;font-size:var(--fs-bodysm);}
+.pr-k{color:var(--muted);flex:0 0 auto;}
+.pr-v{color:var(--ink);font-weight:var(--w-head);text-align:right;min-width:0;line-height:1.5;}
+.prof-foot{border-top:1px solid var(--line-soft);padding-top:16px;display:flex;flex-direction:column;gap:8px;}
+.pf-brand{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);}
+.pf-note{display:flex;align-items:flex-start;gap:6px;font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.6;}
+.pf-note svg{width:14px;height:14px;flex:0 0 auto;margin-top:2px;}
 /* ══ SPLASH / ATTRACT ══ two-tone headline · drifting brand assets · card carousel */
 /* overflow-x only (never -y): the CTA must NEVER be unreachable. overflow:hidden on both axes
    used to CLIP (not scroll-hide) anything past the fold whenever content ran taller than the
@@ -1390,7 +1417,7 @@ function render(){
   else if(st.phase==='home')renderHome();
   else if(st.phase==='passport')renderBooth();
   else if(st.phase==='games')renderGames();
-  else if(st.phase==='profile')renderStub(st.phase);
+  else if(st.phase==='profile')renderProfile();
   window.scrollTo(0,0);
   layoutSpecComets();
 }
@@ -1822,15 +1849,6 @@ function renderHome(){
   var agMore=root.querySelector('#agMore');if(agMore)agMore.onclick=function(){HOME_MST.agendaAll=!HOME_MST.agendaAll;renderHome();};
   layoutSpecComets();
 }
-function renderStub(tab){
-  var meta={games:{icon:'lc-gamepad-2',label:'เกมหลัก'},profile:{icon:'lc-user',label:'โปรไฟล์'}}[tab];
-  root.innerHTML=appHeader()+
-  '<main class="scroll fade"><div class="stub-wrap"><div class="stub-ic">'+ic(meta.icon)+'</div><div class="stub-t">'+meta.label+'</div><div class="stub-s">แท็บนี้กำลังจะมา — อยู่ระหว่างออกแบบตาม Playbook Final</div></div></main>'+
-  appTabbar(tab);
-  bindTabbar();
-  root.querySelector('#devReset').onclick=resetQuiz;
-}
-
 /* ══ BOOTH / PASSPORT TAB ══ content ported from Playbook Final's Passport screen (BOOTHS/ZONES/
    ZONE_BOOTHS + hero-route builder). Check-in/activity is real (toggled locally) so the top progress
    bars and grand-prize gate react; the floorplan is a placeholder (no floorplan asset in this repo). */
@@ -2001,6 +2019,40 @@ function renderGames(){
   root.querySelector('#devReset').onclick=resetQuiz;
   root.querySelectorAll('[data-play]').forEach(function(b){b.onclick=function(e){e.stopPropagation();var i=+b.dataset.play;GAME_PLAYED[i]=true;GAME_OPEN=i;renderGames();};});
   root.querySelectorAll('[data-open]').forEach(function(t){t.onclick=function(){var i=+t.dataset.open;if(!GAME_PLAYED[i])return;GAME_OPEN=(GAME_OPEN===i?null:i);renderGames();};});
+  layoutSpecComets();
+}
+
+/* ══ PROFILE TAB ══ content ported from Playbook Final's Profile screen — userName/userOrg/
+   profileRows + footer disclaimer verbatim. Identity + QR-placeholder + info rows. The QR and email
+   are masked/placeholder (a real event fills them from registration), matching the source's MOCK. */
+var PROFILE_ROWS=[
+  {k:'สิทธิ',v:null}, // filled from curTier() at render
+  {k:'งาน',v:'Better Trade 2026'},
+  {k:'วันที่',v:'31 ต.ค. – 1 พ.ย. 2569 · 09.00–18.30 น.'},
+  {k:'สถานที่',v:'Samyan Mitrtown ชั้น 5 · ถ.พระรามที่ 4 ปทุมวัน กรุงเทพฯ 10330'},
+  {k:'อีเมล',v:'••••••••••'}
+];
+function renderProfile(){
+  var t=curTier();
+  root.innerHTML=appHeader()+
+  '<main class="scroll fade">'+
+    '<div class="prof-t">โปรไฟล์</div>'+
+    '<section class="prof-card">'+
+      '<div class="prof-av">'+ic('lc-user')+'</div>'+
+      '<div class="prof-name">ตรีนุช รัตนมณี</div>'+
+      '<div class="prof-org">บริษัทตัวอย่าง จำกัด (ข้อมูลจำลอง)</div>'+
+      '<div class="prof-chips"><span class="prof-vf">'+ic('lc-check-circle')+'ยืนยันแล้ว</span><span class="prof-tier">'+ic(t.meta.icon)+t.name+'</span></div>'+
+      '<div class="prof-qr"><div class="pq-lbl">QR ประจำตัว</div><div class="pq-box">'+ic('lc-qr-code')+'</div><div class="pq-note">เปิดหน้านี้ให้เจ้าหน้าที่สแกน เพื่อเช็คอินบูธ แลกการ์ดตัวจริง หรือส่งสรุปให้ผู้แนะนำการลงทุน · จะสแกน QR ที่จุดนั้นเองก็ได้ผลเหมือนกัน</div></div>'+
+    '</section>'+
+    '<section class="prof-rows">'+PROFILE_ROWS.map(function(r){var v=r.k==='สิทธิ'?t.name:r.v;return '<div class="pr-row"><span class="pr-k">'+r.k+'</span><span class="pr-v">'+v+'</span></div>';}).join('')+'</section>'+
+    '<div class="prof-foot"><div class="pf-brand">efin × BetterTrade · New World, New Playbook</div>'+
+      '<div class="pf-note">'+ic('lc-info')+'เราแค่ "จด" ไม่ "ชี้" · แต้ม ≠ ตัวตน · เพื่อการวางแผนและการศึกษา ไม่ใช่คำชี้ชวนลงทุน</div>'+
+      '<div class="pf-note">'+ic('lc-lock')+'เปิดคู่มือด้วย OTP/QR ตาม PDPA · ตัวเลข/สิทธิเป็นข้อมูลเบื้องต้น (MOCK) ต้องเคาะกับทีมจัดงานก่อนใช้จริง</div>'+
+    '</div>'+
+  '</main>'+
+  appTabbar('profile');
+  bindTabbar();
+  root.querySelector('#devReset').onclick=resetQuiz;
   layoutSpecComets();
 }
 
