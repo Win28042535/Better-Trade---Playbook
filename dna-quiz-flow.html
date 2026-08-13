@@ -694,6 +694,53 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bp-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);min-height:36px;padding:0 11px;border-radius:var(--r1);cursor:pointer;transition:background .15s,border-color .15s;}
 .bp-btn svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
 .bp-btn.done{background:color-mix(in srgb,var(--cyan) 12%,transparent);border-color:color-mix(in srgb,var(--cyan) 40%,transparent);color:var(--ink);}
+
+/* ══ GAMES TAB ══ the source's "คู่มือ 6 ด้านของคุณ" — 6 mini-games, each fills one Playbook side.
+   Ported from Playbook Final's Games screen + sideResult() narratives, re-skinned to our DNA. */
+.games-hd .games-t{font-size:var(--fs-heading);font-weight:var(--w-head);color:var(--ink);letter-spacing:0;}
+.gh-sub{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin:-6px 0 2px;}
+/* progress hero — dark ink card + ring, echoing the source's dark progress hero */
+.gh-prog{display:flex;align-items:center;gap:16px;background:var(--ink);color:var(--cloud);border-radius:var(--r2);padding:18px var(--sp-card-pad);position:relative;overflow:hidden;}
+.gh-prog::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(340px 170px at 100% -20%,color-mix(in srgb,var(--cyan) 20%,transparent),transparent 60%),radial-gradient(300px 170px at 0% 120%,color-mix(in srgb,var(--violet) 24%,transparent),transparent 62%);}
+.gh-ring{position:relative;z-index:1;flex:0 0 auto;}
+.gh-ptx{position:relative;z-index:1;flex:1;min-width:0;}
+.gh-plbl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,.55);}
+.gh-pval{font-size:var(--fs-h2);font-weight:var(--w-label);color:#fff;line-height:1.25;margin-top:2px;}
+.gh-pval b{color:var(--cyan);font-weight:var(--w-label);}
+/* next-game highlight */
+.next-game{border:2px solid var(--violet);border-radius:var(--r2);background:linear-gradient(150deg,color-mix(in srgb,var(--violet) 8%,transparent),var(--white));padding:16px;}
+.ng-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.ng-tag{font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:.04em;color:#fff;background:var(--violet);padding:4px 11px;border-radius:var(--rpill);}
+.ng-tag.key{color:#8a5a00;background:#fef4e2;}
+.ng-row{display:flex;gap:12px;align-items:flex-start;}
+.ng-ic{width:46px;height:46px;flex:0 0 auto;border-radius:13px;background:color-mix(in srgb,var(--violet) 14%,transparent);display:flex;align-items:center;justify-content:center;color:var(--violet);}
+.ng-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
+.ng-tx{flex:1;min-width:0;}
+.ng-title{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);line-height:1.3;}
+.ng-measures{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.5;margin-top:3px;}
+.ng-cta{width:100%;margin-top:14px;}
+.gh-restlbl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:.06em;color:var(--muted);margin:16px 0 9px;text-transform:uppercase;}
+/* game list rows */
+.game-list{display:flex;flex-direction:column;gap:10px;}
+.game-row{border:1px solid var(--line-soft);border-radius:var(--r2);background:var(--white);overflow:hidden;transition:border-color .15s;}
+.game-row.played{border-color:color-mix(in srgb,var(--cyan) 35%,transparent);background:color-mix(in srgb,var(--cyan) 5%,transparent);}
+.gr-hd{display:flex;align-items:center;gap:11px;padding:12px 14px;}
+.gr-ic{width:38px;height:38px;flex:0 0 auto;border-radius:11px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--muted);}
+.game-row.played .gr-ic{background:color-mix(in srgb,var(--cyan) 14%,transparent);color:var(--ink);}
+.gr-ic svg{width:var(--ic-md);height:var(--ic-md);}
+.gr-tx{flex:1;min-width:0;cursor:pointer;}
+.gr-title{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);line-height:1.35;display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+.gr-played{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:var(--w-head);color:var(--ink);background:color-mix(in srgb,var(--cyan) 16%,transparent);padding:2px 8px;border-radius:var(--rpill);}
+.gr-played svg{width:11px;height:11px;}
+.gr-status{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.4;margin-top:2px;}
+.gr-chev{width:20px;height:20px;color:var(--muted);flex-shrink:0;cursor:pointer;transition:transform .2s var(--ease);}
+.gr-chev.open{transform:rotate(180deg);}
+.gr-body{padding:0 14px 14px;}
+.gr-bin{border-top:1px dashed var(--line-soft);padding-top:12px;}
+.gr-from{font-size:var(--fs-eyebrow);color:var(--muted);margin-bottom:5px;}
+.gr-result{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);line-height:1.6;}
+.games-note{margin-top:12px;display:flex;align-items:center;gap:6px;font-size:var(--fs-eyebrow);color:var(--muted);}
+.games-note svg{width:var(--ic-sm);height:var(--ic-sm);}
 /* ══ SPLASH / ATTRACT ══ two-tone headline · drifting brand assets · card carousel */
 /* overflow-x only (never -y): the CTA must NEVER be unreachable. overflow:hidden on both axes
    used to CLIP (not scroll-hide) anything past the fold whenever content ran taller than the
@@ -1342,7 +1389,8 @@ function render(){
   else if(st.phase==='book')renderBook();
   else if(st.phase==='home')renderHome();
   else if(st.phase==='passport')renderBooth();
-  else if(st.phase==='games'||st.phase==='profile')renderStub(st.phase);
+  else if(st.phase==='games')renderGames();
+  else if(st.phase==='profile')renderStub(st.phase);
   window.scrollTo(0,0);
   layoutSpecComets();
 }
@@ -1882,6 +1930,77 @@ function renderBooth(){
   root.querySelector('#howtoBtn').onclick=function(){BOOTH_HOWTO=!BOOTH_HOWTO;root.querySelector('.zone-howto').classList.toggle('show',BOOTH_HOWTO);};
   root.querySelectorAll('.bp-btn').forEach(function(btn){btn.onclick=function(){var bi=+btn.dataset.b,ci=+btn.dataset.c;if(!BOOTH_CHK[bi])BOOTH_CHK[bi]=new Set();if(BOOTH_CHK[bi].has(ci))BOOTH_CHK[bi].delete(ci);else BOOTH_CHK[bi].add(ci);renderBooth();};});
   root.querySelectorAll('.bc-play').forEach(function(btn){btn.onclick=function(){var bi=+btn.dataset.play;BOOTH_ACT[bi]=!BOOTH_ACT[bi];renderBooth();};});
+  layoutSpecComets();
+}
+
+/* ══ GAMES TAB ══ content ported from Playbook Final: SIDES (6 mini-games) + sideResult() narratives.
+   Games are playable here (toggle); playing fills a Playbook "side" and reveals its result. Started
+   with 2/6 played to stay consistent with the Book/Home "2/6 ด้าน" example state. */
+var SIDES=[
+  {icon:'lc-hourglass',title:'ความเสี่ยงแท้จริง',from:'เกมย้อนเวลาพอร์ต',measures:'เทียบความเสี่ยงที่ "บอก" กับที่ "ทำจริง" ตอนวิกฤต'},
+  {icon:'lc-sliders',title:'สิ่งที่คุณดูก่อนตัดสินใจ',from:'เกมเลือกเครื่องมือ',measures:'ลำดับเครื่องมือวิเคราะห์ที่คุณเปิดจริง'},
+  {icon:'lc-shield',title:'ภูมิคุ้มกันความกลัวตกขบวน',from:'เกมทนกระแส',measures:'วินัยภายใต้แรงกดดันจากกระแส'},
+  {icon:'lc-target',title:'เป้าหมายตามวัย',from:'เกมเป้าหมายแต่ละวัย',measures:'เป้าหมายเงินตั้งแต่วัย 25 ถึง 65'},
+  {icon:'lc-route',title:'ก้าวแรก',from:'เกมก้าวแรก',measures:'กำแพงที่ทำให้ยังไม่เริ่ม + ก้าวเล็กที่สุด'},
+  {icon:'lc-coins',title:'ทองคำในพอร์ต',from:'เกมทองคำในพอร์ต',measures:'บทบาทของทองคำสำหรับคุณ — ตัวถ่วงความเสี่ยง หรือตัวทำกำไร'}
+];
+var GAME_PLAYED={0:true,1:true},GAME_OPEN=null;
+/* sideResult — verbatim from Playbook Final's sideResult(i,hero), with fam mapped G/N/V → guardian/
+   navigator/visionary, and case 5's persona check keyed on heroKey==='sage' (our sage's th differs
+   from the source's "ราชัน"). Driven by hero.skills [ใจกล้า,วินัย,กระจาย]. */
+function sideResult(i,hero,key){
+  if(!hero)return 'ทำแบบทดสอบตัวตนก่อน เพื่อดูว่าเกมนี้บอกอะไรเกี่ยวกับคุณ';
+  var b=hero.skills[0],d=hero.skills[1],v=hero.skills[2];
+  var fam={G:'guardian',N:'navigator',V:'visionary'}[hero.fam];
+  switch(i){
+    case 0:return b>=7?'ตอนวิกฤตจริง คุณ"ใจถึงกว่าที่บอก" — กล้าซื้อเพิ่มเมื่อของถูกลง ความเสี่ยงที่ทำจริงสูงกว่าที่ประกาศไว้':(b<=4?'พอเจอของจริง คุณ"ระวังกว่าที่คิด" — เลือกปกป้องเงินต้นก่อน ความเสี่ยงที่ทำจริงต่ำกว่าที่บอก':'ที่คิดกับที่ทำ "สอดคล้องกัน" — คุณรู้จักระดับความเสี่ยงตัวเองดี');
+    case 1:return fam==='navigator'?'เลนส์แรกที่คุณเปิดคือ "พื้นฐาน VI + ภาพมหภาค" — ตัดสินใจจากข้อมูลก่อนเสมอ':fam==='visionary'?'เลนส์แรกที่คุณเปิดคือ "เทคนิค/กราฟ + ข่าวกระแส" — อ่านจังหวะตลาดเป็นหลัก':'เลนส์แรกที่คุณเปิดคือ "กองทุน/พื้นฐานง่ายๆ" — เน้นความเข้าใจก่อนลงมือ';
+    case 2:return d>=8?'ต้านได้ทั้ง 2 กับดัก (แห่ซื้อ + ลวงโอนเงิน) — วินัยของคุณแน่นมาก':(d>=6?'ต้านได้ 1 พลาด 1 — ยังมีจุดให้ระวังเวลากระแสแรง':'โดนล่อได้ง่ายทั้ง 2 กับดัก — ควรตั้งกฎล่วงหน้าก่อนลงมือ');
+    case 3:return fam==='guardian'?'เป้าหมายของคุณ "คงเดิม" ตลอด 40 ปี — เน้นความมั่นคงตั้งแต่ 25 ถึง 65':'เป้าหมายของคุณ "เปลี่ยนตามวัย" — จากเติบโตช่วงต้น สู่รักษาทุนช่วงหลัง';
+    case 4:return v>=7?'กำแพงหลักคือ "กลัวพลาดโอกาสมากกว่ากลัวเสีย" — ก้าวเล็กที่สุด: จำกัดสัดส่วนสินทรัพย์เสี่ยงสูงต่อพอร์ต':'กำแพงหลักคือ "ยังไม่มั่นใจว่าจะเริ่มตรงไหน" — ก้าวเล็กที่สุด: ตั้ง DCA จำนวนน้อยทุกเดือน';
+    case 5:return (fam==='navigator'&&key==='sage')?'คุณมองทองคำเป็น "ตัวถ่วงพอร์ต" ไม่ใช่ตัวทำกำไร — ลงทุนสุขภาพควบคู่การเงินอย่างจริงจัง':'คุณเริ่มมองสุขภาพเป็น "สินทรัพย์ที่ปกป้องสินทรัพย์อื่น" — มีที่ว่างให้ดูแลเพิ่มได้อีก';
+  }
+  return '';
+}
+function gamesPlayedCount(){return SIDES.reduce(function(n,_,i){return n+(GAME_PLAYED[i]?1:0);},0);}
+function gameRing(filled){
+  var pct=filled/6,R=26,C=2*Math.PI*R,off=(C*(1-pct)).toFixed(1);
+  return '<svg width="66" height="66" viewBox="0 0 66 66"><circle cx="33" cy="33" r="'+R+'" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="6"/><circle cx="33" cy="33" r="'+R+'" fill="none" stroke="'+ (filled>=6?'var(--cyan)':'url(#ggrad)') +'" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off+'" transform="rotate(-90 33 33)"/><text x="33" y="34" text-anchor="middle" dominant-baseline="central" fill="#fff" font-family="'+SERIFFONT+'" font-size="17" font-weight="500">'+filled+'/6</text><defs><linearGradient id="ggrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#61e8ed"/><stop offset="1" stop-color="#9c91ff"/></linearGradient></defs></svg>';
+}
+function gameRow(i){
+  var s=SIDES[i],played=!!GAME_PLAYED[i],open=GAME_OPEN===i;
+  var status=played?(open?'ซ่อนผล':'✓ เล่นแล้ว · แตะอ่านผล'):'ยังไม่เล่น · แตะเพื่อเล่น';
+  var right=played
+    ? '<span class="gr-chev-wrap" data-open="'+i+'">'+ic('lc-chevron-down','gr-chev'+(open?' open':''))+'</span>'
+    : '<button class="howto-btn gr-play" data-play="'+i+'">'+ic('lc-play-circle')+'เล่นเกม</button>';
+  var body=(played&&open)?'<div class="gr-body"><div class="gr-bin"><div class="gr-from">วัดจาก '+s.from+' · '+s.measures+'</div><div class="gr-result">'+sideResult(i,RESULT&&RESULT.hero,RESULT&&RESULT.heroKey)+'</div></div></div>':'';
+  return '<div class="game-row'+(played?' played':'')+'"><div class="gr-hd"><div class="gr-ic">'+ic(s.icon)+'</div><div class="gr-tx" data-open="'+i+'"><div class="gr-title">'+s.title+(played?'<span class="gr-played">'+ic('lc-check')+'เล่นแล้ว</span>':'')+'</div><div class="gr-status">'+status+'</div></div>'+right+'</div>'+body+'</div>';
+}
+function renderGames(){
+  var filled=gamesPlayedCount();
+  var nextIdx=-1;for(var i=0;i<6;i++){if(!GAME_PLAYED[i]){nextIdx=i;break;}}
+  var restIdx=[];for(var j=0;j<6;j++){if(j!==nextIdx)restIdx.push(j);}
+  var nextCard='';
+  if(nextIdx>=0){var ns=SIDES[nextIdx];
+    nextCard='<div class="next-game"><div class="ng-tags"><span class="ng-tag">เล่นเกมนี้ต่อ</span>'+(nextIdx===0?'<span class="ng-tag key">เกมสำคัญที่สุด</span>':'')+'</div><div class="ng-row"><div class="ng-ic">'+ic(ns.icon)+'</div><div class="ng-tx"><div class="ng-title">'+ns.title+'</div><div class="ng-measures">'+ns.measures+'</div></div></div><button class="btn btn-primary ng-cta" data-play="'+nextIdx+'">'+ic('lc-play-circle')+'เล่นเกม</button></div>'+
+      '<div class="gh-restlbl">ด้านอื่นในคู่มือ</div>';
+  }
+  var listIdx=nextIdx>=0?restIdx:[0,1,2,3,4,5];
+  root.innerHTML=appHeader()+
+  '<main class="scroll fade">'+
+    '<div class="games-hd"><div class="games-t">เกมหลัก 6 เกม</div></div>'+
+    '<section class="home-card">'+
+      '<div class="hcard-t">คู่มือ 6 ด้านของคุณ</div><div class="gh-sub">เล่นเกมแล้วเติมทีละด้าน</div>'+
+      '<div class="gh-prog" style="margin-top:14px"><div class="gh-ring">'+gameRing(filled)+'</div><div class="gh-ptx"><div class="gh-plbl">ความคืบหน้าของคู่มือ</div><div class="gh-pval">เปิดแล้ว <b>'+filled+'</b> จาก 6 ด้าน</div></div></div>'+
+      '<div style="margin-top:14px">'+nextCard+'<div class="game-list">'+listIdx.map(gameRow).join('')+'</div></div>'+
+      '<div class="games-note">'+ic('lc-info')+'ผลมาจากสิ่งที่คุณเลือกในเกม ไม่ใช่คะแนนสูงต่ำ</div>'+
+    '</section>'+
+  '</main>'+
+  appTabbar('games');
+  bindTabbar();
+  root.querySelector('#devReset').onclick=resetQuiz;
+  root.querySelectorAll('[data-play]').forEach(function(b){b.onclick=function(e){e.stopPropagation();var i=+b.dataset.play;GAME_PLAYED[i]=true;GAME_OPEN=i;renderGames();};});
+  root.querySelectorAll('[data-open]').forEach(function(t){t.onclick=function(){var i=+t.dataset.open;if(!GAME_PLAYED[i])return;GAME_OPEN=(GAME_OPEN===i?null:i);renderGames();};});
   layoutSpecComets();
 }
 
