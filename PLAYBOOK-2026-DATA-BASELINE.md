@@ -191,3 +191,22 @@ there's no embedded base64 media in this particular export). To re-extract:
 3. That source is a proprietary component-templating format (`sc-if`/`sc-for` custom elements +
    `{{ }}` mustache bindings to a `renderVals()` props method), not plain JSX — read the
    `HEROES`/`FAMILIES`/etc. object literals directly rather than trying to run it.
+
+---
+
+## 11. Component sizing reference (this app's own, added as built — not from source)
+
+This project has no separate DESIGN.md; component sizing decisions get recorded here as they're
+made, so later work reuses the same numbers instead of guessing a new one per instance.
+
+**Hero CTA** (the splash screen's Liquid Metal button, `js/liquid-metal-cta.js`) — ported verbatim
+from `liquid-metal-button-kit/README.md`'s own spec:
+- Desktop: height 56px · font-size 20px · paddingX 48px
+- Mobile ≤575px: height 49px · font-size 18px · paddingX 42px
+
+**Header-pill CTA** (`.tb-pill` — "สแกน QR", "PDF"; inline in a topbar, not a screen's main action,
+so deliberately smaller than the hero CTA above):
+- height 38px · padding 0 16px · font-size `var(--fs-bodysm)` (14px)
+- Uses the existing `.spec-bd`/`.spec-bd-dark` comet-ring border (see `dna-quiz-flow.html`'s CSS
+  comment above `.spec-bd`) rather than the Liquid Metal shader — a header pill doesn't carry
+  enough visual weight to justify a second concurrent WebGL context per screen.

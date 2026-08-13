@@ -148,7 +148,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .tb-title{flex:1;font-size:var(--fs-h2);font-weight:var(--w-head);letter-spacing:0;color:var(--ink);}
 .tb-sub{display:flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);font-family:var(--font);}
 .tb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.tb-pill{display:inline-flex;align-items:center;gap:var(--sp-glue);height:34px;padding:0 14px;border-radius:var(--rpill);color:var(--ink);font-family:var(--font);font-size:var(--fs-label);font-weight:var(--w-head);cursor:pointer;box-shadow:var(--shadow-action);}
+/* Header-pill CTA size — the app's only other explicit CTA size spec is the Liquid Metal hero
+   button's (56px/20px desktop, 49px/18px mobile — see README's kit config); this is the small,
+   secondary counterpart used inline in a header rather than as a screen's main action. Recorded in
+   PLAYBOOK-2026-DATA-BASELINE.md §11 so any future header-pill CTA reuses the same numbers. */
+.tb-pill{display:inline-flex;align-items:center;gap:var(--sp-glue);height:38px;padding:0 16px;border-radius:var(--rpill);color:var(--ink);font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-head);cursor:pointer;box-shadow:var(--shadow-action);}
 .tb-pill svg{width:var(--ic-sm);height:var(--ic-sm);}
 .tb-count{font-family:var(--font);font-size:var(--fs-meta);font-weight:var(--w-head);color:var(--muted);}
 
@@ -739,7 +743,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .gh-pval{font-size:var(--fs-h2);font-weight:var(--w-label);color:#fff;line-height:1.25;margin-top:2px;}
 .gh-pval b{color:var(--cyan);font-weight:var(--w-label);}
 /* next-game highlight */
-.next-game{border:2px solid var(--violet);border-radius:var(--r2);background:linear-gradient(150deg,color-mix(in srgb,var(--violet) 8%,transparent),var(--white));padding:16px;}
+/* .next-game-gw — same spectrum-border technique as .hero-gw/.hero-in on the Book preview card:
+   a 2px padding of the --spectrum gradient shows as a border because .next-game sits flush inside
+   it, inset by that padding. Replaces the old flat solid var(--violet) border. */
+.next-game-gw{padding:2px;border-radius:calc(var(--r2) + 3px);background:var(--spectrum);}
+.next-game{border-radius:var(--r2);background:linear-gradient(150deg,color-mix(in srgb,var(--violet) 8%,transparent),var(--white));padding:16px;}
 .ng-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
 .ng-tag{font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:.04em;color:#fff;background:var(--violet);padding:4px 11px;border-radius:var(--rpill);}
 .ng-tag.key{color:#8a5a00;background:#fef4e2;}
@@ -761,7 +769,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .gr-ic svg{width:var(--ic-md);height:var(--ic-md);}
 .gr-tx{flex:1;min-width:0;cursor:pointer;}
 .gr-title{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);line-height:1.35;display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
-.gr-played{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:var(--w-head);color:var(--ink);background:color-mix(in srgb,var(--cyan) 16%,transparent);padding:2px 8px;border-radius:var(--rpill);}
+/* Solid fill, not a tint — a 16%-tint chip on a row that's ALSO 5%-cyan-tinted (.game-row.played)
+   just blended into its own background instead of reading as a distinct status. */
+.gr-played{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:var(--w-head);color:var(--ink);background:var(--cyan);padding:2px 8px;border-radius:var(--rpill);}
 .gr-played svg{width:11px;height:11px;}
 .gr-status{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.4;margin-top:2px;}
 .gr-chev{width:20px;height:20px;color:var(--muted);flex-shrink:0;cursor:pointer;transition:transform .2s var(--ease);}
@@ -784,7 +794,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .prof-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:10px;}
 .prof-vf{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--rpill);background:color-mix(in srgb,var(--cyan) 15%,transparent);color:var(--ink);font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
 .prof-vf svg{width:14px;height:14px;}
-.prof-tier{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--rpill);background:var(--ink);color:var(--cloud);font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
+/* Gold, not ink-black — a tier badge (crown icon, paid-tier name) reads as a status label better
+   in a premium gold than in the same flat ink-black used for plain UI chrome elsewhere on this page. */
+.prof-tier{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--rpill);background:linear-gradient(135deg,#f6d883,#caa14a);color:#4a3400;font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
 .prof-tier svg{width:14px;height:14px;}
 .prof-qr{margin-top:16px;padding:16px;border-radius:var(--r1);border:1px dashed var(--line-strong);background:var(--paper);}
 .pq-lbl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
@@ -809,6 +821,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .sp-scatter{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
 /* depth-tiered scatter: near = bigger/sharper/stronger shadow/higher z · far = smaller/blurred/faint/behind. Parallax = near drifts more (--dx/--dy larger) */
 .sp-el{position:absolute;width:var(--w,88px);opacity:var(--op,.85);z-index:var(--z,1);filter:drop-shadow(0 var(--sh,10px) var(--shb,22px) rgba(17,19,24,var(--sha,0.16))) blur(var(--bl,0px)) saturate(var(--sat,1));animation:spDrift var(--d,9s) var(--ease) infinite alternate;animation-delay:var(--dl,0s);will-change:transform;}
+/* Each asset's --w is a fixed px size tuned for a wide canvas — on a narrow phone width the exact
+   same px size eats a much bigger share of the screen, so the corners read as crowded instead of
+   ambient. Scale every plane down together on narrow viewports; percentage top/left/right/bottom
+   positions already scale with the container, only the fixed --w px size needed a mobile rule. */
+@media(max-width:575px){.sp-el{width:calc(var(--w,88px) * 0.62);opacity:calc(var(--op,.85) * 0.85);}}
 @keyframes spDrift{from{transform:translate3d(0,0,0) rotate(var(--r0,0deg)) scale(var(--sc,1));}to{transform:translate3d(var(--dx,10px),var(--dy,-16px),0) rotate(var(--r1,6deg)) scale(var(--sc,1));}}
 .sp-top{position:relative;z-index:2;text-align:center;width:100%;}
 .sp-kick{font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:0.14em;color:var(--muted);margin-bottom:16px;}
@@ -2073,13 +2090,12 @@ function renderGames(){
   var restIdx=[];for(var j=0;j<6;j++){if(j!==nextIdx)restIdx.push(j);}
   var nextCard='';
   if(nextIdx>=0){var ns=SIDES[nextIdx];
-    nextCard='<div class="next-game"><div class="ng-tags"><span class="ng-tag">เล่นเกมนี้ต่อ</span>'+(nextIdx===0?'<span class="ng-tag key">เกมสำคัญที่สุด</span>':'')+'</div><div class="ng-row"><div class="ng-ic">'+ic(ns.icon)+'</div><div class="ng-tx"><div class="ng-title">'+ns.title+'</div><div class="ng-measures">'+ns.measures+'</div></div></div><button class="btn btn-primary ng-cta" data-play="'+nextIdx+'">'+ic('lc-play-circle')+'เล่นเกม</button></div>'+
+    nextCard='<div class="next-game-gw"><div class="next-game"><div class="ng-tags"><span class="ng-tag">เล่นเกมนี้ต่อ</span>'+(nextIdx===0?'<span class="ng-tag key">เกมสำคัญที่สุด</span>':'')+'</div><div class="ng-row"><div class="ng-ic">'+ic(ns.icon)+'</div><div class="ng-tx"><div class="ng-title">'+ns.title+'</div><div class="ng-measures">'+ns.measures+'</div></div></div><button class="btn btn-primary spec-bd spec-bd-dark ng-cta" data-play="'+nextIdx+'">'+ic('lc-play-circle')+'เล่นเกม</button></div></div>'+
       '<div class="gh-restlbl">ด้านอื่นในคู่มือ</div>';
   }
   var listIdx=nextIdx>=0?restIdx:[0,1,2,3,4,5];
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
-    '<div class="games-hd"><div class="games-t">เกมหลัก 6 เกม</div></div>'+
     '<section class="home-card">'+
       '<div class="hcard-t">คู่มือ 6 ด้านของคุณ</div><div class="gh-sub">เล่นเกมแล้วเติมทีละด้าน</div>'+
       '<div class="gh-prog" style="margin-top:14px"><div class="gh-ring">'+gameRing(filled)+'</div><div class="gh-ptx"><div class="gh-plbl">ความคืบหน้าของคู่มือ</div><div class="gh-pval">เปิดแล้ว <b>'+filled+'</b> จาก 6 ด้าน</div></div></div>'+
