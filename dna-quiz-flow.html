@@ -631,6 +631,69 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .stub-ic svg{width:32px;height:32px;}
 .stub-t{font-size:var(--fs-heading);font-weight:var(--w-head);color:var(--ink);}
 .stub-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.55;max-width:30ch;}
+
+/* ══ BOOTH / PASSPORT TAB ══ structure ported from Playbook Final's Passport screen (progress →
+   grand-prize status → personalized hero route → per-zone booth check-in), re-skinned to our DNA. */
+.booth-hd .booth-t{font-size:var(--fs-heading);font-weight:var(--w-head);color:var(--ink);letter-spacing:0;}
+.booth-hd .booth-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:3px;}
+.booth-prog{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.bp-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:13px 14px;}
+.bp-hd{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.bp-hd svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
+.bp-lbl{flex:1;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);}
+.bp-frac{font-size:var(--fs-label);font-weight:var(--w-label);white-space:nowrap;}
+.bp-bar{height:6px;border-radius:99px;background:var(--accent);overflow:hidden;}
+.bp-fill{height:100%;border-radius:99px;transition:width .25s var(--ease);}
+.draw-status{display:flex;gap:11px;align-items:flex-start;padding:14px 15px;border-radius:var(--r2);background:var(--paper);border:1px solid var(--line-soft);}
+.draw-status.ok{background:color-mix(in srgb,var(--cyan) 10%,transparent);border-color:color-mix(in srgb,var(--cyan) 30%,transparent);}
+.draw-status svg{width:var(--ic-lg);height:var(--ic-lg);flex:0 0 auto;color:var(--muted);}
+.ds-h{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);line-height:1.45;}
+.ds-s{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;}
+.ds-dl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--ink);margin-top:6px;}
+/* hero route */
+.route-badge{font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--accent);padding:5px 11px;border-radius:var(--rpill);white-space:nowrap;}
+.map-ph{position:relative;border:1px solid var(--line-soft);border-radius:var(--r1);overflow:hidden;background:linear-gradient(135deg,var(--paper),var(--cloud));aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+.map-ph .mp-in{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);}
+.map-ph .mp-in svg{width:28px;height:28px;}
+.map-ph .mp-cap{position:absolute;left:10px;bottom:9px;font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--cloud);background:var(--ink);padding:4px 9px;border-radius:6px;}
+.rt-row{display:flex;gap:12px;align-items:stretch;}
+.rt-row.top{background:color-mix(in srgb,var(--violet) 7%,transparent);border-radius:var(--r1);padding:6px 8px;margin:0 -8px;}
+.rt-rail{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;}
+.rt-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;flex:0 0 auto;}
+.rt-dot svg{width:15px;height:15px;}
+.rt-line{width:2px;flex:1;background:var(--line-soft);margin:2px 0;}
+.rt-body{padding-bottom:14px;min-width:0;}
+.rt-name{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);line-height:1.35;display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+.rt-badge{font-size:9.5px;font-weight:var(--w-label);padding:2px 7px;border-radius:6px;white-space:nowrap;}
+.rt-badge.pick{color:#fff;background:var(--violet);}
+.rt-badge.feat{color:#8a5a00;background:#fef4e2;}
+.rt-badge.new{color:var(--violet);background:color-mix(in srgb,var(--violet) 15%,transparent);}
+.rt-meta{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;}
+/* zone activity */
+.zone-howto{overflow:hidden;max-height:0;transition:max-height .28s var(--ease);}
+.zone-howto.show{max-height:340px;}
+.zh-in{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--r1);padding:13px 14px;margin-top:12px;}
+.zh-li{display:flex;gap:8px;font-size:var(--fs-bodysm);color:var(--ink);line-height:1.5;margin-bottom:8px;}
+.zh-li b{font-weight:var(--w-label);}
+.zh-note{font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);line-height:1.5;padding-top:10px;border-top:1px solid var(--line-soft);}
+.howto-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-weight:var(--w-head);font-size:var(--fs-label);min-height:38px;padding:0 13px;border-radius:var(--rpill);cursor:pointer;flex:0 0 auto;}
+.howto-btn svg{width:var(--ic-sm);height:var(--ic-sm);}
+.booth-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin:12px 0 14px;font-size:var(--fs-eyebrow);color:var(--muted);}
+.booth-legend span{display:inline-flex;align-items:center;gap:5px;}
+.lg-sw{width:10px;height:10px;border-radius:3px;flex:0 0 auto;}
+.booth-grid{display:flex;flex-direction:column;gap:10px;}
+.bc-card{border:1px solid var(--line-soft);border-radius:var(--r1);padding:10px 12px;background:var(--white);}
+.bc-hd{display:flex;align-items:center;gap:10px;}
+.bc-ic{width:36px;height:36px;flex:0 0 auto;border-radius:var(--r1);background:var(--accent);display:flex;align-items:center;justify-content:center;}
+.bc-ic svg{width:var(--ic-md);height:var(--ic-md);}
+.bc-tx{flex:1;min-width:0;}
+.bc-asset{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+.bc-zchip{font-size:9.5px;font-weight:var(--w-head);padding:2px 8px;border-radius:var(--rpill);white-space:nowrap;}
+.bc-game{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;}
+.bc-partners{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+.bp-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);min-height:36px;padding:0 11px;border-radius:var(--r1);cursor:pointer;transition:background .15s,border-color .15s;}
+.bp-btn svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
+.bp-btn.done{background:color-mix(in srgb,var(--cyan) 12%,transparent);border-color:color-mix(in srgb,var(--cyan) 40%,transparent);color:var(--ink);}
 /* ══ SPLASH / ATTRACT ══ two-tone headline · drifting brand assets · card carousel */
 /* overflow-x only (never -y): the CTA must NEVER be unreachable. overflow:hidden on both axes
    used to CLIP (not scroll-hide) anything past the fold whenever content ran taller than the
@@ -1278,7 +1341,8 @@ function render(){
   else if(st.phase==='reveal')renderReveal();
   else if(st.phase==='book')renderBook();
   else if(st.phase==='home')renderHome();
-  else if(st.phase==='passport'||st.phase==='games'||st.phase==='profile')renderStub(st.phase);
+  else if(st.phase==='passport')renderBooth();
+  else if(st.phase==='games'||st.phase==='profile')renderStub(st.phase);
   window.scrollTo(0,0);
   layoutSpecComets();
 }
@@ -1711,12 +1775,114 @@ function renderHome(){
   layoutSpecComets();
 }
 function renderStub(tab){
-  var meta={passport:{icon:'lc-compass',label:'เดินบูธ'},games:{icon:'lc-gamepad-2',label:'เกมหลัก'},profile:{icon:'lc-user',label:'โปรไฟล์'}}[tab];
+  var meta={games:{icon:'lc-gamepad-2',label:'เกมหลัก'},profile:{icon:'lc-user',label:'โปรไฟล์'}}[tab];
   root.innerHTML=appHeader()+
   '<main class="scroll fade"><div class="stub-wrap"><div class="stub-ic">'+ic(meta.icon)+'</div><div class="stub-t">'+meta.label+'</div><div class="stub-s">แท็บนี้กำลังจะมา — อยู่ระหว่างออกแบบตาม Playbook Final</div></div></main>'+
   appTabbar(tab);
   bindTabbar();
   root.querySelector('#devReset').onclick=resetQuiz;
+}
+
+/* ══ BOOTH / PASSPORT TAB ══ content ported from Playbook Final's Passport screen (BOOTHS/ZONES/
+   ZONE_BOOTHS + hero-route builder). Check-in/activity is real (toggled locally) so the top progress
+   bars and grand-prize gate react; the floorplan is a placeholder (no floorplan asset in this repo). */
+var CHECKIN_NEED=5,ACTIVITY_NEED=5;
+var BOOTH_CHK={},BOOTH_ACT={},BOOTH_HOWTO=false; // BOOTH_CHK[assetIdx]=Set(companyIdx); BOOTH_ACT[assetIdx]=bool
+/* 10 booths — asset / gamified game name / icon (Material→Lucide) — verbatim from BOOTHS. */
+var BOOTHS=[
+  {asset:'หุ้นไทย',game:'สังเวียนเลือกหุ้น',icon:'lc-trending-up',zone:0},
+  {asset:'หุ้นต่างประเทศ',game:'พาสปอร์ตนักลงทุนโลก',icon:'lc-globe',zone:0},
+  {asset:'กองทุนรวม',game:'ดวลกองทุน',icon:'lc-pie-chart',zone:0},
+  {asset:'ตราสารหนี้',game:'สร้างตาข่ายกันตก',icon:'lc-landmark',zone:0},
+  {asset:'ทองคำ',game:'ทองคำ เพื่อนยามวิกฤต',icon:'lc-coins',zone:2},
+  {asset:'อสังหา/REIT',game:'ล่าผลตอบแทนค่าเช่า',icon:'lc-building-2',zone:2},
+  {asset:'ประกัน',game:'สแกนช่องโหว่ชีวิต',icon:'lc-shield',zone:0},
+  {asset:'คริปโต',game:'โต้คลื่นความผันผวน',icon:'lc-bitcoin',zone:1},
+  {asset:'ของสะสม',game:'นักตีราคาของสะสม',icon:'lc-gem',zone:3},
+  {asset:'สุขภาพ',game:'เช็กสุขภาพกับเงิน',icon:'lc-heart',zone:4}
+];
+/* partner companies per asset — verbatim from ZONE_BOOTHS (the real check-in points). */
+var ZONE_BOOTHS=[
+  ['บล. กสิกรไทย','บล. อินโนเวสท์ เอกซ์','บล. บัวหลวง'],
+  ['บล. เกียรตินาคินภัทร'],
+  ['บลจ. กสิกรไทย','บลจ. ไทยพาณิชย์'],
+  ['ThaiBMA'],
+  ['YLG','ฮั่วเซ่งเฮง','MTS Gold'],
+  ['แสนสิริ','AP Thai'],
+  ['เมืองไทยประกันชีวิต','AIA'],
+  ['Bitkub','Binance TH'],
+  ['Art Auction','Rare Collectibles'],
+  ['BDMS Wellness']
+];
+/* 5 zones — name / sub-label / dot icon / accent, and the score fn (hero radar → route order). */
+var BOOTH_ZONES=[
+  {name:'Capital Zone',zone:'โซนกิจกรรม · บูธ 1',icon:'lc-landmark',chip:'เงินทุน',color:'#0090c8',score:function(rd,h){return Math.round((rd[2]+rd[0])/2);}},
+  {name:'Crypto Zone',zone:'โซนกิจกรรม · บูธ 2',icon:'lc-bitcoin',chip:'คริปโต',color:'#b88a10',featured:true,score:function(rd,h){return rd[3];}},
+  {name:'Commodity Zone',zone:'โซนกิจกรรม · บูธ 3',icon:'lc-coins',chip:'โภคภัณฑ์',color:'#d1622a',score:function(rd,h){return rd[4];}},
+  {name:'Alternative Investment Zone',zone:'โซนกิจกรรม · บูธ 4',icon:'lc-gem',chip:'ทางเลือก',color:'#9c6bd0',score:function(rd,h){return /สะสม/.test(JSON.stringify(h.assets))?78:(h.fam==='V'?48:30);}},
+  {name:'Health Zone',zone:'โซนกิจกรรม · บูธ 5',icon:'lc-heart',chip:'สุขภาพ',color:'#c048b6',score:function(rd,h){return rd[5];}}
+];
+function boothCheckinCount(){var n=0;for(var k in BOOTH_CHK){if(BOOTH_CHK[k]&&BOOTH_CHK[k].size>0)n++;}return n;}
+function boothActivityCount(){var n=0;for(var k in BOOTH_ACT){if(BOOTH_ACT[k])n++;}return n;}
+function buildRoute(){
+  var h=RESULT?RESULT.hero:null;
+  var rd=h?h.radar:[0,0,0,0,0,0];
+  var zs=BOOTH_ZONES.map(function(z,i){return {name:z.name,zone:z.zone,icon:z.icon,featured:!!z.featured,color:z.color,score:z.score(rd,h||{assets:[],fam:''}),orderIdx:i};});
+  var personalized=!!h;
+  var out=personalized?zs.slice().sort(function(a,b){return b.score-a.score;}):zs;
+  out.forEach(function(z,i){z.topPick=personalized&&i===0;z.newAngle=personalized&&i===out.length-1;});
+  /* leading card-redemption stop, then the 5 (ordered) asset zones — matches source `zones`. */
+  var stops=[{name:'จุดแลกรับการ์ดตัวจริง',zone:'จุดบริการ · สิทธิบัตร Ultimate',icon:'lc-sparkles',topPick:false,newAngle:false,featured:false,color:'var(--violet)'}].concat(out);
+  var visited=Math.min(2,stops.length); // mock: 2 visited (consistent with the 2/6 progress used across the app)
+  return stops.map(function(z,i){
+    var isV=i<visited;
+    return {name:z.name,zone:z.zone,icon:z.icon,topPick:z.topPick,newAngle:z.newAngle,featured:z.featured,color:z.color,
+      status:isV?'✓ แวะแล้ว':(z.topPick?'แนะนำอันดับ 1 สำหรับคุณ':(z.newAngle?'แนะนำให้ลอง (มุมใหม่)':'ยังไม่แวะ')),
+      dotColor:isV?'var(--cyan)':(z.topPick?'var(--violet)':(z.featured?'#b88a10':(z.newAngle?'var(--violet)':'var(--muted)')))};
+  });
+}
+function renderBooth(){
+  var chk=boothCheckinCount(),act=boothActivityCount();
+  var chkOK=chk>=CHECKIN_NEED,actOK=act>=ACTIVITY_NEED,eligible=chkOK&&actOK;
+  var route=buildRoute();
+  var visited=route.filter(function(r){return r.status.indexOf('แวะแล้ว')>-1;}).length;
+  var need=[];if(!chkOK)need.push('เช็คอินอีก '+(CHECKIN_NEED-chk)+' บูธ');if(!actOK)need.push('ร่วมกิจกรรมอีก '+(ACTIVITY_NEED-act)+' บูธ');
+  root.innerHTML=appHeader()+
+  '<main class="scroll fade">'+
+    '<div class="booth-hd"><div class="booth-t">เดินบูธ · ลุ้นรางวัล</div><div class="booth-s">เช็คอินบูธ · กิจกรรมประจำบูธ · ลุ้นรางวัลใหญ่</div></div>'+
+    '<div class="booth-prog">'+
+      '<div class="bp-card"><div class="bp-hd">'+ic('lc-qr-code')+'<span class="bp-lbl">เช็คอินบูธ</span><span class="bp-frac" style="color:'+(chkOK?'var(--cyan)':'var(--violet)')+'">'+(chkOK?('ครบแล้ว · '+chk+' บูธ'):(chk+'/'+CHECKIN_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,chk/CHECKIN_NEED*100)+'%;background:'+(chkOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
+      '<div class="bp-card"><div class="bp-hd">'+ic('lc-gamepad-2')+'<span class="bp-lbl">กิจกรรมประจำบูธ</span><span class="bp-frac" style="color:'+(actOK?'var(--cyan)':'var(--violet)')+'">'+(actOK?('ครบแล้ว · '+act+' บูธ'):(act+'/'+ACTIVITY_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,act/ACTIVITY_NEED*100)+'%;background:'+(actOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
+    '</div>'+
+    (eligible
+      ? '<div class="draw-status ok">'+ic('lc-gift')+'<div><div class="ds-h">ครบเงื่อนไขแล้ว · กดร่วมลุ้นรางวัลใหญ่ได้เลย</div><div class="ds-s">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">✓ กดร่วมลุ้นก่อน 16:00 น. ของวันที่ 2</div></div></div>'
+      : '<div class="draw-status">'+ic('lc-gift')+'<div><div class="ds-h">ยังขาด '+need.join(' · ')+'</div><div class="ds-s">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">ครบเมื่อไหร่ ปุ่มร่วมลุ้นรางวัลใหญ่จะขึ้นตรงนี้ให้กด</div></div></div>')+
+    '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="hcard-t">'+(RESULT?'แผนที่เดินบูธเฉพาะคุณ':'แผนที่เดินบูธ (เส้นทางแนะนำ)')+'</div><span class="route-badge">'+visited+'/'+route.length+' จุด</span></div>'+
+      '<div class="map-ph"><div class="mp-in">'+ic('lc-map-pin')+'<span>ผังงาน (ตัวอย่าง)</span></div><span class="mp-cap">ผังงาน · Samyan Mitrtown ชั้น 5</span></div>'+
+      '<div class="route-list">'+route.map(function(p,i){
+        var badge=(p.topPick?'<span class="rt-badge pick">อันดับ 1 สำหรับคุณ</span>':'')+(p.featured?'<span class="rt-badge feat">ผู้สนับสนุน</span>':'')+(p.newAngle?'<span class="rt-badge new">มุมใหม่</span>':'');
+        return '<div class="rt-row'+(p.topPick?' top':'')+'"><div class="rt-rail"><div class="rt-dot" style="background:'+p.dotColor+'">'+ic(p.icon)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+'</div><div class="rt-meta">'+p.zone+' · '+p.status+'</div></div></div>';
+      }).join('')+'</div>'+
+    '</section>'+
+    '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div class="hcard-t">กิจกรรมประจำโซน</div><button class="howto-btn" id="howtoBtn">'+ic('lc-info')+'วิธีเล่น</button></div>'+
+      '<div class="hcard-s" style="margin-top:-6px">แตะชื่อบูธเพื่อเช็คอิน — เช็คอินก่อน แล้วเกมของโซนนั้นจะปลดให้เล่น</div>'+
+      '<div class="zone-howto'+(BOOTH_HOWTO?' show':'')+'"><div class="zh-in"><div class="zh-li"><b>1)</b><span>เช็คอิน — แตะชื่อบูธแล้วสแกน QR ที่บูธ (หรือเปิด QR ของคุณให้เจ้าหน้าที่สแกน ได้ผลเหมือนกัน)</span></div><div class="zh-li"><b>2)</b><span>เกมประจำโซนปลดให้เล่น — ไม่บังคับ แต่เล่นแล้วคู่มือของคุณสมบูรณ์ขึ้น</span></div><div class="zh-li"><b>3)</b><span>ร่วมกิจกรรมประจำบูธ — สแกน QR กิจกรรม (บางบูธใช้ QR ใบเดียวกับเช็คอิน บางบูธแยก 2 ใบ ดูป้ายที่บูธ)</span></div><div class="zh-note">เช็คอิน 5 บูธ + ร่วมกิจกรรม 5 บูธ = สิทธิ์ลุ้นรางวัลใหญ่ · เป็นคนละบูธกันได้</div></div></div>'+
+      '<div class="booth-legend"><span><span class="lg-sw" style="background:var(--white);border:1px solid var(--line-strong)"></span>ยังไม่เช็คอิน</span><span><span class="lg-sw" style="background:#fff8eb;border:1px solid #fde1b4"></span>เช็คอินแล้ว</span><span><span class="lg-sw" style="background:color-mix(in srgb,var(--cyan) 14%,transparent);border:1px solid color-mix(in srgb,var(--cyan) 40%,transparent)"></span>ร่วมกิจกรรมแล้ว</span></div>'+
+      '<div class="booth-grid">'+BOOTHS.map(function(b,bi){
+        var z=BOOTH_ZONES[b.zone];
+        var played=!!BOOTH_ACT[bi];
+        var partners=ZONE_BOOTHS[bi].map(function(name,ci){var done=BOOTH_CHK[bi]&&BOOTH_CHK[bi].has(ci);return '<button class="bp-btn'+(done?' done':'')+'" data-b="'+bi+'" data-c="'+ci+'">'+ic(done?'lc-check-circle':'lc-qr-code')+name+'</button>';}).join('');
+        return '<div class="bc-card"><div class="bc-hd"><div class="bc-ic">'+ic(b.icon)+'</div><div class="bc-tx"><div class="bc-asset">'+b.asset+'<span class="bc-zchip" style="color:'+z.color+';background:color-mix(in srgb,'+z.color+' 12%,transparent)">'+z.chip+'</span>'+(played?'<span class="bc-zchip" style="color:var(--cyan);background:color-mix(in srgb,var(--cyan) 14%,transparent)">เล่นแล้ว</span>':'')+'</div><div class="bc-game">'+b.game+'</div></div><button class="howto-btn bc-play" data-play="'+bi+'">'+ic(played?'lc-check':'lc-play-circle')+(played?'เล่นแล้ว':'เล่นเกม')+'</button></div><div class="bc-partners">'+partners+'</div></div>';
+      }).join('')+'</div>'+
+    '</section>'+
+  '</main>'+
+  appTabbar('passport');
+  bindTabbar();
+  root.querySelector('#devReset').onclick=resetQuiz;
+  root.querySelector('#howtoBtn').onclick=function(){BOOTH_HOWTO=!BOOTH_HOWTO;root.querySelector('.zone-howto').classList.toggle('show',BOOTH_HOWTO);};
+  root.querySelectorAll('.bp-btn').forEach(function(btn){btn.onclick=function(){var bi=+btn.dataset.b,ci=+btn.dataset.c;if(!BOOTH_CHK[bi])BOOTH_CHK[bi]=new Set();if(BOOTH_CHK[bi].has(ci))BOOTH_CHK[bi].delete(ci);else BOOTH_CHK[bi].add(ci);renderBooth();};});
+  root.querySelectorAll('.bc-play').forEach(function(btn){btn.onclick=function(){var bi=+btn.dataset.play;BOOTH_ACT[bi]=!BOOTH_ACT[bi];renderBooth();};});
+  layoutSpecComets();
 }
 
 /* ── RESPONSIVE VIEW (mobile | tablet | pc) ── driven by window, overridable via demo panel ── */
