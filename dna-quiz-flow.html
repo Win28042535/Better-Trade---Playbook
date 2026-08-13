@@ -562,6 +562,75 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .rs-d{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.5;}
 .route-cta-w{padding:6px 20px 22px;}
 .route-cta-w .btn-primary{width:100%;}
+
+/* ══ HOME TAB ══ landing screen of the 5-tab companion app. Structure/content ported from Playbook
+   Final's Home screen (hero banner → tier strip → "ขั้นต่อไปของคุณ" next-step → 3 counters → book
+   teaser → agenda → announcements), re-skinned into this app's editorial DNA (spectrum/ink, not the
+   source's navy/#007dfe). Each block is a direct child of .scroll so it inherits the same 28px
+   section rhythm as the Book page. */
+.app-topbar .tb-logo{height:20px;}
+.home-hero{position:relative;overflow:hidden;text-align:center;border:1px solid var(--line-soft);border-radius:var(--r2);background:radial-gradient(120% 80% at 50% 0%,color-mix(in srgb,var(--violet) 14%,transparent),color-mix(in srgb,var(--cyan) 8%,transparent) 46%,var(--white) 78%);padding:22px var(--sp-card-pad) 24px;}
+.hh-badge{display:inline-flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);}
+.hh-badge svg{width:var(--ic-sm);height:var(--ic-sm);}
+.hh-logo{display:block;width:min(78%,300px);height:auto;margin:12px auto 0;}
+.hh-sub{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--ink);line-height:1.6;max-width:32ch;margin:12px auto 0;}
+.hh-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 18px;margin-top:16px;}
+.hh-meta span{display:inline-flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);}
+.hh-meta svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--violet);}
+.tier-strip{display:flex;align-items:center;gap:var(--sp-inline);width:100%;padding:14px 16px;border:1px solid var(--line-soft);border-radius:var(--r2);background:var(--white);cursor:pointer;text-align:left;font-family:var(--font);}
+.ts-ic{width:40px;height:40px;flex:0 0 auto;border-radius:var(--r1);background:color-mix(in srgb,var(--violet) 12%,transparent);display:flex;align-items:center;justify-content:center;color:var(--violet);}
+.ts-ic svg{width:var(--ic-md);height:var(--ic-md);}
+.ts-tx{flex:1;min-width:0;font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--muted);}
+.ts-tx b{font-weight:var(--w-head);color:var(--ink);}
+.ts-cv{width:20px;height:20px;color:var(--muted);flex-shrink:0;}
+/* next-step — the ONE prominent home action, an ink card echoing the source's dark navy card */
+.next-step{display:flex;align-items:center;gap:var(--sp-inline);flex-wrap:wrap;background:var(--ink);color:var(--cloud);border-radius:var(--r2);padding:18px var(--sp-card-pad);position:relative;overflow:hidden;}
+.next-step::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(360px 180px at 100% 0%,color-mix(in srgb,var(--cyan) 22%,transparent),transparent 60%),radial-gradient(320px 170px at 0% 100%,color-mix(in srgb,var(--violet) 26%,transparent),transparent 62%);}
+.ns-ic{position:relative;z-index:1;width:48px;height:48px;flex:0 0 auto;border-radius:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;color:var(--cyan);}
+.ns-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
+.ns-tx{position:relative;z-index:1;flex:1;min-width:0;}
+.ns-ey{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,.55);}
+.ns-t{font-size:var(--fs-h2);font-weight:var(--w-label);color:#fff;line-height:1.3;margin-top:2px;}
+.ns-b{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:rgba(255,255,255,.72);line-height:1.5;margin-top:3px;}
+.ns-cta{position:relative;z-index:1;flex:0 0 auto;background:var(--white);color:var(--ink);border-color:var(--white);min-height:44px;}
+:root[data-view="mobile"] .ns-cta{width:100%;}
+.home-counters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.hc-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:14px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;text-align:left;font-family:var(--font);}
+.hc-card svg{width:var(--ic-md);height:var(--ic-md);}
+.hc-val{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);line-height:1.2;font-family:var(--font);}
+.hc-label{font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);line-height:1.35;}
+.book-teaser{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:16px;grid-template-columns:44px 1fr auto;}
+.bt-ic{width:44px;height:44px;flex:0 0 auto;border-radius:13px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--ink);}
+.bt-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
+.bt-t{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);line-height:1.25;}
+.bt-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:2px;}
+.bt-cv{width:20px;height:20px;color:var(--muted);flex-shrink:0;}
+.home-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:18px var(--sp-card-pad);}
+.hcard-hd{margin-bottom:12px;}
+.hcard-hd svg{width:var(--ic-md);height:var(--ic-md);flex-shrink:0;color:var(--violet);}
+.hcard-t{font-size:var(--fs-heading);font-weight:var(--w-head);color:var(--ink);letter-spacing:0;}
+.hcard-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.5;margin-top:3px;}
+.ag-seg{display:flex;gap:8px;margin-bottom:6px;}
+.ag-seg button{flex:1;border:1px solid var(--line-soft);background:var(--white);color:var(--muted);font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-head);min-height:40px;border-radius:var(--r1);cursor:pointer;transition:color .15s,border-color .15s,background .15s;}
+.ag-seg button.on{background:var(--ink);color:var(--cloud);border-color:var(--ink);}
+.ag-row{display:flex;gap:13px;padding:13px 0;border-bottom:1px solid var(--line-soft);}
+.ag-row:last-child{border-bottom:none;}
+.ag-time{flex:0 0 auto;width:52px;font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--violet);line-height:1.45;font-family:var(--font);}
+.ag-t{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);line-height:1.4;}
+.ag-by{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;}
+.ag-more{width:100%;margin-top:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-weight:var(--w-head);font-size:var(--fs-bodysm);min-height:44px;border-radius:var(--r1);cursor:pointer;}
+.ag-more svg{width:var(--ic-sm);height:var(--ic-sm);}
+.ann-row{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border-radius:var(--r1);background:var(--paper);}
+.ann-row+.ann-row{margin-top:9px;}
+.ann-row svg{width:var(--ic-md);height:var(--ic-md);flex:0 0 auto;margin-top:1px;}
+.ann-t{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);line-height:1.4;}
+.ann-s{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:1px;}
+/* stub screen for not-yet-built tabs (passport/games/profile) */
+.stub-wrap{flex:1;min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:40px var(--sp-edge);}
+.stub-ic{width:72px;height:72px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--muted);}
+.stub-ic svg{width:32px;height:32px;}
+.stub-t{font-size:var(--fs-heading);font-weight:var(--w-head);color:var(--ink);}
+.stub-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.55;max-width:30ch;}
 /* ══ SPLASH / ATTRACT ══ two-tone headline · drifting brand assets · card carousel */
 /* overflow-x only (never -y): the CTA must NEVER be unreachable. overflow:hidden on both axes
    used to CLIP (not scroll-hide) anything past the fold whenever content ran taller than the
@@ -805,6 +874,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 <symbol id="lc-sliders" viewBox="0 0 24 24"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></symbol>
 <symbol id="lc-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
 <symbol id="lc-home" viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/></symbol>
+<symbol id="lc-qr-code" viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></symbol>
+<symbol id="lc-calendar" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></symbol>
+<symbol id="lc-megaphone" viewBox="0 0 24 24"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></symbol>
+<symbol id="lc-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></symbol>
+<symbol id="lc-crown" viewBox="0 0 24 24"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></symbol>
 <symbol id="lc-gamepad-2" viewBox="0 0 24 24"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></symbol>
 <symbol id="lc-download" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="M3 15v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="m7 10 5 5 5-5"/></symbol>
 <symbol id="lc-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
@@ -1203,6 +1277,8 @@ function render(){
   else if(st.phase==='quiz')renderQuiz();
   else if(st.phase==='reveal')renderReveal();
   else if(st.phase==='book')renderBook();
+  else if(st.phase==='home')renderHome();
+  else if(st.phase==='passport'||st.phase==='games'||st.phase==='profile')renderStub(st.phase);
   window.scrollTo(0,0);
   layoutSpecComets();
 }
@@ -1467,17 +1543,26 @@ function renderBook(){
         '<div class="klib-item">'+ic('lc-file-text')+'บริหารความเสี่ยงสไตล์ '+h.famTh+'</div>'+
       '</div></div></section>'+
   '</main>'+
-  /* fixed bottom nav — stub only; "คู่มือของคุณ" is this screen, the rest have no destination built yet */
-  '<nav class="book-tabbar">'+
-    tabItem('lc-home','หน้าหลัก',false)+tabItem('lc-book-open','คู่มือของคุณ',true)+tabItem('lc-compass','เดินบูธ',false)+tabItem('lc-gamepad-2','เกมหลัก',false)+tabItem('lc-user','โปรไฟล์',false)+
-  '</nav>';
+  appTabbar('book');
+  bindTabbar();
   root.querySelector('#devReset').onclick=resetQuiz;
   root.querySelectorAll('.side-row').forEach(function(rw){rw.onclick=function(){togSide(rw);};});
   var tocs=root.querySelectorAll('.toc-p');tocs.forEach(function(p){p.onclick=function(){tocs.forEach(function(x){x.classList.remove('active');});p.classList.add('active');};});
   bindViewer();
   root.querySelectorAll('.dd-tab').forEach(function(t){t.onclick=function(){var i=t.dataset.dd;root.querySelectorAll('.dd-tab').forEach(function(x){x.classList.toggle('on',x===t);});root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===i)?'':'none';});};});
 }
-function tabItem(icon,label,active){return '<button class="tab-item'+(active?' active':'')+'">'+ic(icon)+'<span>'+label+'</span></button>';}
+/* ── App shell: shared bottom tab bar across the 5 companion-app screens (home/book/passport/games/
+   profile), ported 1:1 from Playbook Final's `tabs` array (labels/icons/order). Each screen renders
+   appTabbar(activeKey) + calls bindTabbar() so taps switch st.phase and re-render. */
+var APP_TABS=[
+  {k:'home',icon:'lc-home',label:'หน้าหลัก'},
+  {k:'book',icon:'lc-book-open',label:'คู่มือของคุณ'},
+  {k:'passport',icon:'lc-compass',label:'เดินบูธ'},
+  {k:'games',icon:'lc-gamepad-2',label:'เกมหลัก'},
+  {k:'profile',icon:'lc-user',label:'โปรไฟล์'}
+];
+function appTabbar(active){return '<nav class="book-tabbar">'+APP_TABS.map(function(t){return '<button class="tab-item'+(t.k===active?' active':'')+'" data-tab="'+t.k+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>';}).join('')+'</nav>';}
+function bindTabbar(){root.querySelectorAll('.book-tabbar .tab-item').forEach(function(b){b.onclick=function(){var k=b.dataset.tab;if(k===st.phase)return;st.phase=k;render();};});}
 /* ── deferred Book sections — all populated with EXAMPLE data (booth games + analysis engine
    don't exist yet); each carries an .ex-tag in the UI so nothing here reads as a real measurement. ── */
 function traitBars(){
@@ -1532,6 +1617,107 @@ function sidesHTML(r){
 }
 function togSide(row){var item=row.parentElement,body=item.querySelector('.side-body'),cv=row.querySelector('.s-cv'),isOpen=body.classList.contains('show');root.querySelectorAll('.side-body.show').forEach(function(b){b.classList.remove('show');});root.querySelectorAll('.s-cv.open').forEach(function(c){c.classList.remove('open');});if(!isOpen){body.classList.add('show');cv.classList.add('open');}}
 function resetQuiz(){st={phase:'splash',spidx:0,idx:0,consent:false,s1:[null,null,null],s2:[null,null,null,null,null,null,null],s3:[]};RESULT=null;render();}
+
+/* ══ HOME TAB ══ content ported verbatim from Playbook Final's Home screen (see PLAYBOOK-2026-DATA-
+   BASELINE.md §5). Progress values are mock and kept consistent with the Book page's own "2/6 ด้าน"
+   example data so the whole app reads as one coherent (example-tagged) state, not real tracking. */
+var HOME_MST={agendaDay:1,agendaAll:false};
+/* tier meta — the 3 tiers the demo panel exposes (from source tierMeta: Explorer/Master Class/
+   Ultimate rungs; Visitor/Free omitted since the demo can't select them). */
+var TIER_META={
+  'Explorer':{sub:'สมาชิกระดับสำรวจ · 150/200 บาท',icon:'lc-compass'},
+  'Master Class':{sub:'คู่มือเต็ม + เวิร์กช็อป · 990/1,890 บาท',icon:'lc-crown'},
+  'Ultimate':{sub:'ทุกสิทธิ์ + การ์ดตัวจริง · 1,500/2,500 บาท',icon:'lc-crown'}
+};
+function curTier(){var s=document.getElementById('demoTier');var n=(s&&s.value)||'Master Class';return {name:n,meta:TIER_META[n]||TIER_META['Master Class']};}
+/* "ขั้นต่อไปของคุณ" — the source's single-card funnel that surfaces ONE next action from event state.
+   This prototype only tracks "has identity" (a computed RESULT), so it collapses the source's 7-state
+   cascade to the two ends that are real here: no identity → do the quiz; has identity → the same
+   mid-funnel "play more games" step the Book page already implies with its 2/6 progress. */
+function homeNext(){
+  if(!RESULT)return {ey:'เริ่มตรงนี้',t:'ทำแบบทดสอบตัวตน 7 ข้อ',b:'ใช้เวลาราว 2 นาที แล้วคุณจะได้การ์ดตัวตนของตัวเอง',cta:'เริ่มทำแบบทดสอบ',icon:'lc-sparkles',go:function(){st.phase='splash';render();}};
+  return {ey:'ขั้นต่อไป',t:'เล่นเกมหลักอีก 4 เกม',b:'เล่นครบแล้วคู่มือของคุณจะเปิดครบทั้ง 6 ด้าน',cta:'ดูเกมที่เหลือ',icon:'lc-gamepad-2',go:function(){st.phase='games';render();}};
+}
+var HOME_COUNTERS=[
+  {icon:'lc-building-2',color:'var(--cyan)',val:'2/5',label:'กิจกรรมบูธ',go:'passport'},
+  {icon:'lc-gamepad-2',color:'var(--violet)',val:'2/6',label:'เกมหลักที่เล่น',go:'games'},
+  {icon:'lc-qr-code',color:'var(--pink)',val:'2/5',label:'เช็คอินบูธ',go:'passport'}
+];
+var HOME_ANN=[
+  {icon:'lc-hourglass',color:'var(--violet)',t:'ปิดรับสิทธิ์ลุ้นรางวัลใหญ่ 16:00 น. วันที่ 2',s:'ประกาศผล 17:30 น. ที่เวทีห้องใหญ่'},
+  {icon:'lc-gift',color:'var(--pink)',t:'การ์ดตัวจริง แลกที่จุดแลกรับการ์ดตัวจริง',s:'สิทธิบัตร Ultimate · 1 คน 1 ใบ · มีจำนวนจำกัด'}
+];
+/* agenda — verbatim from AGENDA_D1/AGENDA_D2 in Playbook Final (main stage, both days). */
+var AGENDA_D1=[
+  {time:'09:00',t:'ลงทะเบียน',by:'Samyan Mitrtown ชั้น 5'},
+  {time:'10:05',t:'Opening Session · Intelligent Investor',by:'ศ.พิเศษ กิติพงศ์ อุรพีพัฒนพงศ์'},
+  {time:'10:20',t:'มองเหนือกระแสเศรษฐกิจ ปรับทิศการลงทุน',by:'Reframe your global vision'},
+  {time:'11:20',t:'ทองคำ หลุมหลบภัย หรือพลังขับเคลื่อนพอร์ต',by:'นพ.กฤชรัตน์ หิรัณยศิริ'},
+  {time:'11:50',t:'พักเบรค · จับรางวัลครั้งที่ 1',by:'เวทีห้องใหญ่'},
+  {time:'12:45',t:'ตั้งรับความเสี่ยงอย่างชาญฉลาด เห็นโอกาสปี 2026',by:'คุณทรงพล ชีวะปัญญาโรจน์ · คุณเอนก อยู่ยืน · คุณชวินดา หาญรัตนกูล'},
+  {time:'14:00',t:'อ่านเกมเศรษฐกิจโลก 2026 · โอกาสในความผันผวน',by:'ดร.กอบศักดิ์ ภูตระกูล'},
+  {time:'15:10',t:'พอร์ตทนทุกพายุ · Asset Allocation ฉบับนักลงทุนไทย',by:'คุณกวี ชูกิจเกษม'},
+  {time:'16:20',t:'คริปโต & สินทรัพย์ดิจิทัล · จับจังหวะอย่างมีวินัย',by:'คุณพิริยะ สัมพันธารักษ์'},
+  {time:'17:30',t:'จับรางวัลใหญ่ · ปิดวันแรก',by:'เวทีห้องใหญ่'},
+  {time:'18:30',t:'ปิดงานวันที่ 1',by:''}
+];
+var AGENDA_D2=[
+  {time:'09:00',t:'ลงทะเบียน',by:'Samyan Mitrtown ชั้น 5'},
+  {time:'10:00',t:'ภาษีกับการลงทุน · จ่ายให้น้อย ถูกกฎหมาย',by:'TAXBugnom'},
+  {time:'11:00',t:'หุ้นปันผล · สร้างกระแสเงินสดระยะยาว',by:'ดร.นิเวศน์ เหมวชิรวรากร'},
+  {time:'12:00',t:'พักเบรค · จับรางวัลครั้งที่ 2',by:'เวทีห้องใหญ่'},
+  {time:'13:00',t:'อ่านงบการเงินใน 15 นาที · จับสัญญาณก่อนคนอื่น',by:'ผศ.ดร.อุดมศักดิ์ รักวงษ์วาน'},
+  {time:'14:10',t:'ลงทุนต่างประเทศ · เปิดพอร์ตข้ามพรมแดน',by:'คุณวชิรเมษฐ์ ธเนศสถิตพงษ์'},
+  {time:'15:20',t:'เซียนหุ้นถอดบทเรียน · 20 ปีในตลาด',by:'เซียนมี่ คุณทิวา ชินธาดาพงศ์'},
+  {time:'16:00',t:'ปิดรับสิทธิ์ลุ้นรางวัลใหญ่',by:'ระบบปิดอัตโนมัติ'},
+  {time:'17:30',t:'ประกาศผลรางวัลใหญ่',by:'เวทีห้องใหญ่'},
+  {time:'18:30',t:'ปิดงาน',by:''}
+];
+function appHeader(){return '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
+  '<header class="topbar app-topbar"><img class="tb-logo" src="'+LOGO_IMG.efinBT+'" alt="efin × Better Trade" style="margin-right:auto"><button class="tb-pill spec-bd">'+ic('lc-qr-code')+'<span class="spec-label">สแกน QR</span></button></header>';}
+function renderHome(){
+  var ns=homeNext(),t=curTier();
+  var days=(HOME_MST.agendaDay===2?AGENDA_D2:AGENDA_D1);
+  var shown=HOME_MST.agendaAll?days:days.slice(0,3);
+  var bookTeaser=RESULT?'เติมแล้ว 2/6 ด้าน · เล่นเพิ่มเพื่อให้ครบ':'ทำแบบทดสอบตัวตน 7 ข้อ เพื่อเปิดคู่มือ';
+  root.innerHTML=appHeader()+
+  '<main class="scroll fade">'+
+    '<section class="home-hero"><div class="hh-badge">'+ic('lc-book-open')+'คู่มือลงทุนของคุณ</div>'+
+      '<img class="hh-logo" src="'+LOGO_IMG.nwnp+'" alt="New World New Playbook">'+
+      '<p class="hh-sub">คู่มือการลงทุนส่วนตัวของคุณ ประกอบจากการ์ดตัวตนและสิ่งที่คุณทำจริงในงาน ดูย้อนหลังได้บน efin.finance</p>'+
+      '<div class="hh-meta"><span>'+ic('lc-calendar')+'31 ต.ค. – 1 พ.ย. 2569</span><span>'+ic('lc-map-pin')+'Samyan Mitrtown ชั้น 5</span></div></section>'+
+    '<button class="tier-strip" id="homeTier"><span class="ts-ic">'+ic(t.meta.icon)+'</span><span class="ts-tx"><b>'+t.name+'</b> · '+t.meta.sub+'</span>'+ic('lc-chevron-right','ts-cv')+'</button>'+
+    '<section class="next-step"><div class="ns-ic">'+ic(ns.icon)+'</div><div class="ns-tx"><div class="ns-ey">'+ns.ey+'</div><div class="ns-t">'+ns.t+'</div><div class="ns-b">'+ns.b+'</div></div><button class="btn btn-primary ns-cta" id="homeNs">'+ns.cta+ic('lc-arrow-right','ic-fwd')+'</button></section>'+
+    '<div class="home-counters">'+HOME_COUNTERS.map(function(c){return '<button class="hc-card" data-go="'+c.go+'"><svg viewBox="0 0 24 24" class="lucide" style="color:'+c.color+'"><use href="#'+c.icon+'"/></svg><div class="hc-val">'+c.val+'</div><div class="hc-label">'+c.label+'</div></button>';}).join('')+'</div>'+
+    '<div class="list-row book-teaser" id="homeBook"><div class="bt-ic">'+ic('lc-book-open')+'</div><div class="klib-tx"><div class="bt-t">คู่มือลงทุนของคุณ</div><div class="bt-s">'+bookTeaser+'</div></div>'+ic('lc-chevron-right','bt-cv')+'</div>'+
+    '<section class="home-card"><div class="hcard-hd"><div class="hcard-t">เวทีห้องใหญ่</div><div class="hcard-s">09.00–18.30 น. · Samyan Mitrtown ชั้น 5 · เวทีเดียว 2 วัน กำหนดการคนละชุด</div></div>'+
+      '<div class="ag-seg"><button class="'+(HOME_MST.agendaDay===1?'on':'')+'" data-day="1">วันที่ 1 · 31 ต.ค.</button><button class="'+(HOME_MST.agendaDay===2?'on':'')+'" data-day="2">วันที่ 2 · 1 พ.ย.</button></div>'+
+      '<div class="ag-list">'+shown.map(function(a){return '<div class="ag-row"><div class="ag-time">'+a.time+'</div><div><div class="ag-t">'+a.t+'</div>'+(a.by?'<div class="ag-by">'+a.by+'</div>':'')+'</div></div>';}).join('')+'</div>'+
+      (days.length>3?('<button class="ag-more" id="agMore">'+ic(HOME_MST.agendaAll?'lc-chevron-down':'lc-chevron-down')+(HOME_MST.agendaAll?'ย่อกำหนดการ':('ดูกำหนดการทั้งวัน '+days.length+' รายการ'))+'</button>'):'')+
+    '</section>'+
+    '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+ic('lc-megaphone')+'<div class="hcard-t" style="font-size:var(--fs-h2)">ประกาศจากงาน</div></div>'+
+      HOME_ANN.map(function(a){return '<div class="ann-row"><svg viewBox="0 0 24 24" class="lucide" style="color:'+a.color+'"><use href="#'+a.icon+'"/></svg><div><div class="ann-t">'+a.t+'</div><div class="ann-s">'+a.s+'</div></div></div>';}).join('')+
+    '</section>'+
+  '</main>'+
+  appTabbar('home');
+  bindTabbar();
+  root.querySelector('#devReset').onclick=resetQuiz;
+  root.querySelector('#homeNs').onclick=ns.go;
+  root.querySelector('#homeBook').onclick=function(){st.phase='book';render();};
+  root.querySelector('#homeTier').onclick=function(){st.phase='profile';render();};
+  root.querySelectorAll('.hc-card').forEach(function(c){c.onclick=function(){st.phase=c.dataset.go;render();};});
+  root.querySelectorAll('.ag-seg button').forEach(function(b){b.onclick=function(){HOME_MST.agendaDay=parseInt(b.dataset.day,10);HOME_MST.agendaAll=false;renderHome();};});
+  var agMore=root.querySelector('#agMore');if(agMore)agMore.onclick=function(){HOME_MST.agendaAll=!HOME_MST.agendaAll;renderHome();};
+  layoutSpecComets();
+}
+function renderStub(tab){
+  var meta={passport:{icon:'lc-compass',label:'เดินบูธ'},games:{icon:'lc-gamepad-2',label:'เกมหลัก'},profile:{icon:'lc-user',label:'โปรไฟล์'}}[tab];
+  root.innerHTML=appHeader()+
+  '<main class="scroll fade"><div class="stub-wrap"><div class="stub-ic">'+ic(meta.icon)+'</div><div class="stub-t">'+meta.label+'</div><div class="stub-s">แท็บนี้กำลังจะมา — อยู่ระหว่างออกแบบตาม Playbook Final</div></div></main>'+
+  appTabbar(tab);
+  bindTabbar();
+  root.querySelector('#devReset').onclick=resetQuiz;
+}
 
 /* ── RESPONSIVE VIEW (mobile | tablet | pc) ── driven by window, overridable via demo panel ── */
 var DEMO={view:'auto',quizDone:false};
