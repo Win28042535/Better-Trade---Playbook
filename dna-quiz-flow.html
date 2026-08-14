@@ -357,10 +357,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .tab-item.active{color:var(--violet);}
 .toc{display:flex;gap:7px;overflow-x:auto;padding:12px 16px 4px;scrollbar-width:none;flex-shrink:0;}
 .toc::-webkit-scrollbar{display:none;}
-/* TOC jump-nav pills are now .bt-tabs.bt-tabs--secondary too (same visual component as every other
-   tabbar in the app — see the BT-TABS block). Not a real ARIA tablist (clicking one doesn't hide
-   the others' content, it just scrolls to an already-visible section), so it keeps plain buttons
-   with aria-selected toggled by hand instead of the full initBtTabs wiring. */
+/* TOC jump-nav is .bt-tabs.bt-tabs--primary (underline) — this is a page-level section switcher
+   sitting right under the header, the same role as tab-display.html's own "Default" primary demo,
+   not a small in-card choice like the agenda/asset-drilldown/scan-mode pickers (those stay
+   --secondary pills). Not a real ARIA tablist (clicking one doesn't hide the others' content, it
+   just scrolls to an already-visible section), so it keeps plain buttons with aria-selected
+   toggled by hand instead of the full initBtTabs wiring. */
 .prog-wrap{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:14px 16px;position:relative;overflow:hidden;}
 .prog-inner{position:relative;z-index:1;display:flex;align-items:center;gap:14px;}
 /* ambient asset scatter — echoes the splash's floating brand assets, kept tiny/blurred/faint (FAR-plane treatment) so it dresses this otherwise-empty card corner without ever competing with content */
@@ -652,12 +654,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    section rhythm as the Book page. */
 .app-topbar .tb-logo{height:20px;}
 .home-hero{position:relative;overflow:hidden;text-align:center;border:1px solid var(--line-soft);border-radius:var(--r2);background:radial-gradient(120% 80% at 50% 0%,color-mix(in srgb,var(--violet) 14%,transparent),color-mix(in srgb,var(--cyan) 8%,transparent) 46%,var(--white) 78%);padding:22px var(--sp-card-pad) 24px;}
-/* "คู่มือลงทุนของคุณ" poster eyebrow — locked to weight 700 (was 500 in the previous pass). */
-.hh-badge{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;letter-spacing:0.04em;}
-.hh-badge svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--violet);}
-/* Gradient-clip needs its own element — putting it on .hh-badge itself would also turn the icon's
-   `color` (its stroke, via currentColor) transparent, since color:transparent cascades to children. */
-.hh-badge-tx{font-weight:700;background:var(--spectrum);-webkit-background-clip:text;background-clip:text;color:transparent;}
+/* "คู่มือลงทุนของคุณ" poster eyebrow — locked to weight 500 (var(--w-head)) in muted gray, matching
+   every other eyebrow in the app (.s-ey etc. — see design.md's eyebrow convention). Was flipped to
+   700 + a spectrum-gradient-clip in an earlier pass; reverted per direction, this time for good —
+   an eyebrow reading louder than the heading under it fought the system's own hierarchy. */
+.hh-badge{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:var(--w-head);letter-spacing:0.04em;color:var(--muted);}
+.hh-badge svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--muted);}
+.hh-badge-tx{font-weight:var(--w-head);color:var(--muted);}
 /* Smaller hero logo, bigger emphasis on .hh-sub below — the eyebrow badge/logo were carrying more
    visual weight than the sentence that actually says what this screen is for. */
 .hh-logo{display:block;width:min(56%,210px);height:auto;margin:12px auto 0;}
@@ -816,13 +819,17 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* ══ BOOTH / PASSPORT TAB ══ structure ported from Playbook Final's Passport screen (progress →
    grand-prize status → personalized hero route → per-zone booth check-in), re-skinned to our DNA. */
 .booth-hd .booth-t{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);letter-spacing:0;}
+/* the decorative ✦ inside a bold heading (plain text, not an icon) was inheriting the heading's
+   own 24px/700 — reading as its own oversized glyph instead of a quiet separator. .hd-star scales
+   it down relative to whatever heading it sits in (em, not a fixed px) and mutes the color. */
+.hd-star{font-size:0.6em;color:var(--muted);}
 .booth-hd .booth-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:3px;}
 .booth-prog{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .bp-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:13px 14px;}
 .bp-hd{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
 .bp-hd svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
-.bp-lbl{flex:1;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);}
-.bp-frac{font-size:var(--fs-label);font-weight:var(--w-label);white-space:nowrap;}
+.bp-lbl{flex:1;font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
+.bp-frac{font-size:var(--fs-bodysm);font-weight:var(--w-label);white-space:nowrap;}
 .bp-bar{height:6px;border-radius:99px;background:var(--accent);overflow:hidden;}
 .bp-fill{height:100%;border-radius:99px;transition:width .25s var(--ease);}
 .draw-status{display:flex;gap:11px;align-items:flex-start;padding:14px 15px;border-radius:var(--r2);background:var(--paper);border:1px solid var(--line-soft);}
@@ -971,32 +978,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    Ported from Playbook Final's Games screen + sideResult() narratives, re-skinned to our DNA. */
 .games-hd .games-t{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);letter-spacing:0;}
 .gh-sub{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin:-6px 0 2px;}
-/* progress hero — dark ink card + ring, echoing the source's dark progress hero */
-.gh-prog{display:flex;align-items:center;gap:16px;background:var(--ink);color:var(--cloud);border-radius:var(--r2);padding:18px var(--sp-card-pad);position:relative;overflow:hidden;}
-.gh-prog::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(340px 170px at 100% -20%,color-mix(in srgb,var(--cyan) 20%,transparent),transparent 60%),radial-gradient(300px 170px at 0% 120%,color-mix(in srgb,var(--violet) 24%,transparent),transparent 62%);}
-.gh-ring{position:relative;z-index:1;flex:0 0 auto;}
-.gh-ptx{position:relative;z-index:1;flex:1;min-width:0;}
-.gh-plbl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,.55);}
-.gh-pval{font-size:var(--fs-h2);font-weight:var(--w-label);color:#fff;line-height:1.25;margin-top:2px;}
-.gh-pval b{color:var(--cyan);font-weight:var(--w-label);}
-/* next-game highlight */
-/* .next-game-gw — same spectrum-border technique as .hero-gw/.hero-in on the Book preview card:
-   a 2px padding of the --spectrum gradient shows as a border because .next-game sits flush inside
-   it, inset by that padding. Replaces the old flat solid var(--violet) border. */
-.next-game-gw{padding:2px;border-radius:calc(var(--r2) + 3px);background:var(--spectrum);}
-.next-game{border-radius:var(--r2);background:linear-gradient(150deg,color-mix(in srgb,var(--violet) 8%,transparent),var(--white));padding:16px;}
-.ng-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
-.ng-tag{font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:.04em;color:#fff;background:var(--violet);padding:4px 11px;border-radius:var(--rpill);}
-.ng-tag.key{color:#8a5a00;background:#fef4e2;}
-.ng-row{display:flex;gap:12px;align-items:flex-start;}
-.ng-ic{width:46px;height:46px;flex:0 0 auto;border-radius:13px;background:color-mix(in srgb,var(--violet) 14%,transparent);display:flex;align-items:center;justify-content:center;color:var(--violet);}
-.ng-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
-.ng-tx{flex:1;min-width:0;}
-.ng-title{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);line-height:1.3;}
-.ng-measures{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.5;margin-top:3px;}
-/* Liquid Metal buttons auto-size off their own label rather than stretching to fill width:100%
-   like the old .btn-primary did — centered on its own row instead of spanning edge-to-edge. */
-.ng-cta-slot{display:flex;justify-content:center;margin-top:14px;}
+/* Progress hero and "play next" highlight now REUSE Home's own system cards instead of bespoke
+   dark-donut/spectrum-border treatments — .pass-card (บัตรของคุณ) for the progress status, and
+   .next-step (ขั้นต่อไป) for the one next action, both defined near line ~670-703. This also fixes
+   the old pie-chart's cramped center-number legibility complaint by dropping the chart entirely —
+   the pass-card's plain "เปิดแล้ว X จาก 6 ด้าน" text carries the same info without a chart at all. */
 .gh-restlbl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:.06em;color:var(--muted);margin:16px 0 9px;text-transform:uppercase;}
 /* game list rows */
 .game-list{display:flex;flex-direction:column;gap:10px;}
@@ -1007,6 +993,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .game-row.played .gr-ic{background:color-mix(in srgb,var(--cyan) 14%,transparent);color:var(--ink);}
 .gr-ic svg{width:var(--ic-md);height:var(--ic-md);}
 .gr-tx{flex:1;min-width:0;cursor:pointer;}
+/* .gr-play is .btn.btn-primary now (was .howto-btn) — a real primary action, not a quiet ghost
+   button, per direction. .btn-primary's own flex:1 is for CTAs that stand alone on their own row
+   (route-cta-w, consent-btn); here it sits beside .gr-tx (also flex:1) in a compact row, so it's
+   overridden back to content-width like the old .howto-btn was, keeping the row's flush-right look. */
+.gr-hd .btn-primary{flex:0 0 auto;min-height:38px;padding:0 15px;font-size:var(--fs-label);}
 .gr-title{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);line-height:1.35;display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
 /* Solid fill, not a tint — a 16%-tint chip on a row that's ALSO 5%-cyan-tinted (.game-row.played)
    just blended into its own background instead of reading as a distinct status. */
@@ -2043,7 +2034,7 @@ function renderBook(){
   root.innerHTML=
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
   '<header class="topbar"><img class="tb-logo" src="'+LOGO_IMG.bt+'" alt="Better Trade" style="margin-right:auto"><div id="qr-cta-slot"></div></header>'+
-  '<nav class="toc bt-tabs bt-tabs--secondary">'+
+  '<nav class="toc bt-tabs bt-tabs--primary">'+
     '<button class="bt-tab" type="button" data-jump="hero-sec" aria-selected="true"><span class="bt-tab-icon">'+ic('lc-user')+'</span><span class="bt-tab-label">ตัวตน</span></button>'+
     '<button class="bt-tab" type="button" data-jump="conf-box" aria-selected="false"><span class="bt-tab-icon">'+ic('lc-sparkles')+'</span><span class="bt-tab-label">Confidence</span></button>'+
     '<button class="bt-tab" type="button" data-jump="sides-sec" aria-selected="false"><span class="bt-tab-icon">'+ic('lc-pie-chart')+'</span><span class="bt-tab-label">6 ด้าน</span></button>'+
@@ -2099,7 +2090,7 @@ function renderBook(){
         '<div class="next-card"><div class="next-ic">'+ic(h.assets[0].icon)+'</div><div class="next-t">สำรวจ</div><div class="next-d">'+h.assets.slice(0,2).map(function(a){return a.t;}).join(' ✦ ')+'</div></div>'+
         '<div class="next-card"><div class="next-ic">'+ic('lc-map-pin')+'</div><div class="next-t">เดินบูธต่อ</div><div class="next-d">เหลืออีก 4 จาก 6 ด้าน</div></div>'+
       '</div>'+
-      '<div class="sub-divider"><div class="s-ey" style="display:flex;justify-content:space-between;align-items:center"><span style="display:inline-flex;align-items:center;gap:6px">'+ic('lc-message-circle')+'สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:14px">เจาะราย·สินทรัพย์</h2>'+ddTabs(h)+'</div>'+
+      '<div class="sub-divider"><div class="s-ey" style="display:flex;justify-content:space-between;align-items:center"><span style="display:inline-flex;align-items:center;gap:6px">'+ic('lc-message-circle')+'สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:14px">เจาะรายสินทรัพย์</h2>'+ddTabs(h)+'</div>'+
     '</div></section>'+
     '<section class="card" id="route-sec"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">'+ic('lc-route')+'เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2><p class="s-sub">Master Class ขึ้นไป — เส้นทางจากตัวตนที่วัดได้จริง</p></div>'+
       '<div class="route-steps">'+routeStep('done','','ทำ DNA Quiz','ตอบครบ 10 ข้อ เสร็จแล้ว — ได้ตัวตน '+h.th)+routeStep('act','2','ทำครบ 6 ด้าน','เสร็จแล้ว 2 จาก 6 — เหลืออีก 4 ด้านในบูธ')+routeStep('fut','3','รับ Playbook ส่วนตัวสมบูรณ์','เมื่อครบ 6 ด้าน รับกลยุทธ์เฉพาะตัวตน + Confidence เต็ม')+routeStep('fut','4','ติดตามบน efin.finance','Playbook sync ขึ้นแอปหลังงาน พร้อม AI ติดตามพอร์ต')+'</div>'+
@@ -2452,12 +2443,14 @@ function mountHomeNsCta(ns){
   if(!window.mountLiquidMetalButtonInto)return;
   window.mountLiquidMetalButtonInto('#ns-cta-slot','cta',{label:ns.cta,icon:ic('lc-arrow-right'),onClick:ns.go});
 }
-/* Games' "เล่นเกมนี้ต่อ" card CTA — same treatment/preset as mountHomeNsCta above. Only exists
-   when a next-up game is left to play (nextIdx>=0); once all 6 are played the card itself (and
-   its slot) isn't in the DOM, so this just no-ops rather than erroring on a missing target. */
+/* Games' "เล่นเกมนี้ต่อ" card CTA — now the same 'cta' preset as mountHomeNsCta above (the card
+   itself is the same .next-step component as Home's, so its button gets the same tier too, not
+   the smaller 'compact' size). Only exists when a next-up game is left to play (nextIdx>=0); once
+   all 6 are played the card itself (and its slot) isn't in the DOM, so this just no-ops rather
+   than erroring on a missing target. */
 function mountNgCta(nextIdx){
   if(nextIdx<0||!window.mountLiquidMetalButtonInto)return;
-  window.mountLiquidMetalButtonInto('#ng-cta-slot','compact',{label:'เล่นเกม',icon:ic('lc-play-circle'),onClick:function(){GAME_PLAYED[nextIdx]=true;GAME_OPEN=nextIdx;renderGames();}});
+  window.mountLiquidMetalButtonInto('#ng-cta-slot','cta',{label:'เล่นเกม',icon:ic('lc-play-circle'),onClick:function(){GAME_PLAYED[nextIdx]=true;GAME_OPEN=nextIdx;renderGames();}});
 }
 function renderHome(){
   var ns=homeNext(),t=curTier();
@@ -2662,7 +2655,7 @@ function renderBooth(){
   var need=[];if(!chkOK)need.push('เช็คอินอีก '+(CHECKIN_NEED-chk)+' บูธ');if(!actOK)need.push('ร่วมกิจกรรมอีก '+(ACTIVITY_NEED-act)+' บูธ');
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
-    '<div class="booth-hd"><div class="booth-t">เดินบูธ ✦ ลุ้นรางวัล</div><div class="booth-s">เช็คอินบูธ · กิจกรรมประจำบูธ · ลุ้นรางวัลใหญ่</div></div>'+
+    '<div class="booth-hd"><div class="booth-t">เดินบูธ <span class="hd-star">✦</span> ลุ้นรางวัล</div><div class="booth-s">เช็คอินบูธ · กิจกรรมประจำบูธ · ลุ้นรางวัลใหญ่</div></div>'+
     '<div class="booth-prog">'+
       '<div class="bp-card"><div class="bp-hd">'+ic('lc-qr-code')+'<span class="bp-lbl">เช็คอินบูธ</span><span class="bp-frac" style="color:'+(chkOK?'var(--cyan)':'var(--violet)')+'">'+(chkOK?('ครบแล้ว · '+chk+' บูธ'):(chk+'/'+CHECKIN_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,chk/CHECKIN_NEED*100)+'%;background:'+(chkOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
       '<div class="bp-card"><div class="bp-hd">'+ic('lc-gamepad-2')+'<span class="bp-lbl">กิจกรรมประจำบูธ</span><span class="bp-frac" style="color:'+(actOK?'var(--cyan)':'var(--violet)')+'">'+(actOK?('ครบแล้ว · '+act+' บูธ'):(act+'/'+ACTIVITY_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,act/ACTIVITY_NEED*100)+'%;background:'+(actOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
@@ -2737,16 +2730,12 @@ function sideResult(i,hero,key){
   return '';
 }
 function gamesPlayedCount(){return SIDES.reduce(function(n,_,i){return n+(GAME_PLAYED[i]?1:0);},0);}
-function gameRing(filled){
-  var pct=filled/6,R=26,C=2*Math.PI*R,off=(C*(1-pct)).toFixed(1);
-  return '<svg width="66" height="66" viewBox="0 0 66 66"><circle cx="33" cy="33" r="'+R+'" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="6"/><circle cx="33" cy="33" r="'+R+'" fill="none" stroke="'+ (filled>=6?'var(--cyan)':'url(#ggrad)') +'" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off+'" transform="rotate(-90 33 33)"/><text x="33" y="34" text-anchor="middle" dominant-baseline="central" fill="#fff" font-family="'+SERIFFONT+'" font-size="17" font-weight="500">'+filled+'/6</text><defs><linearGradient id="ggrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#61e8ed"/><stop offset="1" stop-color="#9c91ff"/></linearGradient></defs></svg>';
-}
 function gameRow(i){
   var s=SIDES[i],played=!!GAME_PLAYED[i],open=GAME_OPEN===i;
   var status=played?(open?'ซ่อนผล':'✓ เล่นแล้ว · แตะอ่านผล'):'ยังไม่เล่น · แตะเพื่อเล่น';
   var right=played
     ? '<span class="gr-chev-wrap" data-open="'+i+'">'+ic('lc-chevron-down','gr-chev'+(open?' open':''))+'</span>'
-    : '<button class="howto-btn gr-play" data-play="'+i+'">'+ic('lc-play-circle')+'เล่นเกม</button>';
+    : '<button class="btn btn-primary gr-play" data-play="'+i+'">'+ic('lc-play-circle')+'เล่นเกม</button>';
   var body=(played&&open)?'<div class="gr-body"><div class="gr-bin"><div class="gr-from">วัดจาก '+s.from+' · '+s.measures+'</div><div class="gr-result">'+sideResult(i,RESULT&&RESULT.hero,RESULT&&RESULT.heroKey)+'</div></div></div>':'';
   return '<div class="game-row'+(played?' played':'')+'"><div class="gr-hd"><div class="gr-ic">'+ic(s.icon)+'</div><div class="gr-tx" data-open="'+i+'"><div class="gr-title">'+s.title+(played?'<span class="gr-played">'+ic('lc-check')+'เล่นแล้ว</span>':'')+'</div><div class="gr-status">'+status+'</div></div>'+right+'</div>'+body+'</div>';
 }
@@ -2756,7 +2745,9 @@ function renderGames(){
   var restIdx=[];for(var j=0;j<6;j++){if(j!==nextIdx)restIdx.push(j);}
   var nextCard='';
   if(nextIdx>=0){var ns=SIDES[nextIdx];
-    nextCard='<div class="next-game-gw"><div class="next-game"><div class="ng-tags"><span class="ng-tag">เล่นเกมนี้ต่อ</span>'+(nextIdx===0?'<span class="ng-tag key">เกมสำคัญที่สุด</span>':'')+'</div><div class="ng-row"><div class="ng-ic">'+ic(ns.icon)+'</div><div class="ng-tx"><div class="ng-title">'+ns.title+'</div><div class="ng-measures">'+ns.measures+'</div></div></div><div class="ng-cta-slot" id="ng-cta-slot"></div></div></div>'+
+    /* Same .next-step card as Home's "ขั้นต่อไป" — one shared component for "the one next action",
+       not a bespoke spectrum-border card, per direction. */
+    nextCard='<section class="next-step"><div class="ns-ic">'+ic(ns.icon)+'</div><div class="ns-tx"><div class="ns-ey">เล่นเกมนี้ต่อ'+(nextIdx===0?' · เกมสำคัญที่สุด':'')+'</div><div class="ns-t">'+ns.title+'</div><div class="ns-b">'+ns.measures+'</div></div><div class="ns-cta-slot" id="ng-cta-slot"></div></section>'+
       '<div class="gh-restlbl">ด้านอื่นในคู่มือ</div>';
   }
   var listIdx=nextIdx>=0?restIdx:[0,1,2,3,4,5];
@@ -2764,7 +2755,10 @@ function renderGames(){
   '<main class="scroll fade">'+
     '<section class="home-card">'+
       '<div class="hcard-t">คู่มือ 6 ด้านของคุณ</div><div class="gh-sub">เล่นเกมแล้วเติมทีละด้าน</div>'+
-      '<div class="gh-prog" style="margin-top:14px"><div class="gh-ring">'+gameRing(filled)+'</div><div class="gh-ptx"><div class="gh-plbl">ความคืบหน้าของคู่มือ</div><div class="gh-pval">เปิดแล้ว <b>'+filled+'</b> จาก 6 ด้าน</div></div></div>'+
+      /* Same .pass-card as Home's "บัตรของคุณ" — plain icon+eyebrow+value text, no chart. Replaces
+         the old dark donut ring, which crammed "X/6" into a 66px circle hard to read at a glance
+         when the surrounding text already says the same thing. */
+      '<div class="pass-card" style="margin-top:14px;cursor:default"><div class="pass-top"><span class="pass-ic'+(filled>=6?' gold':'')+'">'+ic('lc-pie-chart')+'</span><div class="pass-hd"><div class="pass-ey">ความคืบหน้าของคู่มือ</div><div class="pass-name">เปิดแล้ว '+filled+' จาก 6 ด้าน</div></div></div></div>'+
       '<div style="margin-top:14px">'+nextCard+'<div class="game-list">'+listIdx.map(gameRow).join('')+'</div></div>'+
       '<div class="games-note">'+ic('lc-info')+'ผลมาจากสิ่งที่คุณเลือกในเกม ไม่ใช่คะแนนสูงต่ำ</div>'+
     '</section>'+
