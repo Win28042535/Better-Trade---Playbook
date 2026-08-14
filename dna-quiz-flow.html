@@ -416,10 +416,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .ast-lbl{display:flex;align-items:center;gap:6px;font-family:var(--font);font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);margin-bottom:11px;}
 .ast-lbl svg{width:var(--ic-sm);height:var(--ic-sm);}
 .ast-chips{display:flex;flex-wrap:wrap;gap:9px;}
-/* Color style now matches the "เล่นแล้ว" badge/game-row treatment (.gr-played/.gr-ic) elsewhere in
-   the app per direction — solid accent fill + ink text, not an outlined tint pill. Data/behavior
-   unchanged (still one chip per h.assets entry, same icon+label). */
-.chip{display:inline-flex;align-items:center;gap:6px;padding:9px 15px;border-radius:var(--rpill);border:none;font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
+/* Solid accent fill (prior pass) read as TOO loud — competing with the character card above it
+   for attention. Back to a tint fill, but a stronger one than .ast-block's own 12% wrapper tint
+   (26%) so the chip still visibly "pops" off that background instead of blending into it; icon +
+   label are solid accent color (not ink) so the chip still reads as clearly on-theme. */
+.chip{display:inline-flex;align-items:center;gap:6px;padding:9px 15px;border-radius:var(--rpill);border:none;font-size:var(--fs-bodysm);font-weight:var(--w-label);}
 .chip svg{width:var(--ic-sm);height:var(--ic-sm);}
 /* Was a single flex row mixing raw text runs with 2 inline spans (dot/.ld + name/.ln) — a flex
    container wraps each direct text-node run into its OWN anonymous flex item, so "แรงบันดาลใจจาก",
@@ -1179,22 +1180,31 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pcE-en{font-family:var(--serif);font-weight:600;font-size:20px;line-height:1.05;color:#15171d;letter-spacing:-0.01em;}
 @supports(width:1cqw){.pcE-en{font-size:clamp(20px,10cqw,30px);}}
 .pcE-art{flex:1 1 auto;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;z-index:1;}
-.pcE-halo{position:absolute;width:74%;aspect-ratio:1;border-radius:50%;background:conic-gradient(from 205deg,#61e8ed,#9c91ff,#f178d8,#f2ea83,#61e8ed);filter:saturate(1.1);opacity:.92;-webkit-mask:radial-gradient(closest-side,#000 60%,transparent 76%);mask:radial-gradient(closest-side,#000 60%,transparent 76%);transition:transform .3s var(--ease);}
+/* Halo (a big conic-gradient CIRCLE FILL behind the icon) removed, and the glyph's solid-black
+   color dropped to a quiet ink-tint stroke — per direction, this was the spectrum gradient being
+   used as a background FILL, exactly what the DNA's own accent rule warns against ("spectrum
+   reserved for rare accent moments, never a fill") and it was visually louder than the icon it
+   sat behind. The spectrum now lives ONLY on the divider + sparkles below — a genuinely small
+   accent instead of a big colorful block competing with the character glyph. Icon is now a plain
+   quiet monochrome line drawing (the DNA's own "mid layer"), matching the app's default "light
+   weight" body logic instead of standing out as a bold black shape. */
 .pcE-glyph{position:relative;z-index:2;transition:transform .3s var(--ease);}
-.pcE-glyph svg{width:64px;height:64px;color:#14161c;stroke-width:1.2;filter:drop-shadow(0 6px 15px rgba(17,19,24,0.30));}
-.pcE-spk{position:absolute;color:rgba(17,19,24,0.4);z-index:2;font-size:11px;}
-/* Bottom info — left column (Thai name + description + edition #), right column (2×2 tag grid
-   with sparkle bullets) — matches the real card's actual split instead of one centered block. A
-   hairline top border now separates it from the art region above (was floating with nothing
-   marking where "content" starts — part of the "feels cramped" complaint). */
-.pcE-bot{flex:0 0 auto;position:relative;z-index:2;display:flex;gap:10px;align-items:flex-end;padding-top:10px;border-top:1px solid rgba(17,19,24,0.1);}
-.pcE-left{flex:1;min-width:0;}
+.pcE-glyph svg{width:64px;height:64px;color:rgba(17,19,24,0.45);stroke-width:1.2;}
+/* ✦ sparkles carry the spectrum accent via the same background-clip:text technique used for
+   .spec-label elsewhere in the file, instead of a flat muted color. */
+.pcE-spk{position:absolute;z-index:2;font-size:11px;background:var(--spectrum);-webkit-background-clip:text;background-clip:text;color:transparent;}
+/* Bottom info rebuilt as ONE centered column (name → description → asset tags → edition #) —
+   was a left/right split (text vs. a 2×2 tag grid) per direction "ให้กลุ่ม text ทั้งหมด align
+   กลาง". The hairline divider is now a short spectrum-gradient bar instead of a flat rgba line —
+   the card's one deliberate accent moment, echoing the sparkles above it. */
+.pcE-bot{flex:0 0 auto;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;padding-top:12px;}
+.pcE-divider{width:52px;height:2px;border-radius:2px;background:var(--spectrum);}
 .pcE-th2{font-family:var(--font);font-weight:var(--w-label);font-size:13px;color:#15171d;}
-.pcE-def{font-family:var(--font);font-weight:var(--w-body);font-size:9.5px;line-height:1.45;color:rgba(17,19,24,0.6);margin-top:3px;}
-.pcE-ed{font-family:var(--font);font-size:9px;color:rgba(17,19,24,0.4);margin-top:5px;}
-.pcE-right{flex-shrink:0;display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;}
+.pcE-def{font-family:var(--font);font-weight:var(--w-body);font-size:9.5px;line-height:1.45;color:rgba(17,19,24,0.6);max-width:34ch;}
+.pcE-ed{font-family:var(--font);font-size:9px;color:rgba(17,19,24,0.4);}
+.pcE-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;}
 .pcE-tag{display:flex;align-items:center;gap:4px;font-family:var(--font);font-size:8.5px;color:rgba(17,19,24,0.75);white-space:nowrap;}
-.pcE-tag i{font-style:normal;font-size:8px;color:rgba(17,19,24,0.45);}
+.pcE-tag i{font-style:normal;font-size:8px;background:var(--spectrum);-webkit-background-clip:text;background-clip:text;color:transparent;}
 /* ══ EDITORIAL CARD (back — dossier) ══ */
 .pcb{position:absolute;inset:0;background:#f4f1e9;color:#15171d;padding:20px 18px;display:flex;flex-direction:column;overflow-y:auto;}
 .pcb::before{content:"";position:absolute;inset:9px;border:1px solid rgba(17,19,24,0.22);border-radius:9px;pointer-events:none;}
@@ -1532,21 +1542,22 @@ function cardStats(h){
 }
 function roman(n){return ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][n]||(''+n);}
 /* front — real illustrated art for the 2 personas that have approved final art (Diamond Hand/Wave
-   Rider); editorial CSS poster for the other 10, laid out to match that approved format: serif
-   title top-center, art middle, Thai name+description+edition-number bottom-left, asset tags as a
-   bottom-right 2×2 grid — no ornate frame/corner-brackets/roman-badge/wedge (the real cards don't
-   have them either). */
+   Rider); editorial CSS poster for the other 10, laid out to echo that approved format: serif
+   title top-center, art middle, then one CENTERED info column (name → description → asset tags →
+   edition #) — no ornate frame/corner-brackets/roman-badge/wedge (the real cards don't have them
+   either). Bindings deliberately quiet (line-drawing glyph, no icon halo) so the card's one real
+   accent moment is the small spectrum-gradient divider + sparkles, not a big colorful icon block. */
 function pcFrontInner(key){
   if(REAL_CARD_IMG[key])return '<img class="pcE-photo" src="'+REAL_CARD_IMG[key]+'" alt="การ์ด '+HEROES[key].en+'" loading="lazy">';
   var h=HEROES[key];
   var tags=h.assets.map(function(a){return '<span class="pcE-tag"><i>✦</i>'+a.t+'</span>';}).join('');
   return '<div class="pcE">'+
     '<div class="pcE-name"><div class="pcE-en">'+h.en+'</div></div>'+
-    '<div class="pcE-art"><div class="pcE-halo"></div>'+
+    '<div class="pcE-art">'+
       '<span class="pcE-spk" style="top:2%;left:0%">✦</span><span class="pcE-spk" style="bottom:6%;right:-2%;font-size:15px">✦</span>'+
       '<div class="pcE-glyph">'+ic(PICON[key])+'</div></div>'+
-    '<div class="pcE-bot"><div class="pcE-left"><div class="pcE-th2">'+h.th+'</div><div class="pcE-def">'+h.sig+'</div><div class="pcE-ed">'+roman(pnum(key))+' / XII</div></div>'+
-      '<div class="pcE-right">'+tags+'</div></div>'+
+    '<div class="pcE-bot"><div class="pcE-divider"></div><div class="pcE-th2">'+h.th+'</div><div class="pcE-def">'+h.sig+'</div>'+
+      '<div class="pcE-tags">'+tags+'</div><div class="pcE-ed">'+roman(pnum(key))+' / XII</div></div>'+
     '</div>'; /* closes the outer .pcE opened at the top of this function */
 }
 /* back (dossier) — strengths · watch-outs · persona scale · legend */
@@ -2116,7 +2127,7 @@ function evoCompute(r){
 function heroPanelBody(key,hero,suffix){
   var strengths=hero.strengths.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
   var watch=hero.watchouts.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
-  var chips=hero.assets.map(function(a){return '<span class="chip" style="background:'+hero.accent+'">'+ic(a.icon)+a.t+'</span>';}).join('');
+  var chips=hero.assets.map(function(a){return '<span class="chip" style="background:color-mix(in srgb,'+hero.accent+' 26%,var(--white));color:'+hero.accent+'">'+ic(a.icon)+a.t+'</span>';}).join('');
   return '<div class="hero-cardwrap">'+pcViewer(key,suffix)+'</div>'+
     '<div class="hero-sig-c">'+hero.sig+'</div>'+
     '<div class="ast-block" style="background:color-mix(in srgb,'+hero.accent+' 12%,transparent);border:1px solid color-mix(in srgb,'+hero.accent+' 32%,transparent)">'+
