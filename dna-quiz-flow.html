@@ -2181,6 +2181,14 @@ function evoPanelHTML(ev){
   return heroPanelBody(ev.behKey,ev.behHero,'Post');
 }
 function renderBook(){
+  // Guards against a real crash path: RESULT is only ever set by compute() (called right before
+  // st.phase='reveal' in the real quiz flow), but phase can still land on 'book' without it — most
+  // notably the REVEALTIMER set in renderReveal() fires 3s later on a plain setTimeout, so if
+  // anything (a dev-panel action, a stray back-navigation, a future bug) sends the user away from
+  // 'reveal' and resets RESULT without also clearing that timer, it fires against null and crashed
+  // here with "Cannot read properties of null (reading 'hero')". Falling back to splash is the same
+  // safe default resetQuiz() already uses for "no real quiz data yet".
+  if(!RESULT){st.phase='splash';render();return;}
   var r=RESULT,h=r.hero;
   var ev=evoCompute(r);
   // Which tab opens by default: while there's no post-event evidence yet ('building'), pre-event
@@ -2335,6 +2343,9 @@ var LIBRARY_CATS=[
 ];
 var LIB_OPEN=null;
 function renderLibrary(){
+  // Same defensive guard as renderBook (the only other screen this reachable from) — see the
+  // comment there for why RESULT can theoretically be null when a render lands here.
+  if(!RESULT){st.phase='splash';render();return;}
   var h=RESULT.hero;
   var total=LIBRARY_CATS.reduce(function(n,c){return n+c.n;},0);
   root.innerHTML=
