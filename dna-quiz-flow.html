@@ -416,7 +416,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .ast-lbl{display:flex;align-items:center;gap:6px;font-family:var(--font);font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);margin-bottom:11px;}
 .ast-lbl svg{width:var(--ic-sm);height:var(--ic-sm);}
 .ast-chips{display:flex;flex-wrap:wrap;gap:9px;}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:9px 15px;border-radius:var(--rpill);border:1.5px solid;font-size:var(--fs-bodysm);font-weight:var(--w-label);background:var(--white);}
+/* Color style now matches the "เล่นแล้ว" badge/game-row treatment (.gr-played/.gr-ic) elsewhere in
+   the app per direction — solid accent fill + ink text, not an outlined tint pill. Data/behavior
+   unchanged (still one chip per h.assets entry, same icon+label). */
+.chip{display:inline-flex;align-items:center;gap:6px;padding:9px 15px;border-radius:var(--rpill);border:none;font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
 .chip svg{width:var(--ic-sm);height:var(--ic-sm);}
 /* Was a single flex row mixing raw text runs with 2 inline spans (dot/.ld + name/.ln) — a flex
    container wraps each direct text-node run into its OWN anonymous flex item, so "แรงบันดาลใจจาก",
@@ -431,7 +434,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .hero-leg-txt{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.55;}
 .ld{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .ln{font-family:var(--serif);font-weight:600;color:var(--ink);}
-.hero-acts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;justify-content:flex-end;}
+/* Right-aligned+secondary (prior pass) → full-width+primary per direction: this is the ONE action
+   on the identity card worth an ink-filled CTA, so it should read with the same weight as any
+   other primary button in the app, not a quiet outlined pill off to one side. */
+.hero-acts{display:flex;margin-top:14px;}
+.hero-share-btn{flex:1;}
 .hero-note{margin-top:12px;display:flex;align-items:flex-start;gap:var(--sp-inline);padding:9px 11px;border-radius:var(--r1);background:var(--accent);font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);line-height:1.6;}
 .hero-note svg{width:var(--ic-sm);height:var(--ic-sm);flex-shrink:0;margin-top:1px;}
 /* PRE/POST-EVENT TABS — in-card picker inside the hero card itself (see evoCompute/evoPanelHTML
@@ -444,39 +451,6 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .ev-empty-ic svg{width:var(--ic-md);height:var(--ic-md);color:var(--muted);}
 .ev-empty-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);margin-bottom:6px;}
 .ev-empty-s{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.55;max-width:34ch;margin:0 auto 16px;}
-.ev-badge{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:.03em;padding:6px 12px;border-radius:var(--rpill);margin-bottom:12px;}
-.ev-badge svg{width:var(--ic-sm);height:var(--ic-sm);}
-.ev-head{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);line-height:1.2;margin:0 0 6px;}
-.ev-sub{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.6;margin:0;}
-.ev-compare{margin:18px 0 6px;}
-.ev-cmp-lbl{font-family:var(--font);font-size:var(--fs-eyebrow);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:12px;}
-.ev-cmp-row{display:flex;flex-direction:column;align-items:center;gap:12px;}
-/* Card widths reuse the already-verified-safe tokens from elsewhere (fan-card 172/204, hero-
-   cardwrap 236/268) rather than a new invented size — a narrower one-off (tried 150px first) let
-   the CSS-mockup card's bottom-left description text overflow/wrap vertically down the card edge
-   at that width, since .pcE was only ever tuned against these two known sizes. */
-.ev-cmp-col{width:172px;text-align:center;}
-/* The highlighted "สรุปจบงาน" column carries a live pcViewer (hint chip + flip/reset buttons),
-   not just a bare card image like the "การ์ดใบแรก" reference column — it needs the SAME roomier
-   width the pre-event hero-cardwrap uses (236/268), or the .pcv-ctas buttons' Thai labels have no
-   room to fit and wrap/overflow. Deliberately wider than its plain sibling column. */
-.ev-cmp-col.hi{width:236px;}
-.ev-cmp-arrow{width:20px;height:20px;color:var(--violet);flex-shrink:0;transform:rotate(90deg);}
-.ev-cmp-tag{font-size:var(--fs-meta);font-weight:var(--w-head);color:var(--muted);margin-bottom:7px;}
-.ev-cmp-tag.hi{color:var(--violet);font-weight:var(--w-label);}
-.ev-cmp-name{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);margin-top:9px;}
-.ev-cmp-name.hi{color:var(--violet);font-weight:var(--w-label);}
-.ev-single{width:236px;margin:18px auto 6px;text-align:center;}
-:root[data-view="tablet"] .ev-cmp-col,:root[data-view="pc"] .ev-cmp-col{width:204px;}
-:root[data-view="tablet"] .ev-cmp-col.hi,:root[data-view="pc"] .ev-cmp-col.hi{width:268px;}
-:root[data-view="tablet"] .ev-single,:root[data-view="pc"] .ev-single{width:268px;}
-.ev-ev-lbl{font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px;}
-.ev-evidence{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
-.ev-ev-row{display:flex;gap:8px;align-items:flex-start;font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--ink);line-height:1.5;}
-.ev-ev-row svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--cyan);flex-shrink:0;margin-top:2px;}
-.ev-remain{font-size:var(--fs-bodysm);color:#8a5a00;background:#fef4e2;border:1px solid #f3daa0;border-radius:var(--r1);padding:9px 11px;margin-bottom:10px;line-height:1.5;}
-:root[data-view="tablet"] .ev-cmp-row,:root[data-view="pc"] .ev-cmp-row{flex-direction:row;justify-content:center;}
-:root[data-view="tablet"] .ev-cmp-arrow,:root[data-view="pc"] .ev-cmp-arrow{transform:none;}
 /* แลกรับการ์ดตัวจริง — tier-gated like the post-event tracks (.pe-report/.pe-locked share this
    same on/locked pattern): Ultimate can redeem now, everything else sees what unlocks it. */
 .redeem-card{margin-top:16px;display:flex;gap:11px;align-items:flex-start;padding:13px 14px;border-radius:var(--r1);}
@@ -1190,20 +1164,30 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    middle, Thai name+description bottom-left, asset tags as a bottom-right 2×2 grid, small
    edition-style numbering bottom-left. No real illustration exists for these 9 yet, so the
    middle art keeps the halo+glyph placeholder — everything AROUND it now matches the real cards. */
-.pcE{position:absolute;inset:0;background:#f4f1e9;color:#15171d;overflow:hidden;container-type:inline-size;}
+/* Rebuilt from absolute-positioned regions (name pinned top, art pinned by top%/height%, bottom
+   info pinned by bottom px) to a real flex column, per direction ("cleaner, text shouldn't
+   overlap the icon — currently cramped/tight"). The absolute version anchored the bottom-info
+   block from the BOTTOM with no height limit, so a longer persona description grew UPWARD and
+   could eat into the fixed 26%–72% art band above it — a real overlap risk that got worse the
+   longer h.sig was. Flex column removes the possibility structurally: name/bottom-info each take
+   exactly the height their own content needs (flex:0 0 auto), and the art region (flex:1 1 auto,
+   min-height:0) simply absorbs whatever space is left — it shrinks instead of getting overlapped. */
+.pcE{position:absolute;inset:0;background:#f4f1e9;color:#15171d;overflow:hidden;container-type:inline-size;display:flex;flex-direction:column;padding:20px 16px 15px;}
 .pcE-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#f4f1e9;}
 .pcE::before{content:"";position:absolute;inset:0;opacity:.55;background-image:radial-gradient(rgba(17,19,24,0.05) 0.5px,transparent 0.6px);background-size:3px 3px;pointer-events:none;}
-.pcE-name{position:absolute;top:18px;left:14px;right:14px;text-align:center;z-index:3;}
+.pcE-name{flex:0 0 auto;text-align:center;position:relative;z-index:3;margin-bottom:6px;}
 .pcE-en{font-family:var(--serif);font-weight:600;font-size:20px;line-height:1.05;color:#15171d;letter-spacing:-0.01em;}
 @supports(width:1cqw){.pcE-en{font-size:clamp(20px,10cqw,30px);}}
-.pcE-art{position:absolute;top:26%;left:8%;right:8%;height:46%;display:flex;align-items:center;justify-content:center;z-index:1;}
+.pcE-art{flex:1 1 auto;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;z-index:1;}
 .pcE-halo{position:absolute;width:74%;aspect-ratio:1;border-radius:50%;background:conic-gradient(from 205deg,#61e8ed,#9c91ff,#f178d8,#f2ea83,#61e8ed);filter:saturate(1.1);opacity:.92;-webkit-mask:radial-gradient(closest-side,#000 60%,transparent 76%);mask:radial-gradient(closest-side,#000 60%,transparent 76%);transition:transform .3s var(--ease);}
 .pcE-glyph{position:relative;z-index:2;transition:transform .3s var(--ease);}
 .pcE-glyph svg{width:64px;height:64px;color:#14161c;stroke-width:1.2;filter:drop-shadow(0 6px 15px rgba(17,19,24,0.30));}
 .pcE-spk{position:absolute;color:rgba(17,19,24,0.4);z-index:2;font-size:11px;}
 /* Bottom info — left column (Thai name + description + edition #), right column (2×2 tag grid
-   with sparkle bullets) — matches the real card's actual split instead of one centered block. */
-.pcE-bot{position:absolute;left:16px;right:16px;bottom:14px;z-index:2;display:flex;gap:10px;align-items:flex-end;}
+   with sparkle bullets) — matches the real card's actual split instead of one centered block. A
+   hairline top border now separates it from the art region above (was floating with nothing
+   marking where "content" starts — part of the "feels cramped" complaint). */
+.pcE-bot{flex:0 0 auto;position:relative;z-index:2;display:flex;gap:10px;align-items:flex-end;padding-top:10px;border-top:1px solid rgba(17,19,24,0.1);}
 .pcE-left{flex:1;min-width:0;}
 .pcE-th2{font-family:var(--font);font-weight:var(--w-label);font-size:13px;color:#15171d;}
 .pcE-def{font-family:var(--font);font-weight:var(--w-body);font-size:9.5px;line-height:1.45;color:rgba(17,19,24,0.6);margin-top:3px;}
@@ -2107,14 +2091,14 @@ function radarSVG(vals,hue){
    'evolved' result now lands on real art, never a mockup, on the post-event side. N keeps its
    mockup rep since no N-family persona has real art yet. */
 var EVO_REP={G:'diamondhand',N:'planner',V:'waverider'};
-/* v2 — ties the family-shift decision to ONE real signal only (r.gap, compute()'s own declared-
-   vs-revealed risk gap) instead of a multi-signal weighted tally. The earlier version anchored the
-   declared family with a flat +20 that no combination of other bonuses could ever mathematically
-   exceed — 'evolved' was coded and rendered correctly under a manually-forced test object, but was
-   UNREACHABLE through any real sequence of plays, since nothing could outscore that anchor. Now:
-   games/booth/interests only count toward whether there's ENOUGH evidence to say anything at all
-   (sig, the confidence gate); WHICH family a real divergence points to comes only from the gap,
-   which is the one field in this file that actually measures "declared vs behavior" already. */
+/* v3 — dropped the "เทียบก่อน–หลัง" 2-card compare + badge/evidence narrative entirely per
+   direction ("post-event doesn't need the compare section — just show the card, same layout as
+   pre-event, for the post-event persona"). The evidence-gated behFam decision (v2, still ties the
+   shift to ONE real signal — compute()'s own declared-vs-revealed risk gap, |gap|>=2 — behind an
+   activity threshold so a lone stray signal can't flip the persona) is unchanged; only the
+   RENDERING collapsed from 4 narrative states (building/gathering/confirmed/evolved) to 2 (no
+   data yet vs a resolved persona), since gathering/confirmed/evolved all rendered identically now
+   that there's no compare/badge copy left to differentiate them by. */
 function evoCompute(r){
   var hero=r.hero,heroKey=r.heroKey;
   var played=gamesPlayedCount(),chk=boothCheckinCount(),act=boothActivityCount(),interests=(r.interests||[]).length;
@@ -2123,55 +2107,29 @@ function evoCompute(r){
   var diverged=Math.abs(r.gap)>=2; // a real, already-computed behavioral risk gap of ≥2/10
   var behFam=(enough&&diverged)?(r.gap>=2?'V':'G'):hero.fam;
   var behKey=(behFam===hero.fam)?heroKey:EVO_REP[behFam];
-  var diff=behKey!==heroKey;
-  var state=played===0?'building':(diff?'evolved':(enough?'confirmed':'gathering'));
-  return {state:state,behKey:behKey,behHero:HEROES[behKey],diff:diff,sig:sig,remain:Math.max(0,3-sig),
-    played:played,chk:chk,act:act,interests:interests};
+  return {state:played===0?'building':'ready',behKey:behKey,behHero:HEROES[behKey]};
 }
-function evoEvidence(ev){
-  return [
-    ev.played>0?'เล่นเกมแล้ว '+ev.played+'/6 ด้าน':null,
-    ev.chk>0?'เช็คอินบูธ '+ev.chk+' จุด':null,
-    ev.act>0?'ร่วมกิจกรรมประจำบูธ '+ev.act+' บูธ':null,
-    ev.interests>0?'เลือกความสนใจไว้ '+ev.interests+' หมวด':null
-  ].filter(Boolean);
+/* Shared by both hero-sec tab panels (renderBook's pre-event one and evoPanelHTML's post-event
+   one) so the two are structurally guaranteed to stay in lockstep — card viewer → signature →
+   asset chips → strengths/watchouts, same order, same classes, just fed a different persona +
+   pcViewer id-suffix (so both can be live/interactive at once without id collisions). */
+function heroPanelBody(key,hero,suffix){
+  var strengths=hero.strengths.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
+  var watch=hero.watchouts.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
+  var chips=hero.assets.map(function(a){return '<span class="chip" style="background:'+hero.accent+'">'+ic(a.icon)+a.t+'</span>';}).join('');
+  return '<div class="hero-cardwrap">'+pcViewer(key,suffix)+'</div>'+
+    '<div class="hero-sig-c">'+hero.sig+'</div>'+
+    '<div class="ast-block" style="background:color-mix(in srgb,'+hero.accent+' 12%,transparent);border:1px solid color-mix(in srgb,'+hero.accent+' 32%,transparent)">'+
+      '<div class="ast-lbl">'+ic('lc-sparkles')+'สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div></div>'+
+    '<div class="str-grid" style="margin-top:16px"><div class="str-box"><div class="str-hd">'+ic('lc-zap')+'จุดแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'จุดระวัง</div>'+watch+'</div></div>';
 }
-var EVO_CFG={
-  confirmed:function(hero){return {badge:'สิ่งที่ทำ ตรงกับที่บอก',bg:'#dff9de',fg:'#1f9b1a',icon:'lc-check-circle',
-    head:'ยืนยันตัวตนของคุณแล้ว',sub:'สิ่งที่คุณเล่นจริงในงานตรงกับตัวตนจาก DNA Quiz — '+hero.th+' คือคุณจริงๆ'};},
-  evolved:function(hero,beh){return {badge:'วันนี้มีอีกด้านของคุณเผยออกมา',bg:'#f0e9fd',fg:'#7c3aed',icon:'lc-sparkles',
-    head:'สิ่งที่คุณทำจริงชี้ไปที่อีกสไตล์',sub:'DNA Quiz บอกว่าคุณคือ '+hero.th+' แต่ตอนลงมือจริงคุณเผยด้าน '+beh.th+' ออกมา'};},
-  gathering:function(hero){return {badge:'กำลังเก็บข้อมูลจากในงาน',bg:'var(--accent)',fg:'var(--muted)',icon:'lc-refresh-cw',
-    head:'ข้อมูลยังไม่พอสรุป',sub:'เท่าที่เล่นมาตอนนี้ยังไปในทิศทางเดียวกับ '+hero.th+' — เล่น/เดินบูธเพิ่ม เราจะสรุปให้แม่นขึ้น'};}
-};
-function evoPanelHTML(ev,r){
+function evoPanelHTML(ev){
   if(ev.state==='building')
     return '<div class="ev-empty"><div class="ev-empty-ic">'+ic('lc-hourglass')+'</div>'+
       '<div class="ev-empty-t">ยังไม่มีข้อมูลจากในงาน</div>'+
       '<div class="ev-empty-s">เล่นเกมและเดินบูธในงานก่อน แล้วค่อยกลับมาดูว่าตัวตนที่ "ทำจริง" ตรงกับที่ DNA Quiz บอกไหม</div>'+
       '<button class="btn btn-primary" id="evGoGames">'+ic('lc-play-circle')+'ไปเล่นกิจกรรม</button></div>';
-  var cfg=EVO_CFG[ev.state](r.hero,ev.behHero);
-  // The CURRENT/final identity (ev.behKey) always gets the full interactive pcViewer (suffix
-  // 'Post', bound separately from the pre-event tab's own viewer via renderBook's bindViewer('Post'))
-  // per direction — the post-event card should be just as tap/drag/flip-able as the pre-event one.
-  // In the 2-card compare (evolved), only that highlighted "สรุปจบงาน" card is the live viewer; the
-  // "การ์ดใบแรก" reference card stays a plain pcStatic thumbnail since it's a fixed historical
-  // snapshot, not the identity being explored right now.
-  var cardsHtml=ev.diff
-    ? '<div class="ev-compare"><div class="ev-cmp-lbl">เทียบก่อน–หลัง</div><div class="ev-cmp-row">'+
-        '<div class="ev-cmp-col"><div class="ev-cmp-tag">การ์ดใบแรก</div>'+pcStatic(r.heroKey)+'<div class="ev-cmp-name">'+r.hero.th+'</div></div>'+
-        ic('lc-arrow-right','ev-cmp-arrow')+
-        '<div class="ev-cmp-col hi"><div class="ev-cmp-tag hi">สรุปจบงาน</div>'+pcViewer(ev.behKey,'Post')+'<div class="ev-cmp-name hi">'+ev.behHero.th+'</div></div>'+
-      '</div></div>'
-    : '<div class="ev-single">'+pcViewer(ev.behKey,'Post')+'<div class="ev-cmp-name">'+ev.behHero.th+'</div></div>';
-  var evid=evoEvidence(ev);
-  return '<span class="ev-badge" style="background:'+cfg.bg+';color:'+cfg.fg+'">'+ic(cfg.icon)+cfg.badge+'</span>'+
-    '<h3 class="ev-head">'+cfg.head+'</h3><p class="ev-sub">'+cfg.sub+'</p>'+
-    cardsHtml+
-    '<div class="ev-ev-lbl">เราดูจากสิ่งเหล่านี้</div>'+
-    '<div class="ev-evidence">'+evid.map(function(e){return '<div class="ev-ev-row">'+ic('lc-check-circle')+e+'</div>';}).join('')+'</div>'+
-    (ev.remain>0?'<div class="ev-remain">เล่นเพิ่มอีก '+ev.remain+' อย่าง เราจะสรุปได้แม่นขึ้น</div>':'')+
-    '<span class="ex-tag">ประเมินจากกิจกรรมในงาน</span>';
+  return heroPanelBody(ev.behKey,ev.behHero,'Post');
 }
 function renderBook(){
   var r=RESULT,h=r.hero;
@@ -2183,9 +2141,6 @@ function renderBook(){
   // driving the shared fam-badge above the tabs follows the same rule (activeHero).
   var defaultTab=ev.state==='building'?'pre':'post';
   var activeHero=defaultTab==='pre'?h:ev.behHero;
-  var strengths=h.strengths.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
-  var watch=h.watchouts.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
-  var chips=h.assets.map(function(a){return '<span class="chip" style="background:color-mix(in srgb,'+h.accent+' 14%,transparent);border-color:color-mix(in srgb,'+h.accent+' 38%,transparent);color:'+h.accent+'">'+ic(a.icon)+a.t+'</span>';}).join('');
   var matchOk=Math.abs(r.gap)<=1.5;
   var isUltimate=curTier().name==='Ultimate';
   /* แลกรับการ์ดตัวจริง — same tier-gate as the post-event tracks (Ultimate only, per TIER_META's
@@ -2212,17 +2167,11 @@ function renderBook(){
         '<button class="bt-tab" type="button" role="tab" aria-selected="'+(defaultTab==='pre'?'true':'false')+'" tabindex="'+(defaultTab==='pre'?'0':'-1')+'" data-value="pre"><span class="bt-tab-icon">'+ic('lc-file-text')+'</span><span class="bt-tab-label">โปรไฟล์ก่อนงาน</span></button>'+
         '<button class="bt-tab" type="button" role="tab" aria-selected="'+(defaultTab==='post'?'true':'false')+'" tabindex="'+(defaultTab==='post'?'0':'-1')+'" data-value="post"><span class="bt-tab-icon">'+ic('lc-sparkles')+'</span><span class="bt-tab-label">โปรไฟล์หลังงาน</span></button>'+
       '</div>'+
-      '<div class="hero-ev-panel" id="heroEvPre"'+(defaultTab==='pre'?'':' style="display:none"')+'>'+
-        '<div class="hero-cardwrap">'+pcViewer(r.heroKey)+'</div>'+
-        '<div class="hero-sig-c">'+h.sig+'</div>'+
-        '<div class="ast-block" style="background:color-mix(in srgb,'+h.accent+' 12%,transparent);border:1px solid color-mix(in srgb,'+h.accent+' 32%,transparent)">'+
-          '<div class="ast-lbl">'+ic('lc-sparkles')+'สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div></div>'+
-        '<div class="str-grid" style="margin-top:16px"><div class="str-box"><div class="str-hd">'+ic('lc-zap')+'จุดแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'จุดระวัง</div>'+watch+'</div></div>'+
-      '</div>'+
-      '<div class="hero-ev-panel" id="heroEvPost"'+(defaultTab==='post'?'':' style="display:none"')+'>'+evoPanelHTML(ev,r)+'</div>'+
+      '<div class="hero-ev-panel" id="heroEvPre"'+(defaultTab==='pre'?'':' style="display:none"')+'>'+heroPanelBody(r.heroKey,h,'')+'</div>'+
+      '<div class="hero-ev-panel" id="heroEvPost"'+(defaultTab==='post'?'':' style="display:none"')+'>'+evoPanelHTML(ev)+'</div>'+
       redeemCard+
       '<div class="hero-leg"><span class="hero-leg-dot" style="background:'+h.accent+'"></span><div><div class="hero-leg-lbl">แรงบันดาลใจจาก</div><div class="hero-leg-txt"><span class="ln">'+h.legend+'</span> — '+h.legendWhy+'</div></div></div>'+
-      '<div class="hero-acts"><button class="btn btn-secondary" id="shareCardBtn">'+ic('lc-upload')+'แชร์ภาพการ์ด</button></div>'+
+      '<div class="hero-acts"><button class="btn btn-primary hero-share-btn" id="shareCardBtn">'+ic('lc-upload')+'แชร์ภาพการ์ด</button></div>'+
       '<div class="hero-note">'+ic('lc-info')+'ตัวตนนี้สรุปจากคำตอบ DNA Quiz ของคุณ — ยิ่งทำกิจกรรมในงานครบ ยิ่งแม่นขึ้น</div>'+
     '</div></div></section>'+
     '<div class="efin-banner"><div class="efin-hd"><div class="efin-ic">'+ic('lc-sparkles')+'</div><div class="efin-t">ให้ efin AI ช่วยแนะนำแบบคุณ</div></div>'+
