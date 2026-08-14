@@ -145,7 +145,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .topbar{position:sticky;top:0;z-index:80;background:var(--popover);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line-header);height:54px;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;}
 .tb-ic{width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--muted);background:none;border:none;}
 .tb-ic svg{width:var(--ic-md);height:var(--ic-md);}
-.tb-title{flex:1;font-size:var(--fs-h2);font-weight:var(--w-head);letter-spacing:0;color:var(--ink);}
+/* Title Section typography — bumped from --w-head (500) to --w-label (700, already used by
+   value/number text like .hc-val/.ng-title) across every page/section title. 500 read thin and
+   low-impact at these sizes; this doesn't touch --w-head itself since that's still used by many
+   non-title elements (labels, buttons, badges) that weren't part of this request. */
+.tb-title{flex:1;font-size:var(--fs-h2);font-weight:var(--w-label);letter-spacing:0;color:var(--ink);}
 .tb-sub{display:flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);font-family:var(--font);}
 .tb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 /* Header-pill CTA size — the app's only other explicit CTA size spec is the Liquid Metal hero
@@ -183,7 +187,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* section title/count live in the topbar (.tb-title/.tb-sub) — the body starts straight at the icon,
    no eyebrow/kicker/chapter-opener above the question, so icon → question → answers → CTA read as
    the whole story with nothing competing above them. */
-.q-title{font-size:var(--fs-title);font-weight:var(--w-head);line-height:1.2;letter-spacing:0;color:var(--ink);margin-bottom:10px;}
+.q-title{font-size:var(--fs-title);font-weight:var(--w-label);line-height:1.2;letter-spacing:0;color:var(--ink);margin-bottom:10px;}
 .q-title b{font-weight:var(--w-label);color:var(--qc,var(--ink));}
 .q-sub{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.5;margin:4px auto 0;text-wrap:pretty;max-width:400px;}
 .q-opts,.int-grid{width:100%;max-width:460px;margin:0 auto;}
@@ -298,7 +302,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .reveal-icon{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;background:var(--accent);}
 .reveal-icon svg{width:32px;height:32px;color:var(--violet);}
 .consent-kicker{font-family:var(--font);font-size:var(--fs-eyebrow);letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:22px;}
-.consent-h{font-size:36px;font-weight:var(--w-head);letter-spacing:-0.01em;line-height:1.06;margin-bottom:16px;}
+.consent-h{font-size:36px;font-weight:var(--w-label);letter-spacing:-0.01em;line-height:1.06;margin-bottom:16px;}
 .consent-h .ch-1{display:block;color:var(--ink);}
 .consent-h .ch-2{display:block;color:var(--muted);}
 .consent-p{font-size:var(--fs-body);font-weight:var(--w-body);color:var(--muted);line-height:1.65;max-width:280px;margin:0 auto;}
@@ -364,7 +368,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .hero-art-ft svg{width:var(--ic-sm);height:var(--ic-sm);}
 .hero-tx{flex:1;min-width:0;}
 .hero-en{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:var(--sp-hairline);font-family:var(--font);}
-.hero-th{font-size:var(--fs-heading);font-weight:var(--w-head);color:var(--ink);line-height:1.1;letter-spacing:0;margin-bottom:var(--sp-stack-tight);}
+.hero-th{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);line-height:1.1;letter-spacing:0;margin-bottom:var(--sp-stack-tight);}
 .hero-sig{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.6;margin-bottom:14px;}
 .str-grid{display:flex;flex-direction:column;gap:var(--sp-list);margin-bottom:var(--sp-stack);}
 .str-box{border-radius:var(--r1);padding:10px 12px;background:var(--accent);}
@@ -391,7 +395,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .s-pad{padding:var(--sp-block) var(--sp-card-pad);}
 .s-ey{font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:var(--sp-glue);display:flex;align-items:center;gap:var(--sp-glue);}
 .s-ey svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);}
-.s-h{font-size:var(--fs-heading);font-weight:var(--w-head);letter-spacing:0;color:var(--ink);margin-bottom:4px;}
+.s-h{font-size:var(--fs-heading);font-weight:var(--w-label);letter-spacing:0;color:var(--ink);margin-bottom:4px;}
 .s-sub{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.55;margin-bottom:18px;}
 .upd-pill{display:inline-flex;align-items:center;gap:var(--sp-glue);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.04em;color:var(--muted);margin-bottom:18px;text-transform:uppercase;}
 .upd-pill svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);}
@@ -417,8 +421,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .conf-ic svg{width:var(--ic-md);height:var(--ic-md);color:var(--ink);}
 .conf-ml{font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.08em;color:var(--muted);margin-bottom:2px;text-transform:uppercase;}
 .conf-mv{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
-.conf-sc{margin-left:auto;text-align:right;font-family:var(--serif);font-size:var(--fs-title);font-weight:var(--w-head);color:var(--ink);line-height:1;letter-spacing:-0.01em;}
-.conf-su{font-size:var(--fs-meta);font-weight:var(--w-head);color:var(--muted);font-family:var(--font);}
+/* Was a bare nested span with a 32px/12px size jump and zero gap — read as two colliding numbers
+   stuck together rather than one score. inline-flex + baseline align + a small gap fixes the
+   collision; narrowing the size ratio (12px→16px) keeps "/100" legible as part of the same figure
+   instead of an afterthought. */
+.conf-sc{margin-left:auto;text-align:right;font-family:var(--serif);font-size:var(--fs-title);font-weight:var(--w-label);color:var(--ink);line-height:1;letter-spacing:-0.01em;display:inline-flex;align-items:baseline;gap:3px;}
+.conf-su{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--muted);font-family:var(--font);}
 .conf-bars{display:flex;flex-direction:column;gap:var(--sp-list);}
 .conf-row{display:flex;align-items:center;gap:var(--sp-inline);}
 .conf-rl{width:62px;flex-shrink:0;font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);}
@@ -426,7 +434,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .conf-fi{height:1px;background:var(--ink);position:absolute;left:0;top:0;}
 .conf-vl{width:36px;text-align:right;font-size:var(--fs-meta);font-weight:var(--w-head);color:var(--ink);font-family:var(--serif);}
 .conf-note{font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);line-height:1.55;margin-top:14px;}
-.radar-sec{padding:var(--sp-block) var(--sp-card-pad);border-top:1px solid var(--line-soft);}
+.radar-sec{padding:var(--sp-block) var(--sp-card-pad);}
 .radar-ww{display:flex;justify-content:center;margin-top:14px;}
 /* interests — real data (the ≤3 picks from Section 3 of the quiz), NOT a fabricated per-category %. All 10 categories always show; picked ones are ranked #1–3 and filled in, the rest stay quiet. */
 .int-sec{padding:var(--sp-block) var(--sp-card-pad);border-top:1px solid var(--line-soft);}
@@ -463,7 +471,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* quote / legend card — reuses only real data already in HEROES (legend, legendWhy, strengths) laid out as its own reinforcing moment */
 .quote-card{background:var(--ink);color:var(--cloud);border-radius:var(--r2);padding:22px 20px;}
 .quote-badge{display:inline-flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:10px;}
-.quote-h{font-size:var(--fs-h2);font-weight:var(--w-head);margin-bottom:14px;}
+.quote-h{font-size:var(--fs-h2);font-weight:var(--w-label);margin-bottom:14px;}
 .quote-li{display:flex;align-items:flex-start;gap:var(--sp-inline);font-size:var(--fs-bodysm);color:rgba(255,255,255,.85);line-height:1.5;margin-bottom:8px;}
 .quote-li svg{width:var(--ic-sm);height:var(--ic-sm);flex-shrink:0;margin-top:2px;color:var(--cyan);}
 .quote-leg{display:flex;align-items:center;gap:var(--sp-inline);margin-top:var(--sp-stack);padding-top:14px;border-top:1px solid rgba(255,255,255,.14);font-size:var(--fs-meta);color:rgba(255,255,255,.6);}
@@ -628,7 +636,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .home-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:18px var(--sp-card-pad);}
 .hcard-hd{margin-bottom:12px;}
 .hcard-hd svg{width:var(--ic-md);height:var(--ic-md);flex-shrink:0;color:var(--violet);}
-.hcard-t{font-size:var(--fs-heading);font-weight:var(--w-head);color:var(--ink);letter-spacing:0;}
+.hcard-t{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);letter-spacing:0;}
 .hcard-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.5;margin-top:3px;}
 .ag-seg{display:flex;gap:8px;margin-bottom:6px;}
 .ag-seg button{flex:1;border:1px solid var(--line-soft);background:var(--white);color:var(--muted);font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-head);min-height:40px;border-radius:var(--r1);cursor:pointer;transition:color .15s,border-color .15s,background .15s;}
@@ -683,12 +691,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .stub-wrap{flex:1;min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:40px var(--sp-edge);}
 .stub-ic{width:72px;height:72px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--muted);}
 .stub-ic svg{width:32px;height:32px;}
-.stub-t{font-size:var(--fs-heading);font-weight:var(--w-head);color:var(--ink);}
+.stub-t{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);}
 .stub-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.55;max-width:30ch;}
 
 /* ══ BOOTH / PASSPORT TAB ══ structure ported from Playbook Final's Passport screen (progress →
    grand-prize status → personalized hero route → per-zone booth check-in), re-skinned to our DNA. */
-.booth-hd .booth-t{font-size:var(--fs-heading);font-weight:var(--w-head);color:var(--ink);letter-spacing:0;}
+.booth-hd .booth-t{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);letter-spacing:0;}
 .booth-hd .booth-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:3px;}
 .booth-prog{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .bp-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:13px 14px;}
@@ -733,6 +741,37 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .map-lightbox .ml-cap{padding:12px 16px;font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);}
 .map-lightbox .ml-close{position:absolute;right:10px;top:10px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(17,19,24,.55);color:#fff;border:none;cursor:pointer;}
 .map-lightbox .ml-close svg{width:16px;height:16px;}
+/* ══ QR SCAN MODAL ══ mocked scan flow (analyzed from the demo export — its own version is fully
+   mocked too, no real camera API anywhere in that source; ends in one "simulate successful scan"
+   button). Lives on <body> like .demo-panel does, so one instance overlays any screen. */
+.scan-modal{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:22px;}
+.scan-modal.show{display:flex;}
+.scan-scrim{position:absolute;inset:0;background:rgba(17,19,24,.6);}
+.scan-card{position:relative;width:100%;max-width:340px;background:var(--white);border-radius:var(--r2);padding:18px;box-shadow:0 30px 70px rgba(17,19,24,.35);}
+.scan-x{position:absolute;right:12px;top:12px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--ink);border:none;cursor:pointer;}
+.scan-x svg{width:16px;height:16px;}
+.scan-hd{padding-right:30px;margin-bottom:14px;}
+.scan-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);line-height:1.3;}
+.scan-s{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;}
+.scan-tabs{display:flex;gap:5px;background:var(--accent);border-radius:11px;padding:4px;margin-bottom:14px;}
+.scan-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border:none;background:transparent;color:var(--muted);font-family:var(--font);font-weight:var(--w-head);font-size:11.5px;padding:9px 6px;border-radius:8px;cursor:pointer;}
+.scan-tab svg{width:15px;height:15px;}
+.scan-tab.on{background:var(--white);color:var(--ink);box-shadow:0 2px 6px rgba(17,19,24,.1);}
+.scan-cam{position:relative;border-radius:16px;overflow:hidden;background:#111b25;height:168px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.scan-cam-frame{position:absolute;inset:14%;border-radius:14px;border:2px solid rgba(255,255,255,.28);}
+.scan-cam-laser{position:absolute;left:14%;right:14%;top:14%;height:2px;background:#94d227;box-shadow:0 0 14px #94d227;animation:scanLaser 2.1s ease-in-out infinite;}
+@keyframes scanLaser{0%{transform:translateY(0);}50%{transform:translateY(300%);}100%{transform:translateY(0);}}
+.scan-cam-ic{width:38px;height:38px;color:rgba(255,255,255,.22);}
+.scan-cam-cap{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:11px;color:rgba(255,255,255,.75);}
+.scan-mine{border-radius:16px;border:1px dashed var(--line-strong);background:var(--paper);padding:13px;text-align:center;margin-bottom:10px;}
+.scan-mine-qr{width:96px;height:96px;margin:0 auto;border-radius:10px;background:var(--white);border:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;color:var(--ink);}
+.scan-mine-qr svg{width:56px;height:56px;}
+.scan-mine-cap{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;margin-top:10px;}
+.scan-note{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:11px;background:color-mix(in srgb,var(--cyan) 8%,transparent);border:1px solid color-mix(in srgb,var(--cyan) 25%,transparent);margin-bottom:13px;}
+.scan-note svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);flex:0 0 auto;margin-top:1px;}
+.scan-note span{font-size:11px;color:var(--ink);line-height:1.5;}
+.scan-confirm{width:100%;}
+.scan-demo-note{font-size:10px;color:var(--muted);text-align:center;margin-top:8px;}
 .rt-row{display:flex;gap:12px;align-items:stretch;}
 .rt-row.top{background:color-mix(in srgb,var(--violet) 7%,transparent);border-radius:var(--r1);padding:6px 8px;margin:0 -8px;}
 .rt-rail{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;}
@@ -755,6 +794,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .zh-note{font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);line-height:1.5;padding-top:10px;border-top:1px solid var(--line-soft);}
 .howto-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-weight:var(--w-head);font-size:var(--fs-label);min-height:38px;padding:0 13px;border-radius:var(--rpill);cursor:pointer;flex:0 0 auto;}
 .howto-btn svg{width:var(--ic-sm);height:var(--ic-sm);}
+/* .bc-play — the asset card's main action, was sharing .howto-btn's plain white/outline look with
+   secondary things like "วิธีเล่น"; bumped to a real primary (solid ink) state so it reads as THE
+   thing to tap on that card. Already-played keeps the app's established cyan "done" tint instead
+   of staying ink, so it visually steps back once its job is done. */
+.bc-play{background:var(--ink);border-color:var(--ink);color:var(--cloud);}
+.bc-play.played{background:color-mix(in srgb,var(--cyan) 16%,transparent);border-color:color-mix(in srgb,var(--cyan) 40%,transparent);color:var(--ink);}
 .booth-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin:12px 0 14px;font-size:var(--fs-eyebrow);color:var(--muted);}
 .booth-legend span{display:inline-flex;align-items:center;gap:5px;}
 .lg-sw{width:10px;height:10px;border-radius:3px;flex:0 0 auto;}
@@ -774,7 +819,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 
 /* ══ GAMES TAB ══ the source's "คู่มือ 6 ด้านของคุณ" — 6 mini-games, each fills one Playbook side.
    Ported from Playbook Final's Games screen + sideResult() narratives, re-skinned to our DNA. */
-.games-hd .games-t{font-size:var(--fs-heading);font-weight:var(--w-head);color:var(--ink);letter-spacing:0;}
+.games-hd .games-t{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);letter-spacing:0;}
 .gh-sub{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin:-6px 0 2px;}
 /* progress hero — dark ink card + ring, echoing the source's dark progress hero */
 .gh-prog{display:flex;align-items:center;gap:16px;background:var(--ink);color:var(--cloud);border-radius:var(--r2);padding:18px var(--sp-card-pad);position:relative;overflow:hidden;}
@@ -829,7 +874,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 
 /* ══ PROFILE TAB ══ ported from Playbook Final's Profile screen (identity + QR + info rows + footer
    disclaimer), re-skinned to our DNA. Data (userName/userOrg/profileRows/footer) verbatim. */
-.prof-t{font-size:var(--fs-heading);font-weight:var(--w-head);color:var(--ink);letter-spacing:0;}
+.prof-t{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);letter-spacing:0;}
 .prof-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad);text-align:center;}
 .prof-av{width:66px;height:66px;margin:0 auto 10px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--ink);}
 .prof-av svg{width:32px;height:32px;}
@@ -1753,32 +1798,24 @@ function renderBook(){
   var watch=h.watchouts.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
   var chips=h.assets.map(function(a){return '<span class="chip">'+ic(a.icon)+a.t+'</span>';}).join('');
   var matchOk=Math.abs(r.gap)<=1.5;
-  var offset=(113*(1-2/6)).toFixed(1);
   root.innerHTML=
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
   '<header class="topbar"><img class="tb-logo" src="'+LOGO_IMG.bt+'" alt="Better Trade" style="margin-right:auto"><button class="tb-pill spec-bd">'+ic('lc-upload')+'<span class="spec-label">PDF</span></button></header>'+
-  '<nav class="toc"><button class="toc-p active">'+ic('lc-user')+'ตัวตน</button><button class="toc-p">'+ic('lc-sparkles')+'Confidence</button><button class="toc-p">'+ic('lc-pie-chart')+'6 ด้าน</button><button class="toc-p">'+ic('lc-route')+'เส้นทาง</button></nav>'+
+  '<nav class="toc"><button class="toc-p active" data-jump="hero-sec">'+ic('lc-user')+'ตัวตน</button><button class="toc-p" data-jump="conf-box">'+ic('lc-sparkles')+'Confidence</button><button class="toc-p" data-jump="sides-sec">'+ic('lc-pie-chart')+'6 ด้าน</button><button class="toc-p" data-jump="route-sec">'+ic('lc-route')+'เส้นทาง</button></nav>'+
   '<main class="scroll">'+
-    '<div class="prog-wrap"><div class="page-scatter">'+
-        '<img class="page-el" alt="" src="'+ASSET_IMG.candle+'" style="width:50px;top:-24%;right:6%">'+
-        '<img class="page-el" alt="" src="'+ASSET_IMG.gold+'" style="width:38px;bottom:-30%;left:38%">'+
-      '</div>'+
-      '<div class="prog-inner"><svg class="prog-donut" viewBox="0 0 48 48" aria-label="2 จาก 6 ด้านสำเร็จ"><circle class="donut-track" cx="24" cy="24" r="18" fill="none" stroke-width="5"/><circle class="donut-arc" cx="24" cy="24" r="18" fill="none" stroke-width="5" stroke-dasharray="113" stroke-dashoffset="'+offset+'" stroke-linecap="round" transform="rotate(-90 24 24)"/><text class="donut-txt" x="24" y="25" text-anchor="middle" dominant-baseline="central" font-family="'+SERIFFONT+'" font-size="13" font-weight="400">2/6</text></svg><div class="prog-r"><div class="prog-lbl">ความคืบหน้า</div><div class="prog-val">สำเร็จ 2 จาก 6 ด้าน</div><div class="prog-track"><div class="prog-fill" style="width:33.3%"></div></div></div></div>'+
-    '</div>'+
-    '<section class="fade hero-sec"><div class="hero-gw"><div class="hero-in">'+
+    '<section class="fade hero-sec" id="hero-sec"><div class="hero-gw"><div class="hero-in">'+
       '<div class="fam-badge"><span class="fam-dot" style="background:'+h.accent+'"></span>'+h.famTh+'</div>'+
       '<div class="hero-cardwrap">'+pcViewer(r.heroKey)+'</div>'+
       '<div class="hero-sig-c">'+h.sig+'</div>'+
       '<div class="str-grid"><div class="str-box"><div class="str-hd">'+ic('lc-zap')+'จุดแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'จุดระวัง</div>'+watch+'</div></div>'+
       '<div class="ast-lbl">สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div>'+
       '<div class="hero-leg"><span class="ld" style="background:'+h.accent+'"></span>แรงบันดาลใจจาก&nbsp;<span class="ln">'+h.legend+'</span>&thinsp;—&thinsp;'+h.legendWhy+'</div>'+
-      '<div class="hero-acts"><button class="btn btn-secondary">'+ic('lc-upload')+'แชร์ภาพการ์ด</button></div>'+
+      '<div class="hero-acts"><button class="btn btn-secondary" id="shareCardBtn">'+ic('lc-upload')+'แชร์ภาพการ์ด</button></div>'+
       '<div class="hero-note">'+ic('lc-info')+'ตัวตนนี้สรุปจากคำตอบ DNA Quiz ของคุณ — ยิ่งทำกิจกรรมในงานครบ ยิ่งแม่นขึ้น</div>'+
     '</div></div></section>'+
     '<div class="efin-banner"><div class="efin-hd"><div class="efin-ic">'+ic('lc-sparkles')+'</div><div class="efin-t">ให้ efin AI ช่วยแนะนำแบบคุณ</div></div>'+
       '<div class="efin-d">คัดลอกคำถามที่ปรับตามตัวตน '+h.th+' ของคุณไปคุยกับ efin AI ต่อได้ทันที</div>'+
       '<div class="efin-acts"><button class="btn btn-primary">'+ic('lc-message-circle')+'คัดลอกคำถามไปถาม efin AI</button><button class="btn btn-secondary">เปิดหน้า efin AI</button></div></div>'+
-    '<div class="pdf-bar"><div class="pdf-ic">'+ic('lc-download')+'</div><div class="pdf-tx"><div class="pdf-t">ดาวน์โหลด Playbook PDF</div><div class="pdf-s">สิทธิ์ Ultimate ✦ ตัวตน '+h.th+'</div></div><button class="pdf-btn">'+ic('lc-download')+'ดาวน์โหลด</button></div>'+
     '<section class="card mb"><div class="s-pad" style="padding-bottom:0">'+
       '<div class="s-ey">'+ic('lc-sparkles')+'AI Insight</div><h2 class="s-h">คุณเป็นนักลงทุนแบบไหน</h2>'+
       '<div class="upd-pill">'+ic('lc-zap')+'อัปเดตจาก DNA Quiz</div>'+
@@ -1787,11 +1824,14 @@ function renderBook(){
         '<div class="risk-slbl">ระดับความเสี่ยง 1–10</div>'+
         '<div class="risk-bars"><div class="risk-row"><span class="risk-rl">ความเสี่ยงที่บอก</span><div class="risk-tr"><div class="risk-fi" style="width:'+(r.declared*10)+'%;background:var(--muted)"></div></div><span class="risk-vl">'+r.declared+'</span></div>'+
         '<div class="risk-row"><span class="risk-rl" style="color:var(--ink)">ความเสี่ยงจริง</span><div class="risk-tr"><div class="risk-fi" style="width:'+(r.revealed*10)+'%"></div></div><span class="risk-vl">'+r.revealed+'</span></div></div></div>'+
-      '<div class="conf-box"><div class="conf-glow"></div><div class="conf-hd"><div class="conf-ic">'+ic('lc-sparkles')+'</div><div><div class="conf-ml">Confidence Score</div><div class="conf-mv">'+r.confLevel+'</div></div><div class="conf-sc">'+r.conf+'<span class="conf-su">/100</span></div></div>'+
+      '<div class="conf-box" id="conf-box"><div class="conf-glow"></div><div class="conf-hd"><div class="conf-ic">'+ic('lc-sparkles')+'</div><div><div class="conf-ml">Confidence Score</div><div class="conf-mv">'+r.confLevel+'</div></div><div class="conf-sc">'+r.conf+'<span class="conf-su">/100</span></div></div>'+
         '<div class="conf-bars">'+confRow('ตัวตน',r.subs.identity)+confRow('พฤติกรรม',r.subs.behavior)+confRow('ความเสี่ยง',r.subs.riskAlign)+confRow('วินัย',r.subs.discipline)+'</div>'+
         '<p class="conf-note">คะแนนจะสมบูรณ์เมื่อทำครบ 6 ด้านในงาน — ยิ่งสูง ทำนายผลตอบแทนได้แม่นขึ้น</p></div>'+
     '</div>'+
-    '<div class="radar-sec"><div class="s-ey" style="margin-bottom:0">'+ic('lc-pie-chart')+'พอร์ตลงทุนที่ถนัด</div><div class="radar-ww">'+radarSVG(h.radar,h.rgb)+'</div></div>'+
+    /* Every sibling section here (int-sec/trait-sec/alloc-sec) has an .s-sub explaining what the
+       chart is + an .ex-tag marking it as example data — radar-sec had neither, so next to them
+       it read as an unfinished chart rather than a deliberately-scoped demo section. */
+    '<div class="radar-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">'+ic('lc-pie-chart')+'พอร์ตลงทุนที่ถนัด</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนความถนัดต่อสินทรัพย์แต่ละประเภท จากคำตอบ DNA Quiz ✦ ยิ่งเล่นกิจกรรมในงานครบ ยิ่งแม่นขึ้น</p><div class="radar-ww">'+radarSVG(h.radar,h.rgb)+'</div></div>'+
     '<div class="int-sec"><div class="s-ey" style="margin-bottom:0">'+ic('lc-target')+'เรื่องที่คุณสนใจ</div><p class="s-sub" style="margin:4px 0 0">3 อันดับที่คุณเลือกไว้ในแบบทดสอบ ✦ ยังไม่ใช่สัดส่วนพอร์ตจริง</p>'+interestsHTML(r)+'</div>'+
     '<div class="trait-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">'+ic('lc-zap')+'คะแนนพฤติกรรม</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">วัดจากกิจกรรมในงาน ✦ ยิ่งเล่นครบ ยิ่งแม่น</p>'+traitBars()+'</div>'+
     '<div class="alloc-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">'+ic('lc-pie-chart')+'แผนจัดพอร์ตที่แนะนำ</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนเริ่มต้นที่เหมาะกับ '+h.th+'</p>'+allocBars()+'</div>'+
@@ -1800,7 +1840,7 @@ function renderBook(){
     '<div class="quote-card"><div class="quote-badge">'+ic('lc-sparkles')+'จากตัวตนของคุณ</div><h2 class="quote-h">คุณคือ '+h.th+' ตัวจริง</h2>'+
       '<div class="quote-li">'+ic('lc-check')+h.strengths[0]+'</div><div class="quote-li">'+ic('lc-check')+h.strengths[1]+'</div>'+
       '<div class="quote-leg"><span class="ld" style="background:'+h.accent+'"></span>แรงบันดาลใจจาก '+h.legend+'</div>'+
-      '<div class="quote-acts"><button class="btn btn-primary btn-onink">'+ic('lc-upload')+'แชร์พรุ่งนี้ของคุณ</button></div></div>'+
+      '<div class="quote-acts"><button class="btn btn-primary btn-onink" id="shareTomorrowBtn">'+ic('lc-upload')+'แชร์พรุ่งนี้ของคุณ</button></div></div>'+
     '<section class="card mb-lg"><div class="s-pad"><div class="s-ey">'+ic('lc-compass')+'ทำอะไรต่อดี</div><h2 class="s-h" style="margin-bottom:14px">ขั้นต่อไปที่แนะนำ</h2>'+
       '<div class="next-grid">'+
         '<div class="next-card"><div class="next-ic">'+ic('lc-book-open')+'</div><div class="next-t">เรียนรู้</div><div class="next-d">พื้นฐานสำหรับ '+h.th+'</div></div>'+
@@ -1808,7 +1848,7 @@ function renderBook(){
         '<div class="next-card"><div class="next-ic">'+ic('lc-map-pin')+'</div><div class="next-t">เดินบูธต่อ</div><div class="next-d">เหลืออีก 4 จาก 6 ด้าน</div></div>'+
       '</div></div></section>'+
     '<section class="card mb"><div class="s-pad"><div class="s-ey" style="display:flex;justify-content:space-between"><span style="display:inline-flex;align-items:center;gap:6px">'+ic('lc-message-circle')+'สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:14px">เจาะราย·สินทรัพย์</h2>'+ddTabs(h)+'</div></section>'+
-    '<section class="card"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">'+ic('lc-route')+'เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2><p class="s-sub">Master Class ขึ้นไป — เส้นทางจากตัวตนที่วัดได้จริง</p></div>'+
+    '<section class="card" id="route-sec"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">'+ic('lc-route')+'เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2><p class="s-sub">Master Class ขึ้นไป — เส้นทางจากตัวตนที่วัดได้จริง</p></div>'+
       '<div class="route-steps">'+routeStep('done','','ทำ DNA Quiz','ตอบครบ 10 ข้อ เสร็จแล้ว — ได้ตัวตน '+h.th)+routeStep('act','2','ทำครบ 6 ด้าน','เสร็จแล้ว 2 จาก 6 — เหลืออีก 4 ด้านในบูธ')+routeStep('fut','3','รับ Playbook ส่วนตัวสมบูรณ์','เมื่อครบ 6 ด้าน รับกลยุทธ์เฉพาะตัวตน + Confidence เต็ม')+routeStep('fut','4','ติดตามบน efin.finance','Playbook sync ขึ้นแอปหลังงาน พร้อม AI ติดตามพอร์ต')+'</div>'+
       '<div class="route-cta-w"><button class="btn btn-primary">'+ic('lc-play-circle')+'ไปเล่นกิจกรรมต่อ'+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
     '</section>'+
@@ -1823,7 +1863,8 @@ function renderBook(){
   bindTabbar();
   root.querySelector('#devReset').onclick=resetQuiz;
   root.querySelectorAll('.side-row').forEach(function(rw){rw.onclick=function(){togSide(rw);};});
-  var tocs=root.querySelectorAll('.toc-p');tocs.forEach(function(p){p.onclick=function(){tocs.forEach(function(x){x.classList.remove('active');});p.classList.add('active');};});
+  var tocs=root.querySelectorAll('.toc-p');tocs.forEach(function(p){p.onclick=function(){tocs.forEach(function(x){x.classList.remove('active');});p.classList.add('active');var target=root.querySelector('#'+p.dataset.jump);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});};});
+  root.querySelectorAll('#shareCardBtn,#shareTomorrowBtn').forEach(function(b){b.onclick=function(){shareHeroCard(h,b);};});
   bindViewer();
   root.querySelectorAll('.dd-tab').forEach(function(t){t.onclick=function(){var i=t.dataset.dd;root.querySelectorAll('.dd-tab').forEach(function(x){x.classList.toggle('on',x===t);});root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===i)?'':'none';});};});
 }
@@ -1865,6 +1906,21 @@ function ddTabs(h){
   return '<div class="dd-tablist">'+tablist+'</div>'+panels;
 }
 function confRow(l,v){return '<div class="conf-row"><span class="conf-rl">'+l+'</span><div class="conf-tr"><div class="conf-fi" style="width:'+(v/20*100)+'%"></div></div><span class="conf-vl">'+v+'</span></div>';}
+/* "แชร์ภาพการ์ด"/"แชร์พรุ่งนี้ของคุณ" — both buttons meant the same thing (share your persona card
+   to social media); neither was wired to anything before. Actually rendering the card to an image
+   (html2canvas-style DOM screenshot) is a real dependency this project doesn't have, so this
+   shares the equivalent as TEXT — persona name + a line of copy + this page's URL — via the native
+   share sheet where available, falling back to copying that text to the clipboard (with brief
+   inline confirmation on the button itself, since there's no toast/snackbar system in this app). */
+function shareHeroCard(h,btn){
+  var text='ฉันคือ '+h.th+' ('+h.en+') — ค้นหาตัวตนนักลงทุนของคุณได้ที่ Better Trade 2026';
+  var flash=function(msg){if(!btn)return;var old=btn.innerHTML;btn.innerHTML=ic('lc-check')+'<span>'+msg+'</span>';setTimeout(function(){btn.innerHTML=old;},1800);};
+  if(navigator.share){
+    navigator.share({title:'ตัวตนนักลงทุนของฉัน · '+h.th,text:text,url:location.href}).catch(function(){});
+  } else if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text+' '+location.href).then(function(){flash('คัดลอกลิงก์แล้ว');}).catch(function(){});
+  }
+}
 /* real data only: r.interests holds the ≤3 S3_OPTS indices the user actually picked, in pick order.
    Every one of the 10 categories always renders — picked ones get a #rank and filled dot, the rest stay quiet — so this never implies a fabricated per-category percentage. */
 function interestsHTML(r){
@@ -1889,7 +1945,7 @@ function sidesHTML(r){
   ];
   var items='';
   sides.forEach(function(sd,i){items+='<article class="side-item"'+(i===5?' style="border-bottom:none"':'')+'><div class="list-row side-row"><div class="side-num '+sd.cc+'">'+sd.num+'</div><div class="side-cx"><div class="side-t">'+sd.t+'</div><div class="side-s">'+sd.s+'</div></div><div class="side-r"><span class="sc '+sd.cc+'">'+sd.chip+'</span>'+ic('lc-chevron-down','s-cv'+(sd.show?' open':''))+'</div></div><div class="side-body'+(sd.show?' show':'')+'"><div class="side-bi"><div class="side-dl">'+sd.body+'</div></div></div></article>';});
-  return '<section class="card mb-lg"><div class="sides-hd"><div class="s-ey">'+ic('lc-pie-chart')+'ข้อมูลจากกิจกรรมบูธจริง</div><h2 class="s-h">6 ด้านที่วัดได้จากคุณ</h2><p class="s-sub" style="margin-bottom:2px">แต่ละด้านมาจากพฤติกรรมในงาน — ไม่ใช่คำตอบจากแบบสอบถาม</p></div>'+items+'</section>';
+  return '<section class="card mb-lg" id="sides-sec"><div class="sides-hd"><div class="s-ey">'+ic('lc-pie-chart')+'ข้อมูลจากกิจกรรมบูธจริง</div><h2 class="s-h">6 ด้านที่วัดได้จากคุณ</h2><p class="s-sub" style="margin-bottom:2px">แต่ละด้านมาจากพฤติกรรมในงาน — ไม่ใช่คำตอบจากแบบสอบถาม</p></div>'+items+'</section>';
 }
 function togSide(row){var item=row.parentElement,body=item.querySelector('.side-body'),cv=row.querySelector('.s-cv'),isOpen=body.classList.contains('show');root.querySelectorAll('.side-body.show').forEach(function(b){b.classList.remove('show');});root.querySelectorAll('.s-cv.open').forEach(function(c){c.classList.remove('open');});if(!isOpen){body.classList.add('show');cv.classList.add('open');}}
 function resetQuiz(){st={phase:'splash',spidx:0,idx:0,consent:false,s1:[null,null,null],s2:[null,null,null,null,null,null,null],s3:[]};RESULT=null;render();}
@@ -2041,12 +2097,11 @@ var AGENDA_D2=[
 function appHeader(){return '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
   '<header class="topbar app-topbar"><img class="tb-logo" src="'+LOGO_IMG.efinBT+'" alt="efin × Better Trade" style="margin-right:auto"><div id="qr-cta-slot"></div></header>';}
 /* Every screen that renders appHeader() calls this right after — same re-callable-mount pattern as
-   mountSplashCTA(), just aimed at the 'compact' preset/slot instead of the hero one. No onClick:
-   the original static "สแกน QR" pill had no click handler either, so this preserves that (a
-   no-op tap), not a regression. */
+   mountSplashCTA(), just aimed at the 'compact' preset/slot instead of the hero one. Now opens the
+   QR scan modal (generic — no specific booth) instead of being a no-op tap. */
 function mountHeaderQR(){
   if(!window.mountLiquidMetalButtonInto)return;
-  window.mountLiquidMetalButtonInto('#qr-cta-slot','compact',{label:'สแกน QR',icon:ic('lc-qr-code')});
+  window.mountLiquidMetalButtonInto('#qr-cta-slot','compact',{label:'สแกน QR',icon:ic('lc-qr-code'),onClick:function(){openScan(null,null);}});
 }
 /* Home's "ขั้นต่อไป" card CTA — was a plain .btn-primary, now the same Liquid Metal treatment as
    the splash hero button, just at the 'compact' size (see js/liquid-metal-cta.js's PRESETS). */
@@ -2138,6 +2193,95 @@ var BOOTH_ZONES=[
   {name:'Alternative Investment Zone',zone:'โซนกิจกรรม · บูธ 4',icon:'lc-gem',chip:'ทางเลือก',color:'#9c6bd0',score:function(rd,h){return /สะสม/.test(JSON.stringify(h.assets))?78:(h.fam==='V'?48:30);}},
   {name:'Health Zone',zone:'โซนกิจกรรม · บูธ 5',icon:'lc-heart',chip:'สุขภาพ',color:'#c048b6',score:function(rd,h){return rd[5];}}
 ];
+/* ══ QR SCAN MODAL (logic) ══ single reusable mocked scan flow, analyzed from the demo export's
+   openScan/scanMode/confirmScan (itself fully mocked, no camera API — see the CSS comment above
+   .scan-modal). Reused by the nav-bar "สแกน QR" pill (SCAN.bi==null, a generic scan that checks in
+   whichever partner isn't done yet) and by tapping a booth-partner name on the booth page (a
+   specific bi/ci). Markup built once by buildScanModal() and appended to <body>, same pattern as
+   buildDemo()'s own panel, so one instance can overlay any screen. */
+var SCAN=null; // {bi, ci} while open; null when closed. bi==null means the generic nav-bar scan.
+var SCAN_MODE='scan'; // 'scan' | 'mine' — which of the modal's two tabs is showing
+function openScan(bi,ci){
+  SCAN={bi:(bi==null?null:bi),ci:(ci==null?null:ci)};
+  SCAN_MODE='scan';
+  paintScan();
+  document.getElementById('scanModal').classList.add('show');
+}
+function closeScan(){
+  var m=document.getElementById('scanModal');if(m)m.classList.remove('show');
+  SCAN=null;
+}
+function confirmScan(){
+  if(!SCAN)return;
+  if(SCAN.bi!=null){
+    var bi=SCAN.bi,ci=SCAN.ci;
+    if(!BOOTH_CHK[bi])BOOTH_CHK[bi]=new Set();
+    if(BOOTH_CHK[bi].has(ci))BOOTH_CHK[bi].delete(ci);else BOOTH_CHK[bi].add(ci);
+  } else {
+    // generic "any" scan (nav-bar button, no specific booth) — check in the first partner not
+    // yet checked in, across all booths in zone order.
+    outer: for(var bi2=0;bi2<BOOTHS.length;bi2++){
+      var partners=ZONE_BOOTHS[bi2]||[];
+      for(var ci2=0;ci2<partners.length;ci2++){
+        if(!BOOTH_CHK[bi2]||!BOOTH_CHK[bi2].has(ci2)){
+          if(!BOOTH_CHK[bi2])BOOTH_CHK[bi2]=new Set();
+          BOOTH_CHK[bi2].add(ci2);
+          break outer;
+        }
+      }
+    }
+  }
+  closeScan();
+  if(st.phase==='passport')renderBooth();
+}
+function scanTitle(){
+  if(!SCAN)return '';
+  if(SCAN.bi==null)return 'สแกน QR ในงาน';
+  var name=(ZONE_BOOTHS[SCAN.bi]||[])[SCAN.ci]||'';
+  var already=BOOTH_CHK[SCAN.bi]&&BOOTH_CHK[SCAN.bi].has(SCAN.ci);
+  return (already?'ยกเลิกเช็คอิน · ':'เช็คอิน · ')+name;
+}
+function scanSubText(){
+  if(!SCAN)return '';
+  if(SCAN.bi==null)return 'สแกน QR ที่จุดใดก็ได้ในงาน — ระบบจะเช็คอินบูธถัดไปที่ยังไม่ได้ทำให้อัตโนมัติ';
+  var b=BOOTHS[SCAN.bi];
+  return b?(b.asset+' · '+BOOTH_ZONES[b.zone].chip):'';
+}
+function paintScan(){
+  var m=document.getElementById('scanModal');if(!m)return;
+  m.querySelector('#scanTitle').textContent=scanTitle();
+  m.querySelector('#scanSub').textContent=scanSubText();
+  m.querySelector('#scanTabScan').classList.toggle('on',SCAN_MODE==='scan');
+  m.querySelector('#scanTabMine').classList.toggle('on',SCAN_MODE==='mine');
+  m.querySelector('#scanViewScan').style.display=SCAN_MODE==='scan'?'':'none';
+  m.querySelector('#scanViewMine').style.display=SCAN_MODE==='mine'?'':'none';
+}
+function buildScanModal(){
+  var wrap=document.createElement('div');
+  wrap.className='scan-modal';
+  wrap.id='scanModal';
+  wrap.innerHTML=
+    '<div class="scan-scrim" id="scanScrim"></div>'+
+    '<div class="scan-card">'+
+      '<button class="scan-x" id="scanClose">'+ic('lc-x')+'</button>'+
+      '<div class="scan-hd"><div class="scan-t" id="scanTitle"></div><div class="scan-s" id="scanSub"></div></div>'+
+      '<div class="scan-tabs">'+
+        '<button class="scan-tab" id="scanTabScan">'+ic('lc-qr-code')+'<span>สแกน QR ที่จุดนี้</span></button>'+
+        '<button class="scan-tab" id="scanTabMine">'+ic('lc-user')+'<span>ให้เจ้าหน้าที่สแกน</span></button>'+
+      '</div>'+
+      '<div class="scan-view" id="scanViewScan"><div class="scan-cam"><div class="scan-cam-frame"></div><div class="scan-cam-laser"></div>'+ic('lc-qr-code','scan-cam-ic')+'<div class="scan-cam-cap">หัน QR ที่จุดนี้เข้ากรอบ</div></div></div>'+
+      '<div class="scan-view" id="scanViewMine" style="display:none"><div class="scan-mine"><div class="scan-mine-qr">'+ic('lc-qr-code')+'</div><div class="scan-mine-cap">เปิดหน้านี้ให้เจ้าหน้าที่ที่จุดนี้สแกน — ได้ผลเหมือนกับที่คุณสแกนเอง</div></div></div>'+
+      '<div class="scan-note">'+ic('lc-info')+'<span>สแกนได้ทั้งจากบูธหรือจุดกิจกรรม — ระบบเช็คอินให้ตามจุดที่คุณอยู่</span></div>'+
+      '<button class="btn btn-primary scan-confirm" id="scanConfirm">'+ic('lc-check-circle')+'จำลองการสแกนสำเร็จ</button>'+
+      '<div class="scan-demo-note">ปุ่มนี้มีไว้สำหรับเดโมเท่านั้น · ของจริงใช้กล้องสแกน</div>'+
+    '</div>';
+  document.body.appendChild(wrap);
+  document.getElementById('scanScrim').onclick=closeScan;
+  document.getElementById('scanClose').onclick=closeScan;
+  document.getElementById('scanTabScan').onclick=function(){SCAN_MODE='scan';paintScan();};
+  document.getElementById('scanTabMine').onclick=function(){SCAN_MODE='mine';paintScan();};
+  document.getElementById('scanConfirm').onclick=confirmScan;
+}
 function boothCheckinCount(){var n=0;for(var k in BOOTH_CHK){if(BOOTH_CHK[k]&&BOOTH_CHK[k].size>0)n++;}return n;}
 function boothActivityCount(){var n=0;for(var k in BOOTH_ACT){if(BOOTH_ACT[k])n++;}return n;}
 function buildRoute(){
@@ -2188,7 +2332,7 @@ function renderBooth(){
         var z=BOOTH_ZONES[b.zone];
         var played=!!BOOTH_ACT[bi];
         var partners=ZONE_BOOTHS[bi].map(function(name,ci){var done=BOOTH_CHK[bi]&&BOOTH_CHK[bi].has(ci);return '<button class="bp-btn'+(done?' done':'')+'" data-b="'+bi+'" data-c="'+ci+'">'+ic(done?'lc-check-circle':'lc-qr-code')+name+'</button>';}).join('');
-        return '<div class="bc-card"><div class="bc-hd"><div class="bc-ic">'+ic(b.icon)+'</div><div class="bc-tx"><div class="bc-asset">'+b.asset+'<span class="bc-zchip" style="color:'+z.color+';background:color-mix(in srgb,'+z.color+' 12%,transparent)">'+z.chip+'</span>'+(played?'<span class="bc-zchip" style="color:var(--cyan);background:color-mix(in srgb,var(--cyan) 14%,transparent)">เล่นแล้ว</span>':'')+'</div><div class="bc-game">'+b.game+'</div></div><button class="howto-btn bc-play" data-play="'+bi+'">'+ic(played?'lc-check':'lc-play-circle')+(played?'เล่นแล้ว':'เล่นเกม')+'</button></div><div class="bc-partners">'+partners+'</div></div>';
+        return '<div class="bc-card"><div class="bc-hd"><div class="bc-ic">'+ic(b.icon)+'</div><div class="bc-tx"><div class="bc-asset">'+b.asset+'<span class="bc-zchip" style="color:'+z.color+';background:color-mix(in srgb,'+z.color+' 12%,transparent)">'+z.chip+'</span>'+(played?'<span class="bc-zchip" style="color:var(--cyan);background:color-mix(in srgb,var(--cyan) 14%,transparent)">เล่นแล้ว</span>':'')+'</div><div class="bc-game">'+b.game+'</div></div><button class="howto-btn bc-play'+(played?' played':'')+'" data-play="'+bi+'">'+ic(played?'lc-check':'lc-play-circle')+(played?'เล่นแล้ว':'เล่นเกม')+'</button></div><div class="bc-partners">'+partners+'</div></div>';
       }).join('')+'</div>'+
     '</section>'+
   '</main>'+
@@ -2199,7 +2343,7 @@ function renderBooth(){
   bindTabbar();
   root.querySelector('#devReset').onclick=resetQuiz;
   root.querySelector('#howtoBtn').onclick=function(){BOOTH_HOWTO=!BOOTH_HOWTO;root.querySelector('.zone-howto').classList.toggle('show',BOOTH_HOWTO);};
-  root.querySelectorAll('.bp-btn').forEach(function(btn){btn.onclick=function(){var bi=+btn.dataset.b,ci=+btn.dataset.c;if(!BOOTH_CHK[bi])BOOTH_CHK[bi]=new Set();if(BOOTH_CHK[bi].has(ci))BOOTH_CHK[bi].delete(ci);else BOOTH_CHK[bi].add(ci);renderBooth();};});
+  root.querySelectorAll('.bp-btn').forEach(function(btn){btn.onclick=function(){openScan(+btn.dataset.b,+btn.dataset.c);};});
   root.querySelectorAll('.bc-play').forEach(function(btn){btn.onclick=function(){var bi=+btn.dataset.play;BOOTH_ACT[bi]=!BOOTH_ACT[bi];renderBooth();};});
   var mapLightbox=root.querySelector('#mapLightbox');
   var openMap=function(){mapLightbox.classList.add('show');};
@@ -2365,6 +2509,6 @@ function buildDemo(){
   document.getElementById('demoReset').onclick=function(){DEMO.quizDone=false;document.getElementById('demoQuiz').classList.remove('on');document.getElementById('demoPersona').value='';panel.classList.remove('open');resetQuiz();};
 }
 
-applyView();buildDemo();
+applyView();buildDemo();buildScanModal();
 render();
 </script>
