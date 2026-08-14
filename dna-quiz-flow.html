@@ -22,10 +22,20 @@
   --focus:#2b6cff; --popover:rgba(255,255,255,0.96);
   --cyan:#61e8ed; --violet:#9c91ff; --pink:#f178d8; --yellow:#f2ea83;
   --spectrum:linear-gradient(90deg,#61e8ed,#9c91ff,#f178d8,#f2ea83,#61e8ed);
+  /* "Gold/amber" status color (2026-08-14) — was the exact same 3-hex combo hand-copied into 5
+     separate rules (str-box.wn, redeem-card.on, pass-ic.gold, rt-badge.feat, prof-tier) plus a 6th
+     near-miss variant that wasn't even color-identical (booth check-in legend swatch) — named here
+     once so "the one gold across the app" (already the stated intent in 3 of those rules' own
+     comments) is actually one definition, not five+ copies that can drift apart independently. */
+  --amber-bg:#fef4e2; --amber-border:#f3daa0; --amber-text:#8a5a00;
   --ease:cubic-bezier(0.22,1,0.36,1);
   /* Radius scale (2026-08-12) — 8/12/16/24 is the full ladder; the system only ever
-     names the two rungs actually in use. 12 and 24 stay reserved for future needs. */
-  --r1:8px; --r2:16px; --rpill:48px;
+     names the two rungs actually in use. 12 and 24 stay reserved for future needs.
+     --r0 added (2026-08-14): 6px was hand-copied identically into 4 small-chrome rules
+     (tooltip, focus ring, map caption, route badge) — named rather than left as 4 independent
+     "6px" literals that could drift apart. Below the 8/16/48 ladder on purpose (micro-chrome
+     tier, not a new rung in the main ladder). */
+  --r0:6px; --r1:8px; --r2:16px; --rpill:48px;
   --shadow-action:0 1px 4px rgba(17,19,24,0.10);
   --shadow-primary:0 1px 4px rgba(17,19,24,0.24);
   --shadow-md:0 6px 18px rgba(17,19,24,0.14);
@@ -374,8 +384,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .prog-r{flex:1;}
 .prog-lbl{font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:var(--sp-hairline);}
 .prog-val{font-size:var(--fs-h2);font-weight:var(--w-head);color:var(--ink);margin-bottom:7px;letter-spacing:0;}
-.prog-track{height:3px;border-radius:99px;background:var(--accent);overflow:hidden;}
-.prog-fill{height:100%;border-radius:99px;background-image:var(--spectrum);}
+.prog-track{height:3px;border-radius:var(--rpill);background:var(--accent);overflow:hidden;}
+.prog-fill{height:100%;border-radius:var(--rpill);background-image:var(--spectrum);}
 
 /* HERO CARD — spectrum border is the one accent this scene earns */
 .hero-gw{padding:2px;border-radius:calc(var(--r2) + 3px);background:var(--spectrum);}
@@ -409,9 +419,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 :root[data-view="tablet"] .str-grid,:root[data-view="pc"] .str-grid{flex-direction:row;}
 .str-grid .str-box{flex:1;}
 .str-box{border-radius:var(--r1);padding:11px 13px;background:color-mix(in srgb,#22c55e 10%,transparent);border:1px solid color-mix(in srgb,#22c55e 28%,transparent);}
-.str-box.wn{background:#fef4e2;border-color:#f3daa0;}
+.str-box.wn{background:var(--amber-bg);border-color:var(--amber-border);}
 .str-hd{display:flex;align-items:center;gap:var(--sp-glue);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:0.04em;margin-bottom:var(--sp-list);color:#15803d;}
-.str-box.wn .str-hd{color:#8a5a00;}
+.str-box.wn .str-hd{color:var(--amber-text);}
 .str-hd svg{width:var(--ic-sm);height:var(--ic-sm);}
 .str-li{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--ink);line-height:1.55;margin-bottom:3px;}
 /* สินทรัพย์ที่ถนัด — the one thing this whole card exists to tell the customer ("what you're
@@ -461,10 +471,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* แลกรับการ์ดตัวจริง — tier-gated like the post-event tracks (.pe-report/.pe-locked share this
    same on/locked pattern): Ultimate can redeem now, everything else sees what unlocks it. */
 .redeem-card{margin-top:16px;display:flex;gap:11px;align-items:flex-start;padding:13px 14px;border-radius:var(--r1);}
-.redeem-card.on{background:#fef4e2;border:1px solid #f3daa0;}
+.redeem-card.on{background:var(--amber-bg);border:1px solid var(--amber-border);}
 .redeem-card.locked{border:1px dashed var(--line-strong);}
 .redeem-card svg{width:var(--ic-lg);height:var(--ic-lg);flex:0 0 auto;}
-.redeem-card.on svg{color:#8a5a00;}
+.redeem-card.on svg{color:var(--amber-text);}
 .redeem-card.locked svg{color:var(--muted);}
 .redeem-t{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
 .redeem-s{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;line-height:1.5;}
@@ -591,11 +601,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .trait-l{font-size:var(--fs-bodysm);color:var(--ink);}
 .trait-v{font-family:var(--serif);font-size:var(--fs-bodysm);color:var(--muted);}
 .trait-v b{color:var(--ink);}
-.trait-tr{grid-column:1/-1;height:6px;border-radius:6px;background:var(--accent);overflow:hidden;}
-.trait-fi{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--violet),var(--cyan));}
+.trait-tr{grid-column:1/-1;height:6px;border-radius:var(--rpill);background:var(--accent);overflow:hidden;}
+.trait-fi{height:100%;border-radius:var(--rpill);background:linear-gradient(90deg,var(--violet),var(--cyan));}
 
 /* recommended allocation — 4 buckets summing to 100%, a stacked bar + legend */
-.alloc-bar{display:flex;height:14px;border-radius:8px;overflow:hidden;margin:16px 0 14px;}
+.alloc-bar{display:flex;height:14px;border-radius:var(--r1);overflow:hidden;margin:16px 0 14px;}
 .alloc-seg{height:100%;}
 .alloc-legend{display:flex;flex-direction:column;gap:var(--sp-list);}
 .alloc-row{display:flex;align-items:center;gap:var(--sp-inline);font-size:var(--fs-bodysm);}
@@ -703,7 +713,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* Smaller hero logo, bigger emphasis on .hh-sub below — the eyebrow badge/logo were carrying more
    visual weight than the sentence that actually says what this screen is for. */
 .hh-logo{display:block;width:min(56%,210px);height:auto;margin:12px auto 0;}
-.hh-sub{font-size:var(--fs-sub);font-weight:600;color:var(--ink);line-height:1.55;max-width:34ch;margin:14px auto 0;}
+.hh-sub{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);line-height:1.55;max-width:34ch;margin:14px auto 0;}
 .hh-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 18px;margin-top:16px;}
 .hh-meta span{display:inline-flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);}
 .hh-meta svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--violet);}
@@ -713,10 +723,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pass-card{display:block;width:100%;text-align:left;font-family:var(--font);background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:15px 16px;cursor:pointer;}
 .pass-top{display:flex;align-items:center;gap:12px;}
 .pass-ic{width:44px;height:44px;flex:0 0 auto;border-radius:12px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--violet) 12%,transparent);color:var(--violet);}
-/* Light gold, not the previous medium-saturation gradient — same #fef4e2/#8a5a00 pairing as the
-   route page's existing "ผู้สนับสนุน" sponsor chip (.rt-badge.feat), so every "gold" accent in the
-   app now shares one light tone instead of three different golds. */
-.pass-ic.gold{background:#fef4e2;color:#8a5a00;}
+/* Light gold, not the previous medium-saturation gradient — same --amber-* tokens as the route
+   page's existing "ผู้สนับสนุน" sponsor chip (.rt-badge.feat), so every "gold" accent in the app
+   now shares one light tone instead of three different golds. */
+.pass-ic.gold{background:var(--amber-bg);color:var(--amber-text);}
 .pass-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
 .pass-hd{flex:1;min-width:0;}
 .pass-ey{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.08em;color:var(--muted);text-transform:uppercase;}
@@ -733,7 +743,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .ns-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
 .ns-tx{position:relative;z-index:1;flex:1;min-width:0;}
 .ns-ey{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,.55);}
-.ns-t{font-size:var(--fs-h2);font-weight:var(--w-label);color:#fff;line-height:1.3;margin-top:2px;}
+.ns-t{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--white);line-height:1.3;margin-top:2px;}
 .ns-b{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:rgba(255,255,255,.72);line-height:1.5;margin-top:3px;}
 /* .ns-cta-slot replaces the old plain .btn-primary — a Liquid Metal button auto-sizes itself off
    its own label, it doesn't stretch to fill a flex track the way the old <button width:100%> did,
@@ -773,8 +783,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bt-tab{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font);cursor:pointer;background:none;border:none;color:var(--muted);white-space:nowrap;-webkit-tap-highlight-color:transparent;}
 .bt-tab:disabled,.bt-tab[aria-disabled="true"]{opacity:.45;cursor:not-allowed;}
 .bt-tab-icon{display:inline-flex;flex:0 0 auto;}
-.bt-tab-icon svg{width:16px;height:16px;}
-.bt-tab:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px;}
+.bt-tab-icon svg{width:var(--ic-md);height:var(--ic-md);}
+.bt-tab:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:var(--r0);}
 /* --primary: underline active state, for a page-level section switcher (not used by either of
    this app's two real instances yet, both of which matched the pill look — kept in the toolkit
    since the brief explicitly asked for both variants to exist). */
@@ -794,7 +804,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bt-tabs--secondary .bt-tab[aria-selected="true"]{background:var(--ink);color:var(--cloud);border-color:var(--ink);}
 .bt-tabs--secondary .bt-tab-label{overflow:hidden;text-overflow:ellipsis;}
 /* data-tooltip — CSS-only, no JS beyond what initBtTabs already wires for focus */
-.bt-tab[data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--ink);color:var(--cloud);font-size:11px;font-weight:var(--w-body);padding:5px 9px;border-radius:6px;white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .15s,transform .15s;pointer-events:none;z-index:20;}
+.bt-tab[data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--ink);color:var(--cloud);font-size:var(--fs-label);font-weight:var(--w-body);padding:5px 9px;border-radius:var(--r0);white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .15s,transform .15s;pointer-events:none;z-index:20;}
 .bt-tab[data-tooltip]:hover::after,.bt-tab[data-tooltip]:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
 /* This app has no other dark-theme surface (no data-theme toggle exists elsewhere), so this is a
    self-contained prefers-color-scheme block scoped to just this component, satisfying the "light +
@@ -877,8 +887,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bp-hd svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
 .bp-lbl{flex:1;font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
 .bp-frac{font-size:var(--fs-bodysm);font-weight:var(--w-label);white-space:nowrap;}
-.bp-bar{height:6px;border-radius:99px;background:var(--accent);overflow:hidden;}
-.bp-fill{height:100%;border-radius:99px;transition:width .25s var(--ease);}
+.bp-bar{height:6px;border-radius:var(--rpill);background:var(--accent);overflow:hidden;}
+.bp-fill{height:100%;border-radius:var(--rpill);transition:width .25s var(--ease);}
 .draw-status{display:flex;gap:11px;align-items:flex-start;padding:14px 15px;border-radius:var(--r2);background:var(--paper);border:1px solid var(--line-soft);}
 .draw-status.ok{background:color-mix(in srgb,var(--cyan) 10%,transparent);border-color:color-mix(in srgb,var(--cyan) 30%,transparent);}
 /* .need — the "not eligible yet" state used to read as flatly as the page's own quiet default
@@ -901,9 +911,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .map-ph .mp-in{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);}
 .map-ph .mp-in svg{width:28px;height:28px;}
 .map-ph .mp-img{width:100%;height:100%;object-fit:cover;display:block;}
-.map-ph .mp-cap{position:absolute;left:10px;bottom:9px;font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--cloud);background:var(--ink);padding:4px 9px;border-radius:6px;}
+.map-ph .mp-cap{position:absolute;left:10px;bottom:9px;font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--cloud);background:var(--ink);padding:4px 9px;border-radius:var(--r0);}
 .map-ph .mp-zoom{position:absolute;right:10px;top:9px;display:flex;align-items:center;gap:5px;background:var(--white);color:var(--ink);border:1px solid var(--line-soft);padding:6px 11px;border-radius:var(--rpill);font-size:var(--fs-eyebrow);font-weight:var(--w-head);box-shadow:0 2px 6px rgba(17,19,24,.1);}
-.map-ph .mp-zoom svg{width:14px;height:14px;flex:0 0 auto;}
+.map-ph .mp-zoom svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
 /* map-lightbox — fixed so it clears the app's own scroll container; the real target is a phone
    viewport (.shell fills the screen edge-to-edge there per the ≥480px media query), so fixed
    positioning covers exactly the app, not just this card's scroll area. */
@@ -916,8 +926,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .map-lightbox .ml-body .mp-in{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);}
 .map-lightbox .ml-body .mp-in svg{width:40px;height:40px;}
 .map-lightbox .ml-cap{padding:12px 16px;font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);}
-.map-lightbox .ml-close{position:absolute;right:10px;top:10px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(17,19,24,.55);color:#fff;border:none;cursor:pointer;}
-.map-lightbox .ml-close svg{width:16px;height:16px;}
+.map-lightbox .ml-close{position:absolute;right:10px;top:10px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(17,19,24,.55);color:var(--white);border:none;cursor:pointer;}
+.map-lightbox .ml-close svg{width:var(--ic-md);height:var(--ic-md);}
 /* ══ QR SCAN MODAL ══ mocked scan flow (analyzed from the demo export — its own version is fully
    mocked too, no real camera API anywhere in that source; ends in one "simulate successful scan"
    button). Lives on <body> like .demo-panel does, so one instance overlays any screen. */
@@ -926,7 +936,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .scan-scrim{position:absolute;inset:0;background:rgba(17,19,24,.6);}
 .scan-card{position:relative;width:100%;max-width:340px;background:var(--white);border-radius:var(--r2);padding:18px;box-shadow:0 30px 70px rgba(17,19,24,.35);}
 .scan-x{position:absolute;right:12px;top:12px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--ink);border:none;cursor:pointer;}
-.scan-x svg{width:16px;height:16px;}
+.scan-x svg{width:var(--ic-md);height:var(--ic-md);}
 .scan-hd{padding-right:30px;margin-bottom:14px;}
 .scan-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);line-height:1.3;}
 .scan-s{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;}
@@ -934,25 +944,25 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    used everywhere else) — was its own bespoke .scan-tab pill-in-a-track, now one component
    system-wide. */
 #scanTabs{margin-bottom:14px;}
-.scan-cam{position:relative;border-radius:16px;overflow:hidden;background:#111b25;height:168px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.scan-cam{position:relative;border-radius:var(--r2);overflow:hidden;background:#111b25;height:168px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
 .scan-cam-frame{position:absolute;inset:14%;border-radius:14px;border:2px solid rgba(255,255,255,.28);}
 .scan-cam-laser{position:absolute;left:14%;right:14%;top:14%;height:2px;background:#94d227;box-shadow:0 0 14px #94d227;animation:scanLaser 2.1s ease-in-out infinite;}
 @keyframes scanLaser{0%{transform:translateY(0);}50%{transform:translateY(300%);}100%{transform:translateY(0);}}
 .scan-cam-ic{width:38px;height:38px;color:rgba(255,255,255,.22);}
-.scan-cam-cap{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:11px;color:rgba(255,255,255,.75);}
+.scan-cam-cap{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:var(--fs-label);color:rgba(255,255,255,.75);}
 /* Same height + margin as .scan-cam (168px/12px) — the two tabs' content used to be sized off
    their own content (the camera box vs. this QR+caption block), so switching tabs resized the
    whole modal and visibly shifted the title bar/confirm button. Fixed height + flex-centered
    content keeps every OTHER part of the modal in the same position regardless of which tab is on. */
-.scan-mine{box-sizing:border-box;height:168px;border-radius:16px;border:1px dashed var(--line-strong);background:var(--paper);padding:13px;text-align:center;margin-bottom:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.scan-mine{box-sizing:border-box;height:168px;border-radius:var(--r2);border:1px dashed var(--line-strong);background:var(--paper);padding:13px;text-align:center;margin-bottom:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .scan-mine-qr{width:96px;height:96px;margin:0 auto;border-radius:10px;background:var(--white);border:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;color:var(--ink);}
 .scan-mine-qr svg{width:56px;height:56px;}
 .scan-mine-cap{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;margin-top:10px;}
 .scan-note{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:11px;background:color-mix(in srgb,var(--cyan) 8%,transparent);border:1px solid color-mix(in srgb,var(--cyan) 25%,transparent);margin-bottom:13px;}
 .scan-note svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);flex:0 0 auto;margin-top:1px;}
-.scan-note span{font-size:11px;color:var(--ink);line-height:1.5;}
+.scan-note span{font-size:var(--fs-label);color:var(--ink);line-height:1.5;}
 .scan-confirm{width:100%;}
-.scan-demo-note{font-size:10px;color:var(--muted);text-align:center;margin-top:8px;}
+.scan-demo-note{font-size:var(--fs-label);color:var(--muted);text-align:center;margin-top:8px;}
 /* ══ SHARE MODAL ══ social-share sheet for the persona card (opened by the Book page's share
    buttons). Restyled to match the OTHER system modals (.scan-modal/.scan-card) — centered card,
    close X inset in the card's own top-right corner, title+subtitle header — instead of the earlier
@@ -965,29 +975,29 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .share-hd{padding-right:30px;margin-bottom:14px;}
 .share-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);line-height:1.3;}
 .share-x{position:absolute;right:12px;top:12px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--ink);border:none;cursor:pointer;}
-.share-x svg{width:16px;height:16px;}
+.share-x svg{width:var(--ic-md);height:var(--ic-md);}
 .share-sub{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;}
 .share-row{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;margin:14px 0 16px;scrollbar-width:none;}
 .share-row::-webkit-scrollbar{display:none;}
 .share-opt{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:7px;background:none;border:none;cursor:pointer;font-family:var(--font);width:58px;}
-.share-ic{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;}
+.share-ic{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--white);}
 .share-ic svg{width:22px;height:22px;}
-.share-opt-lbl{font-size:10.5px;color:var(--ink);font-weight:var(--w-head);text-align:center;line-height:1.2;}
+.share-opt-lbl{font-size:var(--fs-label);color:var(--ink);font-weight:var(--w-head);text-align:center;line-height:1.2;}
 .share-copy{display:flex;align-items:center;gap:10px;border:1px solid var(--line-soft);border-radius:var(--rpill);padding:6px 6px 6px 15px;}
 .share-copy-url{flex:1;min-width:0;font-size:var(--fs-eyebrow);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .share-copy-btn{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;background:var(--ink);color:var(--cloud);border:none;font-family:var(--font);font-weight:var(--w-head);font-size:var(--fs-label);padding:9px 16px;border-radius:var(--rpill);cursor:pointer;}
-.share-copy-btn svg{width:14px;height:14px;}
+.share-copy-btn svg{width:var(--ic-sm);height:var(--ic-sm);}
 .rt-row{display:flex;gap:12px;align-items:stretch;}
 .rt-row.top{background:color-mix(in srgb,var(--violet) 7%,transparent);border-radius:var(--r1);padding:6px 8px;margin:0 -8px;}
 .rt-rail{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;}
-.rt-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;flex:0 0 auto;}
+.rt-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--white);flex:0 0 auto;}
 .rt-dot svg{width:15px;height:15px;}
 .rt-line{width:2px;flex:1;background:var(--line-soft);margin:2px 0;}
 .rt-body{padding-bottom:14px;min-width:0;}
 .rt-name{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);line-height:1.35;display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
-.rt-badge{font-size:9.5px;font-weight:var(--w-label);padding:2px 7px;border-radius:6px;white-space:nowrap;}
-.rt-badge.pick{color:#fff;background:var(--violet);}
-.rt-badge.feat{color:#8a5a00;background:#fef4e2;}
+.rt-badge{font-size:var(--fs-label);font-weight:var(--w-label);padding:2px 7px;border-radius:var(--r0);white-space:nowrap;}
+.rt-badge.pick{color:var(--white);background:var(--violet);}
+.rt-badge.feat{color:var(--amber-text);background:var(--amber-bg);}
 .rt-badge.new{color:var(--violet);background:color-mix(in srgb,var(--violet) 15%,transparent);}
 .rt-meta{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;}
 /* zone activity */
@@ -1015,7 +1025,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bc-ic svg{width:var(--ic-md);height:var(--ic-md);}
 .bc-tx{flex:1;min-width:0;}
 .bc-asset{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
-.bc-zchip{font-size:9.5px;font-weight:var(--w-head);padding:2px 8px;border-radius:var(--rpill);white-space:nowrap;}
+.bc-zchip{font-size:var(--fs-label);font-weight:var(--w-head);padding:2px 8px;border-radius:var(--rpill);white-space:nowrap;}
 .bc-game{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;}
 .bc-partners{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
 .bp-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);min-height:36px;padding:0 11px;border-radius:var(--r1);cursor:pointer;transition:background .15s,border-color .15s;}
@@ -1049,7 +1059,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .gr-title{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);line-height:1.35;display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
 /* Solid fill, not a tint — a 16%-tint chip on a row that's ALSO 5%-cyan-tinted (.game-row.played)
    just blended into its own background instead of reading as a distinct status. */
-.gr-played{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:var(--w-head);color:var(--ink);background:var(--cyan);padding:2px 8px;border-radius:var(--rpill);}
+.gr-played{display:inline-flex;align-items:center;gap:3px;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--cyan);padding:2px 8px;border-radius:var(--rpill);}
 .gr-played svg{width:11px;height:11px;}
 .gr-status{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.4;margin-top:2px;}
 .gr-chev{width:20px;height:20px;color:var(--muted);flex-shrink:0;cursor:pointer;transition:transform .2s var(--ease);}
@@ -1071,13 +1081,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .prof-org{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:2px;}
 .prof-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:10px;}
 .prof-vf{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--rpill);background:color-mix(in srgb,var(--cyan) 15%,transparent);color:var(--ink);font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
-.prof-vf svg{width:14px;height:14px;}
+.prof-vf svg{width:var(--ic-sm);height:var(--ic-sm);}
 /* Gold, not ink-black — a tier badge (crown icon, paid-tier name) reads as a status label better
    in a premium gold than in the same flat ink-black used for plain UI chrome elsewhere on this
-   page. Light tone, matching Home's pass-card icon + the route page's sponsor chip (#fef4e2/
-   #8a5a00) — one gold across the app, not a separate darker one just for this badge. */
-.prof-tier{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--rpill);background:#fef4e2;color:#8a5a00;font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
-.prof-tier svg{width:14px;height:14px;}
+   page. Light tone, matching Home's pass-card icon + the route page's sponsor chip (--amber-*) —
+   one gold across the app, not a separate darker one just for this badge. */
+.prof-tier{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--rpill);background:var(--amber-bg);color:var(--amber-text);font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
+.prof-tier svg{width:var(--ic-sm);height:var(--ic-sm);}
 .prof-qr{margin-top:16px;padding:16px;border-radius:var(--r1);border:1px dashed var(--line-strong);background:var(--paper);}
 .pq-lbl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
 .pq-box{width:148px;height:148px;margin:0 auto;border-radius:var(--r1);background:var(--white);border:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;color:var(--ink);}
@@ -1090,7 +1100,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .prof-foot{border-top:1px solid var(--line-soft);padding-top:16px;display:flex;flex-direction:column;gap:8px;}
 .pf-brand{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);}
 .pf-note{display:flex;align-items:flex-start;gap:6px;font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.6;}
-.pf-note svg{width:14px;height:14px;flex:0 0 auto;margin-top:2px;}
+.pf-note svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;margin-top:2px;}
 /* ══ SPLASH / ATTRACT ══ two-tone headline · drifting brand assets · card carousel */
 /* overflow-x only (never -y): the CTA must NEVER be unreachable. overflow:hidden on both axes
    used to CLIP (not scroll-hide) anything past the fold whenever content ran taller than the
@@ -1314,14 +1324,14 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .demo-lbl{font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:0.05em;color:var(--muted);text-transform:uppercase;margin:15px 0 8px;}
 .seg{display:flex;background:var(--accent);border-radius:var(--r1);padding:4px;gap:4px;}
 .seg button{flex:1;border:none;background:none;padding:9px 4px;border-radius:var(--r1);font-family:var(--font);font-size:var(--fs-bodysm);color:var(--muted);cursor:pointer;transition:background .15s,color .15s;}
-.seg button.on{background:var(--focus);color:#fff;font-weight:var(--w-label);box-shadow:0 1px 3px rgba(43,108,255,0.4);}
+.seg button.on{background:var(--focus);color:var(--white);font-weight:var(--w-label);box-shadow:0 1px 3px rgba(43,108,255,0.4);}
 .demo-sel{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:10px;background:var(--white);font-family:var(--font);font-size:var(--fs-bodysm);color:var(--ink);cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23687078' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
 .demo-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line-soft);border-radius:var(--r1);padding:12px 14px;}
 .demo-row .rl{display:flex;align-items:center;gap:var(--sp-inline);font-size:var(--fs-bodysm);color:var(--ink);}
 .demo-row .rl svg{width:var(--ic-md);height:var(--ic-md);color:var(--muted);}
 .sw{width:44px;height:26px;border-radius:var(--rpill);background:var(--line);position:relative;cursor:pointer;transition:background .18s;flex-shrink:0;}
 .sw.on{background:var(--focus);}
-.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .18s var(--ease);box-shadow:0 1px 3px rgba(0,0,0,0.25);}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--white);transition:transform .18s var(--ease);box-shadow:0 1px 3px rgba(0,0,0,0.25);}
 .sw.on::after{transform:translateX(18px);}
 /* .demo-reset now composes with .btn.btn-secondary (call site) for its fill/border/motion — this
    rule only supplies the dev-panel-specific layout (full-width, spaced from the row above it). */
@@ -2828,7 +2838,7 @@ function renderBooth(){
     '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div class="hcard-t">กิจกรรมประจำโซน</div><button class="howto-btn" id="howtoBtn">'+ic('lc-info')+'วิธีเล่น</button></div>'+
       '<div class="hcard-s" style="margin-top:-6px">แตะชื่อบูธเพื่อเช็คอิน — เช็คอินก่อน แล้วเกมของโซนนั้นจะปลดให้เล่น</div>'+
       '<div class="zone-howto'+(BOOTH_HOWTO?' show':'')+'"><div class="zh-in"><div class="zh-li"><b>1)</b><span>เช็คอิน — แตะชื่อบูธแล้วสแกน QR ที่บูธ (หรือเปิด QR ของคุณให้เจ้าหน้าที่สแกน ได้ผลเหมือนกัน)</span></div><div class="zh-li"><b>2)</b><span>เกมประจำโซนปลดให้เล่น — ไม่บังคับ แต่เล่นแล้วคู่มือของคุณสมบูรณ์ขึ้น</span></div><div class="zh-li"><b>3)</b><span>ร่วมกิจกรรมประจำบูธ — สแกน QR กิจกรรม (บางบูธใช้ QR ใบเดียวกับเช็คอิน บางบูธแยก 2 ใบ ดูป้ายที่บูธ)</span></div><div class="zh-note">เช็คอิน 5 บูธ + ร่วมกิจกรรม 5 บูธ = สิทธิ์ลุ้นรางวัลใหญ่ · เป็นคนละบูธกันได้</div></div></div>'+
-      '<div class="booth-legend"><span><span class="lg-sw" style="background:var(--white);border:1px solid var(--line-strong)"></span>ยังไม่เช็คอิน</span><span><span class="lg-sw" style="background:#fff8eb;border:1px solid #fde1b4"></span>เช็คอินแล้ว</span><span><span class="lg-sw" style="background:color-mix(in srgb,var(--cyan) 14%,transparent);border:1px solid color-mix(in srgb,var(--cyan) 40%,transparent)"></span>ร่วมกิจกรรมแล้ว</span></div>'+
+      '<div class="booth-legend"><span><span class="lg-sw" style="background:var(--white);border:1px solid var(--line-strong)"></span>ยังไม่เช็คอิน</span><span><span class="lg-sw" style="background:var(--amber-bg);border:1px solid var(--amber-border)"></span>เช็คอินแล้ว</span><span><span class="lg-sw" style="background:color-mix(in srgb,var(--cyan) 14%,transparent);border:1px solid color-mix(in srgb,var(--cyan) 40%,transparent)"></span>ร่วมกิจกรรมแล้ว</span></div>'+
       '<div class="booth-grid">'+BOOTHS.map(function(b,bi){
         var z=BOOTH_ZONES[b.zone];
         var played=!!BOOTH_ACT[bi];
