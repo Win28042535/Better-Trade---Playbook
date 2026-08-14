@@ -199,7 +199,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    between "has custom art" and "still placeholder" questions. */
 .q-icon-bare{display:flex;align-items:center;justify-content:center;margin:0 auto 16px;width:60px;height:60px;color:var(--qc,var(--violet));}
 .q-icon-bare svg{width:32px;height:32px;}
-.q-icon-bare img{width:100%;height:100%;object-fit:contain;}
+/* Gentle idle motion per direction ("motion แบบเดียวกับ asset element หน้าแรก") — reuses the
+   SAME spDrift keyframe the splash scatter runs on (defined further down, order-independent for
+   @keyframes) at its own default drift/rotate values, just a touch slower/smaller since this is a
+   single focal icon, not a background decoration. Scoped to img only — the questions still on a
+   plain Lucide icon (no q.img yet) aren't part of "the newly updated icons" this asked for. */
+.q-icon-bare img{width:100%;height:100%;object-fit:contain;animation:spDrift 5s var(--ease) infinite alternate;--dx:6px;--dy:-9px;--r0:-3deg;--r1:3deg;}
 /* section title/count live in the topbar (.tb-title/.tb-sub) — the body starts straight at the icon,
    no eyebrow/kicker/chapter-opener above the question, so icon → question → answers → CTA read as
    the whole story with nothing competing above them. */
@@ -319,11 +324,14 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .consent{flex:1;padding:60px var(--sp-edge) 32px;display:flex;flex-direction:column;align-items:center;text-align:center;}
 /* reveal/analysis scene — the blue wash that was pulled off the quiz + identity card now lives HERE, as a soft glow rising behind the sparkle icon (this is the one "magic" beat in the flow, so the accent earns its place) */
 .reveal-scene{background:radial-gradient(125% 62% at 50% 20%,color-mix(in srgb,var(--violet) 20%,transparent) 0%,color-mix(in srgb,var(--violet) 10%,transparent) 38%,var(--paper) 72%);}
-.reveal-icon{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;background:var(--accent);}
+/* Background circle dropped per direction (the hourglass is a full-color illustration, doesn't
+   need a backdrop the way a thin line icon did) — width/height kept as the layout box the spin
+   ring (.reveal-spin, inset:-6px off THIS box) still centers around. */
+.reveal-icon{width:80px;height:80px;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;}
 .reveal-icon svg{width:32px;height:32px;color:var(--violet);}
-/* Custom hourglass illustration (per direction) replaces the sparkle svg — sized a bit larger
-   since it's a full-color icon meant to read clearly, not a thin line glyph. */
-.reveal-icon img{width:44px;height:44px;object-fit:contain;}
+/* Custom hourglass illustration (per direction) replaces the sparkle svg — bumped 64→72px per a
+   follow-up direction, still comfortably inside the 80px ring box. */
+.reveal-icon img{width:72px;height:72px;object-fit:contain;}
 /* analyzing state — a spectrum arc spinning around the icon while results compute. Selector
    covers both svg (older icons elsewhere reusing .reveal-icon) and img (the hourglass) so the
    pulse still applies regardless of which one is inside. */
@@ -1258,7 +1266,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pcv-btn.on{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,var(--spectrum) border-box;}
 .hero-cardwrap{max-width:236px;margin:8px auto 18px;}
 .hero-sig-c{font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--muted);line-height:1.55;text-align:center;max-width:32ch;margin:0 auto 20px;}
-@media(prefers-reduced-motion:reduce){.sp-el{animation:none!important;}.pc-tilt{transition:none!important;}}
+@media(prefers-reduced-motion:reduce){.sp-el,.q-icon-bare img{animation:none!important;}.pc-tilt{transition:none!important;}}
 
 /* ══ RESPONSIVE ══ data-view on <html>: mobile | tablet | pc (set by JS from window, or forced by demo panel) */
 .shell{transition:max-width .3s var(--ease);}
