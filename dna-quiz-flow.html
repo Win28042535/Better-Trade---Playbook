@@ -384,7 +384,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    identity line ("Visionary ✦ ผู้มองการณ์ไกล"), so it should read as a badge, not a caption. No
    leading dot (removed per direction — the ✦ inside famTh already marks it, a second dot in front
    was redundant clutter). */
-.fam-badge{display:flex;width:fit-content;align-items:center;gap:7px;font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);letter-spacing:0.01em;margin:0 auto 18px;padding:7px 15px;border-radius:var(--rpill);background:var(--accent);}
+/* Flat neutral-gray pill read as plain/uninteresting per direction ("เด่น หรือน่าสนใจขึ้น") —
+   same size and shape, but now tinted+colored with the ACTIVE family's own accent (cyan/violet/
+   pink) instead of a generic gray, matching the family-color language already used everywhere
+   else on this card (icons, chip fills, str-box borders). bg/color are set inline per-render (and
+   updated live on tab switch, see renderBook/heroPanelBody call sites) since they depend on
+   whichever persona is currently showing, not a fixed value. */
+.fam-badge{display:flex;width:fit-content;align-items:center;gap:7px;font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-label);letter-spacing:0.01em;margin:0 auto 18px;padding:7px 15px;border-radius:var(--rpill);}
 .hero-lay{display:flex;gap:15px;align-items:flex-start;}
 .hero-art{flex-shrink:0;width:106px;border-radius:var(--r1);overflow:hidden;border:1px solid var(--line-soft);}
 .hero-art-in{width:106px;height:134px;background:var(--accent);display:flex;align-items:center;justify-content:center;}
@@ -2120,6 +2126,10 @@ function evoCompute(r){
   var behKey=(behFam===hero.fam)?heroKey:EVO_REP[behFam];
   return {state:played===0?'building':'ready',behKey:behKey,behHero:HEROES[behKey]};
 }
+/* #famBadge's tint+text color track whichever persona is currently active (pre vs post can be a
+   different family entirely) — shared by the initial render and the tab-switch handler below so
+   the two never drift apart. */
+function famBadgeStyle(hero){return 'background:color-mix(in srgb,'+hero.accent+' 16%,var(--white));color:'+hero.accent+';';}
 /* Shared by both hero-sec tab panels (renderBook's pre-event one and evoPanelHTML's post-event
    one) so the two are structurally guaranteed to stay in lockstep — card viewer → signature →
    asset chips → strengths/watchouts, same order, same classes, just fed a different persona +
@@ -2173,7 +2183,7 @@ function renderBook(){
   '</nav>'+
   '<main class="scroll">'+
     '<section class="fade hero-sec" id="hero-sec"><div class="hero-gw"><div class="hero-in">'+
-      '<div class="fam-badge" id="famBadge">'+activeHero.famTh+'</div>'+
+      '<div class="fam-badge" id="famBadge" style="'+famBadgeStyle(activeHero)+'">'+activeHero.famTh+'</div>'+
       '<div class="bt-tabs bt-tabs--primary hero-ev-tabs" id="heroEvTabs" role="tablist" aria-label="เลือกช่วงเวลาของโปรไฟล์">'+
         '<button class="bt-tab" type="button" role="tab" aria-selected="'+(defaultTab==='pre'?'true':'false')+'" tabindex="'+(defaultTab==='pre'?'0':'-1')+'" data-value="pre"><span class="bt-tab-icon">'+ic('lc-file-text')+'</span><span class="bt-tab-label">โปรไฟล์ก่อนงาน</span></button>'+
         '<button class="bt-tab" type="button" role="tab" aria-selected="'+(defaultTab==='post'?'true':'false')+'" tabindex="'+(defaultTab==='post'?'0':'-1')+'" data-value="post"><span class="bt-tab-icon">'+ic('lc-sparkles')+'</span><span class="bt-tab-label">โปรไฟล์หลังงาน</span></button>'+
@@ -2246,8 +2256,8 @@ function renderBook(){
   initBtTabs(root.querySelector('#heroEvTabs'),function(value){
     root.querySelector('#heroEvPre').style.display=value==='pre'?'':'none';
     root.querySelector('#heroEvPost').style.display=value==='post'?'':'none';
-    var badge=root.querySelector('#famBadge');
-    if(badge)badge.textContent=value==='pre'?h.famTh:ev.behHero.famTh;
+    var badge=root.querySelector('#famBadge'),bh=value==='pre'?h:ev.behHero;
+    if(badge){badge.textContent=bh.famTh;badge.setAttribute('style',famBadgeStyle(bh));}
   });
   var evGoGames=root.querySelector('#evGoGames');if(evGoGames)evGoGames.onclick=function(){st.phase='games';render();};
   initBtTabs(root.querySelector('#ddTabs'),function(value){root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===value)?'':'none';});});
