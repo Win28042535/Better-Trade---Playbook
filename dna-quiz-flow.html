@@ -215,7 +215,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .int-ic{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--muted);flex-shrink:0;transition:background .18s,color .18s;}
 .int-ic svg{width:var(--ic-md);height:var(--ic-md);}
 .int-opt.sel .int-ic{background:var(--ink);color:var(--cloud);}
-.int-t{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--ink);line-height:1.35;}
+.int-t{font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--ink);line-height:1.35;}
 
 /* NAV / BUTTONS — nav pinned to bottom (equal-height screens); primary CTA capped so it stays a consistent proportion, never full-bleed on wide screens */
 /* Both nav buttons now split the row evenly (flex:1 each) instead of sizing to their own content and
@@ -358,9 +358,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .tab-item svg{width:var(--ic-lg);height:var(--ic-lg);}
 .tab-item span{font-size:var(--fs-label);font-weight:var(--w-label);}
 .tab-item.active{color:var(--violet);}
-.toc{display:flex;flex-wrap:nowrap;gap:7px;overflow-x:auto;padding:12px 16px 4px;scrollbar-width:none;flex-shrink:0;}
-.toc .bt-tab{flex:0 0 auto;}
-.toc::-webkit-scrollbar{display:none;}
+.toc{display:flex;gap:7px;padding:12px 16px 4px;flex-shrink:0;}
 /* TOC jump-nav is .bt-tabs.bt-tabs--secondary (pill) — per direction, swapped with the in-card
    pickers below: the page-level section switcher (TOC) now reads as pills, while the small
    in-card choices (agenda/asset-drilldown/scan-mode/hero-ev-tabs pickers) now use --primary
@@ -448,6 +446,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    the CSS-mockup card's bottom-left description text overflow/wrap vertically down the card edge
    at that width, since .pcE was only ever tuned against these two known sizes. */
 .ev-cmp-col{width:172px;text-align:center;}
+/* The highlighted "สรุปจบงาน" column carries a live pcViewer (hint chip + flip/reset buttons),
+   not just a bare card image like the "การ์ดใบแรก" reference column — it needs the SAME roomier
+   width the pre-event hero-cardwrap uses (236/268), or the .pcv-ctas buttons' Thai labels have no
+   room to fit and wrap/overflow. Deliberately wider than its plain sibling column. */
+.ev-cmp-col.hi{width:236px;}
 .ev-cmp-arrow{width:20px;height:20px;color:var(--violet);flex-shrink:0;transform:rotate(90deg);}
 .ev-cmp-tag{font-size:var(--fs-meta);font-weight:var(--w-head);color:var(--muted);margin-bottom:7px;}
 .ev-cmp-tag.hi{color:var(--violet);font-weight:var(--w-label);}
@@ -455,6 +458,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .ev-cmp-name.hi{color:var(--violet);font-weight:var(--w-label);}
 .ev-single{width:236px;margin:18px auto 6px;text-align:center;}
 :root[data-view="tablet"] .ev-cmp-col,:root[data-view="pc"] .ev-cmp-col{width:204px;}
+:root[data-view="tablet"] .ev-cmp-col.hi,:root[data-view="pc"] .ev-cmp-col.hi{width:268px;}
 :root[data-view="tablet"] .ev-single,:root[data-view="pc"] .ev-single{width:268px;}
 .ev-ev-lbl{font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px;}
 .ev-evidence{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
@@ -784,10 +788,17 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bt-tabs--primary .bt-tab{padding:10px 1px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border-bottom:2px solid transparent;margin-bottom:-1px;}
 .bt-tabs--primary .bt-tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:var(--w-label);}
 @media(max-width:420px){.bt-tabs--primary{overflow-x:auto;scrollbar-width:none;}.bt-tabs--primary::-webkit-scrollbar{display:none;}}
-/* --secondary: compact/pill active state */
-.bt-tabs--secondary{flex-wrap:wrap;}
-.bt-tabs--secondary .bt-tab{flex:1;padding:9px 14px;min-height:40px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border:1px solid var(--line-soft);border-radius:var(--r1);background:var(--white);transition:color .15s,border-color .15s,background .15s;}
+/* --secondary: compact/pill active state. flex-wrap:nowrap (was wrap) + flex:1 min-width:0 keeps
+   every item on ONE row at equal width regardless of label length — wrap let items size to their
+   own content instead, which visually read as "uneven, and the one that didn't fit fell to a
+   second row" (TOC's 4 buttons, the only current --secondary consumer). min-width:0 overrides the
+   flex-item default (content-based) so flex-shrink can actually shrink a tab below its label's
+   natural width; .bt-tab-label gets the matching ellipsis truncation so a squeezed label clips
+   cleanly instead of overflowing the pill. */
+.bt-tabs--secondary{flex-wrap:nowrap;}
+.bt-tabs--secondary .bt-tab{flex:1;min-width:0;padding:9px 10px;min-height:40px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border:1px solid var(--line-soft);border-radius:var(--r1);background:var(--white);transition:color .15s,border-color .15s,background .15s;}
 .bt-tabs--secondary .bt-tab[aria-selected="true"]{background:var(--ink);color:var(--cloud);border-color:var(--ink);}
+.bt-tabs--secondary .bt-tab-label{overflow:hidden;text-overflow:ellipsis;}
 /* data-tooltip — CSS-only, no JS beyond what initBtTabs already wires for focus */
 .bt-tab[data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--ink);color:var(--cloud);font-size:11px;font-weight:var(--w-body);padding:5px 9px;border-radius:6px;white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .15s,transform .15s;pointer-events:none;z-index:20;}
 .bt-tab[data-tooltip]:hover::after,.bt-tab[data-tooltip]:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
@@ -1556,16 +1567,21 @@ function pcBackInner(key){
 }
 /* static front-only card (carousel) */
 function pcStatic(key){return '<div class="pc3d"><div class="pc-tilt"><div class="pc-face front">'+pcFrontInner(key)+'</div></div></div>';}
-/* full interactive viewer: drag-to-rotate + flip (book) */
-function pcViewer(key){
-  return '<div class="pcv-wrap" id="pcvWrap">'+
+/* full interactive viewer: drag-to-rotate + flip (book). `suffix` lets more than one viewer exist
+   at once on the same page (e.g. the Book hero-sec's pre-event AND post-event tab panels each want
+   their own live viewer) without id collisions — pass '' (default) for a lone/first instance,
+   a distinct string (e.g. 'Post') for any additional one. bindViewer() below takes the matching
+   suffix. */
+function pcViewer(key,suffix){
+  suffix=suffix||'';
+  return '<div class="pcv-wrap" id="pcvWrap'+suffix+'">'+
     '<div class="pcv-hint">'+ic('lc-refresh-cw')+'ลากเพื่อหมุน ✦ แตะปุ่มพลิกดูนิยาม</div>'+
-    '<div class="pc3d" id="pcv"><div class="pc-tilt" id="pcvTilt"><div class="pc-flip">'+
+    '<div class="pc3d" id="pcv'+suffix+'"><div class="pc-tilt" id="pcvTilt'+suffix+'"><div class="pc-flip">'+
       '<div class="pc-face front">'+pcFrontInner(key)+'</div>'+
       '<div class="pc-face back">'+pcBackInner(key)+'</div>'+
     '</div></div></div>'+
-    '<div class="pcv-ctas"><button class="pcv-btn" id="pcvFlip">'+ic('lc-refresh-cw')+'<span>พลิกดูนิยาม</span></button>'+
-      '<button class="pcv-btn" id="pcvReset">'+ic('lc-compass')+'จัดกลับกลาง</button></div>'+
+    '<div class="pcv-ctas"><button class="pcv-btn" id="pcvFlip'+suffix+'">'+ic('lc-refresh-cw')+'<span>พลิกดูนิยาม</span></button>'+
+      '<button class="pcv-btn" id="pcvReset'+suffix+'">'+ic('lc-compass')+'จัดกลับกลาง</button></div>'+
   '</div>';
 }
 var RM=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -1575,9 +1591,10 @@ var RM=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').m
    touch = drag-to-tilt kept as the mobile equivalent (touchscreens have no hover to repel against),
    with a tap (drag that never moved) doing the same left/right-half flip as the desktop click.
    Only 2 faces exist (front/back) so "which half" maps to "which face" rather than stepping through a gallery. */
-function bindViewer(){
-  var wrap=document.getElementById('pcvWrap');if(!wrap)return;
-  var tilt=document.getElementById('pcvTilt'),pc3d=document.getElementById('pcv');
+function bindViewer(suffix){
+  suffix=suffix||'';
+  var wrap=document.getElementById('pcvWrap'+suffix);if(!wrap)return;
+  var tilt=document.getElementById('pcvTilt'+suffix),pc3d=document.getElementById('pcv'+suffix);
   var glyph=wrap.querySelector('.pc-face.front .pcE-glyph'),halo=wrap.querySelector('.pc-face.front .pcE-halo');
   var TILT=16,HOVER_SCALE=1.05;
   var dragT=false,px=0,py=0,startX=0,startY=0,moved=false,rx=0,ry=0,lastTapAt=0;
@@ -1585,7 +1602,7 @@ function bindViewer(){
   // opposite way (background) — the split creates a real sense of layered depth on the flat face.
   function apply(rx,ry,scale){tilt.style.transform='rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) scale3d('+scale+','+scale+','+scale+')';if(glyph)glyph.style.transform='translate('+(ry*0.95).toFixed(1)+'px,'+(-rx*0.9).toFixed(1)+'px) scale('+(1+Math.min(Math.abs(rx)+Math.abs(ry),32)*0.0016).toFixed(3)+')';if(halo)halo.style.transform='translate('+(ry*-0.5).toFixed(1)+'px,'+(rx*0.5).toFixed(1)+'px)';}
   function resetTilt(){tilt.style.transition='transform .4s var(--ease)';apply(0,0,1);}
-  function syncFlipBtn(){var on=pc3d.classList.contains('flipped'),btn=document.getElementById('pcvFlip');btn.classList.toggle('on',on);btn.querySelector('span').textContent=on?'ดูด้านหน้า':'พลิกดูนิยาม';}
+  function syncFlipBtn(){var on=pc3d.classList.contains('flipped'),btn=document.getElementById('pcvFlip'+suffix);btn.classList.toggle('on',on);btn.querySelector('span').textContent=on?'ดูด้านหน้า':'พลิกดูนิยาม';}
   function tapFlip(clientX){var rect=pc3d.getBoundingClientRect();var wantBack=(clientX-rect.left)>=rect.width/2;var isBack=pc3d.classList.contains('flipped');if(wantBack!==isBack){wrap.classList.add('touched');pc3d.classList.toggle('flipped');syncFlipBtn();}}
 
   /* NOTE: interaction is bound to the CARD (#pcv), NOT the wrap — the flip/reset buttons are
@@ -1610,8 +1627,8 @@ function bindViewer(){
   function down(e){if(RM)return;dragT=true;moved=false;wrap.classList.add('touched');var p=e.touches[0];px=p.clientX;py=p.clientY;startX=p.clientX;startY=p.clientY;window.addEventListener('touchmove',move,{passive:false});window.addEventListener('touchend',up);}
   pc3d.addEventListener('touchstart',down,{passive:true});
 
-  document.getElementById('pcvFlip').onclick=function(){wrap.classList.add('touched');pc3d.classList.toggle('flipped');syncFlipBtn();};
-  document.getElementById('pcvReset').onclick=function(){wrap.classList.add('touched');rx=0;ry=0;resetTilt();};
+  document.getElementById('pcvFlip'+suffix).onclick=function(){wrap.classList.add('touched');pc3d.classList.toggle('flipped');syncFlipBtn();};
+  document.getElementById('pcvReset'+suffix).onclick=function(){wrap.classList.add('touched');rx=0;ry=0;resetTilt();};
 }
 
 /* ── SPLASH / ATTRACT fan carousel ── auto-plays forever, no arrows/dots/hover needed.
@@ -2073,23 +2090,24 @@ function radarSVG(vals,hue){
    measured/validated behavioral score. */
 var EVO_REP={G:'guardian',N:'planner',V:'maverick'}; // one flagship persona per family, this
   // build's own pick (not sourced from the PDF) for "what a full family-shift lands on".
+/* v2 — ties the family-shift decision to ONE real signal only (r.gap, compute()'s own declared-
+   vs-revealed risk gap) instead of a multi-signal weighted tally. The earlier version anchored the
+   declared family with a flat +20 that no combination of other bonuses could ever mathematically
+   exceed — 'evolved' was coded and rendered correctly under a manually-forced test object, but was
+   UNREACHABLE through any real sequence of plays, since nothing could outscore that anchor. Now:
+   games/booth/interests only count toward whether there's ENOUGH evidence to say anything at all
+   (sig, the confidence gate); WHICH family a real divergence points to comes only from the gap,
+   which is the one field in this file that actually measures "declared vs behavior" already. */
 function evoCompute(r){
   var hero=r.hero,heroKey=r.heroKey;
   var played=gamesPlayedCount(),chk=boothCheckinCount(),act=boothActivityCount(),interests=(r.interests||[]).length;
   var sig=[played>=1,chk>=1,act>=1,interests>=1,played>=4,(chk>=CHECKIN_NEED&&act>=ACTIVITY_NEED)].filter(Boolean).length;
-  var fs={G:0,N:0,V:0};fs[hero.fam]+=20;
-  if(r.gap>=2)fs.V+=18;else if(r.gap<=-2)fs.G+=18;else fs.N+=6;
-  if(played>=4)fs[hero.fam]+=6;
-  if(interests>=2)fs.N+=8;
-  var order=['G','N','V'].sort(function(a,b){return fs[b]-fs[a];});
-  var lead=fs[order[0]]-fs[order[1]];
-  var ready=played>=1&&sig>=3&&lead>10;
-  var behFam=ready?order[0]:hero.fam;
+  var enough=played>=1&&sig>=3;
+  var diverged=Math.abs(r.gap)>=2; // a real, already-computed behavioral risk gap of ≥2/10
+  var behFam=(enough&&diverged)?(r.gap>=2?'V':'G'):hero.fam;
   var behKey=(behFam===hero.fam)?heroKey:EVO_REP[behFam];
   var diff=behKey!==heroKey;
-  // 'gathering' = played something but not enough signal/lead to conclude either way — distinct
-  // from 'confirmed' (enough evidence AND it lines up), so the copy doesn't overclaim early on.
-  var state=played===0?'building':(ready&&diff?'evolved':(ready&&!diff?'confirmed':(played>=1?'gathering':'confirmed')));
+  var state=played===0?'building':(diff?'evolved':(enough?'confirmed':'gathering'));
   return {state:state,behKey:behKey,behHero:HEROES[behKey],diff:diff,sig:sig,remain:Math.max(0,3-sig),
     played:played,chk:chk,act:act,interests:interests};
 }
@@ -2116,13 +2134,19 @@ function evoPanelHTML(ev,r){
       '<div class="ev-empty-s">เล่นเกมและเดินบูธในงานก่อน แล้วค่อยกลับมาดูว่าตัวตนที่ "ทำจริง" ตรงกับที่ DNA Quiz บอกไหม</div>'+
       '<button class="btn btn-primary" id="evGoGames">'+ic('lc-play-circle')+'ไปเล่นกิจกรรม</button></div>';
   var cfg=EVO_CFG[ev.state](r.hero,ev.behHero);
+  // The CURRENT/final identity (ev.behKey) always gets the full interactive pcViewer (suffix
+  // 'Post', bound separately from the pre-event tab's own viewer via renderBook's bindViewer('Post'))
+  // per direction — the post-event card should be just as tap/drag/flip-able as the pre-event one.
+  // In the 2-card compare (evolved), only that highlighted "สรุปจบงาน" card is the live viewer; the
+  // "การ์ดใบแรก" reference card stays a plain pcStatic thumbnail since it's a fixed historical
+  // snapshot, not the identity being explored right now.
   var cardsHtml=ev.diff
     ? '<div class="ev-compare"><div class="ev-cmp-lbl">เทียบก่อน–หลัง</div><div class="ev-cmp-row">'+
         '<div class="ev-cmp-col"><div class="ev-cmp-tag">การ์ดใบแรก</div>'+pcStatic(r.heroKey)+'<div class="ev-cmp-name">'+r.hero.th+'</div></div>'+
         ic('lc-arrow-right','ev-cmp-arrow')+
-        '<div class="ev-cmp-col"><div class="ev-cmp-tag hi">สรุปจบงาน</div>'+pcStatic(ev.behKey)+'<div class="ev-cmp-name hi">'+ev.behHero.th+'</div></div>'+
+        '<div class="ev-cmp-col hi"><div class="ev-cmp-tag hi">สรุปจบงาน</div>'+pcViewer(ev.behKey,'Post')+'<div class="ev-cmp-name hi">'+ev.behHero.th+'</div></div>'+
       '</div></div>'
-    : '<div class="ev-single">'+pcStatic(ev.behKey)+'<div class="ev-cmp-name">'+ev.behHero.th+'</div></div>';
+    : '<div class="ev-single">'+pcViewer(ev.behKey,'Post')+'<div class="ev-cmp-name">'+ev.behHero.th+'</div></div>';
   var evid=evoEvidence(ev);
   return '<span class="ev-badge" style="background:'+cfg.bg+';color:'+cfg.fg+'">'+ic(cfg.icon)+cfg.badge+'</span>'+
     '<h3 class="ev-head">'+cfg.head+'</h3><p class="ev-sub">'+cfg.sub+'</p>'+
@@ -2134,6 +2158,14 @@ function evoPanelHTML(ev,r){
 }
 function renderBook(){
   var r=RESULT,h=r.hero;
+  var ev=evoCompute(r);
+  // Which tab opens by default: while there's no post-event evidence yet ('building'), pre-event
+  // is the only real content, so it leads; once there's ANY real activity, the post-event view is
+  // the more current/relevant one and leads instead — per direction, the identity card should
+  // default to whichever profile is actually "live" right now, not always pre-event. The persona
+  // driving the shared fam-badge above the tabs follows the same rule (activeHero).
+  var defaultTab=ev.state==='building'?'pre':'post';
+  var activeHero=defaultTab==='pre'?h:ev.behHero;
   var strengths=h.strengths.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
   var watch=h.watchouts.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
   var chips=h.assets.map(function(a){return '<span class="chip" style="background:color-mix(in srgb,'+h.accent+' 14%,transparent);border-color:color-mix(in srgb,'+h.accent+' 38%,transparent);color:'+h.accent+'">'+ic(a.icon)+a.t+'</span>';}).join('');
@@ -2158,19 +2190,19 @@ function renderBook(){
   '</nav>'+
   '<main class="scroll">'+
     '<section class="fade hero-sec" id="hero-sec"><div class="hero-gw"><div class="hero-in">'+
-      '<div class="fam-badge">'+h.famTh+'</div>'+
+      '<div class="fam-badge" id="famBadge">'+activeHero.famTh+'</div>'+
       '<div class="bt-tabs bt-tabs--primary hero-ev-tabs" id="heroEvTabs" role="tablist" aria-label="เลือกช่วงเวลาของโปรไฟล์">'+
-        '<button class="bt-tab" type="button" role="tab" aria-selected="true" tabindex="0" data-value="pre"><span class="bt-tab-icon">'+ic('lc-file-text')+'</span><span class="bt-tab-label">โปรไฟล์ก่อนงาน</span></button>'+
-        '<button class="bt-tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-value="post"><span class="bt-tab-icon">'+ic('lc-sparkles')+'</span><span class="bt-tab-label">โปรไฟล์หลังงาน</span></button>'+
+        '<button class="bt-tab" type="button" role="tab" aria-selected="'+(defaultTab==='pre'?'true':'false')+'" tabindex="'+(defaultTab==='pre'?'0':'-1')+'" data-value="pre"><span class="bt-tab-icon">'+ic('lc-file-text')+'</span><span class="bt-tab-label">โปรไฟล์ก่อนงาน</span></button>'+
+        '<button class="bt-tab" type="button" role="tab" aria-selected="'+(defaultTab==='post'?'true':'false')+'" tabindex="'+(defaultTab==='post'?'0':'-1')+'" data-value="post"><span class="bt-tab-icon">'+ic('lc-sparkles')+'</span><span class="bt-tab-label">โปรไฟล์หลังงาน</span></button>'+
       '</div>'+
-      '<div class="hero-ev-panel" id="heroEvPre">'+
+      '<div class="hero-ev-panel" id="heroEvPre"'+(defaultTab==='pre'?'':' style="display:none"')+'>'+
         '<div class="hero-cardwrap">'+pcViewer(r.heroKey)+'</div>'+
         '<div class="hero-sig-c">'+h.sig+'</div>'+
         '<div class="ast-block" style="background:color-mix(in srgb,'+h.accent+' 12%,transparent);border:1px solid color-mix(in srgb,'+h.accent+' 32%,transparent)">'+
           '<div class="ast-lbl">'+ic('lc-sparkles')+'สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div></div>'+
         '<div class="str-grid" style="margin-top:16px"><div class="str-box"><div class="str-hd">'+ic('lc-zap')+'จุดแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'จุดระวัง</div>'+watch+'</div></div>'+
       '</div>'+
-      '<div class="hero-ev-panel" id="heroEvPost" style="display:none">'+evoPanelHTML(evoCompute(r),r)+'</div>'+
+      '<div class="hero-ev-panel" id="heroEvPost"'+(defaultTab==='post'?'':' style="display:none"')+'>'+evoPanelHTML(ev,r)+'</div>'+
       redeemCard+
       '<div class="hero-leg"><span class="ld" style="background:'+h.accent+'"></span>แรงบันดาลใจจาก&nbsp;<span class="ln">'+h.legend+'</span>&thinsp;—&thinsp;'+h.legendWhy+'</div>'+
       '<div class="hero-acts"><button class="btn btn-secondary" id="shareCardBtn">'+ic('lc-upload')+'แชร์ภาพการ์ด</button></div>'+
@@ -2232,10 +2264,13 @@ function renderBook(){
   root.querySelectorAll('.side-row').forEach(function(rw){rw.onclick=function(){togSide(rw);};});
   var tocs=root.querySelectorAll('.toc .bt-tab');tocs.forEach(function(p){p.onclick=function(){tocs.forEach(function(x){x.setAttribute('aria-selected','false');});p.setAttribute('aria-selected','true');var target=root.querySelector('#'+p.dataset.jump);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});};});
   root.querySelectorAll('#shareCardBtn,#shareTomorrowBtn').forEach(function(b){b.onclick=openShare;});
-  bindViewer();
+  bindViewer();       // pre-event card (always present)
+  bindViewer('Post'); // post-event card — no-ops itself if the 'building' state skipped rendering one
   initBtTabs(root.querySelector('#heroEvTabs'),function(value){
     root.querySelector('#heroEvPre').style.display=value==='pre'?'':'none';
     root.querySelector('#heroEvPost').style.display=value==='post'?'':'none';
+    var badge=root.querySelector('#famBadge');
+    if(badge)badge.textContent=value==='pre'?h.famTh:ev.behHero.famTh;
   });
   var evGoGames=root.querySelector('#evGoGames');if(evGoGames)evGoGames.onclick=function(){st.phase='games';render();};
   initBtTabs(root.querySelector('#ddTabs'),function(value){root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===value)?'':'none';});});
