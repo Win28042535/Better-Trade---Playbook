@@ -53,7 +53,9 @@
                            Was 28 — brought down per direction ("still feels too far apart"); still reads
                            as its own boundary since most cards' own internal padding (--sp-card-pad) sits
                            on both sides of it. Reserved for section-to-section only; intra-card spacing
-                           uses --sp-block and smaller. */
+                           uses --sp-block and smaller. Mobile keeps this 20px value; tablet/pc override
+                           to 24px below — a wider canvas can afford (and reads better with) slightly more
+                           breathing room than the narrow phone frame. */
   --font:'FC Minimal','Noto Sans Thai','Thonburi','DB Helvethaica X',system-ui,-apple-system,'Segoe UI',sans-serif;
   --serif:'Baskervville','Bodoni MT','Didot',Georgia,'Times New Roman',serif; /* Editorial display serif — matches the printed character-card art. English display + numerals ONLY; Thai stays on --font (FC Minimal). Baskervville embedded (OFL, variable font — one @font-face covers weight 400–700); Bodoni MT = local-first fallback */
   /* --mono retired (2026-08-12, per direction) — every former mono site (topbar count, opt-key,
@@ -355,9 +357,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .tab-item.active{color:var(--violet);}
 .toc{display:flex;gap:7px;overflow-x:auto;padding:12px 16px 4px;scrollbar-width:none;flex-shrink:0;}
 .toc::-webkit-scrollbar{display:none;}
-.toc-p{flex-shrink:0;display:inline-flex;align-items:center;gap:var(--sp-glue);height:34px;padding:0 14px;border-radius:var(--rpill);border:1px solid var(--line-soft);background:var(--white);font-family:var(--font);font-size:var(--fs-label);font-weight:var(--w-head);color:var(--muted);cursor:pointer;transition:color .18s,border-color .18s;}
-.toc-p svg{width:var(--ic-sm);height:var(--ic-sm);}
-.toc-p.active{color:var(--ink);border-color:var(--line-strong);}
+/* TOC jump-nav pills are now .bt-tabs.bt-tabs--secondary too (same visual component as every other
+   tabbar in the app — see the BT-TABS block). Not a real ARIA tablist (clicking one doesn't hide
+   the others' content, it just scrolls to an already-visible section), so it keeps plain buttons
+   with aria-selected toggled by hand instead of the full initBtTabs wiring. */
 .prog-wrap{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:14px 16px;position:relative;overflow:hidden;}
 .prog-inner{position:relative;z-index:1;display:flex;align-items:center;gap:14px;}
 /* ambient asset scatter — echoes the splash's floating brand assets, kept tiny/blurred/faint (FAR-plane treatment) so it dresses this otherwise-empty card corner without ever competing with content */
@@ -374,9 +377,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .hero-gw{padding:2px;border-radius:calc(var(--r2) + 3px);background:var(--spectrum);}
 .hero-in{background:var(--white);border-radius:var(--r2);padding:var(--sp-block) var(--sp-card-pad);}
 /* Centered + a real pill chip instead of quiet uppercase eyebrow text — this is the card's own
-   identity line ("Visionary ✦ ผู้มองการณ์ไกล"), so it should read as a badge, not a caption. */
+   identity line ("Visionary ✦ ผู้มองการณ์ไกล"), so it should read as a badge, not a caption. No
+   leading dot (removed per direction — the ✦ inside famTh already marks it, a second dot in front
+   was redundant clutter). */
 .fam-badge{display:flex;width:fit-content;align-items:center;gap:7px;font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);letter-spacing:0.01em;margin:0 auto 18px;padding:7px 15px;border-radius:var(--rpill);background:var(--accent);}
-.fam-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 .hero-lay{display:flex;gap:15px;align-items:flex-start;}
 .hero-art{flex-shrink:0;width:106px;border-radius:var(--r1);overflow:hidden;border:1px solid var(--line-soft);}
 .hero-art-in{width:106px;height:134px;background:var(--accent);display:flex;align-items:center;justify-content:center;}
@@ -387,26 +391,28 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .hero-en{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:var(--sp-hairline);font-family:var(--font);}
 .hero-th{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);line-height:1.1;letter-spacing:0;margin-bottom:var(--sp-stack-tight);}
 .hero-sig{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.6;margin-bottom:14px;}
-/* จุดแกร่ง = cyan (this app's "positive/good" tint elsewhere); จุดระวัง = the same amber the
-   sponsor chip/gold badges use (reads as "pay attention", not a scary red). Side-by-side on
-   tablet/pc — was a fixed column on every viewport, so a wide screen wasted its own width instead
-   of using it to show both at once. */
+/* จุดแกร่ง = green (a clear "this is good" signal — distinct from any persona accent color, so it
+   reads the same for every persona); จุดระวัง = the same amber the sponsor chip/gold badges use
+   (reads as "pay attention", not a scary red). Side-by-side on tablet/pc — was a fixed column on
+   every viewport, so a wide screen wasted its own width instead of using it to show both at once. */
 .str-grid{display:flex;flex-direction:column;gap:var(--sp-list);margin-bottom:var(--sp-stack);}
 :root[data-view="tablet"] .str-grid,:root[data-view="pc"] .str-grid{flex-direction:row;}
 .str-grid .str-box{flex:1;}
-.str-box{border-radius:var(--r1);padding:11px 13px;background:color-mix(in srgb,var(--cyan) 10%,transparent);border:1px solid color-mix(in srgb,var(--cyan) 28%,transparent);}
+.str-box{border-radius:var(--r1);padding:11px 13px;background:color-mix(in srgb,#22c55e 10%,transparent);border:1px solid color-mix(in srgb,#22c55e 28%,transparent);}
 .str-box.wn{background:#fef4e2;border-color:#f3daa0;}
-.str-hd{display:flex;align-items:center;gap:var(--sp-glue);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:0.04em;margin-bottom:var(--sp-list);color:var(--ink);}
+.str-hd{display:flex;align-items:center;gap:var(--sp-glue);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:0.04em;margin-bottom:var(--sp-list);color:#15803d;}
 .str-box.wn .str-hd{color:#8a5a00;}
 .str-hd svg{width:var(--ic-sm);height:var(--ic-sm);}
 .str-li{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--ink);line-height:1.55;margin-bottom:3px;}
 /* สินทรัพย์ที่ถนัด — the one thing this whole card exists to tell the customer ("what you're
-   suited for"), so it gets a bigger label + chips tinted in the persona's own accent color
-   (h.accent, applied inline per chip) instead of the same flat gray every other chip in the app
-   uses — this is the highlight, not a footnote. */
-.ast-lbl{font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);margin-bottom:10px;}
+   suited for"), so the whole block is its own tinted panel (background+border in the persona's
+   accent color, applied inline via h.accent) instead of just sitting bare on the card surface —
+   this is the highlight the customer should see they're "คู่ควรกับ", not a footnote. */
+.ast-block{border-radius:var(--r1);padding:14px 15px;margin-bottom:var(--sp-stack);}
+.ast-lbl{display:flex;align-items:center;gap:6px;font-family:var(--font);font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);margin-bottom:11px;}
+.ast-lbl svg{width:var(--ic-sm);height:var(--ic-sm);}
 .ast-chips{display:flex;flex-wrap:wrap;gap:9px;}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--rpill);border:1px solid;font-size:var(--fs-label);font-weight:var(--w-label);}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:9px 15px;border-radius:var(--rpill);border:1.5px solid;font-size:var(--fs-bodysm);font-weight:var(--w-label);background:var(--white);}
 .chip svg{width:var(--ic-sm);height:var(--ic-sm);}
 .hero-leg{display:flex;align-items:center;gap:var(--sp-inline);margin-top:16px;padding-top:15px;border-top:1px solid var(--line-soft);font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);}
 .ld{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
@@ -870,10 +876,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .scan-hd{padding-right:30px;margin-bottom:14px;}
 .scan-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);line-height:1.3;}
 .scan-s{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;}
-.scan-tabs{display:flex;gap:5px;background:var(--accent);border-radius:11px;padding:4px;margin-bottom:14px;}
-.scan-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border:none;background:transparent;color:var(--muted);font-family:var(--font);font-weight:var(--w-head);font-size:11.5px;padding:9px 6px;border-radius:8px;cursor:pointer;}
-.scan-tab svg{width:15px;height:15px;}
-.scan-tab.on{background:var(--white);color:var(--ink);box-shadow:0 2px 6px rgba(17,19,24,.1);}
+/* Scan-mode switcher is now .bt-tabs.bt-tabs--secondary (the same tab component used everywhere
+   else) — was its own bespoke .scan-tab pill-in-a-track, now one component system-wide. */
+#scanTabs{margin-bottom:14px;}
 .scan-cam{position:relative;border-radius:16px;overflow:hidden;background:#111b25;height:168px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
 .scan-cam-frame{position:absolute;inset:14%;border-radius:14px;border:2px solid rgba(255,255,255,.28);}
 .scan-cam-laser{position:absolute;left:14%;right:14%;top:14%;height:2px;background:#94d227;box-shadow:0 0 14px #94d227;animation:scanLaser 2.1s ease-in-out infinite;}
@@ -1192,6 +1197,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 :root[data-view="tablet"] .shell{max-width:820px;}
 :root[data-view="pc"] .shell{max-width:min(94vw,1120px);}
 :root[data-view="mobile"] .shell{max-width:400px;}
+/* Section-to-section gap: mobile keeps the tighter 20px; tablet/pc get a touch more room (24px) —
+   a wider canvas reads better with slightly more separation than the narrow phone frame needs. */
+:root[data-view="tablet"],:root[data-view="pc"]{--sp-section:24px;}
 /* Phone-frame preview on desktop (data-view=mobile at ≥480px): the frame is stretched to the
    viewport height by body's flex align-stretch, so it MUST scroll its own content internally like a
    real phone. Using overflow:hidden here clipped every screen taller than one viewport (the whole
@@ -2035,13 +2043,19 @@ function renderBook(){
   root.innerHTML=
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
   '<header class="topbar"><img class="tb-logo" src="'+LOGO_IMG.bt+'" alt="Better Trade" style="margin-right:auto"><div id="qr-cta-slot"></div></header>'+
-  '<nav class="toc"><button class="toc-p active" data-jump="hero-sec">'+ic('lc-user')+'ตัวตน</button><button class="toc-p" data-jump="conf-box">'+ic('lc-sparkles')+'Confidence</button><button class="toc-p" data-jump="sides-sec">'+ic('lc-pie-chart')+'6 ด้าน</button><button class="toc-p" data-jump="route-sec">'+ic('lc-route')+'เส้นทาง</button></nav>'+
+  '<nav class="toc bt-tabs bt-tabs--secondary">'+
+    '<button class="bt-tab" type="button" data-jump="hero-sec" aria-selected="true"><span class="bt-tab-icon">'+ic('lc-user')+'</span><span class="bt-tab-label">ตัวตน</span></button>'+
+    '<button class="bt-tab" type="button" data-jump="conf-box" aria-selected="false"><span class="bt-tab-icon">'+ic('lc-sparkles')+'</span><span class="bt-tab-label">Confidence</span></button>'+
+    '<button class="bt-tab" type="button" data-jump="sides-sec" aria-selected="false"><span class="bt-tab-icon">'+ic('lc-pie-chart')+'</span><span class="bt-tab-label">6 ด้าน</span></button>'+
+    '<button class="bt-tab" type="button" data-jump="route-sec" aria-selected="false"><span class="bt-tab-icon">'+ic('lc-route')+'</span><span class="bt-tab-label">เส้นทาง</span></button>'+
+  '</nav>'+
   '<main class="scroll">'+
     '<section class="fade hero-sec" id="hero-sec"><div class="hero-gw"><div class="hero-in">'+
-      '<div class="fam-badge"><span class="fam-dot" style="background:'+h.accent+'"></span>'+h.famTh+'</div>'+
+      '<div class="fam-badge">'+h.famTh+'</div>'+
       '<div class="hero-cardwrap">'+pcViewer(r.heroKey)+'</div>'+
       '<div class="hero-sig-c">'+h.sig+'</div>'+
-      '<div class="ast-lbl">สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div>'+
+      '<div class="ast-block" style="background:color-mix(in srgb,'+h.accent+' 12%,transparent);border:1px solid color-mix(in srgb,'+h.accent+' 32%,transparent)">'+
+        '<div class="ast-lbl">'+ic('lc-sparkles')+'สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div></div>'+
       '<div class="str-grid" style="margin-top:16px"><div class="str-box"><div class="str-hd">'+ic('lc-zap')+'จุดแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'จุดระวัง</div>'+watch+'</div></div>'+
       redeemCard+
       '<div class="hero-leg"><span class="ld" style="background:'+h.accent+'"></span>แรงบันดาลใจจาก&nbsp;<span class="ln">'+h.legend+'</span>&thinsp;—&thinsp;'+h.legendWhy+'</div>'+
@@ -2091,7 +2105,7 @@ function renderBook(){
       '<div class="route-steps">'+routeStep('done','','ทำ DNA Quiz','ตอบครบ 10 ข้อ เสร็จแล้ว — ได้ตัวตน '+h.th)+routeStep('act','2','ทำครบ 6 ด้าน','เสร็จแล้ว 2 จาก 6 — เหลืออีก 4 ด้านในบูธ')+routeStep('fut','3','รับ Playbook ส่วนตัวสมบูรณ์','เมื่อครบ 6 ด้าน รับกลยุทธ์เฉพาะตัวตน + Confidence เต็ม')+routeStep('fut','4','ติดตามบน efin.finance','Playbook sync ขึ้นแอปหลังงาน พร้อม AI ติดตามพอร์ต')+'</div>'+
       '<div class="route-cta-w"><button class="btn btn-primary">'+ic('lc-play-circle')+'ไปเล่นกิจกรรมต่อ'+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
     '</section>'+
-    '<section class="card mb-lg"><div class="s-pad"><div class="list-row klib-row" id="klibRow"><div class="klib-ic">'+ic('lc-library')+'</div><div class="klib-tx"><div class="klib-t">คลังความรู้</div><div class="klib-s">41 บทความที่คัดมาสำหรับ '+h.th+' ✦ จัดเป็น 6 หมวด</div></div>'+ic('lc-chevron-right','klib-cv')+'</div>'+
+    '<section class="card mb-lg"><div class="s-pad"><div class="list-row klib-row" id="klibRow"><div class="klib-ic">'+ic('lc-library')+'</div><div class="klib-tx"><div class="klib-t">คลังความรู้</div><div class="klib-s">41 บทความที่คัดมาสำหรับ '+h.th+' ✦ จัดเป็น 8 หมวด</div></div>'+ic('lc-chevron-right','klib-cv')+'</div>'+
       '<div class="klib-list">'+
         '<div class="klib-item">'+ic('lc-file-text')+'พื้นฐานที่ '+h.th+' ควรรู้ก่อนเริ่ม</div>'+
         '<div class="klib-item">'+ic('lc-file-text')+'เจาะ '+h.assets[0].t+' ฉบับเข้าใจง่าย</div>'+
@@ -2102,7 +2116,7 @@ function renderBook(){
   bindTabbar();
   root.querySelector('#devReset').onclick=resetQuiz;
   root.querySelectorAll('.side-row').forEach(function(rw){rw.onclick=function(){togSide(rw);};});
-  var tocs=root.querySelectorAll('.toc-p');tocs.forEach(function(p){p.onclick=function(){tocs.forEach(function(x){x.classList.remove('active');});p.classList.add('active');var target=root.querySelector('#'+p.dataset.jump);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});};});
+  var tocs=root.querySelectorAll('.toc .bt-tab');tocs.forEach(function(p){p.onclick=function(){tocs.forEach(function(x){x.setAttribute('aria-selected','false');});p.setAttribute('aria-selected','true');var target=root.querySelector('#'+p.dataset.jump);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});};});
   root.querySelectorAll('#shareCardBtn,#shareTomorrowBtn').forEach(function(b){b.onclick=openShare;});
   bindViewer();
   initBtTabs(root.querySelector('#ddTabs'),function(value){root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===value)?'':'none';});});
@@ -2590,8 +2604,9 @@ function paintScan(){
   var m=document.getElementById('scanModal');if(!m)return;
   m.querySelector('#scanTitle').textContent=scanTitle();
   m.querySelector('#scanSub').textContent=scanSubText();
-  m.querySelector('#scanTabScan').classList.toggle('on',SCAN_MODE==='scan');
-  m.querySelector('#scanTabMine').classList.toggle('on',SCAN_MODE==='mine');
+  m.querySelectorAll('#scanTabs [role="tab"]').forEach(function(t){
+    var sel=t.dataset.value===SCAN_MODE;t.setAttribute('aria-selected',sel?'true':'false');t.tabIndex=sel?0:-1;
+  });
   m.querySelector('#scanViewScan').style.display=SCAN_MODE==='scan'?'':'none';
   m.querySelector('#scanViewMine').style.display=SCAN_MODE==='mine'?'':'none';
 }
@@ -2604,9 +2619,9 @@ function buildScanModal(){
     '<div class="scan-card">'+
       '<button class="scan-x" id="scanClose">'+ic('lc-x')+'</button>'+
       '<div class="scan-hd"><div class="scan-t" id="scanTitle"></div><div class="scan-s" id="scanSub"></div></div>'+
-      '<div class="scan-tabs">'+
-        '<button class="scan-tab" id="scanTabScan">'+ic('lc-qr-code')+'<span>สแกน QR ที่จุดนี้</span></button>'+
-        '<button class="scan-tab" id="scanTabMine">'+ic('lc-user')+'<span>ให้เจ้าหน้าที่สแกน</span></button>'+
+      '<div class="bt-tabs bt-tabs--secondary" id="scanTabs" role="tablist" aria-label="เลือกวิธีสแกน">'+
+        '<button class="bt-tab" type="button" role="tab" aria-selected="true" data-value="scan"><span class="bt-tab-icon">'+ic('lc-qr-code')+'</span><span class="bt-tab-label">สแกน QR ที่จุดนี้</span></button>'+
+        '<button class="bt-tab" type="button" role="tab" aria-selected="false" data-value="mine"><span class="bt-tab-icon">'+ic('lc-user')+'</span><span class="bt-tab-label">ให้เจ้าหน้าที่สแกน</span></button>'+
       '</div>'+
       '<div class="scan-view" id="scanViewScan"><div class="scan-cam"><div class="scan-cam-frame"></div><div class="scan-cam-laser"></div>'+ic('lc-qr-code','scan-cam-ic')+'<div class="scan-cam-cap">หัน QR ที่จุดนี้เข้ากรอบ</div></div></div>'+
       '<div class="scan-view" id="scanViewMine" style="display:none"><div class="scan-mine"><div class="scan-mine-qr">'+ic('lc-qr-code')+'</div><div class="scan-mine-cap">เปิดหน้านี้ให้เจ้าหน้าที่ที่จุดนี้สแกน — ได้ผลเหมือนกับที่คุณสแกนเอง</div></div></div>'+
@@ -2617,8 +2632,7 @@ function buildScanModal(){
   document.body.appendChild(wrap);
   document.getElementById('scanScrim').onclick=closeScan;
   document.getElementById('scanClose').onclick=closeScan;
-  document.getElementById('scanTabScan').onclick=function(){SCAN_MODE='scan';paintScan();};
-  document.getElementById('scanTabMine').onclick=function(){SCAN_MODE='mine';paintScan();};
+  initBtTabs(document.getElementById('scanTabs'),function(value){SCAN_MODE=value;paintScan();});
   document.getElementById('scanConfirm').onclick=confirmScan;
 }
 function boothCheckinCount(){var n=0;for(var k in BOOTH_CHK){if(BOOTH_CHK[k]&&BOOTH_CHK[k].size>0)n++;}return n;}
@@ -2847,10 +2861,13 @@ function buildDemo(){
   document.getElementById('demoReset').onclick=function(){DEMO.quizDone=false;document.getElementById('demoQuiz').classList.remove('on');document.getElementById('demoPersona').value='';panel.classList.remove('open');resetQuiz();};
 }
 
-/* Go-to-top FAB (system-wide). #root (.shell) is the persistent scroll container on the desktop
-   phone-frame; on a real narrow phone the window scrolls instead — so we watch both and act on
-   whichever moved. Positioned against the shell's live right edge so it stays inside the frame in
-   every view mode. */
+/* Go-to-top FAB (system-wide, all view modes incl. desktop/tablet). The page itself is what
+   scrolls (the tabbar is position:fixed to the real viewport, not to #root/.shell), so the FAB is
+   anchored the same way: `bottom` is a fixed viewport offset (cleared above the tabbar), not
+   computed from the shell's own bounding rect — that used to drift far off-screen on tall pages
+   once scrolled deep, since the shell's rect.bottom moves with scroll while its rect.height does
+   NOT track total content height. Only the horizontal position (left) needs the shell's rect, to
+   hug the phone-frame's right edge instead of the full browser width on tablet/pc. */
 function buildGoTop(){
   var btn=document.createElement('button');
   btn.className='go-top';btn.id='goTop';btn.setAttribute('aria-label','กลับขึ้นบนสุด');
@@ -2861,8 +2878,9 @@ function buildGoTop(){
   var reposition=function(){
     var r=root.getBoundingClientRect();
     btn.style.left=Math.round(r.right-16-btn.offsetWidth)+'px';
-    var bottomRef=Math.min(r.bottom,window.innerHeight);
-    btn.style.top=Math.round(bottomRef-84-btn.offsetHeight)+'px';
+    var tabbar=document.querySelector('.book-tabbar');
+    var clear=tabbar?tabbar.getBoundingClientRect().height:64;
+    btn.style.bottom=Math.round(clear+16)+'px';
   };
   var onScroll=function(){btn.classList.toggle('show',scrollTopNow()>window.innerHeight*0.7);reposition();};
   window.addEventListener('scroll',onScroll,{passive:true});
