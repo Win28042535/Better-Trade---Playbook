@@ -51,8 +51,35 @@ const compactCompactOptions = {
     paddingX: 18,
 };
 
+/* "cta" preset — for the app's genuine single-action CTAs that live inside a card rather than
+   standing alone like the splash hero (home's "ดูเกมที่เหลือ" next-step, the post-event upgrade
+   button): bigger than "compact" so they read as THE thing to tap, but not full hero size since
+   that was sized for a standalone centered screen, not a card row. Sizing recorded in
+   PLAYBOOK-2026-DATA-BASELINE.md §11 alongside the other two tiers. */
+const ctaDesktopOptions = {
+    height: 46,
+    fontSize: 16,
+    fontWeight: 600,
+    fontFamily: 'var(--font)',
+    textColor: '#111318',
+    textShadow: 'none',
+    pillBackground: 'linear-gradient(180deg, #ffffff 0%, #f3f4f8 55%, #e4e7ee 100%)',
+    rimPalette: 'linear-gradient(90deg, #00d4fe, #1f87e6, #113cf3, #722df4, #e63bd8, #f79319)',
+    paddingX: 28,
+    rim: 2,
+    metalShiftRed: 0.18,
+    metalShiftBlue: 0.18,
+};
+
+const ctaCompactOptions = {
+    height: 43,
+    fontSize: 15,
+    paddingX: 24,
+};
+
 const PRESETS = {
     hero: { base: heroDesktopOptions, compact: heroCompactOptions },
+    cta: { base: ctaDesktopOptions, compact: ctaCompactOptions },
     compact: { base: compactDesktopOptions, compact: compactCompactOptions },
 };
 
@@ -92,8 +119,9 @@ const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
 /**
  * Mount (or remount) a Liquid Metal button into `selector`.
  * @param {string} selector   CSS selector for the mount target, re-queried fresh every call.
- * @param {'hero'|'compact'} preset  'hero' = the splash-screen size; 'compact' = every other
- *                                    instance (header pill, in-content secondary CTAs).
+ * @param {'hero'|'cta'|'compact'} preset  'hero' = the splash-screen standalone size; 'cta' = an
+ *                                    in-card single-action button (home next-step, upgrade CTA);
+ *                                    'compact' = smaller still (header pill, secondary in-card CTAs).
  * @param {object} overrides   Per-call options merged over the preset — label/onClick/icon/etc.
  *                             Remembered so a later breakpoint-change remount reuses them.
  * @returns {Promise<{el:HTMLElement,button:HTMLButtonElement,destroy:Function}|null>}

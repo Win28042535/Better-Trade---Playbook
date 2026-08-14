@@ -293,7 +293,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
   .q-opt:hover{border-color:var(--line-strong);transform:translateY(-1px);}
   .int-opt:hover{border-color:var(--line-strong);transform:translateY(-1px);}
   .tab-item:hover{color:var(--ink);}
-  .dd-tab:hover{border-color:var(--line-strong);color:var(--ink);}
+  .bt-tabs--secondary .bt-tab:hover{border-color:var(--line-strong);color:var(--ink);}
   .pcv-btn:hover{border-color:var(--line-strong);transform:translateY(-1px);}
   .pcv-btn:hover svg{transform:scale(1.1);}
 }
@@ -313,9 +313,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 @keyframes revealPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.08);opacity:.72;}}
 @media(prefers-reduced-motion:reduce){.reveal-icon.analyzing svg,.reveal-spin{animation:none!important;}}
 .consent-kicker{font-family:var(--font);font-size:var(--fs-eyebrow);letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:22px;}
-.consent-h{font-size:36px;font-weight:var(--w-label);letter-spacing:-0.01em;line-height:1.06;margin-bottom:16px;}
-.consent-h .ch-1{display:block;color:var(--ink);}
-.consent-h .ch-2{display:block;color:var(--muted);}
+/* Same 2-weight device as .q-title (see the comment there) — ch-1 (the statement itself) at 500,
+   ch-2 (the trailing "...is coming"/"...for you" continuation) at 700, so the two lines read as one
+   composed thought instead of one flat weight. */
+.consent-h{font-size:36px;letter-spacing:-0.01em;line-height:1.06;margin-bottom:16px;}
+.consent-h .ch-1{display:block;color:var(--ink);font-weight:var(--w-head);}
+.consent-h .ch-2{display:block;color:var(--muted);font-weight:var(--w-label);}
 .consent-p{font-size:var(--fs-body);font-weight:var(--w-body);color:var(--muted);line-height:1.65;max-width:280px;margin:0 auto;}
 .round-cards{display:flex;gap:10px;width:100%;margin:32px 0 4px;}
 .round-card{flex:1;border:1px solid var(--line-soft);border-radius:var(--r2);padding:16px 12px;background:var(--white);}
@@ -525,12 +528,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .alloc-l{flex:1;color:var(--ink);}
 .alloc-p{font-family:var(--serif);color:var(--ink);}
 
-/* deep-dive summary — asset tabs + tailored bullet list for the advisor conversation */
-.dd-tablist{display:flex;gap:var(--sp-list);overflow-x:auto;padding:2px 0 12px;scrollbar-width:none;}
+/* deep-dive summary — asset tabs (now .bt-tabs.bt-tabs--secondary, see the BT-TABS block above) +
+   tailored bullet list for the advisor conversation. .dd-tablist is just the horizontal-scroll
+   modifier — up to 4 asset names can be longer than this card is wide, so this scrolls instead of
+   wrapping (bt-tabs--secondary's own default) or shrinking every tab to fit. */
+.dd-tablist{flex-wrap:nowrap;overflow-x:auto;padding-bottom:12px;scrollbar-width:none;}
 .dd-tablist::-webkit-scrollbar{display:none;}
-.dd-tab{flex-shrink:0;display:inline-flex;align-items:center;gap:var(--sp-glue);padding:8px 14px;border-radius:var(--rpill);border:1px solid var(--line-soft);background:var(--white);font-family:var(--font);font-size:var(--fs-label);color:var(--muted);cursor:pointer;white-space:nowrap;transition:border-color .18s,color .18s;}
-.dd-tab svg{width:var(--ic-sm);height:var(--ic-sm);}
-.dd-tab.on{border-color:var(--ink);color:var(--ink);font-weight:var(--w-label);}
+.dd-tablist .bt-tab{flex:0 0 auto;}
 .dd-panel{padding-top:4px;}
 .dd-li{display:flex;align-items:flex-start;gap:var(--sp-inline);font-size:var(--fs-bodysm);color:var(--ink);line-height:1.55;margin-bottom:10px;}
 .dd-li svg{width:var(--ic-sm);height:var(--ic-sm);flex-shrink:0;margin-top:2px;color:var(--violet);}
@@ -646,14 +650,20 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    its own label, it doesn't stretch to fill a flex track the way the old <button width:100%> did,
    so on mobile it just centers on its own line instead of spanning edge-to-edge. */
 .ns-cta-slot{position:relative;z-index:1;flex:0 0 auto;}
-:root[data-view="mobile"] .ns-cta-slot{width:100%;display:flex;justify-content:center;}
+/* Right-aligned, not centered — scoped to .next-step specifically so the post-event upgrade CTA
+   (.pe-cta-slot, which reuses .ns-cta-slot's base rule above but lives in a different section)
+   keeps its own layout untouched. */
+:root[data-view="mobile"] .next-step .ns-cta-slot{width:100%;display:flex;justify-content:flex-end;}
 .home-counters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
 .hc-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:14px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;text-align:left;font-family:var(--font);}
 .hc-card svg{width:var(--ic-md);height:var(--ic-md);}
 .hc-val{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);line-height:1.2;font-family:var(--font);}
 .hc-label{font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);line-height:1.35;}
 .book-teaser{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:16px;grid-template-columns:44px 1fr auto;}
-.bt-ic{width:44px;height:44px;flex:0 0 auto;border-radius:13px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--ink);}
+/* Was flat neutral gray (var(--accent)/var(--ink)) like a plain UI-chrome icon — the book teaser
+   is a real content shortcut (same "your guide/identity" idea as the Home pass-card and profile
+   tier badge), so it gets the same violet tint those already use instead of reading as generic. */
+.bt-ic{width:44px;height:44px;flex:0 0 auto;border-radius:13px;background:color-mix(in srgb,var(--violet) 12%,transparent);display:flex;align-items:center;justify-content:center;color:var(--violet);}
 .bt-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
 .bt-t{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);line-height:1.25;}
 .bt-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:2px;}
@@ -663,9 +673,46 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .hcard-hd svg{width:var(--ic-md);height:var(--ic-md);flex-shrink:0;color:var(--violet);}
 .hcard-t{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);letter-spacing:0;}
 .hcard-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.5;margin-top:3px;}
-.ag-seg{display:flex;gap:8px;margin-bottom:6px;}
-.ag-seg button{flex:1;border:1px solid var(--line-soft);background:var(--white);color:var(--muted);font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-head);min-height:40px;border-radius:var(--r1);cursor:pointer;transition:color .15s,border-color .15s,background .15s;}
-.ag-seg button.on{background:var(--ink);color:var(--cloud);border-color:var(--ink);}
+/* ══ BT-TABS ══ generic accessible tab component (bt- prefix, per direction, to avoid clashing
+   with this file's own many single-purpose classes) — role=tablist/tab, full keyboard nav, whole-
+   group + per-tab disable, optional icon, CSS-only tooltip, light/dark, responsive. Two variants:
+   --primary (underline, for a page-level section switcher) and --secondary (pill/compact, matching
+   what .ag-seg/.dd-tab already looked like before this pass — used for both real in-card tab groups
+   in this app: the agenda day-selector below, and ddTabs()'s asset drilldown). Behavior lives in
+   initBtTabs() near the bottom of the script; markup/ARIA state is plain HTML attributes, not a
+   framework, so it works with this file's own render()-replaces-innerHTML pattern. */
+.bt-tabs{display:flex;gap:8px;}
+.bt-tabs[aria-disabled="true"]{opacity:.5;pointer-events:none;}
+.bt-tab{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font);cursor:pointer;background:none;border:none;color:var(--muted);white-space:nowrap;-webkit-tap-highlight-color:transparent;}
+.bt-tab:disabled,.bt-tab[aria-disabled="true"]{opacity:.45;cursor:not-allowed;}
+.bt-tab-icon{display:inline-flex;flex:0 0 auto;}
+.bt-tab-icon svg{width:16px;height:16px;}
+.bt-tab:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px;}
+/* --primary: underline active state, for a page-level section switcher (not used by either of
+   this app's two real instances yet, both of which matched the pill look — kept in the toolkit
+   since the brief explicitly asked for both variants to exist). */
+.bt-tabs--primary{border-bottom:1px solid var(--line-soft);gap:20px;}
+.bt-tabs--primary .bt-tab{padding:10px 1px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border-bottom:2px solid transparent;margin-bottom:-1px;}
+.bt-tabs--primary .bt-tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:var(--w-label);}
+@media(max-width:420px){.bt-tabs--primary{overflow-x:auto;scrollbar-width:none;}.bt-tabs--primary::-webkit-scrollbar{display:none;}}
+/* --secondary: compact/pill active state */
+.bt-tabs--secondary{flex-wrap:wrap;}
+.bt-tabs--secondary .bt-tab{flex:1;padding:9px 14px;min-height:40px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border:1px solid var(--line-soft);border-radius:var(--r1);background:var(--white);transition:color .15s,border-color .15s,background .15s;}
+.bt-tabs--secondary .bt-tab[aria-selected="true"]{background:var(--ink);color:var(--cloud);border-color:var(--ink);}
+/* data-tooltip — CSS-only, no JS beyond what initBtTabs already wires for focus */
+.bt-tab[data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--ink);color:var(--cloud);font-size:11px;font-weight:var(--w-body);padding:5px 9px;border-radius:6px;white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .15s,transform .15s;pointer-events:none;z-index:20;}
+.bt-tab[data-tooltip]:hover::after,.bt-tab[data-tooltip]:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
+/* This app has no other dark-theme surface (no data-theme toggle exists elsewhere), so this is a
+   self-contained prefers-color-scheme block scoped to just this component, satisfying the "light +
+   dark" requirement without retrofitting the rest of the app's color system. */
+@media(prefers-color-scheme:dark){
+  .bt-tabs--secondary .bt-tab{background:#1c1e24;border-color:#33363f;color:#9096a3;}
+  .bt-tabs--secondary .bt-tab[aria-selected="true"]{background:#f4f1e9;color:#111318;border-color:#f4f1e9;}
+  .bt-tabs--primary{border-bottom-color:#33363f;}
+  .bt-tabs--primary .bt-tab{color:#9096a3;}
+  .bt-tabs--primary .bt-tab[aria-selected="true"]{color:#f4f1e9;border-bottom-color:#f4f1e9;}
+  .bt-tab[data-tooltip]::after{background:#f4f1e9;color:#111318;}
+}
 .ag-row{display:flex;gap:13px;padding:13px 0;border-bottom:1px solid var(--line-soft);}
 .ag-row:last-child{border-bottom:none;}
 .ag-time{flex:0 0 auto;width:52px;font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--violet);line-height:1.45;font-family:var(--font);}
@@ -1629,6 +1676,57 @@ var RESULT=null;
 var root=document.getElementById('root');
 function ic(id,cls){return '<svg viewBox="0 0 24 24" class="lucide'+(cls?' '+cls:'')+'"><use href="#'+id+'"/></svg>';}
 
+/* ══ BT-TABS (behavior) ══ generic tablist engine — ARIA state, full keyboard nav (ArrowLeft/
+   ArrowRight/Home/End, skipping disabled tabs), click-to-select, whole-group disable via
+   aria-disabled="true" on the tablist itself, per-tab disable via the `disabled` attribute.
+   Deliberately does NOT assume a fixed tab→panel mapping — this app's two real instances need
+   different side-effects on selection (the agenda day-selector re-renders the whole screen with
+   different data; the asset drilldown just toggles a local panel's visibility), so selection just
+   calls back via onSelect(value, tabEl) and the caller owns what happens next — same division of
+   responsibility as this file's other local-repaint helpers (togSide, paintInterests). Safe to
+   call again on a tablist it's already wired (e.g. a re-render that rebuilds the same DOM node
+   fresh) since it's keyed off the live element, not a one-time global flag. */
+function initBtTabs(tablist,onSelect){
+  if(!tablist)return;
+  var getTabs=function(){return Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));};
+  var isDisabled=function(t){return t.disabled||t.getAttribute('aria-disabled')==='true';};
+  var groupDisabled=function(){return tablist.getAttribute('aria-disabled')==='true';};
+  var select=function(tab,focus){
+    if(groupDisabled()||isDisabled(tab))return;
+    getTabs().forEach(function(t){
+      var sel=(t===tab);
+      t.setAttribute('aria-selected',sel?'true':'false');
+      t.tabIndex=sel?0:-1;
+    });
+    if(focus!==false)tab.focus();
+    if(onSelect)onSelect(tab.dataset.value,tab);
+  };
+  tablist.onclick=function(e){
+    var tab=e.target.closest('[role="tab"]');
+    if(!tab||!tablist.contains(tab))return;
+    select(tab);
+  };
+  tablist.onkeydown=function(e){
+    if(groupDisabled())return;
+    var keys=['ArrowLeft','ArrowRight','Home','End'];
+    if(keys.indexOf(e.key)<0)return;
+    var tabs=getTabs(),enabled=tabs.filter(function(t){return !isDisabled(t);});
+    if(!enabled.length)return;
+    var active=document.activeElement,cur=enabled.indexOf(active)>-1?active:tabs.filter(function(t){return t.getAttribute('aria-selected')==='true';})[0];
+    var pos=enabled.indexOf(cur),next=null;
+    if(e.key==='ArrowLeft')next=enabled[pos<=0?enabled.length-1:pos-1];
+    else if(e.key==='ArrowRight')next=enabled[(pos<0||pos>=enabled.length-1)?0:pos+1];
+    else if(e.key==='Home')next=enabled[0];
+    else if(e.key==='End')next=enabled[enabled.length-1];
+    if(next){e.preventDefault();select(next);}
+  };
+  // tabIndex pass — only the selected enabled tab (or the first enabled one, if markup didn't
+  // pre-select any) is in the natural tab order; every other tab is reachable via arrow keys only.
+  var tabs=getTabs(),preSelected=tabs.filter(function(t){return t.getAttribute('aria-selected')==='true';});
+  tabs.forEach(function(t){t.tabIndex=(t.getAttribute('aria-selected')==='true')?0:-1;});
+  if(!preSelected.length){var firstEnabled=tabs.filter(function(t){return !isDisabled(t);})[0];if(firstEnabled)firstEnabled.tabIndex=0;}
+}
+
 /* --- CTA comet: SVG stroke drawn on the button's own rounded-rect outline (see the .spec-bd comment
    in the stylesheet for why this replaced the earlier offset-path+blob approach) ---
    ensureCometSVG lazily injects one <svg class="spec-comet"><path/></svg> as each .spec-bd's first
@@ -1947,7 +2045,7 @@ function renderBook(){
   var tocs=root.querySelectorAll('.toc-p');tocs.forEach(function(p){p.onclick=function(){tocs.forEach(function(x){x.classList.remove('active');});p.classList.add('active');var target=root.querySelector('#'+p.dataset.jump);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});};});
   root.querySelectorAll('#shareCardBtn,#shareTomorrowBtn').forEach(function(b){b.onclick=openShare;});
   bindViewer();
-  root.querySelectorAll('.dd-tab').forEach(function(t){t.onclick=function(){var i=t.dataset.dd;root.querySelectorAll('.dd-tab').forEach(function(x){x.classList.toggle('on',x===t);});root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===i)?'':'none';});};});
+  initBtTabs(root.querySelector('#ddTabs'),function(value){root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===value)?'':'none';});});
   mountHeaderQR();
 }
 /* ── App shell: shared bottom tab bar across the 5 companion-app screens (home/book/passport/games/
@@ -1976,7 +2074,7 @@ function allocBars(){
 }
 function ddTabs(h){
   var tabs=h.assets.slice(0,4);
-  var tablist=tabs.map(function(a,i){return '<button class="dd-tab'+(i===0?' on':'')+'" data-dd="'+i+'">'+ic(a.icon)+a.t+'</button>';}).join('');
+  var tablist=tabs.map(function(a,i){return '<button class="bt-tab" type="button" role="tab" aria-selected="'+(i===0?'true':'false')+'" data-value="'+i+'"><span class="bt-tab-icon">'+ic(a.icon)+'</span><span class="bt-tab-label">'+a.t+'</span></button>';}).join('');
   var panels=tabs.map(function(a,i){
     return '<div class="dd-panel" data-ddp="'+i+'"'+(i===0?'':' style="display:none"')+'>'+
       '<div class="dd-li">'+ic('lc-check')+a.t+' เข้ากับจุดแกร่งของ '+h.th+' — เป็นสินทรัพย์ที่คุณน่าจะเข้าใจได้เร็ว</div>'+
@@ -1985,7 +2083,7 @@ function ddTabs(h){
       '<div class="dd-note">* เนื้อหาตัวอย่าง — ฉบับสมบูรณ์จะปรับตามพฤติกรรมจริงของคุณในงาน</div>'+
     '</div>';
   }).join('');
-  return '<div class="dd-tablist">'+tablist+'</div>'+panels;
+  return '<div class="bt-tabs bt-tabs--secondary dd-tablist" id="ddTabs" role="tablist" aria-label="เลือกสินทรัพย์ที่จะดูรายละเอียด">'+tablist+'</div>'+panels;
 }
 function confRow(l,v){return '<div class="conf-row"><span class="conf-rl">'+l+'</span><div class="conf-tr"><div class="conf-fi" style="width:'+(v/20*100)+'%"></div></div><span class="conf-vl">'+v+'</span></div>';}
 /* ══ SHARE MODAL (logic) ══ "แชร์ภาพการ์ด"/"แชร์พรุ่งนี้ของคุณ" both open this bottom-sheet share
@@ -2175,7 +2273,9 @@ function bindPostEvent(){
   // silently doing nothing.
   root.querySelectorAll('[data-pe-dl]').forEach(function(b){b.onclick=function(){b.innerHTML=ic('lc-check-circle')+'<span>บันทึกแล้ว (ตัวอย่าง)</span>';b.disabled=true;};});
   if(!window.mountLiquidMetalButtonInto)return;
-  window.mountLiquidMetalButtonInto('#pe-cta-slot','compact',{label:s.cta.primary,icon:ic('lc-sparkles'),onClick:function(){st.phase='profile';render();}});
+  // 'cta' preset — this upgrade button is the section's one real action, same tier as home's
+  // next-step CTA, not the smaller 'compact' size used for the header pill.
+  window.mountLiquidMetalButtonInto('#pe-cta-slot','cta',{label:s.cta.primary,icon:ic('lc-sparkles'),onClick:function(){st.phase='profile';render();}});
 }
 /* "ขั้นต่อไปของคุณ" — the source's single-card funnel that surfaces ONE next action from event state.
    This prototype only tracks "has identity" (a computed RESULT), so it collapses the source's 7-state
@@ -2229,11 +2329,11 @@ function mountHeaderQR(){
   if(!window.mountLiquidMetalButtonInto)return;
   window.mountLiquidMetalButtonInto('#qr-cta-slot','compact',{label:'สแกน QR',icon:ic('lc-qr-code'),onClick:function(){openScan(null,null);}});
 }
-/* Home's "ขั้นต่อไป" card CTA — was a plain .btn-primary, now the same Liquid Metal treatment as
-   the splash hero button, just at the 'compact' size (see js/liquid-metal-cta.js's PRESETS). */
+/* Home's "ขั้นต่อไป" card CTA — the ONE next action on the whole home screen, so it gets the 'cta'
+   preset (bigger than the header pill's 'compact') rather than blending in as a minor button. */
 function mountHomeNsCta(ns){
   if(!window.mountLiquidMetalButtonInto)return;
-  window.mountLiquidMetalButtonInto('#ns-cta-slot','compact',{label:ns.cta,icon:ic('lc-arrow-right'),onClick:ns.go});
+  window.mountLiquidMetalButtonInto('#ns-cta-slot','cta',{label:ns.cta,icon:ic('lc-arrow-right'),onClick:ns.go});
 }
 /* Games' "เล่นเกมนี้ต่อ" card CTA — same treatment/preset as mountHomeNsCta above. Only exists
    when a next-up game is left to play (nextIdx>=0); once all 6 are played the card itself (and
@@ -2262,7 +2362,7 @@ function renderHome(){
     '<div class="home-counters">'+HOME_COUNTERS.map(function(c){return '<button class="hc-card" data-go="'+c.go+'"><svg viewBox="0 0 24 24" class="lucide" style="color:'+c.color+'"><use href="#'+c.icon+'"/></svg><div class="hc-val">'+c.val+'</div><div class="hc-label">'+c.label+'</div></button>';}).join('')+'</div>'+
     '<div class="list-row book-teaser" id="homeBook"><div class="bt-ic">'+ic('lc-book-open')+'</div><div class="klib-tx"><div class="bt-t">คู่มือลงทุนของคุณ</div><div class="bt-s">'+bookTeaser+'</div></div>'+ic('lc-chevron-right','bt-cv')+'</div>'+
     '<section class="home-card"><div class="hcard-hd"><div class="hcard-t">เวทีห้องใหญ่</div><div class="hcard-s">09.00–18.30 น. · Samyan Mitrtown ชั้น 5 · เวทีเดียว 2 วัน กำหนดการคนละชุด</div></div>'+
-      '<div class="ag-seg"><button class="'+(HOME_MST.agendaDay===1?'on':'')+'" data-day="1">วันที่ 1 · 31 ต.ค.</button><button class="'+(HOME_MST.agendaDay===2?'on':'')+'" data-day="2">วันที่ 2 · 1 พ.ย.</button></div>'+
+      '<div class="bt-tabs bt-tabs--secondary" id="agTabs" role="tablist" aria-label="เลือกวันที่กำหนดการ"><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===1?'true':'false')+'" data-value="1"><span class="bt-tab-label">วันที่ 1 ✦ 31 ต.ค.</span></button><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===2?'true':'false')+'" data-value="2"><span class="bt-tab-label">วันที่ 2 ✦ 1 พ.ย.</span></button></div>'+
       '<div class="ag-list">'+shown.map(function(a){return '<div class="ag-row"><div class="ag-time">'+a.time+'</div><div><div class="ag-t">'+a.t+'</div>'+(a.by?'<div class="ag-by">'+a.by+'</div>':'')+'</div></div>';}).join('')+'</div>'+
       (days.length>3?('<button class="ag-more" id="agMore">'+ic(HOME_MST.agendaAll?'lc-chevron-down':'lc-chevron-down')+(HOME_MST.agendaAll?'ย่อกำหนดการ':('ดูกำหนดการทั้งวัน '+days.length+' รายการ'))+'</button>'):'')+
     '</section>'+
@@ -2277,7 +2377,13 @@ function renderHome(){
   root.querySelector('#homeBook').onclick=function(){st.phase='book';render();};
   root.querySelector('#homeTier').onclick=function(){st.phase='profile';render();};
   root.querySelectorAll('.hc-card').forEach(function(c){c.onclick=function(){st.phase=c.dataset.go;render();};});
-  root.querySelectorAll('.ag-seg button').forEach(function(b){b.onclick=function(){HOME_MST.agendaDay=parseInt(b.dataset.day,10);HOME_MST.agendaAll=false;renderHome();};});
+  initBtTabs(root.querySelector('#agTabs'),function(value){
+    HOME_MST.agendaDay=parseInt(value,10);HOME_MST.agendaAll=false;renderHome();
+    // renderHome() replaces #agTabs wholesale (unlike ddTabs' local-repaint case below), which
+    // detaches the tab initBtTabs just focused — refocus its replacement so keyboard users don't
+    // silently lose their place after an arrow-key day switch.
+    var fresh=root.querySelector('#agTabs [aria-selected="true"]');if(fresh)fresh.focus();
+  });
   var agMore=root.querySelector('#agMore');if(agMore)agMore.onclick=function(){HOME_MST.agendaAll=!HOME_MST.agendaAll;renderHome();};
   mountHeaderQR();
   mountHomeNsCta(ns);

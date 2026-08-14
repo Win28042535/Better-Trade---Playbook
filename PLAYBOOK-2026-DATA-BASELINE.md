@@ -199,14 +199,23 @@ there's no embedded base64 media in this particular export). To re-extract:
 This project has no separate DESIGN.md; component sizing decisions get recorded here as they're
 made, so later work reuses the same numbers instead of guessing a new one per instance.
 
-**Hero CTA** (the splash screen's Liquid Metal button, `js/liquid-metal-cta.js`) — ported verbatim
-from `liquid-metal-button-kit/README.md`'s own spec:
+Liquid Metal buttons (`js/liquid-metal-cta.js`'s `PRESETS`) come in three sizes — pick by how much
+weight the action actually carries, not by which screen it's on:
+
+**hero** (the splash screen's standalone CTA) — ported verbatim from
+`liquid-metal-button-kit/README.md`'s own spec:
 - Desktop: height 56px · font-size 20px · paddingX 48px
 - Mobile ≤575px: height 49px · font-size 18px · paddingX 42px
 
-**Header-pill CTA** (`.tb-pill` — "สแกน QR", "PDF"; inline in a topbar, not a screen's main action,
-so deliberately smaller than the hero CTA above):
-- height 38px · padding 0 16px · font-size `var(--fs-bodysm)` (14px)
-- Uses the existing `.spec-bd`/`.spec-bd-dark` comet-ring border (see `dna-quiz-flow.html`'s CSS
-  comment above `.spec-bd`) rather than the Liquid Metal shader — a header pill doesn't carry
-  enough visual weight to justify a second concurrent WebGL context per screen.
+**cta** (a genuine single-action button that lives inside a card, not standing alone like the hero
+— home's "ขั้นต่อไป" next-step, the post-event "อัปเกรดเป็น Ultimate" upgrade button):
+- Desktop: height 46px · font-size 16px · paddingX 28px
+- Mobile ≤575px: height 43px · font-size 15px · paddingX 24px
+
+**compact** (smaller still — the header "สแกน QR" pill, and secondary in-card actions like games'
+"เล่นเกมนี้ต่อ"):
+- Desktop: height 40px · font-size 15px · paddingX 22px
+- Mobile ≤575px: height 38px · font-size 14px · paddingX 18px
+
+All three share the same rim spectrum palette and pill background so every Liquid Metal button in
+the app reads as one family, just at three sizes.
