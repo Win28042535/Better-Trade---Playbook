@@ -418,10 +418,20 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .ast-chips{display:flex;flex-wrap:wrap;gap:9px;}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:9px 15px;border-radius:var(--rpill);border:1.5px solid;font-size:var(--fs-bodysm);font-weight:var(--w-label);background:var(--white);}
 .chip svg{width:var(--ic-sm);height:var(--ic-sm);}
-.hero-leg{display:flex;align-items:center;gap:var(--sp-inline);margin-top:16px;padding-top:15px;border-top:1px solid var(--line-soft);font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);}
+/* Was a single flex row mixing raw text runs with 2 inline spans (dot/.ld + name/.ln) — a flex
+   container wraps each direct text-node run into its OWN anonymous flex item, so "แรงบันดาลใจจาก",
+   the name, and the "— why" clause each became separate narrow items that wrapped independently
+   ("แรงบันดาลใจ"/"จาก" splitting mid-word, the name stranded alone) — read as "broken/half-built"
+   per direction. Rebuilt as an explicit label-then-sentence block: one small eyebrow caption
+   ("แรงบันดาลใจจาก") on its own line, then the name+why as ONE real paragraph underneath — a
+   single wrapping unit instead of several competing ones. */
+.hero-leg{display:flex;align-items:flex-start;gap:10px;margin-top:16px;padding-top:15px;border-top:1px solid var(--line-soft);}
+.hero-leg-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:8px;}
+.hero-leg-lbl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.hero-leg-txt{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.55;}
 .ld{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .ln{font-family:var(--serif);font-weight:600;color:var(--ink);}
-.hero-acts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.hero-acts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;justify-content:flex-end;}
 .hero-note{margin-top:12px;display:flex;align-items:flex-start;gap:var(--sp-inline);padding:9px 11px;border-radius:var(--r1);background:var(--accent);font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);line-height:1.6;}
 .hero-note svg{width:var(--ic-sm);height:var(--ic-sm);flex-shrink:0;margin-top:1px;}
 /* PRE/POST-EVENT TABS — in-card picker inside the hero card itself (see evoCompute/evoPanelHTML
@@ -537,7 +547,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .int-sec-ic svg{width:var(--ic-sm);height:var(--ic-sm);}
 .int-sec-t{flex:1;font-size:var(--fs-bodysm);color:var(--muted);}
 .int-sec-row.picked .int-sec-t{color:var(--ink);font-weight:var(--w-label);}
-.int-sec-rank{font-family:var(--serif);font-size:var(--fs-bodysm);color:var(--line-strong);flex-shrink:0;}
+/* Rank digit only ever renders on a .picked row (see interestsHTML) so its resting color below is
+   moot in practice — kept for safety if that ever changes. Bumped from bodysm/serif-comma to a
+   bigger bold sans digit per direction ("no #, make the number stand out more"). */
+.int-sec-rank{font-family:var(--font);font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--line-strong);flex-shrink:0;line-height:1;}
 .int-sec-row.picked .int-sec-rank{color:var(--violet);}
 
 /* efin AI banner — static/decorative CTA, no real efin AI wiring exists yet (same stub precedent as the bottom tab bar) */
@@ -2088,8 +2101,12 @@ function radarSVG(vals,hue){
    below is a design estimate (like riskLevel/radar elsewhere in this file) even though its INPUTS
    are all real user actions — hence the .ex-tag on the rendered result, never claimed as a
    measured/validated behavioral score. */
-var EVO_REP={G:'guardian',N:'planner',V:'maverick'}; // one flagship persona per family, this
-  // build's own pick (not sourced from the PDF) for "what a full family-shift lands on".
+/* G and V point at the 2 personas with REAL photographed card art (diamondhand/waverider) instead
+   of a CSS-mockup flagship — since evoCompute() below can only ever resolve a shift to G or V
+   (risk gap is a 1-axis signal; N has no natural "more/less risk than declared" direction), every
+   'evolved' result now lands on real art, never a mockup, on the post-event side. N keeps its
+   mockup rep since no N-family persona has real art yet. */
+var EVO_REP={G:'diamondhand',N:'planner',V:'waverider'};
 /* v2 — ties the family-shift decision to ONE real signal only (r.gap, compute()'s own declared-
    vs-revealed risk gap) instead of a multi-signal weighted tally. The earlier version anchored the
    declared family with a flat +20 that no combination of other bonuses could ever mathematically
@@ -2204,7 +2221,7 @@ function renderBook(){
       '</div>'+
       '<div class="hero-ev-panel" id="heroEvPost"'+(defaultTab==='post'?'':' style="display:none"')+'>'+evoPanelHTML(ev,r)+'</div>'+
       redeemCard+
-      '<div class="hero-leg"><span class="ld" style="background:'+h.accent+'"></span>แรงบันดาลใจจาก&nbsp;<span class="ln">'+h.legend+'</span>&thinsp;—&thinsp;'+h.legendWhy+'</div>'+
+      '<div class="hero-leg"><span class="hero-leg-dot" style="background:'+h.accent+'"></span><div><div class="hero-leg-lbl">แรงบันดาลใจจาก</div><div class="hero-leg-txt"><span class="ln">'+h.legend+'</span> — '+h.legendWhy+'</div></div></div>'+
       '<div class="hero-acts"><button class="btn btn-secondary" id="shareCardBtn">'+ic('lc-upload')+'แชร์ภาพการ์ด</button></div>'+
       '<div class="hero-note">'+ic('lc-info')+'ตัวตนนี้สรุปจากคำตอบ DNA Quiz ของคุณ — ยิ่งทำกิจกรรมในงานครบ ยิ่งแม่นขึ้น</div>'+
     '</div></div></section>'+
@@ -2424,7 +2441,7 @@ function interestsHTML(r){
   return '<div class="int-sec-list">'+S3_OPTS.map(function(o,i){
     var rank=picks.indexOf(i);
     var picked=rank>-1;
-    return '<div class="int-sec-row'+(picked?' picked':'')+'"><span class="int-sec-ic">'+ic(o.icon)+'</span><span class="int-sec-t">'+o.t+'</span>'+(picked?('<span class="int-sec-rank">#'+(rank+1)+'</span>'):'')+'</div>';
+    return '<div class="int-sec-row'+(picked?' picked':'')+'"><span class="int-sec-ic">'+ic(o.icon)+'</span><span class="int-sec-t">'+o.t+'</span>'+(picked?('<span class="int-sec-rank">'+(rank+1)+'</span>'):'')+'</div>';
   }).join('')+'</div>';
 }
 function routeStep(cls,n,t,d){var inner=cls==='done'?ic('lc-check'):n;return '<div class="list-row rs"><div class="rs-n '+cls+'">'+inner+'</div><div><div class="rs-t">'+t+'</div><div class="rs-d">'+d+'</div></div></div>';}
@@ -2989,11 +3006,22 @@ function applyView(){
 }
 window.addEventListener('resize',function(){if(DEMO.view==='auto')applyView();});
 
-/* synthesize a plausible RESULT for a forced persona and jump to the Book (demo shortcut) */
+/* synthesize a plausible RESULT for a forced persona and jump to the Book (demo shortcut).
+   gap:0 here used to mean the demo persona picker could NEVER show a real post-event difference —
+   evoCompute() only shifts family when |gap|>=2, so an always-aligned demo always rendered
+   'confirmed'/'gathering' (same card both tabs), which read as "the preview doesn't actually
+   change between before/after." Now simulates a real divergence (±4) in whichever direction moves
+   AWAY from the picked persona's own family, plus enough activity for evoCompute's evidence gate
+   (sig>=3) — so picking ANY of the 12 demo personas reliably lands on a genuine 'evolved' state,
+   and thanks to EVO_REP above, the post-event card is always real photographed art (diamondhand/
+   waverider), never the CSS mockup, on that side. */
 function forcePersona(key){
   var h=HEROES[key];
-  RESULT={hero:h,heroKey:key,declared:h.riskLevel,revealed:h.riskLevel,gap:0,conf:74,confLevel:'สูง — สอดคล้องดี',
+  var simGap=h.fam==='V'?-4:4;
+  RESULT={hero:h,heroKey:key,declared:h.riskLevel,revealed:Math.max(1,Math.min(10,h.riskLevel+simGap)),gap:simGap,
+    conf:74,confLevel:'สูง — สอดคล้องดี',
     subs:{identity:16,behavior:16,riskAlign:18,discipline:15},knowledge:'intermediate',horizon:'mid',votes:{},interests:[0,2,4]};
+  GAME_PLAYED={0:true,1:true,2:true,3:true};BOOTH_CHK={0:new Set([0])};BOOTH_ACT={0:true};
   st.phase='book';stopSplashTimer();render();
 }
 
