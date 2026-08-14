@@ -358,12 +358,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .tab-item svg{width:var(--ic-lg);height:var(--ic-lg);}
 .tab-item span{font-size:var(--fs-label);font-weight:var(--w-label);}
 .tab-item.active{color:var(--violet);}
-.toc{display:flex;gap:7px;overflow-x:auto;padding:12px 16px 4px;scrollbar-width:none;flex-shrink:0;}
+.toc{display:flex;flex-wrap:nowrap;gap:7px;overflow-x:auto;padding:12px 16px 4px;scrollbar-width:none;flex-shrink:0;}
+.toc .bt-tab{flex:0 0 auto;}
 .toc::-webkit-scrollbar{display:none;}
-/* TOC jump-nav is .bt-tabs.bt-tabs--primary (underline) — this is a page-level section switcher
-   sitting right under the header, the same role as tab-display.html's own "Default" primary demo,
-   not a small in-card choice like the agenda/asset-drilldown/scan-mode pickers (those stay
-   --secondary pills). Not a real ARIA tablist (clicking one doesn't hide the others' content, it
+/* TOC jump-nav is .bt-tabs.bt-tabs--secondary (pill) — per direction, swapped with the in-card
+   pickers below: the page-level section switcher (TOC) now reads as pills, while the small
+   in-card choices (agenda/asset-drilldown/scan-mode/hero-ev-tabs pickers) now use --primary
+   (underline) instead. Not a real ARIA tablist (clicking one doesn't hide the others' content, it
    just scrolls to an already-visible section), so it keeps plain buttons with aria-selected
    toggled by hand instead of the full initBtTabs wiring. */
 .prog-wrap{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:14px 16px;position:relative;overflow:hidden;}
@@ -425,6 +426,43 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .hero-acts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
 .hero-note{margin-top:12px;display:flex;align-items:flex-start;gap:var(--sp-inline);padding:9px 11px;border-radius:var(--r1);background:var(--accent);font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);line-height:1.6;}
 .hero-note svg{width:var(--ic-sm);height:var(--ic-sm);flex-shrink:0;margin-top:1px;}
+/* PRE/POST-EVENT TABS — in-card picker inside the hero card itself (see evoCompute/evoPanelHTML
+   near renderBook). --primary per the system-wide swap (TOC now pills, in-card pickers now
+   underline); margin-bottom pulls it snug against the panel content below since fam-badge above
+   already carries the section's own top spacing. */
+.hero-ev-tabs{margin:0 0 18px;}
+.ev-empty{text-align:center;padding:26px 14px;border:1px dashed var(--line-strong);border-radius:var(--r1);}
+.ev-empty-ic{width:44px;height:44px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+.ev-empty-ic svg{width:var(--ic-md);height:var(--ic-md);color:var(--muted);}
+.ev-empty-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);margin-bottom:6px;}
+.ev-empty-s{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.55;max-width:34ch;margin:0 auto 16px;}
+.ev-badge{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:.03em;padding:6px 12px;border-radius:var(--rpill);margin-bottom:12px;}
+.ev-badge svg{width:var(--ic-sm);height:var(--ic-sm);}
+.ev-head{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);line-height:1.2;margin:0 0 6px;}
+.ev-sub{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.6;margin:0;}
+.ev-compare{margin:18px 0 6px;}
+.ev-cmp-lbl{font-family:var(--font);font-size:var(--fs-eyebrow);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:12px;}
+.ev-cmp-row{display:flex;flex-direction:column;align-items:center;gap:12px;}
+/* Card widths reuse the already-verified-safe tokens from elsewhere (fan-card 172/204, hero-
+   cardwrap 236/268) rather than a new invented size — a narrower one-off (tried 150px first) let
+   the CSS-mockup card's bottom-left description text overflow/wrap vertically down the card edge
+   at that width, since .pcE was only ever tuned against these two known sizes. */
+.ev-cmp-col{width:172px;text-align:center;}
+.ev-cmp-arrow{width:20px;height:20px;color:var(--violet);flex-shrink:0;transform:rotate(90deg);}
+.ev-cmp-tag{font-size:var(--fs-meta);font-weight:var(--w-head);color:var(--muted);margin-bottom:7px;}
+.ev-cmp-tag.hi{color:var(--violet);font-weight:var(--w-label);}
+.ev-cmp-name{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);margin-top:9px;}
+.ev-cmp-name.hi{color:var(--violet);font-weight:var(--w-label);}
+.ev-single{width:236px;margin:18px auto 6px;text-align:center;}
+:root[data-view="tablet"] .ev-cmp-col,:root[data-view="pc"] .ev-cmp-col{width:204px;}
+:root[data-view="tablet"] .ev-single,:root[data-view="pc"] .ev-single{width:268px;}
+.ev-ev-lbl{font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px;}
+.ev-evidence{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.ev-ev-row{display:flex;gap:8px;align-items:flex-start;font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--ink);line-height:1.5;}
+.ev-ev-row svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--cyan);flex-shrink:0;margin-top:2px;}
+.ev-remain{font-size:var(--fs-bodysm);color:#8a5a00;background:#fef4e2;border:1px solid #f3daa0;border-radius:var(--r1);padding:9px 11px;margin-bottom:10px;line-height:1.5;}
+:root[data-view="tablet"] .ev-cmp-row,:root[data-view="pc"] .ev-cmp-row{flex-direction:row;justify-content:center;}
+:root[data-view="tablet"] .ev-cmp-arrow,:root[data-view="pc"] .ev-cmp-arrow{transform:none;}
 /* แลกรับการ์ดตัวจริง — tier-gated like the post-event tracks (.pe-report/.pe-locked share this
    same on/locked pattern): Ultimate can redeem now, everything else sees what unlocks it. */
 .redeem-card{margin-top:16px;display:flex;gap:11px;align-items:flex-start;padding:13px 14px;border-radius:var(--r1);}
@@ -567,10 +605,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .alloc-l{flex:1;color:var(--ink);}
 .alloc-p{font-family:var(--serif);color:var(--ink);}
 
-/* deep-dive summary — asset tabs (now .bt-tabs.bt-tabs--secondary, see the BT-TABS block above) +
-   tailored bullet list for the advisor conversation. .dd-tablist is just the horizontal-scroll
-   modifier — up to 4 asset names can be longer than this card is wide, so this scrolls instead of
-   wrapping (bt-tabs--secondary's own default) or shrinking every tab to fit. */
+/* deep-dive summary — asset tabs (now .bt-tabs.bt-tabs--primary, swapped per direction — see the
+   BT-TABS block above) + tailored bullet list for the advisor conversation. .dd-tablist is just
+   the horizontal-scroll modifier — up to 4 asset names can be longer than this card is wide, so
+   this scrolls instead of wrapping or shrinking every tab to fit. */
 .dd-tablist{flex-wrap:nowrap;overflow-x:auto;padding-bottom:12px;scrollbar-width:none;}
 .dd-tablist::-webkit-scrollbar{display:none;}
 .dd-tablist .bt-tab{flex:0 0 auto;}
@@ -887,8 +925,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .scan-hd{padding-right:30px;margin-bottom:14px;}
 .scan-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);line-height:1.3;}
 .scan-s{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;}
-/* Scan-mode switcher is now .bt-tabs.bt-tabs--secondary (the same tab component used everywhere
-   else) — was its own bespoke .scan-tab pill-in-a-track, now one component system-wide. */
+/* Scan-mode switcher is .bt-tabs.bt-tabs--primary (swapped per direction, the same tab component
+   used everywhere else) — was its own bespoke .scan-tab pill-in-a-track, now one component
+   system-wide. */
 #scanTabs{margin-bottom:14px;}
 .scan-cam{position:relative;border-radius:16px;overflow:hidden;background:#111b25;height:168px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
 .scan-cam-frame{position:absolute;inset:14%;border-radius:14px;border:2px solid rgba(255,255,255,.28);}
@@ -1101,6 +1140,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .sp-logo{display:block;height:24px;width:auto;margin:0 auto 16px;opacity:.92;}
 .sp-hero-logo{display:block;width:min(84%,420px);height:auto;margin:2px auto 0;}
 .tb-logo{height:22px;width:auto;object-fit:contain;}
+.hd-logo{cursor:pointer;}
 .q-scroll{position:relative;z-index:1;}
 
 /* ══ COLLECTIBLE PERSONA CARD ══ full-bleed dark art · overlays · flip back
@@ -1948,7 +1988,11 @@ function renderReveal(){
   '<div class="consent reveal-scene fade" style="padding-top:88px">'+
     '<div class="reveal-icon analyzing">'+ic('lc-sparkles')+'<span class="reveal-spin"></span></div>'+
     '<div class="consent-kicker">กำลังวิเคราะห์คำตอบของคุณ</div>'+
-    '<div class="consent-h"><span class="ch-1">ตัวตนนักลงทุนของคุณ</span><span class="ch-2">กำลังจะปรากฏ&hellip;</span></div>'+
+    /* Per direction, this screen wants the OPPOSITE weight/color order from renderConsent's
+       "รู้จัก"/"ตัวคุณ" (which stays ch-1/ch-2 as-is) — top line 700/ink, bottom line 500/muted —
+       so the classes are swapped on the spans here rather than touching the shared .ch-1/.ch-2
+       CSS, which both screens read from. */
+    '<div class="consent-h"><span class="ch-2">ตัวตนนักลงทุนของคุณ</span><span class="ch-1">กำลังจะปรากฏ&hellip;</span></div>'+
   '</div>';
   root.querySelector('#rvBack').onclick=function(){st.idx=10;st.phase='quiz';render();};
   REVEALTIMER=setTimeout(function(){REVEALTIMER=null;st.phase='book';render();},3000);
@@ -2015,6 +2059,79 @@ function radarSVG(vals,hue){
     '<polygon class="rk-poly" points="'+poly+'" fill="rgba('+hue+',0.14)" stroke-linejoin="round"/>'+dots+labels+'</g></svg>';
 }
 
+/* ── PRE/POST-EVENT IDENTITY — merges the old standalone "hero card" (pure DNA Quiz result) with
+   a "สรุปให้คุณก่อนกลับ" post-event verdict into ONE hero-sec, switched by an in-card tab instead
+   of two separate scroll-stops, so a customer can flip between "what the quiz said" and "what you
+   actually did in the event" without leaving the card. Logic is adapted from Playbook Final's own
+   evoState machine (declared quiz persona vs a behavior-revealed persona, gated by evidence) —
+   simplified to this app's real signals: games played (gamesPlayedCount), booth check-ins/
+   activities (boothCheckinCount/boothActivityCount, defined further down — safe to reference here
+   since these are all function declarations, fully hoisted), interests picked, and the
+   declared-vs-revealed risk gap compute() already produces (r.gap). The family-weight FORMULA
+   below is a design estimate (like riskLevel/radar elsewhere in this file) even though its INPUTS
+   are all real user actions — hence the .ex-tag on the rendered result, never claimed as a
+   measured/validated behavioral score. */
+var EVO_REP={G:'guardian',N:'planner',V:'maverick'}; // one flagship persona per family, this
+  // build's own pick (not sourced from the PDF) for "what a full family-shift lands on".
+function evoCompute(r){
+  var hero=r.hero,heroKey=r.heroKey;
+  var played=gamesPlayedCount(),chk=boothCheckinCount(),act=boothActivityCount(),interests=(r.interests||[]).length;
+  var sig=[played>=1,chk>=1,act>=1,interests>=1,played>=4,(chk>=CHECKIN_NEED&&act>=ACTIVITY_NEED)].filter(Boolean).length;
+  var fs={G:0,N:0,V:0};fs[hero.fam]+=20;
+  if(r.gap>=2)fs.V+=18;else if(r.gap<=-2)fs.G+=18;else fs.N+=6;
+  if(played>=4)fs[hero.fam]+=6;
+  if(interests>=2)fs.N+=8;
+  var order=['G','N','V'].sort(function(a,b){return fs[b]-fs[a];});
+  var lead=fs[order[0]]-fs[order[1]];
+  var ready=played>=1&&sig>=3&&lead>10;
+  var behFam=ready?order[0]:hero.fam;
+  var behKey=(behFam===hero.fam)?heroKey:EVO_REP[behFam];
+  var diff=behKey!==heroKey;
+  // 'gathering' = played something but not enough signal/lead to conclude either way — distinct
+  // from 'confirmed' (enough evidence AND it lines up), so the copy doesn't overclaim early on.
+  var state=played===0?'building':(ready&&diff?'evolved':(ready&&!diff?'confirmed':(played>=1?'gathering':'confirmed')));
+  return {state:state,behKey:behKey,behHero:HEROES[behKey],diff:diff,sig:sig,remain:Math.max(0,3-sig),
+    played:played,chk:chk,act:act,interests:interests};
+}
+function evoEvidence(ev){
+  return [
+    ev.played>0?'เล่นเกมแล้ว '+ev.played+'/6 ด้าน':null,
+    ev.chk>0?'เช็คอินบูธ '+ev.chk+' จุด':null,
+    ev.act>0?'ร่วมกิจกรรมประจำบูธ '+ev.act+' บูธ':null,
+    ev.interests>0?'เลือกความสนใจไว้ '+ev.interests+' หมวด':null
+  ].filter(Boolean);
+}
+var EVO_CFG={
+  confirmed:function(hero){return {badge:'สิ่งที่ทำ ตรงกับที่บอก',bg:'#dff9de',fg:'#1f9b1a',icon:'lc-check-circle',
+    head:'ยืนยันตัวตนของคุณแล้ว',sub:'สิ่งที่คุณเล่นจริงในงานตรงกับตัวตนจาก DNA Quiz — '+hero.th+' คือคุณจริงๆ'};},
+  evolved:function(hero,beh){return {badge:'วันนี้มีอีกด้านของคุณเผยออกมา',bg:'#f0e9fd',fg:'#7c3aed',icon:'lc-sparkles',
+    head:'สิ่งที่คุณทำจริงชี้ไปที่อีกสไตล์',sub:'DNA Quiz บอกว่าคุณคือ '+hero.th+' แต่ตอนลงมือจริงคุณเผยด้าน '+beh.th+' ออกมา'};},
+  gathering:function(hero){return {badge:'กำลังเก็บข้อมูลจากในงาน',bg:'var(--accent)',fg:'var(--muted)',icon:'lc-refresh-cw',
+    head:'ข้อมูลยังไม่พอสรุป',sub:'เท่าที่เล่นมาตอนนี้ยังไปในทิศทางเดียวกับ '+hero.th+' — เล่น/เดินบูธเพิ่ม เราจะสรุปให้แม่นขึ้น'};}
+};
+function evoPanelHTML(ev,r){
+  if(ev.state==='building')
+    return '<div class="ev-empty"><div class="ev-empty-ic">'+ic('lc-hourglass')+'</div>'+
+      '<div class="ev-empty-t">ยังไม่มีข้อมูลจากในงาน</div>'+
+      '<div class="ev-empty-s">เล่นเกมและเดินบูธในงานก่อน แล้วค่อยกลับมาดูว่าตัวตนที่ "ทำจริง" ตรงกับที่ DNA Quiz บอกไหม</div>'+
+      '<button class="btn btn-primary" id="evGoGames">'+ic('lc-play-circle')+'ไปเล่นกิจกรรม</button></div>';
+  var cfg=EVO_CFG[ev.state](r.hero,ev.behHero);
+  var cardsHtml=ev.diff
+    ? '<div class="ev-compare"><div class="ev-cmp-lbl">เทียบก่อน–หลัง</div><div class="ev-cmp-row">'+
+        '<div class="ev-cmp-col"><div class="ev-cmp-tag">การ์ดใบแรก</div>'+pcStatic(r.heroKey)+'<div class="ev-cmp-name">'+r.hero.th+'</div></div>'+
+        ic('lc-arrow-right','ev-cmp-arrow')+
+        '<div class="ev-cmp-col"><div class="ev-cmp-tag hi">สรุปจบงาน</div>'+pcStatic(ev.behKey)+'<div class="ev-cmp-name hi">'+ev.behHero.th+'</div></div>'+
+      '</div></div>'
+    : '<div class="ev-single">'+pcStatic(ev.behKey)+'<div class="ev-cmp-name">'+ev.behHero.th+'</div></div>';
+  var evid=evoEvidence(ev);
+  return '<span class="ev-badge" style="background:'+cfg.bg+';color:'+cfg.fg+'">'+ic(cfg.icon)+cfg.badge+'</span>'+
+    '<h3 class="ev-head">'+cfg.head+'</h3><p class="ev-sub">'+cfg.sub+'</p>'+
+    cardsHtml+
+    '<div class="ev-ev-lbl">เราดูจากสิ่งเหล่านี้</div>'+
+    '<div class="ev-evidence">'+evid.map(function(e){return '<div class="ev-ev-row">'+ic('lc-check-circle')+e+'</div>';}).join('')+'</div>'+
+    (ev.remain>0?'<div class="ev-remain">เล่นเพิ่มอีก '+ev.remain+' อย่าง เราจะสรุปได้แม่นขึ้น</div>':'')+
+    '<span class="ex-tag">ประเมินจากกิจกรรมในงาน</span>';
+}
 function renderBook(){
   var r=RESULT,h=r.hero;
   var strengths=h.strengths.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
@@ -2032,8 +2149,8 @@ function renderBook(){
      next (redeem card) → inspiration/legend → actions → disclaimer. */
   root.innerHTML=
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
-  '<header class="topbar"><img class="tb-logo" src="'+LOGO_IMG.bt+'" alt="Better Trade" style="margin-right:auto"><div id="qr-cta-slot"></div></header>'+
-  '<nav class="toc bt-tabs bt-tabs--primary">'+
+  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="Better Trade — กลับหน้าหลัก" style="margin-right:auto"><div id="qr-cta-slot"></div></header>'+
+  '<nav class="toc bt-tabs bt-tabs--secondary">'+
     '<button class="bt-tab" type="button" data-jump="hero-sec" aria-selected="true"><span class="bt-tab-icon">'+ic('lc-user')+'</span><span class="bt-tab-label">ตัวตน</span></button>'+
     '<button class="bt-tab" type="button" data-jump="conf-box" aria-selected="false"><span class="bt-tab-icon">'+ic('lc-sparkles')+'</span><span class="bt-tab-label">Confidence</span></button>'+
     '<button class="bt-tab" type="button" data-jump="sides-sec" aria-selected="false"><span class="bt-tab-icon">'+ic('lc-pie-chart')+'</span><span class="bt-tab-label">6 ด้าน</span></button>'+
@@ -2042,11 +2159,18 @@ function renderBook(){
   '<main class="scroll">'+
     '<section class="fade hero-sec" id="hero-sec"><div class="hero-gw"><div class="hero-in">'+
       '<div class="fam-badge">'+h.famTh+'</div>'+
-      '<div class="hero-cardwrap">'+pcViewer(r.heroKey)+'</div>'+
-      '<div class="hero-sig-c">'+h.sig+'</div>'+
-      '<div class="ast-block" style="background:color-mix(in srgb,'+h.accent+' 12%,transparent);border:1px solid color-mix(in srgb,'+h.accent+' 32%,transparent)">'+
-        '<div class="ast-lbl">'+ic('lc-sparkles')+'สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div></div>'+
-      '<div class="str-grid" style="margin-top:16px"><div class="str-box"><div class="str-hd">'+ic('lc-zap')+'จุดแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'จุดระวัง</div>'+watch+'</div></div>'+
+      '<div class="bt-tabs bt-tabs--primary hero-ev-tabs" id="heroEvTabs" role="tablist" aria-label="เลือกช่วงเวลาของโปรไฟล์">'+
+        '<button class="bt-tab" type="button" role="tab" aria-selected="true" tabindex="0" data-value="pre"><span class="bt-tab-icon">'+ic('lc-file-text')+'</span><span class="bt-tab-label">โปรไฟล์ก่อนงาน</span></button>'+
+        '<button class="bt-tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-value="post"><span class="bt-tab-icon">'+ic('lc-sparkles')+'</span><span class="bt-tab-label">โปรไฟล์หลังงาน</span></button>'+
+      '</div>'+
+      '<div class="hero-ev-panel" id="heroEvPre">'+
+        '<div class="hero-cardwrap">'+pcViewer(r.heroKey)+'</div>'+
+        '<div class="hero-sig-c">'+h.sig+'</div>'+
+        '<div class="ast-block" style="background:color-mix(in srgb,'+h.accent+' 12%,transparent);border:1px solid color-mix(in srgb,'+h.accent+' 32%,transparent)">'+
+          '<div class="ast-lbl">'+ic('lc-sparkles')+'สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div></div>'+
+        '<div class="str-grid" style="margin-top:16px"><div class="str-box"><div class="str-hd">'+ic('lc-zap')+'จุดแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'จุดระวัง</div>'+watch+'</div></div>'+
+      '</div>'+
+      '<div class="hero-ev-panel" id="heroEvPost" style="display:none">'+evoPanelHTML(evoCompute(r),r)+'</div>'+
       redeemCard+
       '<div class="hero-leg"><span class="ld" style="background:'+h.accent+'"></span>แรงบันดาลใจจาก&nbsp;<span class="ln">'+h.legend+'</span>&thinsp;—&thinsp;'+h.legendWhy+'</div>'+
       '<div class="hero-acts"><button class="btn btn-secondary" id="shareCardBtn">'+ic('lc-upload')+'แชร์ภาพการ์ด</button></div>'+
@@ -2109,9 +2233,15 @@ function renderBook(){
   var tocs=root.querySelectorAll('.toc .bt-tab');tocs.forEach(function(p){p.onclick=function(){tocs.forEach(function(x){x.setAttribute('aria-selected','false');});p.setAttribute('aria-selected','true');var target=root.querySelector('#'+p.dataset.jump);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});};});
   root.querySelectorAll('#shareCardBtn,#shareTomorrowBtn').forEach(function(b){b.onclick=openShare;});
   bindViewer();
+  initBtTabs(root.querySelector('#heroEvTabs'),function(value){
+    root.querySelector('#heroEvPre').style.display=value==='pre'?'':'none';
+    root.querySelector('#heroEvPost').style.display=value==='post'?'':'none';
+  });
+  var evGoGames=root.querySelector('#evGoGames');if(evGoGames)evGoGames.onclick=function(){st.phase='games';render();};
   initBtTabs(root.querySelector('#ddTabs'),function(value){root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===value)?'':'none';});});
   root.querySelector('#klibRow').onclick=function(){LIB_OPEN=null;st.phase='library';render();};
   mountHeaderQR();
+  bindHeaderLogo();
 }
 /* ── App shell: shared bottom tab bar across the 5 companion-app screens (home/book/passport/games/
    profile), ported 1:1 from Playbook Final's `tabs` array (labels/icons/order). Each screen renders
@@ -2190,7 +2320,7 @@ function ddTabs(h){
       '<div class="dd-note">* เนื้อหาตัวอย่าง — ฉบับสมบูรณ์จะปรับตามพฤติกรรมจริงของคุณในงาน</div>'+
     '</div>';
   }).join('');
-  return '<div class="bt-tabs bt-tabs--secondary dd-tablist" id="ddTabs" role="tablist" aria-label="เลือกสินทรัพย์ที่จะดูรายละเอียด">'+tablist+'</div>'+panels;
+  return '<div class="bt-tabs bt-tabs--primary dd-tablist" id="ddTabs" role="tablist" aria-label="เลือกสินทรัพย์ที่จะดูรายละเอียด">'+tablist+'</div>'+panels;
 }
 function confRow(l,v){return '<div class="conf-row"><span class="conf-rl">'+l+'</span><div class="conf-tr"><div class="conf-fi" style="width:'+(v/20*100)+'%"></div></div><span class="conf-vl">'+v+'</span></div>';}
 /* ══ SHARE MODAL (logic) ══ "แชร์ภาพการ์ด"/"แชร์พรุ่งนี้ของคุณ" both open this bottom-sheet share
@@ -2427,7 +2557,11 @@ var AGENDA_D2=[
   {time:'18:30',t:'ปิดงาน',by:''}
 ];
 function appHeader(){return '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
-  '<header class="topbar app-topbar"><img class="tb-logo" src="'+LOGO_IMG.efinBT+'" alt="efin × Better Trade" style="margin-right:auto"><div id="qr-cta-slot"></div></header>';}
+  '<header class="topbar app-topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.efinBT+'" alt="efin × Better Trade — กลับหน้าหลัก" style="margin-right:auto"><div id="qr-cta-slot"></div></header>';}
+/* Header logo (left) is clickable system-wide → always routes to Home, same "brand mark = home"
+   convention as most apps/sites. Bound once per render call right after appHeader()/renderBook's
+   own header is injected — see mountHeaderQR's sibling calls and renderBook's own binding. */
+function bindHeaderLogo(){var el=root.querySelector('#hdLogo');if(el)el.onclick=function(){if(st.phase==='home')return;st.phase='home';render();};}
 /* Every screen that renders appHeader() calls this right after — same re-callable-mount pattern as
    mountSplashCTA(), just aimed at the 'compact' preset/slot instead of the hero one. Now opens the
    QR scan modal (generic — no specific booth) instead of being a no-op tap. */
@@ -2470,7 +2604,7 @@ function renderHome(){
     '<div class="home-counters">'+HOME_COUNTERS.map(function(c){return '<button class="hc-card" data-go="'+c.go+'"><svg viewBox="0 0 24 24" class="lucide" style="color:'+c.color+'"><use href="#'+c.icon+'"/></svg><div class="hc-val">'+c.val+'</div><div class="hc-label">'+c.label+'</div></button>';}).join('')+'</div>'+
     '<div class="list-row book-teaser" id="homeBook"><div class="bt-ic">'+ic('lc-book-open')+'</div><div class="klib-tx"><div class="bt-t">คู่มือลงทุนของคุณ</div><div class="bt-s">'+bookTeaser+'</div></div>'+ic('lc-chevron-right','bt-cv')+'</div>'+
     '<section class="home-card"><div class="hcard-hd"><div class="hcard-t">เวทีห้องใหญ่</div><div class="hcard-s">09.00–18.30 น. · Samyan Mitrtown ชั้น 5 · เวทีเดียว 2 วัน กำหนดการคนละชุด</div></div>'+
-      '<div class="bt-tabs bt-tabs--secondary" id="agTabs" role="tablist" aria-label="เลือกวันที่กำหนดการ"><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===1?'true':'false')+'" data-value="1"><span class="bt-tab-label">วันที่ 1 ✦ 31 ต.ค.</span></button><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===2?'true':'false')+'" data-value="2"><span class="bt-tab-label">วันที่ 2 ✦ 1 พ.ย.</span></button></div>'+
+      '<div class="bt-tabs bt-tabs--primary" id="agTabs" role="tablist" aria-label="เลือกวันที่กำหนดการ"><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===1?'true':'false')+'" data-value="1"><span class="bt-tab-label">วันที่ 1 ✦ 31 ต.ค.</span></button><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===2?'true':'false')+'" data-value="2"><span class="bt-tab-label">วันที่ 2 ✦ 1 พ.ย.</span></button></div>'+
       '<div class="ag-list">'+shown.map(function(a){return '<div class="ag-row"><div class="ag-time">'+a.time+'</div><div><div class="ag-t">'+a.t+'</div>'+(a.by?'<div class="ag-by">'+a.by+'</div>':'')+'</div></div>';}).join('')+'</div>'+
       (days.length>3?('<button class="ag-more" id="agMore">'+ic(HOME_MST.agendaAll?'lc-chevron-down':'lc-chevron-down')+(HOME_MST.agendaAll?'ย่อกำหนดการ':('ดูกำหนดการทั้งวัน '+days.length+' รายการ'))+'</button>'):'')+
     '</section>'+
@@ -2494,6 +2628,7 @@ function renderHome(){
   });
   var agMore=root.querySelector('#agMore');if(agMore)agMore.onclick=function(){HOME_MST.agendaAll=!HOME_MST.agendaAll;renderHome();};
   mountHeaderQR();
+  bindHeaderLogo();
   mountHomeNsCta(ns);
   bindPostEvent(t);
   layoutSpecComets();
@@ -2610,7 +2745,7 @@ function buildScanModal(){
     '<div class="scan-card">'+
       '<button class="scan-x" id="scanClose">'+ic('lc-x')+'</button>'+
       '<div class="scan-hd"><div class="scan-t" id="scanTitle"></div><div class="scan-s" id="scanSub"></div></div>'+
-      '<div class="bt-tabs bt-tabs--secondary" id="scanTabs" role="tablist" aria-label="เลือกวิธีสแกน">'+
+      '<div class="bt-tabs bt-tabs--primary" id="scanTabs" role="tablist" aria-label="เลือกวิธีสแกน">'+
         '<button class="bt-tab" type="button" role="tab" aria-selected="true" data-value="scan"><span class="bt-tab-icon">'+ic('lc-qr-code')+'</span><span class="bt-tab-label">สแกน QR ที่จุดนี้</span></button>'+
         '<button class="bt-tab" type="button" role="tab" aria-selected="false" data-value="mine"><span class="bt-tab-icon">'+ic('lc-user')+'</span><span class="bt-tab-label">ให้เจ้าหน้าที่สแกน</span></button>'+
       '</div>'+
@@ -2695,6 +2830,7 @@ function renderBooth(){
   root.querySelector('#mlScrim').onclick=closeMap;
   root.querySelector('#mlClose').onclick=closeMap;
   mountHeaderQR();
+  bindHeaderLogo();
   layoutSpecComets();
 }
 
@@ -2767,6 +2903,7 @@ function renderGames(){
   root.querySelectorAll('[data-play]').forEach(function(b){b.onclick=function(e){e.stopPropagation();var i=+b.dataset.play;GAME_PLAYED[i]=true;GAME_OPEN=i;renderGames();};});
   root.querySelectorAll('[data-open]').forEach(function(t){t.onclick=function(){var i=+t.dataset.open;if(!GAME_PLAYED[i])return;GAME_OPEN=(GAME_OPEN===i?null:i);renderGames();};});
   mountHeaderQR();
+  bindHeaderLogo();
   mountNgCta(nextIdx);
   layoutSpecComets();
 }
@@ -2803,6 +2940,7 @@ function renderProfile(){
   bindTabbar();
   root.querySelector('#devReset').onclick=resetQuiz;
   mountHeaderQR();
+  bindHeaderLogo();
   layoutSpecComets();
 }
 
