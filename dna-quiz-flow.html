@@ -46,13 +46,14 @@
   --sp-card-pad:20px;   /* a card's own inner edge padding — the gutter between a card's border and its content */
   --sp-edge:20px;       /* the SCREEN's own outer gutter before any card starts — unified across quiz/book/splash/consent (was 14–24px ad hoc per screen) */
   --sp-block:22px;      /* one labeled sub-section to the next INSIDE the same card (identity → radar → interests → traits → allocation) */
-  --sp-section:28px;    /* THE gap between any two top-level sections/cards on a long scroll (Book).
+  --sp-section:20px;    /* THE gap between any two top-level sections/cards on a long scroll (Book).
                            One value for every section boundary — driven from .scroll's flex `gap`, not
                            per-card margins — so the whole page shares one rhythm (was an ad-hoc mix of
                            18/28/44/0 that made "where does one section end" read inconsistently).
-                           28 sits clearly above the 22 max intra-card step, so a section break reads as
-                           distinctly bigger than any gap *within* a card. Reserved for section-to-section
-                           only; intra-card spacing uses --sp-block and smaller. */
+                           Was 28 — brought down per direction ("still feels too far apart"); still reads
+                           as its own boundary since most cards' own internal padding (--sp-card-pad) sits
+                           on both sides of it. Reserved for section-to-section only; intra-card spacing
+                           uses --sp-block and smaller. */
   --font:'FC Minimal','Noto Sans Thai','Thonburi','DB Helvethaica X',system-ui,-apple-system,'Segoe UI',sans-serif;
   --serif:'Baskervville','Bodoni MT','Didot',Georgia,'Times New Roman',serif; /* Editorial display serif — matches the printed character-card art. English display + numerals ONLY; Thai stays on --font (FC Minimal). Baskervville embedded (OFL, variable font — one @font-face covers weight 400–700); Bodoni MT = local-first fallback */
   /* --mono retired (2026-08-12, per direction) — every former mono site (topbar count, opt-key,
@@ -372,8 +373,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* HERO CARD — spectrum border is the one accent this scene earns */
 .hero-gw{padding:2px;border-radius:calc(var(--r2) + 3px);background:var(--spectrum);}
 .hero-in{background:var(--white);border-radius:var(--r2);padding:var(--sp-block) var(--sp-card-pad);}
-.fam-badge{display:inline-flex;align-items:center;gap:var(--sp-glue);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:18px;}
-.fam-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+/* Centered + a real pill chip instead of quiet uppercase eyebrow text — this is the card's own
+   identity line ("Visionary ✦ ผู้มองการณ์ไกล"), so it should read as a badge, not a caption. */
+.fam-badge{display:flex;width:fit-content;align-items:center;gap:7px;font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);letter-spacing:0.01em;margin:0 auto 18px;padding:7px 15px;border-radius:var(--rpill);background:var(--accent);}
+.fam-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 .hero-lay{display:flex;gap:15px;align-items:flex-start;}
 .hero-art{flex-shrink:0;width:106px;border-radius:var(--r1);overflow:hidden;border:1px solid var(--line-soft);}
 .hero-art-in{width:106px;height:134px;background:var(--accent);display:flex;align-items:center;justify-content:center;}
@@ -384,22 +387,43 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .hero-en{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:var(--sp-hairline);font-family:var(--font);}
 .hero-th{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);line-height:1.1;letter-spacing:0;margin-bottom:var(--sp-stack-tight);}
 .hero-sig{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.6;margin-bottom:14px;}
+/* จุดแกร่ง = cyan (this app's "positive/good" tint elsewhere); จุดระวัง = the same amber the
+   sponsor chip/gold badges use (reads as "pay attention", not a scary red). Side-by-side on
+   tablet/pc — was a fixed column on every viewport, so a wide screen wasted its own width instead
+   of using it to show both at once. */
 .str-grid{display:flex;flex-direction:column;gap:var(--sp-list);margin-bottom:var(--sp-stack);}
-.str-box{border-radius:var(--r1);padding:10px 12px;background:var(--accent);}
-.str-hd{display:flex;align-items:center;gap:var(--sp-glue);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:var(--sp-list);color:var(--ink);}
-.str-box.wn .str-hd{color:var(--muted);}
+:root[data-view="tablet"] .str-grid,:root[data-view="pc"] .str-grid{flex-direction:row;}
+.str-grid .str-box{flex:1;}
+.str-box{border-radius:var(--r1);padding:11px 13px;background:color-mix(in srgb,var(--cyan) 10%,transparent);border:1px solid color-mix(in srgb,var(--cyan) 28%,transparent);}
+.str-box.wn{background:#fef4e2;border-color:#f3daa0;}
+.str-hd{display:flex;align-items:center;gap:var(--sp-glue);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:0.04em;margin-bottom:var(--sp-list);color:var(--ink);}
+.str-box.wn .str-hd{color:#8a5a00;}
 .str-hd svg{width:var(--ic-sm);height:var(--ic-sm);}
 .str-li{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--ink);line-height:1.55;margin-bottom:3px;}
-.ast-lbl{font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:var(--sp-list);}
-.ast-chips{display:flex;flex-wrap:wrap;gap:var(--sp-list);}
-.chip{display:inline-flex;align-items:center;gap:var(--sp-glue);padding:6px 12px;border-radius:var(--r1);background:var(--accent);border:1px solid var(--line-soft);font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);}
-.chip svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);}
+/* สินทรัพย์ที่ถนัด — the one thing this whole card exists to tell the customer ("what you're
+   suited for"), so it gets a bigger label + chips tinted in the persona's own accent color
+   (h.accent, applied inline per chip) instead of the same flat gray every other chip in the app
+   uses — this is the highlight, not a footnote. */
+.ast-lbl{font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);margin-bottom:10px;}
+.ast-chips{display:flex;flex-wrap:wrap;gap:9px;}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--rpill);border:1px solid;font-size:var(--fs-label);font-weight:var(--w-label);}
+.chip svg{width:var(--ic-sm);height:var(--ic-sm);}
 .hero-leg{display:flex;align-items:center;gap:var(--sp-inline);margin-top:16px;padding-top:15px;border-top:1px solid var(--line-soft);font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);}
 .ld{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .ln{font-family:var(--serif);font-weight:600;color:var(--ink);}
-.hero-acts{display:flex;gap:8px;margin-top:14px;}
+.hero-acts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
 .hero-note{margin-top:12px;display:flex;align-items:flex-start;gap:var(--sp-inline);padding:9px 11px;border-radius:var(--r1);background:var(--accent);font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);line-height:1.6;}
 .hero-note svg{width:var(--ic-sm);height:var(--ic-sm);flex-shrink:0;margin-top:1px;}
+/* แลกรับการ์ดตัวจริง — tier-gated like the post-event tracks (.pe-report/.pe-locked share this
+   same on/locked pattern): Ultimate can redeem now, everything else sees what unlocks it. */
+.redeem-card{margin-top:16px;display:flex;gap:11px;align-items:flex-start;padding:13px 14px;border-radius:var(--r1);}
+.redeem-card.on{background:#fef4e2;border:1px solid #f3daa0;}
+.redeem-card.locked{border:1px dashed var(--line-strong);}
+.redeem-card svg{width:var(--ic-lg);height:var(--ic-lg);flex:0 0 auto;}
+.redeem-card.on svg{color:#8a5a00;}
+.redeem-card.locked svg{color:var(--muted);}
+.redeem-t{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
+.redeem-s{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;line-height:1.5;}
 
 .card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);overflow:hidden;position:relative;}
 /* the corner-bracket frame ornament (a ::after with 8 tiny corner ticks) was removed per direction —
@@ -499,6 +523,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .next-ic svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);}
 .next-t{font-size:var(--fs-label);font-weight:var(--w-label);color:var(--ink);margin-bottom:3px;line-height:1.3;}
 .next-d{font-size:var(--fs-meta);color:var(--muted);line-height:1.4;}
+/* boundary between the merged "ทำอะไรต่อดี"/"สรุปไว้คุยกับผู้แนะนำการลงทุน" sub-sections — same
+   weight as a section-to-section break (border, not just spacing) since they used to be two
+   separate cards, just now inside one. */
+.sub-divider{margin-top:var(--sp-block);padding-top:var(--sp-block);border-top:1px solid var(--line-soft);}
 .rk-grid{stroke:var(--line-soft);fill:none;stroke-width:1;}
 .rk-axis{stroke:var(--line-soft);stroke-width:1;}
 .rk-poly{stroke:var(--ink);stroke-width:1.5;}
@@ -554,6 +582,19 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .klib-list{display:flex;flex-direction:column;margin-top:14px;border-top:1px solid var(--line-soft);}
 .klib-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line-soft);font-size:var(--fs-bodysm);color:var(--ink);}
 .klib-item:last-child{border-bottom:none;}
+/* ══ LIBRARY (คลังความรู้ sub-screen) ══ real category names/counts, accordion-per-category */
+.lib-num{font-family:var(--serif);}
+.lib-cats{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+.lib-cat{border:1px solid var(--line-soft);border-radius:var(--r1);overflow:hidden;}
+.lib-cat-hd{width:100%;display:flex;align-items:center;gap:10px;padding:13px 15px;background:var(--white);border:none;cursor:pointer;font-family:var(--font);text-align:left;}
+.lib-cat-ic{width:18px;height:18px;color:var(--muted);flex:0 0 auto;}
+.lib-cat-t{flex:1;min-width:0;font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
+.lib-cat-n{flex:0 0 auto;font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--violet);background:color-mix(in srgb,var(--violet) 12%,transparent);padding:3px 9px;border-radius:var(--rpill);}
+.lib-cat-cv{width:18px;height:18px;color:var(--muted);flex:0 0 auto;transition:transform .18s var(--ease);}
+.lib-cat.open .lib-cat-cv{transform:rotate(180deg);}
+.lib-cat-body{padding:0 15px 13px;}
+.lib-stub{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:var(--r1);background:var(--paper);font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;}
+.lib-stub svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;margin-top:1px;}
 .klib-item svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--muted);flex-shrink:0;}
 .rk-lab{fill:var(--muted);}
 .donut-track{stroke:var(--line-soft);}
@@ -839,7 +880,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 @keyframes scanLaser{0%{transform:translateY(0);}50%{transform:translateY(300%);}100%{transform:translateY(0);}}
 .scan-cam-ic{width:38px;height:38px;color:rgba(255,255,255,.22);}
 .scan-cam-cap{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:11px;color:rgba(255,255,255,.75);}
-.scan-mine{border-radius:16px;border:1px dashed var(--line-strong);background:var(--paper);padding:13px;text-align:center;margin-bottom:10px;}
+/* Same height + margin as .scan-cam (168px/12px) — the two tabs' content used to be sized off
+   their own content (the camera box vs. this QR+caption block), so switching tabs resized the
+   whole modal and visibly shifted the title bar/confirm button. Fixed height + flex-centered
+   content keeps every OTHER part of the modal in the same position regardless of which tab is on. */
+.scan-mine{box-sizing:border-box;height:168px;border-radius:16px;border:1px dashed var(--line-strong);background:var(--paper);padding:13px;text-align:center;margin-bottom:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .scan-mine-qr{width:96px;height:96px;margin:0 auto;border-radius:10px;background:var(--white);border:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;color:var(--ink);}
 .scan-mine-qr svg{width:56px;height:56px;}
 .scan-mine-cap{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;margin-top:10px;}
@@ -1769,6 +1814,7 @@ function render(){
   else if(st.phase==='quiz')renderQuiz();
   else if(st.phase==='reveal')renderReveal();
   else if(st.phase==='book')renderBook();
+  else if(st.phase==='library')renderLibrary();
   else if(st.phase==='home')renderHome();
   else if(st.phase==='passport')renderBooth();
   else if(st.phase==='games')renderGames();
@@ -1975,8 +2021,17 @@ function renderBook(){
   var r=RESULT,h=r.hero;
   var strengths=h.strengths.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
   var watch=h.watchouts.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
-  var chips=h.assets.map(function(a){return '<span class="chip">'+ic(a.icon)+a.t+'</span>';}).join('');
+  var chips=h.assets.map(function(a){return '<span class="chip" style="background:color-mix(in srgb,'+h.accent+' 14%,transparent);border-color:color-mix(in srgb,'+h.accent+' 38%,transparent);color:'+h.accent+'">'+ic(a.icon)+a.t+'</span>';}).join('');
   var matchOk=Math.abs(r.gap)<=1.5;
+  var isUltimate=curTier().name==='Ultimate';
+  /* แลกรับการ์ดตัวจริง — same tier-gate as the post-event tracks (Ultimate only, per TIER_META's
+     "ทุกสิทธิ์ + การ์ดตัวจริง"), same on/locked visual language as .pe-report. */
+  var redeemCard=isUltimate
+    ? '<div class="redeem-card on">'+ic('lc-sparkles')+'<div><div class="redeem-t">พร้อมแลกรับการ์ดตัวจริงแล้ว</div><div class="redeem-s">แลกได้ที่จุดแลกรับการ์ดตัวจริง ✦ Samyan Mitrtown ชั้น 5</div></div></div>'
+    : '<div class="redeem-card locked">'+ic('lc-lock')+'<div><div class="redeem-t">แลกรับการ์ดตัวจริง</div><div class="redeem-s">ปลดด้วยบัตร Ultimate — การ์ดตัวจริงที่ตรงกับตัวตนคุณ 1 คน 1 ใบ</div></div></div>';
+  /* Reordered per direction: identity (badge→card→signature) → the one highlight customers should
+     see first (assets: "what you're suited for") → analysis (strengths/watchouts) → what unlocks
+     next (redeem card) → inspiration/legend → actions → disclaimer. */
   root.innerHTML=
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
   '<header class="topbar"><img class="tb-logo" src="'+LOGO_IMG.bt+'" alt="Better Trade" style="margin-right:auto"><div id="qr-cta-slot"></div></header>'+
@@ -1986,8 +2041,9 @@ function renderBook(){
       '<div class="fam-badge"><span class="fam-dot" style="background:'+h.accent+'"></span>'+h.famTh+'</div>'+
       '<div class="hero-cardwrap">'+pcViewer(r.heroKey)+'</div>'+
       '<div class="hero-sig-c">'+h.sig+'</div>'+
-      '<div class="str-grid"><div class="str-box"><div class="str-hd">'+ic('lc-zap')+'จุดแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'จุดระวัง</div>'+watch+'</div></div>'+
       '<div class="ast-lbl">สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div>'+
+      '<div class="str-grid" style="margin-top:16px"><div class="str-box"><div class="str-hd">'+ic('lc-zap')+'จุดแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'จุดระวัง</div>'+watch+'</div></div>'+
+      redeemCard+
       '<div class="hero-leg"><span class="ld" style="background:'+h.accent+'"></span>แรงบันดาลใจจาก&nbsp;<span class="ln">'+h.legend+'</span>&thinsp;—&thinsp;'+h.legendWhy+'</div>'+
       '<div class="hero-acts"><button class="btn btn-secondary" id="shareCardBtn">'+ic('lc-upload')+'แชร์ภาพการ์ด</button></div>'+
       '<div class="hero-note">'+ic('lc-info')+'ตัวตนนี้สรุปจากคำตอบ DNA Quiz ของคุณ — ยิ่งทำกิจกรรมในงานครบ ยิ่งแม่นขึ้น</div>'+
@@ -2020,13 +2076,17 @@ function renderBook(){
       '<div class="quote-li">'+ic('lc-check')+h.strengths[0]+'</div><div class="quote-li">'+ic('lc-check')+h.strengths[1]+'</div>'+
       '<div class="quote-leg"><span class="ld" style="background:'+h.accent+'"></span>แรงบันดาลใจจาก '+h.legend+'</div>'+
       '<div class="quote-acts"><button class="btn btn-primary btn-onink" id="shareTomorrowBtn">'+ic('lc-upload')+'แชร์พรุ่งนี้ของคุณ</button></div></div>'+
+    /* Merged — "ทำอะไรต่อดี" (broad next steps) and "สรุปไว้คุยกับผู้แนะนำการลงทุน" (per-asset
+       advisor prep) were two separate cards answering the same underlying question ("what next"),
+       just at two different zoom levels; now one card, broad→specific top to bottom. */
     '<section class="card mb-lg"><div class="s-pad"><div class="s-ey">'+ic('lc-compass')+'ทำอะไรต่อดี</div><h2 class="s-h" style="margin-bottom:14px">ขั้นต่อไปที่แนะนำ</h2>'+
       '<div class="next-grid">'+
         '<div class="next-card"><div class="next-ic">'+ic('lc-book-open')+'</div><div class="next-t">เรียนรู้</div><div class="next-d">พื้นฐานสำหรับ '+h.th+'</div></div>'+
         '<div class="next-card"><div class="next-ic">'+ic(h.assets[0].icon)+'</div><div class="next-t">สำรวจ</div><div class="next-d">'+h.assets.slice(0,2).map(function(a){return a.t;}).join(' ✦ ')+'</div></div>'+
         '<div class="next-card"><div class="next-ic">'+ic('lc-map-pin')+'</div><div class="next-t">เดินบูธต่อ</div><div class="next-d">เหลืออีก 4 จาก 6 ด้าน</div></div>'+
-      '</div></div></section>'+
-    '<section class="card mb"><div class="s-pad"><div class="s-ey" style="display:flex;justify-content:space-between"><span style="display:inline-flex;align-items:center;gap:6px">'+ic('lc-message-circle')+'สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:14px">เจาะราย·สินทรัพย์</h2>'+ddTabs(h)+'</div></section>'+
+      '</div>'+
+      '<div class="sub-divider"><div class="s-ey" style="display:flex;justify-content:space-between;align-items:center"><span style="display:inline-flex;align-items:center;gap:6px">'+ic('lc-message-circle')+'สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:14px">เจาะราย·สินทรัพย์</h2>'+ddTabs(h)+'</div>'+
+    '</div></section>'+
     '<section class="card" id="route-sec"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">'+ic('lc-route')+'เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2><p class="s-sub">Master Class ขึ้นไป — เส้นทางจากตัวตนที่วัดได้จริง</p></div>'+
       '<div class="route-steps">'+routeStep('done','','ทำ DNA Quiz','ตอบครบ 10 ข้อ เสร็จแล้ว — ได้ตัวตน '+h.th)+routeStep('act','2','ทำครบ 6 ด้าน','เสร็จแล้ว 2 จาก 6 — เหลืออีก 4 ด้านในบูธ')+routeStep('fut','3','รับ Playbook ส่วนตัวสมบูรณ์','เมื่อครบ 6 ด้าน รับกลยุทธ์เฉพาะตัวตน + Confidence เต็ม')+routeStep('fut','4','ติดตามบน efin.finance','Playbook sync ขึ้นแอปหลังงาน พร้อม AI ติดตามพอร์ต')+'</div>'+
       '<div class="route-cta-w"><button class="btn btn-primary">'+ic('lc-play-circle')+'ไปเล่นกิจกรรมต่อ'+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
@@ -2046,6 +2106,7 @@ function renderBook(){
   root.querySelectorAll('#shareCardBtn,#shareTomorrowBtn').forEach(function(b){b.onclick=openShare;});
   bindViewer();
   initBtTabs(root.querySelector('#ddTabs'),function(value){root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===value)?'':'none';});});
+  root.querySelector('#klibRow').onclick=function(){LIB_OPEN=null;st.phase='library';render();};
   mountHeaderQR();
 }
 /* ── App shell: shared bottom tab bar across the 5 companion-app screens (home/book/passport/games/
@@ -2071,6 +2132,48 @@ function allocBars(){
   var bar=segs.map(function(s){return '<div class="alloc-seg" style="width:'+s.p+'%;background:'+s.c+'"></div>';}).join('');
   var legend=segs.map(function(s){return '<div class="alloc-row"><span class="alloc-dot" style="background:'+s.c+'"></span><span class="alloc-l">'+s.l+'</span><span class="alloc-p">'+s.p+'%</span></div>';}).join('');
   return '<div class="alloc-bar">'+bar+'</div><div class="alloc-legend">'+legend+'</div>';
+}
+/* ══ LIBRARY (คลังความรู้) ══ real category names + item counts extracted verbatim from the source
+   (playbook-final-extracted.html — see PLAYBOOK-2026-DATA-BASELINE.md §7): 8 categories, 41 items
+   total. The source's own sub-screen goes 3 levels deep (category → item → full myth/fact body);
+   the full 41 article titles/bodies weren't re-extracted for this pass (flagged in §7 as a future
+   content-parity gap), so this is a real, correctly-labeled category accordion — counts are real,
+   not fabricated — rather than a fake "browse the articles" experience with invented copy. */
+var LIBRARY_CATS=[
+  {t:'พื้นฐานการลงทุน',n:9,icon:'lc-book-open'},
+  {t:'สินทรัพย์แต่ละประเภท',n:6,icon:'lc-pie-chart'},
+  {t:'ต้นทุนและผลตอบแทน',n:3,icon:'lc-trending-up'},
+  {t:'กลลวงและการป้องกันตัว',n:4,icon:'lc-shield'},
+  {t:'วางแผนชีวิตและสุขภาพการเงิน',n:5,icon:'lc-heart'},
+  {t:'ความเสี่ยงและการอ่านตัวเอง',n:6,icon:'lc-alert-triangle'},
+  {t:'ภาษีและกฎเกณฑ์',n:3,icon:'lc-file-text'},
+  {t:'เครื่องมือและการติดตาม',n:5,icon:'lc-sliders'}
+];
+var LIB_OPEN=null;
+function renderLibrary(){
+  var h=RESULT.hero;
+  var total=LIBRARY_CATS.reduce(function(n,c){return n+c.n;},0);
+  root.innerHTML=
+  '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
+  '<header class="topbar"><div class="tb-ic" id="libBack">'+ic('lc-arrow-left')+'</div><div style="flex:1"><div class="tb-title">คลังความรู้</div><div class="tb-sub">41 บทความ ✦ จัดเป็น 8 หมวด</div></div></header>'+
+  '<main class="scroll fade">'+
+    '<section class="card"><div class="s-pad">'+
+      '<div class="s-ey">'+ic('lc-library')+'สำหรับ '+h.th+'</div>'+
+      '<h2 class="s-h"><span class="lib-num">'+total+'</span> เรื่องที่คุณเก็บได้ตลอดงาน</h2>'+
+      '<p class="s-sub">แตะหมวดเพื่อดูรายการ ✦ เนื้อหาเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน</p>'+
+      '<div class="lib-cats">'+LIBRARY_CATS.map(function(c,i){
+        var open=(LIB_OPEN===i);
+        return '<div class="lib-cat'+(open?' open':'')+'"><button class="lib-cat-hd" data-i="'+i+'">'+ic(c.icon,'lib-cat-ic')+'<span class="lib-cat-t">'+c.t+'</span><span class="lib-cat-n">'+c.n+'</span>'+ic('lc-chevron-down','lib-cat-cv')+'</button>'+
+          (open?('<div class="lib-cat-body"><div class="lib-stub">'+ic('lc-info')+'<span>เนื้อหาเต็มของ '+c.n+' บทความในหมวดนี้ยังไม่ได้ใส่ในตัวต้นแบบนี้ — ชื่อหมวดและจำนวนบทความเป็นข้อมูลจริงจากต้นฉบับ</span></div></div>'):'')+
+        '</div>';
+      }).join('')+'</div>'+
+    '</div></section>'+
+  '</main>';
+  appTabbar('book');
+  bindTabbar();
+  root.querySelector('#devReset').onclick=resetQuiz;
+  root.querySelector('#libBack').onclick=function(){st.phase='book';render();};
+  root.querySelectorAll('.lib-cat-hd').forEach(function(b){b.onclick=function(){var i=+b.dataset.i;LIB_OPEN=(LIB_OPEN===i?null:i);renderLibrary();};});
 }
 function ddTabs(h){
   var tabs=h.assets.slice(0,4);
