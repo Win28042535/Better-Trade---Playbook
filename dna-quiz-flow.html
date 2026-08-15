@@ -341,8 +341,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* justify-content:center added (2026-08-15, "โดยรวมลองดูเรื่อง layout ใหม่") — this screen lost its
    kicker, consent checkbox, and caption in the same pass (see below), so there's meaningfully less
    content now; without centering, it just left a growing dead gap at the bottom below a fixed 60px
-   top pad instead of the whole block sitting centered in the available space. */
-.consent{flex:1;padding:60px var(--sp-edge) 32px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+   top pad instead of the whole block sitting centered in the available space.
+   position:relative added the same day so .sp-scatter's position:absolute;inset:0 (see
+   consentScatter()) anchors to THIS box specifically — .consent had no positioned ancestor of its
+   own before, so inset:0 would otherwise have resolved against .shell (the next positioned
+   ancestor up) and let the scatter cover the whole screen instead of just this one. */
+.consent{position:relative;flex:1;padding:60px var(--sp-edge) 32px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
 /* reveal/analysis scene — the blue wash that was pulled off the quiz + identity card now lives HERE, as a soft glow rising behind the sparkle icon (this is the one "magic" beat in the flow, so the accent earns its place) */
 .reveal-scene{background:radial-gradient(125% 62% at 50% 20%,color-mix(in srgb,var(--violet) 20%,transparent) 0%,color-mix(in srgb,var(--violet) 10%,transparent) 38%,var(--paper) 72%);}
 /* Background circle dropped per direction (the hourglass is a full-color illustration, doesn't
@@ -378,6 +382,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .consent-h .ch-1{color:var(--muted);font-weight:var(--w-head);}
 .consent-h .ch-2{color:var(--ink);font-weight:var(--w-label);}
 .consent-p{font-size:var(--fs-body);font-weight:var(--w-body);color:var(--muted);line-height:1.65;max-width:280px;margin:0 auto;}
+/* "คู่มือลงทุนของคุณ" emphasis (2026-08-15, per direction) — ink/700 against the paragraph's own
+   muted/500 base, same two-weight device used elsewhere in the file rather than a new pattern. */
+.consent-p b{color:var(--ink);font-weight:var(--w-label);}
 .round-cards{display:flex;gap:10px;width:100%;margin:32px 0 4px;}
 .round-card{flex:1;border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad-sm);background:var(--white);}
 .rc-top{display:flex;align-items:center;justify-content:center;gap:var(--sp-glue);margin-bottom:9px;}
@@ -394,6 +401,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    "เอาคำว่า ตอบตามใจจริง...ออก") — #startBtn's gating on st.consent was removed to match. */
 .consent-btn{width:100%;margin-top:26px;}
 .consent-btn .btn-primary{width:100%;}
+/* Fixed to the bottom on mobile (2026-08-15, per direction "ตำแหน่งเดียวกับ button ในหน้าแบบทดสอบ")
+   — same technique as .q-nav's mobile rule right above: margin-top:auto already parks it at the
+   bottom of .consent's own flex column; position:sticky;bottom:0 then holds it at the visible
+   viewport bottom. width:auto (not 100%) is required for the same reason as .q-nav — with
+   width:100%, that resolves against the box BEFORE the negative margins apply, so the full-bleed
+   edges fall short. pc/tablet keep the roomy centered layout below, untouched. */
+:root[data-view="mobile"] .consent-btn{position:sticky;bottom:0;z-index:6;width:auto;margin:auto calc(-1*var(--sp-edge)) 0;padding:14px var(--sp-edge) calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper) 45%,color-mix(in srgb,var(--paper) 50%,transparent) 75%,transparent);}
 .consent-caption b{font-weight:var(--w-label);color:var(--ink);}
 
 /* ── BOOK — scene-based: hairlines, not shadows ── */
@@ -1256,6 +1270,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    everywhere else content stacks near-full-width). */
 @media(max-width:575px){
   .sp-el-far, .sp-el-efin, .sp-el-card{display:none;}
+  /* Consent screen's 2 scatter assets hidden outright on mobile, not shrunk — this screen's
+     round-cards already claim the full width at that size, and mobile is exactly where the
+     splash version's own crowding problem showed up before fixing it above. */
+  .cs-el{display:none;}
   .sp-el-mid{width:calc(var(--w,88px) * 0.42);opacity:calc(var(--op,.85) * 0.55);}
   .sp-el-near{width:calc(var(--w,88px) * 0.42);opacity:calc(var(--op,.85) * 0.65);}
   /* dy also capped here — candle's rest position sits only ~20px under the hero logo, so its
@@ -2028,12 +2046,28 @@ function render(){
    closing caption line — #startBtn no longer gates on st.consent since there's no checkbox left to
    set it. ch-1/ch-2 now sit on one line (their CSS lost display:block, and there's a real space
    between the two spans below) instead of stacking as two lines. */
+/* Same depth-tiered asset scatter as the splash screen (2026-08-15, per direction "ลองเอา asset
+   element (แบบ splash มา preview + ใช้การ animate) ด้วย") — reuses .sp-el/spDrift verbatim so the
+   drift animation and per-asset shadow/blur/saturate custom properties all just work. Deliberately
+   a lighter composition than splash's 6-asset spread, not a 1:1 copy: only 2 assets (both far-plane
+   sized/opacity — faint, small, blurred), placed above the title where the only real open space on
+   this screen is, and hidden outright on mobile rather than shrunk — this screen's round-cards
+   already claim the full width at that size, and mobile is exactly where the splash version's own
+   crowding problem showed up before, so the safer call here is "not present" rather than "smaller". */
+function consentScatter(){
+  var items=[
+    {k:'gold',s:'top:2%;left:4%',w:52,sc:.8,op:.4,bl:2.2,sh:6,shb:14,sha:.12,sat:.92,d:'13s',dl:'0s',dx:'7px',dy:'8px',r0:'4deg',r1:'-3deg'},
+    {k:'bitcoin',s:'top:1%;right:5%',w:50,sc:.78,op:.38,bl:2.4,sh:6,shb:14,sha:.12,sat:.92,d:'14s',dl:'.6s',dx:'-8px',dy:'8px',r0:'-5deg',r1:'4deg'}
+  ];
+  return items.map(function(a){return '<img class="sp-el cs-el" alt="" src="'+(ASSET_IMG[a.k]||'')+'" style="'+a.s+';--w:'+a.w+'px;--sc:'+a.sc+';--op:'+a.op+';--bl:'+a.bl+'px;--z:0;--sh:'+a.sh+'px;--shb:'+a.shb+'px;--sha:'+a.sha+';--sat:'+a.sat+';--d:'+a.d+';--dl:'+a.dl+';--dx:'+a.dx+';--dy:'+a.dy+';--r0:'+a.r0+';--r1:'+a.r1+'">';}).join('');
+}
 function renderConsent(){
   root.innerHTML=
   '<header class="topbar"><span class="tb-title">แบบวัดตัวตนนักลงทุน</span></header>'+
   '<div class="consent fade">'+
-    '<div class="consent-h"><span class="ch-1">รู้จัก</span> <span class="ch-2">ตัวคุณ</span></div>'+
-    '<div class="consent-p">ตอบคำถามสั้นๆ ตามใจจริง ไม่มีคำตอบผิด แล้วระบบจะสรุปเป็น "คู่มือลงทุนของคุณ" เฉพาะตัว</div>'+
+    '<div class="sp-scatter">'+consentScatter()+'</div>'+
+    '<div class="consent-h"><span class="ch-1">รู้จัก</span> <span class="ch-2">ตัวคุณ?</span></div>'+
+    '<div class="consent-p">ตอบคำถามสั้นๆ ตามใจจริง ไม่มีคำตอบผิด แล้วระบบจะสรุปเป็น <b>"คู่มือลงทุนของคุณ"</b> เฉพาะตัว</div>'+
     '<div class="round-cards">'+
       '<div class="round-card"><div class="rc-top"><span class="rc-dot" style="background:var(--yellow)"></span><span class="rc-kicker">ส่วนที่ 1</span></div><div class="rc-title">ความเสี่ยง</div><div class="rc-meta">3 ข้อ</div></div>'+
       '<div class="round-card"><div class="rc-top"><span class="rc-dot" style="background:var(--violet)"></span><span class="rc-kicker">ส่วนที่ 2</span></div><div class="rc-title">ตัวตน DNA</div><div class="rc-meta">7 ข้อ</div></div>'+
