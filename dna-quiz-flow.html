@@ -253,7 +253,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .int-ic{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--muted);flex-shrink:0;transition:background .18s,color .18s;}
 .int-ic svg{width:var(--ic-md);height:var(--ic-md);}
 .int-opt.sel .int-ic{background:var(--ink);color:var(--cloud);}
-.int-t{font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--ink);line-height:1.35;}
+/* flex:1;min-width:0 added (2026-08-15, per direction "ตัวเลือกอสังหา คำว่ากองทุนตัดคำให้เต็ม") — as a
+   flex item with no explicit min-width, this defaulted to min-width:auto, which for long compound
+   Thai text with no browser-recognized break opportunity refuses to shrink/wrap at all, overflowing
+   past the card edge instead ("อสังหาฯ และกองทุนอสังหาฯ (REIT)" was the option that hit this). */
+.int-t{flex:1;min-width:0;font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--ink);line-height:1.35;}
 
 /* NAV / BUTTONS — nav pinned to bottom (equal-height screens); primary CTA capped so it stays a consistent proportion, never full-bleed on wide screens */
 /* Both nav buttons now split the row evenly (flex:1 each) instead of sizing to their own content and
@@ -815,7 +819,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pass-foot-lbl{font-size:var(--fs-eyebrow);color:var(--muted);}
 .pass-price{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);}
 /* next-step — the ONE prominent home action, an ink card echoing the source's dark navy card */
-.next-step{display:flex;align-items:center;gap:var(--sp-inline);flex-wrap:wrap;background:var(--ink);color:var(--cloud);border-radius:var(--r2);padding:18px var(--sp-card-pad);position:relative;overflow:hidden;}
+/* align-items:flex-start (2026-08-15, per direction "align top... ตอนนี้ align center อยู่") — shared
+   by Home's "ขั้นต่อไป" card and Games' "เล่นเกมนี้ต่อ" card (same .next-step component) — the 48px
+   icon was centering against the full 3-line eyebrow/title/body text block instead of its first line. */
+.next-step{display:flex;align-items:flex-start;gap:var(--sp-inline);flex-wrap:wrap;background:var(--ink);color:var(--cloud);border-radius:var(--r2);padding:18px var(--sp-card-pad);position:relative;overflow:hidden;}
 .next-step::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(360px 180px at 100% 0%,color-mix(in srgb,var(--cyan) 22%,transparent),transparent 60%),radial-gradient(320px 170px at 0% 100%,color-mix(in srgb,var(--violet) 26%,transparent),transparent 62%);}
 .ns-ic{position:relative;z-index:1;width:48px;height:48px;flex:0 0 auto;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;color:var(--cyan);}
 .ns-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
@@ -826,7 +833,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* .ns-cta-slot replaces the old plain .btn-primary — a Liquid Metal button auto-sizes itself off
    its own label, it doesn't stretch to fill a flex track the way the old <button width:100%> did,
    so on mobile it just centers on its own line instead of spanning edge-to-edge. */
-.ns-cta-slot{position:relative;z-index:1;flex:0 0 auto;}
+/* align-self:center — the row itself just went align-items:flex-start (see .next-step), but the CTA
+   button still reads better vertically centered against the icon+text rather than pinned to the top. */
+.ns-cta-slot{position:relative;z-index:1;flex:0 0 auto;align-self:center;}
 /* Right-aligned on mobile, scoped to .next-step specifically (Home + Games' next-step cards). */
 :root[data-view="mobile"] .next-step .ns-cta-slot{width:100%;display:flex;justify-content:flex-end;}
 .home-counters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
@@ -1859,7 +1868,7 @@ function renderSplash(){
     '<div class="sp-top fade"><img class="sp-logo" src="'+LOGO_IMG.efinBT+'" alt="efin × Better Trade">'+
       '<div class="sp-kick">เกมค้นหาตัวตนนักลงทุน</div>'+
       '<img class="sp-hero-logo" src="'+LOGO_IMG.nwnp+'" alt="New World, New Playbook · Better Trade 2026">'+
-      '<p class="sp-sub">โลกการลงทุนใบใหม่ เริ่มจากรู้จักตัวเอง ✦ พบตัวตนนักลงทุน 1 ใน 12 แบบที่เป็นคุณ</p></div>'+
+      '<p class="sp-sub">โลกการลงทุนใบใหม่ เริ่มจากรู้จักตัวเอง พบตัวตนนักลงทุน 1 ใน 12 แบบที่เป็นคุณ</p></div>'+
     '<div class="sp-stage"><div class="fan-stage" id="fanStage">'+slides+'</div></div>'+
     '<div class="sp-preview-note">พรีวิวการ์ดตัวตนนักลงทุน '+ic('lc-sparkles')+' 12 แบบ</div>'+
     '<div class="sp-cta"><div id="cta-slot"></div></div>'+
@@ -2286,12 +2295,14 @@ function renderBook(){
   if(!RESULT){st.phase='splash';render();return;}
   var r=RESULT,h=r.hero;
   var ev=evoCompute(r);
-  // Which tab opens by default: while there's no post-event evidence yet ('building'), pre-event
-  // is the only real content, so it leads; once there's ANY real activity, the post-event view is
-  // the more current/relevant one and leads instead — per direction, the identity card should
-  // default to whichever profile is actually "live" right now, not always pre-event. The persona
-  // driving the shared fam-badge above the tabs follows the same rule (activeHero).
-  var defaultTab=ev.state==='building'?'pre':'post';
+  // Which tab opens by default: reverted to always 'pre' (2026-08-15, per direction "หลังจาก ทำ
+  // quiz dna เสร็จ ... ให้ active ที่ โปรไฟล์ก่อนงาน ก่อน") — the previous rule (default to whichever
+  // profile is "live") meant this demo's pre-seeded GAME_PLAYED mock data made "post" the default
+  // the moment a fresh quiz-taker landed here, even though they hadn't really done anything at the
+  // event yet. Landing on your own quiz result first, and opting into the post-event view
+  // yourself, is the more predictable flow. The persona driving the shared fam-badge above the
+  // tabs follows the same rule (activeHero).
+  var defaultTab='pre';
   var activeHero=defaultTab==='pre'?h:ev.behHero;
   var matchOk=Math.abs(r.gap)<=1.5;
   var isUltimate=curTier().name==='Ultimate';
@@ -2795,8 +2806,12 @@ function renderHome(){
     HOME_MST.agendaDay=parseInt(value,10);HOME_MST.agendaAll=false;renderHome();
     // renderHome() replaces #agTabs wholesale (unlike ddTabs' local-repaint case below), which
     // detaches the tab initBtTabs just focused — refocus its replacement so keyboard users don't
-    // silently lose their place after an arrow-key day switch.
-    var fresh=root.querySelector('#agTabs [aria-selected="true"]');if(fresh)fresh.focus();
+    // silently lose their place after an arrow-key day switch. {preventScroll:true} is required
+    // here (2026-08-15, per direction "กดแล้ว หน้าจอจะกระตุกเด้งลงด้านล่าง") — a plain .focus() call
+    // triggers the browser's default scroll-into-view behavior, which jumped the whole page on
+    // EVERY tab switch (mouse click included, since this callback fires regardless of input type),
+    // not just keyboard nav.
+    var fresh=root.querySelector('#agTabs [aria-selected="true"]');if(fresh)fresh.focus({preventScroll:true});
   });
   var agMore=root.querySelector('#agMore');if(agMore)agMore.onclick=function(){HOME_MST.agendaAll=!HOME_MST.agendaAll;renderHome();};
   mountHeaderQR();
@@ -3211,7 +3226,21 @@ function buildGoTop(){
     var clear=tabbar?tabbar.getBoundingClientRect().height:64;
     btn.style.bottom=Math.round(clear+16)+'px';
   };
-  var onScroll=function(){btn.classList.toggle('show',scrollTopNow()>window.innerHeight*0.7);reposition();};
+  /* Threshold made relative to each screen's OWN scrollable range, not a flat 70%-of-viewport
+     (2026-08-15, per direction "ปุ่ม go to top เพิ่มในหน้า เกมส์หลัก และ โปรไฟล์ด้วย") — Games and
+     Profile are short enough that (scrollHeight - clientHeight) never reaches 70% of the viewport
+     height, so the button was mathematically unreachable there, not just rare — no amount of
+     scrolling could ever satisfy the old fixed threshold. Long pages (Book) are unaffected since
+     min() just keeps the original 70%-of-viewport figure whenever a screen's own range comfortably
+     exceeds it. */
+  var onScroll=function(){
+    var maxRoot=Math.max(0,root.scrollHeight-root.clientHeight);
+    var maxDoc=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
+    var max=Math.max(maxRoot,maxDoc);
+    var thresh=Math.min(window.innerHeight*0.7,max*0.5);
+    btn.classList.toggle('show',max>0&&scrollTopNow()>thresh&&scrollTopNow()>150);
+    reposition();
+  };
   window.addEventListener('scroll',onScroll,{passive:true});
   root.addEventListener('scroll',onScroll,{passive:true});
   window.addEventListener('resize',reposition,{passive:true});
