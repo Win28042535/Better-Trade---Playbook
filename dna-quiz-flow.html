@@ -1891,7 +1891,12 @@ function mountSplashCTA(){
   window.mountLiquidMetalCta({
     label:'ค้นหาตัวตนของคุณ',
     fontFamily:'var(--font)',
-    onClick:function(){stopSplashTimer();st.phase='quiz';st.idx=0;render();}
+    /* Bug fix (2026-08-15, per "fix bug" review) — this jumped straight to st.phase='quiz', so
+       renderConsent() (the PDPA data-consent checkbox + "เริ่มทำแบบทดสอบ" screen, fully built and
+       working — its own #startBtn already does the phase='quiz';idx=0 transition once st.consent
+       is true) was completely unreachable from the real navigation flow. Splash now routes to
+       consent first, same as the screen's own header ("แบบวัดตัวตนนักลงทุน · DNA · 11") implies. */
+    onClick:function(){stopSplashTimer();st.phase='consent';render();}
   });
 }
 window.addEventListener('lmb:ready',function(){if(st.phase==='splash')mountSplashCTA();});
