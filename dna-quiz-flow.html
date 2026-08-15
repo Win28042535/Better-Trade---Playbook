@@ -16,11 +16,17 @@
      divider border in the app inherits from these 4 tokens, so lightening them here softens boundary
      lines app-wide in one place rather than per-component. */
   --line:rgba(17,19,24,0.09); --line-soft:rgba(17,19,24,0.08); --line-strong:rgba(17,19,24,0.17); --line-header:rgba(17,19,24,0.06);
-  /* the last 3 black-alpha values in the file that weren't already part of the line/shadow scale —
-     each has exactly one use-site, named here so nothing app-facing is a bare rgba() (2026-08-12). */
-  --ring-idle:rgba(17,19,24,0.14); --shadow-cta-ink:rgba(17,19,24,0.18);
+  /* 2026-08-15, per Color DNA review — --shadow-cta-ink (previously here) had zero consumers
+     anywhere in the file despite its own comment claiming one use-site; deleted rather than kept
+     around unread. --ring-idle is still real (.spec-bd's static ring), kept as-is. */
+  --ring-idle:rgba(17,19,24,0.14);
   --focus:#2b6cff; --popover:rgba(255,255,255,0.96);
   --cyan:#61e8ed; --violet:#9c91ff; --pink:#f178d8; --yellow:#f2ea83;
+  /* --cyan-ink (2026-08-15, per Color DNA review "01") — .pe-report.on svg read this via
+     var(--cyan-ink,var(--ink)) but it was never defined, so the "unlocked progress report" icon
+     silently fell back to plain ink instead of the cyan its name promises. Wired to the real
+     value rather than deleted, since cyan genuinely is the intended "unlocked/done" tint here. */
+  --cyan-ink:var(--cyan);
   --spectrum:linear-gradient(90deg,#61e8ed,#9c91ff,#f178d8,#f2ea83,#61e8ed);
   /* "Gold/amber" status color (2026-08-14) — was the exact same 3-hex combo hand-copied into 5
      separate rules (str-box.wn, redeem-card.on, pass-ic.gold, rt-badge.feat, prof-tier) plus a 6th
@@ -28,6 +34,22 @@
      once so "the one gold across the app" (already the stated intent in 3 of those rules' own
      comments) is actually one definition, not five+ copies that can drift apart independently. */
   --amber-bg:#fef4e2; --amber-border:#f3daa0; --amber-text:#8a5a00;
+  /* "Good/green" status color (2026-08-15, per Color DNA review "04") — .str-box's raw #22c55e/
+     #15803d were the one semantic left untokenized while its amber sibling (.str-box.wn, directly
+     below it) already had named tokens. Same 3-part shape (bg/border/text) as --amber-*. */
+  --green-bg:color-mix(in srgb,#22c55e 10%,transparent); --green-border:color-mix(in srgb,#22c55e 28%,transparent); --green-text:#15803d;
+  /* "Done" (cyan) / "active" (violet) status ladders (2026-08-15, per Color DNA review "06") — cyan
+     alone was independently re-tinted at 5/10/12/14/15/16/20% fill + 30/35/40% border across 12
+     selectors for one semantic ("this is done/unlocked"); violet had the same shape at 7/8/12/14/
+     15/20% fill + 22/26% border for "in progress/active". Collapsed to 3 rungs each — wash (a
+     background tint), fill (a chip that must read as its own object), border (a visible outline) —
+     and every consumer below now points at one of these six instead of picking its own percentage. */
+  --done-wash:color-mix(in srgb,var(--cyan) 10%,transparent);
+  --done-fill:color-mix(in srgb,var(--cyan) 15%,transparent);
+  --done-border:color-mix(in srgb,var(--cyan) 35%,transparent);
+  --active-wash:color-mix(in srgb,var(--violet) 10%,transparent);
+  --active-fill:color-mix(in srgb,var(--violet) 15%,transparent);
+  --active-border:color-mix(in srgb,var(--violet) 35%,transparent);
   --ease:cubic-bezier(0.22,1,0.36,1);
   /* Radius scale (2026-08-12) — 8/12/16/24 is the full ladder; the system only ever
      names the two rungs actually in use. 12 and 24 stay reserved for future needs.
@@ -54,6 +76,10 @@
   --sp-inline:10px;       /* two distinct-but-related items sharing a row (row icon + its text, avatar + label, a stat's icon + value) */
   --sp-stack:14px;      /* a section's own eyebrow/heading → the body content that follows it (inside one card) */
   --sp-card-pad:20px;   /* a card's own inner edge padding — the gutter between a card's border and its content */
+  /* 2026-08-15, per Card & Section review "11" — small (--r1) cards had no padding rung of their
+     own, so 7 different literal values (10/12/13/14/15/16px) floated independently across them.
+     One value now, applied on all 4 sides (was previously asymmetric per selector). */
+  --sp-card-pad-sm:14px;
   --sp-edge:20px;       /* the SCREEN's own outer gutter before any card starts — unified across quiz/book/splash/consent (was 14–24px ad hoc per screen) */
   --sp-block:22px;      /* one labeled sub-section to the next INSIDE the same card (identity → radar → interests → traits → allocation) */
   --sp-section:20px;    /* THE gap between any two top-level sections/cards on a long scroll (Book).
@@ -385,7 +411,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .consent-h .ch-2{display:block;color:var(--ink);font-weight:var(--w-label);}
 .consent-p{font-size:var(--fs-body);font-weight:var(--w-body);color:var(--muted);line-height:1.65;max-width:280px;margin:0 auto;}
 .round-cards{display:flex;gap:10px;width:100%;margin:32px 0 4px;}
-.round-card{flex:1;border:1px solid var(--line-soft);border-radius:var(--r2);padding:16px 12px;background:var(--white);}
+.round-card{flex:1;border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad-sm);background:var(--white);}
 .rc-top{display:flex;align-items:center;justify-content:center;gap:var(--sp-glue);margin-bottom:9px;}
 .rc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .rc-kicker{font-family:var(--font);font-size:var(--fs-eyebrow);letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);}
@@ -471,9 +497,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .str-grid{display:flex;flex-direction:column;gap:var(--sp-list);margin-bottom:var(--sp-stack);}
 :root[data-view="tablet"] .str-grid,:root[data-view="pc"] .str-grid{flex-direction:row;}
 .str-grid .str-box{flex:1;}
-.str-box{border-radius:var(--r1);padding:11px 13px;background:color-mix(in srgb,#22c55e 10%,transparent);border:1px solid color-mix(in srgb,#22c55e 28%,transparent);}
+.str-box{border-radius:var(--r1);padding:var(--sp-card-pad-sm);background:var(--green-bg);border:1px solid var(--green-border);}
 .str-box.wn{background:var(--amber-bg);border-color:var(--amber-border);}
-.str-hd{display:flex;align-items:center;gap:var(--sp-glue);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:0.04em;margin-bottom:var(--sp-list);color:#15803d;}
+.str-hd{display:flex;align-items:center;gap:var(--sp-glue);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:0.04em;margin-bottom:var(--sp-list);color:var(--green-text);}
 .str-box.wn .str-hd{color:var(--amber-text);}
 .str-hd svg{width:var(--ic-sm);height:var(--ic-sm);}
 .str-li{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--ink);line-height:1.55;margin-bottom:3px;}
@@ -481,7 +507,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    suited for"), so the whole block is its own tinted panel (background+border in the persona's
    accent color, applied inline via h.accent) instead of just sitting bare on the card surface —
    this is the highlight the customer should see they're "คู่ควรกับ", not a footnote. */
-.ast-block{border-radius:var(--r1);padding:14px 15px;margin-bottom:var(--sp-stack);}
+.ast-block{border-radius:var(--r1);padding:var(--sp-card-pad-sm);margin-bottom:var(--sp-stack);}
 .ast-lbl{display:flex;align-items:center;gap:6px;font-family:var(--font);font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);margin-bottom:11px;}
 .ast-lbl svg{width:var(--ic-sm);height:var(--ic-sm);}
 .ast-chips{display:flex;flex-wrap:wrap;gap:9px;}
@@ -544,7 +570,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .s-sub{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.55;margin-bottom:18px;}
 .upd-pill{display:inline-flex;align-items:center;gap:var(--sp-glue);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.04em;color:var(--muted);margin-bottom:18px;text-transform:uppercase;}
 .upd-pill svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);}
-.risk-box{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--r2);padding:16px 16px;margin-bottom:14px;}
+/* Stepped down from --r2 to --r1 (2026-08-15, per Card & Section review "09") — this panel sits
+   nested inside a --r2 .card, so it was matching its own parent's radius instead of reading as a
+   smaller nested surface; .next-card (same nesting depth, same card) was already --r1. */
+.risk-box{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--r1);padding:16px 16px;margin-bottom:14px;}
 .risk-hd{display:flex;align-items:center;gap:var(--sp-inline);margin-bottom:8px;}
 /* Hierarchy pass (2026-08-15, "ตอนนี้ดูเท่าๆ กันไปหมด") — .risk-tag/.risk-match/.risk-desc were all
    --fs-bodysm (16px), so the box's one real headline (the "ตรงกัน"/"ต่างกัน N" finding) never stood
@@ -568,7 +597,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    serif-numeral language as .conf-sc just below it in the same card. */
 .risk-vl{width:50px;text-align:right;font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);font-family:var(--serif);}
 /* confidence highlight — the soft blue wash moved here from the identity card (it read poorly overlapping the card art); a quiet radial glow behind the score corner only */
-.conf-box{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--r2);padding:16px 16px;position:relative;overflow:hidden;}
+.conf-box{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--r1);padding:16px 16px;position:relative;overflow:hidden;}
 .conf-glow{position:absolute;top:-45%;right:-15%;width:60%;height:150%;background:radial-gradient(closest-side,rgba(101,152,255,0.18),rgba(101,152,255,0) 70%);pointer-events:none;z-index:0;}
 .conf-box>*:not(.conf-glow){position:relative;z-index:1;}
 .conf-hd{display:flex;align-items:center;gap:var(--sp-inline);margin-bottom:16px;}
@@ -716,7 +745,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .lib-cat-hd{width:100%;display:flex;align-items:center;gap:10px;padding:13px 15px;background:var(--white);border:none;cursor:pointer;font-family:var(--font);text-align:left;}
 .lib-cat-ic{width:18px;height:18px;color:var(--muted);flex:0 0 auto;}
 .lib-cat-t{flex:1;min-width:0;font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
-.lib-cat-n{flex:0 0 auto;font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--violet);background:color-mix(in srgb,var(--violet) 12%,transparent);padding:3px 9px;border-radius:var(--rpill);}
+.lib-cat-n{flex:0 0 auto;font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--violet);background:var(--active-fill);padding:3px 9px;border-radius:var(--rpill);}
 .lib-cat-cv{width:18px;height:18px;color:var(--muted);flex:0 0 auto;transition:transform .18s var(--ease);}
 .lib-cat.open .lib-cat-cv{transform:rotate(180deg);}
 /* Same max-height mechanism as .side-body/.gr-body — body markup is now always present and just
@@ -802,7 +831,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    icon badge, matching the Profile tier badge, so the premium tiers read as premium. */
 .pass-card{display:block;width:100%;text-align:left;font-family:var(--font);background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:15px 16px;cursor:pointer;}
 .pass-top{display:flex;align-items:center;gap:12px;}
-.pass-ic{width:44px;height:44px;flex:0 0 auto;border-radius:12px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--violet) 12%,transparent);color:var(--violet);}
+.pass-ic{width:44px;height:44px;flex:0 0 auto;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--active-fill);color:var(--violet);}
 /* Light gold, not the previous medium-saturation gradient — same --amber-* tokens as the route
    page's existing "ผู้สนับสนุน" sponsor chip (.rt-badge.feat), so every "gold" accent in the app
    now shares one light tone instead of three different golds. */
@@ -819,7 +848,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* next-step — the ONE prominent home action, an ink card echoing the source's dark navy card */
 .next-step{display:flex;align-items:center;gap:var(--sp-inline);flex-wrap:wrap;background:var(--ink);color:var(--cloud);border-radius:var(--r2);padding:18px var(--sp-card-pad);position:relative;overflow:hidden;}
 .next-step::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(360px 180px at 100% 0%,color-mix(in srgb,var(--cyan) 22%,transparent),transparent 60%),radial-gradient(320px 170px at 0% 100%,color-mix(in srgb,var(--violet) 26%,transparent),transparent 62%);}
-.ns-ic{position:relative;z-index:1;width:48px;height:48px;flex:0 0 auto;border-radius:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;color:var(--cyan);}
+.ns-ic{position:relative;z-index:1;width:48px;height:48px;flex:0 0 auto;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;color:var(--cyan);}
 .ns-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
 .ns-tx{position:relative;z-index:1;flex:1;min-width:0;}
 .ns-ey{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,.55);}
@@ -832,7 +861,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* Right-aligned on mobile, scoped to .next-step specifically (Home + Games' next-step cards). */
 :root[data-view="mobile"] .next-step .ns-cta-slot{width:100%;display:flex;justify-content:flex-end;}
 .home-counters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.hc-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:14px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;text-align:left;font-family:var(--font);}
+.hc-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad-sm);cursor:pointer;display:flex;flex-direction:column;gap:2px;text-align:left;font-family:var(--font);}
 .hc-card svg{width:var(--ic-md);height:var(--ic-md);}
 .hc-val{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);line-height:1.2;font-family:var(--font);}
 .hc-label{font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);line-height:1.35;}
@@ -840,7 +869,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* Was flat neutral gray (var(--accent)/var(--ink)) like a plain UI-chrome icon — the book teaser
    is a real content shortcut (same "your guide/identity" idea as the Home pass-card and profile
    tier badge), so it gets the same violet tint those already use instead of reading as generic. */
-.bt-ic{width:44px;height:44px;flex:0 0 auto;border-radius:13px;background:color-mix(in srgb,var(--violet) 12%,transparent);display:flex;align-items:center;justify-content:center;color:var(--violet);}
+.bt-ic{width:44px;height:44px;flex:0 0 auto;border-radius:12px;background:var(--active-fill);display:flex;align-items:center;justify-content:center;color:var(--violet);}
 .bt-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
 .bt-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);line-height:1.25;}
 .bt-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:2px;}
@@ -848,7 +877,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .home-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:18px var(--sp-card-pad);}
 .hcard-hd{margin-bottom:12px;}
 .hcard-hd svg{width:var(--ic-md);height:var(--ic-md);flex-shrink:0;color:var(--violet);}
-.hcard-t{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);letter-spacing:0;}
+/* .hcard-t / .booth-hd .booth-t / .games-hd .games-t / .prof-t all computed to this exact rule —
+   five names, one role (2026-08-15, per Card & Section review "08"). Consolidated onto the single
+   canonical .s-h; .games-t and .prof-t had zero markup consumers left already and are gone
+   entirely, .hcard-t/.booth-t markup sites now use .s-h directly instead of their own class. */
 .hcard-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.5;margin-top:3px;}
 /* ══ BT-TABS ══ generic accessible tab component (bt- prefix, per direction, to avoid clashing
    with this file's own many single-purpose classes) — role=tablist/tab, full keyboard nav, whole-
@@ -891,17 +923,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* data-tooltip — CSS-only, no JS beyond what initBtTabs already wires for focus */
 .bt-tab[data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--ink);color:var(--cloud);font-size:var(--fs-label);font-weight:var(--w-body);padding:5px 9px;border-radius:var(--r0);white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .15s,transform .15s;pointer-events:none;z-index:20;}
 .bt-tab[data-tooltip]:hover::after,.bt-tab[data-tooltip]:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
-/* This app has no other dark-theme surface (no data-theme toggle exists elsewhere), so this is a
-   self-contained prefers-color-scheme block scoped to just this component, satisfying the "light +
-   dark" requirement without retrofitting the rest of the app's color system. */
-@media(prefers-color-scheme:dark){
-  .bt-tabs--secondary .bt-tab{background:#1c1e24;border-color:#33363f;color:#9096a3;}
-  .bt-tabs--secondary .bt-tab[aria-selected="true"]{background:#f4f1e9;color:#111318;border-color:#f4f1e9;}
-  .bt-tabs--primary{border-bottom-color:#33363f;}
-  .bt-tabs--primary .bt-tab{color:#9096a3;}
-  .bt-tabs--primary .bt-tab[aria-selected="true"]{color:#f4f1e9;border-bottom-color:#f4f1e9;}
-  .bt-tab[data-tooltip]::after{background:#f4f1e9;color:#111318;}
-}
+/* The one @media(prefers-color-scheme:dark) block in the file was deleted (2026-08-15, per Color
+   DNA review "07") — it contradicted this file's own "light theme only" stance elsewhere, and only
+   ever covered one component (this tab picker), so a system-dark-mode user got an inverted TOC pill
+   and tab picker sitting inside otherwise all-white cards everywhere else. */
 .ag-row{display:flex;gap:13px;padding:13px 0;border-bottom:1px solid var(--line-soft);}
 .ag-row:last-child{border-bottom:none;}
 .ag-time{flex:0 0 auto;width:52px;font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--violet);line-height:1.45;font-family:var(--font);}
@@ -916,7 +941,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .ann-s{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:1px;}
 /* ══ POST-EVENT ("หลังจบงาน · ดูย้อนหลัง") ══ */
 .pe-report{display:flex;gap:10px;align-items:flex-start;padding:12px 13px;border-radius:var(--r1);background:var(--paper);margin-top:2px;}
-.pe-report.on{background:color-mix(in srgb,var(--cyan) 10%,transparent);}
+.pe-report.on{background:var(--done-wash);}
 .pe-report svg{width:var(--ic-md);height:var(--ic-md);flex:0 0 auto;margin-top:1px;color:var(--muted);}
 .pe-report.on svg{color:var(--cyan-ink,var(--ink));}
 .pe-report-t{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.4;}
@@ -927,8 +952,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    weight, muted gray would look like a mismatch against its now-equal-sized siblings. */
 .pe-vlbl{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);margin:14px 0 6px;}
 .pe-vlist{display:flex;flex-direction:column;gap:8px;}
-.pe-vitem{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r1);border:1px solid var(--line-soft);background:var(--white);}
-.pe-vic{width:36px;height:36px;flex:0 0 auto;border-radius:10px;background:color-mix(in srgb,var(--violet) 14%,transparent);color:var(--violet);display:flex;align-items:center;justify-content:center;}
+.pe-vitem{display:flex;align-items:center;gap:10px;padding:var(--sp-card-pad-sm);border-radius:var(--r1);border:1px solid var(--line-soft);background:var(--white);}
+.pe-vic{width:36px;height:36px;flex:0 0 auto;border-radius:var(--r1);background:var(--active-fill);color:var(--violet);display:flex;align-items:center;justify-content:center;}
 .pe-vic svg{width:var(--ic-md);height:var(--ic-md);}
 .pe-vtx{flex:1;min-width:0;}
 .pe-vt{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);}
@@ -939,7 +964,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pe-track-lbl{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);}
 .pe-track-badge{font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--accent);padding:4px 10px;border-radius:var(--rpill);white-space:nowrap;}
 .pe-track-badge.locked{color:var(--muted);}
-.pe-track-badge.full{color:var(--ink);background:color-mix(in srgb,var(--cyan) 20%,transparent);}
+.pe-track-badge.full{color:var(--ink);background:var(--done-fill);}
 .pe-locked{display:flex;align-items:center;gap:8px;padding:12px 13px;border-radius:var(--r1);border:1px dashed var(--line-strong);color:var(--muted);font-size:var(--fs-eyebrow);}
 .pe-locked svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
 .pe-items{display:flex;flex-direction:column;gap:8px;}
@@ -964,34 +989,33 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 
 /* ══ BOOTH / PASSPORT TAB ══ structure ported from Playbook Final's Passport screen (progress →
    grand-prize status → personalized hero route → per-zone booth check-in), re-skinned to our DNA. */
-.booth-hd .booth-t{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);letter-spacing:0;}
 /* the decorative ✦ inside a bold heading (plain text, not an icon) was inheriting the heading's
    own 24px/700 — reading as its own oversized glyph instead of a quiet separator. .hd-star scales
    it down relative to whatever heading it sits in (em, not a fixed px) and mutes the color. */
 .hd-star{font-size:0.6em;color:var(--muted);}
 .booth-hd .booth-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:3px;}
 .booth-prog{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.bp-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:13px 14px;}
+.bp-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad-sm);}
 .bp-hd{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
 .bp-hd svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
 .bp-lbl{flex:1;font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
 .bp-frac{font-size:var(--fs-bodysm);font-weight:var(--w-label);white-space:nowrap;}
 .bp-bar{height:6px;border-radius:var(--rpill);background:var(--accent);overflow:hidden;}
 .bp-fill{height:100%;border-radius:var(--rpill);transition:width .25s var(--ease);}
-.draw-status{display:flex;gap:11px;align-items:flex-start;padding:14px 15px;border-radius:var(--r2);background:var(--paper);border:1px solid var(--line-soft);}
-.draw-status.ok{background:color-mix(in srgb,var(--cyan) 10%,transparent);border-color:color-mix(in srgb,var(--cyan) 30%,transparent);}
+.draw-status{display:flex;gap:11px;align-items:flex-start;padding:var(--sp-card-pad-sm);border-radius:var(--r2);background:var(--paper);border:1px solid var(--line-soft);}
+.draw-status.ok{background:var(--done-wash);border-color:var(--done-border);}
 /* .need — the "not eligible yet" state used to read as flatly as the page's own quiet default
    (same gray-on-paper as everything else), so the one card that should make you want to go
    check in at another booth blended in instead of standing out. Violet echoes the "not done yet"
    color already used on .bp-fill's progress bars, so the whole page agrees on what violet means. */
-.draw-status.need{background:color-mix(in srgb,var(--violet) 8%,transparent);border-color:color-mix(in srgb,var(--violet) 26%,transparent);}
+.draw-status.need{background:var(--active-wash);border-color:var(--active-border);}
 .draw-status svg{width:var(--ic-lg);height:var(--ic-lg);flex:0 0 auto;color:var(--muted);}
 .draw-status.need svg{color:var(--violet);}
 .ds-h{font-size:var(--fs-body);font-weight:var(--w-label);color:var(--ink);line-height:1.45;}
 .ds-s{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;}
 .ds-dl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--ink);margin-top:6px;}
 .ds-chips{display:inline-flex;flex-wrap:wrap;gap:6px;margin-left:7px;vertical-align:middle;}
-.ds-chip{display:inline-block;background:color-mix(in srgb,var(--violet) 15%,transparent);color:var(--violet);font-weight:var(--w-head);font-size:var(--fs-eyebrow);padding:4px 11px;border-radius:var(--rpill);white-space:nowrap;}
+.ds-chip{display:inline-block;background:var(--active-fill);color:var(--violet);font-weight:var(--w-head);font-size:var(--fs-eyebrow);padding:4px 11px;border-radius:var(--rpill);white-space:nowrap;}
 /* hero route */
 .route-badge{font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--accent);padding:4px 11px;border-radius:var(--rpill);white-space:nowrap;}
 /* aspect-ratio matches Map.png's real 1:1 (a top-down floor plan, not a wide banner) — was 16/9,
@@ -1045,7 +1069,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    their own content (the camera box vs. this QR+caption block), so switching tabs resized the
    whole modal and visibly shifted the title bar/confirm button. Fixed height + flex-centered
    content keeps every OTHER part of the modal in the same position regardless of which tab is on. */
-.scan-mine{box-sizing:border-box;height:168px;border-radius:var(--r2);border:1px dashed var(--line-strong);background:var(--paper);padding:13px;text-align:center;margin-bottom:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+/* --r2 -> --r1 (2026-08-15, per Card & Section review "10") — every other dashed placeholder panel
+   of this size (.lib-stub, .hero-note, .ann-row) uses --r1; this was the one outlier at --r2. */
+.scan-mine{box-sizing:border-box;height:168px;border-radius:var(--r1);border:1px dashed var(--line-strong);background:var(--paper);padding:13px;text-align:center;margin-bottom:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .scan-mine-qr{width:96px;height:96px;margin:0 auto;border-radius:10px;background:var(--white);border:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;color:var(--ink);}
 /* 64px — a large placeholder icon (no real QR to show yet), one-off, no repeated value elsewhere
    to consolidate into a token. */
@@ -1081,7 +1107,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .share-copy-btn{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;background:var(--ink);color:var(--cloud);border:none;font-family:var(--font);font-weight:var(--w-head);font-size:var(--fs-label);padding:9px 16px;border-radius:var(--rpill);cursor:pointer;}
 .share-copy-btn svg{width:var(--ic-sm);height:var(--ic-sm);}
 .rt-row{display:flex;gap:12px;align-items:stretch;}
-.rt-row.top{background:color-mix(in srgb,var(--violet) 7%,transparent);border-radius:var(--r1);padding:6px 8px;margin:0 -8px;}
+.rt-row.top{background:var(--active-wash);border-radius:var(--r1);padding:6px 8px;margin:0 -8px;}
 .rt-rail{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;}
 .rt-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--white);flex:0 0 auto;}
 .rt-dot svg{width:var(--ic-sm);height:var(--ic-sm);}
@@ -1094,7 +1120,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .rt-badge{font-size:var(--fs-label);font-weight:var(--w-label);padding:4px 11px;border-radius:var(--rpill);white-space:nowrap;}
 .rt-badge.pick{color:var(--white);background:var(--violet);}
 .rt-badge.feat{color:var(--amber-text);background:var(--amber-bg);}
-.rt-badge.new{color:var(--violet);background:color-mix(in srgb,var(--violet) 15%,transparent);}
+.rt-badge.new{color:var(--violet);background:var(--active-fill);}
 .rt-meta{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;}
 /* zone activity */
 .zone-howto{overflow:hidden;max-height:0;transition:max-height .28s var(--ease);}
@@ -1110,12 +1136,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    thing to tap on that card. Already-played keeps the app's established cyan "done" tint instead
    of staying ink, so it visually steps back once its job is done. */
 .bc-play{background:var(--ink);border-color:var(--ink);color:var(--cloud);}
-.bc-play.played{background:color-mix(in srgb,var(--cyan) 16%,transparent);border-color:color-mix(in srgb,var(--cyan) 40%,transparent);color:var(--ink);}
+.bc-play.played{background:var(--done-fill);border-color:var(--done-border);color:var(--ink);}
 .booth-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin:12px 0 14px;font-size:var(--fs-eyebrow);color:var(--muted);}
 .booth-legend span{display:inline-flex;align-items:center;gap:5px;}
 .lg-sw{width:10px;height:10px;border-radius:3px;flex:0 0 auto;}
 .booth-grid{display:flex;flex-direction:column;gap:10px;}
-.bc-card{border:1px solid var(--line-soft);border-radius:var(--r1);padding:10px 12px;background:var(--white);}
+.bc-card{border:1px solid var(--line-soft);border-radius:var(--r1);padding:var(--sp-card-pad-sm);background:var(--white);}
 .bc-hd{display:flex;align-items:center;gap:10px;}
 .bc-ic{width:36px;height:36px;flex:0 0 auto;border-radius:var(--r1);background:var(--accent);display:flex;align-items:center;justify-content:center;}
 .bc-ic svg{width:var(--ic-md);height:var(--ic-md);}
@@ -1126,11 +1152,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bc-partners{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
 .bp-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);min-height:36px;padding:0 11px;border-radius:var(--r1);cursor:pointer;transition:background .15s,border-color .15s;}
 .bp-btn svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
-.bp-btn.done{background:color-mix(in srgb,var(--cyan) 12%,transparent);border-color:color-mix(in srgb,var(--cyan) 40%,transparent);color:var(--ink);}
+.bp-btn.done{background:var(--done-fill);border-color:var(--done-border);color:var(--ink);}
 
 /* ══ GAMES TAB ══ the source's "คู่มือ 6 ด้านของคุณ" — 6 mini-games, each fills one Playbook side.
    Ported from Playbook Final's Games screen + sideResult() narratives, re-skinned to our DNA. */
-.games-hd .games-t{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);letter-spacing:0;}
 .gh-sub{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin:-6px 0 2px;}
 /* Progress hero and "play next" highlight now REUSE Home's own system cards instead of bespoke
    dark-donut/spectrum-border treatments — .pass-card (บัตรของคุณ) for the progress status, and
@@ -1141,10 +1166,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* game list rows */
 .game-list{display:flex;flex-direction:column;gap:10px;}
 .game-row{border:1px solid var(--line-soft);border-radius:var(--r2);background:var(--white);overflow:hidden;transition:border-color .15s;}
-.game-row.played{border-color:color-mix(in srgb,var(--cyan) 35%,transparent);background:color-mix(in srgb,var(--cyan) 5%,transparent);}
-.gr-hd{display:flex;align-items:center;gap:11px;padding:12px 14px;}
-.gr-ic{width:38px;height:38px;flex:0 0 auto;border-radius:11px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--muted);}
-.game-row.played .gr-ic{background:color-mix(in srgb,var(--cyan) 14%,transparent);color:var(--ink);}
+.game-row.played{border-color:var(--done-border);background:var(--done-wash);}
+.gr-hd{display:flex;align-items:center;gap:11px;padding:var(--sp-card-pad-sm);}
+.gr-ic{width:38px;height:38px;flex:0 0 auto;border-radius:var(--r1);background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--muted);}
+.game-row.played .gr-ic{background:var(--done-fill);color:var(--ink);}
 .gr-ic svg{width:var(--ic-md);height:var(--ic-md);}
 .gr-tx{flex:1;min-width:0;cursor:pointer;}
 /* .gr-play is .btn.btn-primary now (was .howto-btn) — a real primary action, not a quiet ghost
@@ -1169,7 +1194,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    element can't carry padding itself or it'd peek through at max-height:0. */
 .gr-body{max-height:0;overflow:hidden;transition:max-height .28s var(--ease);}
 .gr-body.show{max-height:400px;}
-.gr-bin{border-top:1px dashed var(--line-soft);padding:12px 14px 14px;}
+/* --line-soft -> --line-strong (2026-08-15, per Card & Section review "13") — every other dashed
+   "not yet unlocked" border in the app (.redeem-card.locked, .ev-empty, .prof-qr, .scan-mine) uses
+   --line-strong; this was the one dashed border on the fainter token. */
+.gr-bin{border-top:1px dashed var(--line-strong);padding:12px 14px 14px;}
 .gr-from{font-size:var(--fs-eyebrow);color:var(--muted);margin-bottom:5px;}
 .gr-result{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);line-height:1.6;}
 .games-note{margin-top:12px;display:flex;align-items:center;gap:6px;font-size:var(--fs-eyebrow);color:var(--muted);}
@@ -1177,14 +1205,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 
 /* ══ PROFILE TAB ══ ported from Playbook Final's Profile screen (identity + QR + info rows + footer
    disclaimer), re-skinned to our DNA. Data (userName/userOrg/profileRows/footer) verbatim. */
-.prof-t{font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);letter-spacing:0;}
 .prof-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad);text-align:center;}
 .prof-av{width:66px;height:66px;margin:0 auto 10px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--ink);}
 .prof-av svg{width:32px;height:32px;}
 .prof-name{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);}
 .prof-org{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:2px;}
 .prof-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:10px;}
-.prof-vf{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:var(--rpill);background:color-mix(in srgb,var(--cyan) 15%,transparent);color:var(--ink);font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
+.prof-vf{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:var(--rpill);background:var(--done-fill);color:var(--ink);font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
 .prof-vf svg{width:var(--ic-sm);height:var(--ic-sm);}
 /* Gold, not ink-black — a tier badge (crown icon, paid-tier name) reads as a status label better
    in a premium gold than in the same flat ink-black used for plain UI chrome elsewhere on this
@@ -2685,7 +2712,7 @@ function postEventHTML(){
           }).join('')+'</div>')+
       '</div>';
   };
-  return '<section class="home-card pe-sec"><div class="hcard-hd"><div class="hcard-t">หลังจบงาน · ดูย้อนหลัง</div></div><div class="hcard-s" style="margin-top:-6px">'+s.ebookNote+'</div>'+
+  return '<section class="home-card pe-sec"><div class="hcard-hd"><div class="s-h">หลังจบงาน · ดูย้อนหลัง</div></div><div class="hcard-s" style="margin-top:-6px">'+s.ebookNote+'</div>'+
     '<div class="pe-report'+(s.progressUnlocked?' on':'')+'">'+ic(s.progressUnlocked?'lc-trending-up':'lc-lock')+'<div><div class="pe-report-t">รายงานพัฒนาการหลังงาน</div><div class="pe-report-s">'+s.progressNote+'</div></div></div>'+
     (s.vdos.length?('<div class="pe-vlbl">วิดีโอย้อนหลัง</div><div class="pe-vlist">'+s.vdos.map(function(v){return '<div class="pe-vitem"><div class="pe-vic">'+ic(v.icon)+'</div><div class="pe-vtx"><div class="pe-vt">'+v.title+'</div><div class="pe-vs">'+v.note+'</div></div>'+ic('lc-play-circle','pe-vplay')+'</div>';}).join('')+'</div>'):'')+
     s.tracks.map(trackHTML).join('')+
@@ -2792,12 +2819,12 @@ function renderHome(){
     '<section class="next-step"><div class="ns-ic">'+ic(ns.icon)+'</div><div class="ns-tx"><div class="ns-ey">'+ns.ey+'</div><div class="ns-t">'+ns.t+'</div><div class="ns-b">'+ns.b+'</div></div><div class="ns-cta-slot" id="ns-cta-slot"></div></section>'+
     '<div class="home-counters">'+HOME_COUNTERS.map(function(c){return '<button class="hc-card" data-go="'+c.go+'"><svg viewBox="0 0 24 24" class="lucide" style="color:'+c.color+'"><use href="#'+c.icon+'"/></svg><div class="hc-val">'+c.val+'</div><div class="hc-label">'+c.label+'</div></button>';}).join('')+'</div>'+
     '<div class="list-row book-teaser" id="homeBook"><div class="bt-ic">'+ic('lc-book-open')+'</div><div class="klib-tx"><div class="bt-t">คู่มือลงทุนของคุณ</div><div class="bt-s">'+bookTeaser+'</div></div>'+ic('lc-chevron-right','bt-cv')+'</div>'+
-    '<section class="home-card"><div class="hcard-hd"><div class="hcard-t">เวทีห้องใหญ่</div><div class="hcard-s">09.00–18.30 น. · Samyan Mitrtown ชั้น 5 · เวทีเดียว 2 วัน กำหนดการคนละชุด</div></div>'+
+    '<section class="home-card"><div class="hcard-hd"><div class="s-h">เวทีห้องใหญ่</div><div class="hcard-s">09.00–18.30 น. · Samyan Mitrtown ชั้น 5 · เวทีเดียว 2 วัน กำหนดการคนละชุด</div></div>'+
       '<div class="bt-tabs bt-tabs--primary" id="agTabs" role="tablist" aria-label="เลือกวันที่กำหนดการ"><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===1?'true':'false')+'" data-value="1"><span class="bt-tab-label">วันที่ 1 ✦ 31 ต.ค.</span></button><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===2?'true':'false')+'" data-value="2"><span class="bt-tab-label">วันที่ 2 ✦ 1 พ.ย.</span></button></div>'+
       '<div class="ag-list">'+shown.map(function(a){return '<div class="ag-row"><div class="ag-time">'+a.time+'</div><div><div class="ag-t">'+a.t+'</div>'+(a.by?'<div class="ag-by">'+a.by+'</div>':'')+'</div></div>';}).join('')+'</div>'+
       (days.length>3?('<button class="ag-more" id="agMore">'+ic(HOME_MST.agendaAll?'lc-chevron-down':'lc-chevron-down')+(HOME_MST.agendaAll?'ย่อกำหนดการ':('ดูกำหนดการทั้งวัน '+days.length+' รายการ'))+'</button>'):'')+
     '</section>'+
-    '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+ic('lc-megaphone')+'<div class="hcard-t" style="font-size:var(--fs-h2)">ประกาศจากงาน</div></div>'+
+    '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+ic('lc-megaphone')+'<div class="s-h" style="font-size:var(--fs-h2);margin-bottom:0">ประกาศจากงาน</div></div>'+
       HOME_ANN.map(function(a){return '<div class="ann-row"><svg viewBox="0 0 24 24" class="lucide" style="color:'+a.color+'"><use href="#'+a.icon+'"/></svg><div><div class="ann-t">'+a.t+'</div><div class="ann-s">'+a.s+'</div></div></div>';}).join('')+
     '</section>'+
     postEventHTML()+
@@ -2856,7 +2883,9 @@ var ZONE_BOOTHS=[
 /* 5 zones — name / sub-label / dot icon / accent, and the score fn (hero radar → route order). */
 var BOOTH_ZONES=[
   {name:'Capital Zone',zone:'โซนกิจกรรม · บูธ 1',icon:'lc-landmark',chip:'เงินทุน',color:'#0090c8',score:function(rd,h){return Math.round((rd[2]+rd[0])/2);}},
-  {name:'Crypto Zone',zone:'โซนกิจกรรม · บูธ 2',icon:'lc-bitcoin',chip:'คริปโต',color:'#b88a10',featured:true,score:function(rd,h){return rd[3];}},
+  /* color unified to --amber-text (2026-08-15, per Color DNA review "05") — was a second, darker,
+     unrelated gold (#b88a10) rendering on the same Booth screen as .rt-badge.feat's --amber-text. */
+  {name:'Crypto Zone',zone:'โซนกิจกรรม · บูธ 2',icon:'lc-bitcoin',chip:'คริปโต',color:'var(--amber-text)',featured:true,score:function(rd,h){return rd[3];}},
   {name:'Commodity Zone',zone:'โซนกิจกรรม · บูธ 3',icon:'lc-coins',chip:'โภคภัณฑ์',color:'#d1622a',score:function(rd,h){return rd[4];}},
   {name:'Alternative Investment Zone',zone:'โซนกิจกรรม · บูธ 4',icon:'lc-gem',chip:'ทางเลือก',color:'#9c6bd0',score:function(rd,h){return /สะสม/.test(JSON.stringify(h.assets))?78:(h.fam==='V'?48:30);}},
   {name:'Health Zone',zone:'โซนกิจกรรม · บูธ 5',icon:'lc-heart',chip:'สุขภาพ',color:'#c048b6',score:function(rd,h){return rd[5];}}
@@ -2966,7 +2995,7 @@ function buildRoute(){
     var isV=i<visited;
     return {name:z.name,zone:z.zone,icon:z.icon,topPick:z.topPick,newAngle:z.newAngle,featured:z.featured,color:z.color,
       status:isV?'✓ แวะแล้ว':(z.topPick?'แนะนำอันดับ 1 สำหรับคุณ':(z.newAngle?'แนะนำให้ลอง (มุมใหม่)':'ยังไม่แวะ')),
-      dotColor:isV?'var(--cyan)':(z.topPick?'var(--violet)':(z.featured?'#b88a10':(z.newAngle?'var(--violet)':'var(--muted)')))};
+      dotColor:isV?'var(--cyan)':(z.topPick?'var(--violet)':(z.featured?'var(--amber-text)':(z.newAngle?'var(--violet)':'var(--muted)')))};
   });
 }
 function renderBooth(){
@@ -2977,7 +3006,7 @@ function renderBooth(){
   var need=[];if(!chkOK)need.push('เช็คอินอีก '+(CHECKIN_NEED-chk)+' บูธ');if(!actOK)need.push('ร่วมกิจกรรมอีก '+(ACTIVITY_NEED-act)+' บูธ');
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
-    '<div class="booth-hd"><div class="booth-t">เดินบูธ <span class="hd-star">✦</span> ลุ้นรางวัล</div><div class="booth-s">เช็คอินบูธ · กิจกรรมประจำบูธ · ลุ้นรางวัลใหญ่</div></div>'+
+    '<div class="booth-hd"><div class="s-h">เดินบูธ <span class="hd-star">✦</span> ลุ้นรางวัล</div><div class="booth-s">เช็คอินบูธ · กิจกรรมประจำบูธ · ลุ้นรางวัลใหญ่</div></div>'+
     '<div class="booth-prog">'+
       '<div class="bp-card"><div class="bp-hd">'+ic('lc-qr-code')+'<span class="bp-lbl">เช็คอินบูธ</span><span class="bp-frac" style="color:'+(chkOK?'var(--cyan)':'var(--violet)')+'">'+(chkOK?('ครบแล้ว · '+chk+' บูธ'):(chk+'/'+CHECKIN_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,chk/CHECKIN_NEED*100)+'%;background:'+(chkOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
       '<div class="bp-card"><div class="bp-hd">'+ic('lc-gamepad-2')+'<span class="bp-lbl">กิจกรรมประจำบูธ</span><span class="bp-frac" style="color:'+(actOK?'var(--cyan)':'var(--violet)')+'">'+(actOK?('ครบแล้ว · '+act+' บูธ'):(act+'/'+ACTIVITY_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,act/ACTIVITY_NEED*100)+'%;background:'+(actOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
@@ -2985,22 +3014,22 @@ function renderBooth(){
     (eligible
       ? '<div class="draw-status ok">'+ic('lc-gift')+'<div><div class="ds-h">ครบเงื่อนไขแล้ว · กดร่วมลุ้นรางวัลใหญ่ได้เลย</div><div class="ds-s">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">✓ กดร่วมลุ้นก่อน 16:00 น. ของวันที่ 2</div></div></div>'
       : '<div class="draw-status need">'+ic('lc-gift')+'<div><div class="ds-h">ยังขาด<span class="ds-chips">'+need.map(function(n){return '<span class="ds-chip">'+n+'</span>';}).join('')+'</span></div><div class="ds-s">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">ครบเมื่อไหร่ ปุ่มร่วมลุ้นรางวัลใหญ่จะขึ้นตรงนี้ให้กด</div></div></div>')+
-    '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="hcard-t">'+(RESULT?'แผนที่เดินบูธเฉพาะคุณ':'แผนที่เดินบูธ (เส้นทางแนะนำ)')+'</div><span class="route-badge">'+visited+'/'+route.length+' จุด</span></div>'+
+    '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="s-h" style="margin-bottom:0">'+(RESULT?'แผนที่เดินบูธเฉพาะคุณ':'แผนที่เดินบูธ (เส้นทางแนะนำ)')+'</div><span class="route-badge">'+visited+'/'+route.length+' จุด</span></div>'+
       '<div class="map-ph has-img"><img class="mp-img" src="'+MAP_IMG+'" alt="ผังงาน Better Trade 2026 · Samyan Mitrtown ชั้น 5"><span class="mp-cap">ผังงาน · Samyan Mitrtown ชั้น 5</span><button class="mp-zoom" id="mapZoomBtn">'+ic('lc-maximize-2')+'<span>ดูแบบเต็มจอ</span></button></div>'+
       '<div class="route-list">'+route.map(function(p,i){
         var badge=(p.topPick?'<span class="rt-badge pick">อันดับ 1 สำหรับคุณ</span>':'')+(p.featured?'<span class="rt-badge feat">ผู้สนับสนุน</span>':'')+(p.newAngle?'<span class="rt-badge new">มุมใหม่</span>':'');
         return '<div class="rt-row'+(p.topPick?' top':'')+'"><div class="rt-rail"><div class="rt-dot" style="background:'+p.dotColor+'">'+ic(p.icon)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+'</div><div class="rt-meta">'+p.zone+' · '+p.status+'</div></div></div>';
       }).join('')+'</div>'+
     '</section>'+
-    '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div class="hcard-t">กิจกรรมประจำโซน</div><button class="howto-btn" id="howtoBtn">'+ic('lc-info')+'วิธีเล่น</button></div>'+
+    '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div class="s-h" style="margin-bottom:0">กิจกรรมประจำโซน</div><button class="howto-btn" id="howtoBtn">'+ic('lc-info')+'วิธีเล่น</button></div>'+
       '<div class="hcard-s" style="margin-top:-6px">แตะชื่อบูธเพื่อเช็คอิน — เช็คอินก่อน แล้วเกมของโซนนั้นจะปลดให้เล่น</div>'+
       '<div class="zone-howto'+(BOOTH_HOWTO?' show':'')+'"><div class="zh-in"><div class="zh-li"><b>1)</b><span>เช็คอิน — แตะชื่อบูธแล้วสแกน QR ที่บูธ (หรือเปิด QR ของคุณให้เจ้าหน้าที่สแกน ได้ผลเหมือนกัน)</span></div><div class="zh-li"><b>2)</b><span>เกมประจำโซนปลดให้เล่น — ไม่บังคับ แต่เล่นแล้วคู่มือของคุณสมบูรณ์ขึ้น</span></div><div class="zh-li"><b>3)</b><span>ร่วมกิจกรรมประจำบูธ — สแกน QR กิจกรรม (บางบูธใช้ QR ใบเดียวกับเช็คอิน บางบูธแยก 2 ใบ ดูป้ายที่บูธ)</span></div><div class="zh-note">เช็คอิน 5 บูธ + ร่วมกิจกรรม 5 บูธ = สิทธิ์ลุ้นรางวัลใหญ่ · เป็นคนละบูธกันได้</div></div></div>'+
-      '<div class="booth-legend"><span><span class="lg-sw" style="background:var(--white);border:1px solid var(--line-strong)"></span>ยังไม่เช็คอิน</span><span><span class="lg-sw" style="background:var(--amber-bg);border:1px solid var(--amber-border)"></span>เช็คอินแล้ว</span><span><span class="lg-sw" style="background:color-mix(in srgb,var(--cyan) 14%,transparent);border:1px solid color-mix(in srgb,var(--cyan) 40%,transparent)"></span>ร่วมกิจกรรมแล้ว</span></div>'+
+      '<div class="booth-legend"><span><span class="lg-sw" style="background:var(--white);border:1px solid var(--line-strong)"></span>ยังไม่เช็คอิน</span><span><span class="lg-sw" style="background:var(--amber-bg);border:1px solid var(--amber-border)"></span>เช็คอินแล้ว</span><span><span class="lg-sw" style="background:var(--done-fill);border:1px solid var(--done-border)"></span>ร่วมกิจกรรมแล้ว</span></div>'+
       '<div class="booth-grid">'+BOOTHS.map(function(b,bi){
         var z=BOOTH_ZONES[b.zone];
         var played=!!BOOTH_ACT[bi];
         var partners=ZONE_BOOTHS[bi].map(function(name,ci){var done=BOOTH_CHK[bi]&&BOOTH_CHK[bi].has(ci);return '<button class="bp-btn'+(done?' done':'')+'" data-b="'+bi+'" data-c="'+ci+'">'+ic(done?'lc-check-circle':'lc-qr-code')+name+'</button>';}).join('');
-        return '<div class="bc-card"><div class="bc-hd"><div class="bc-ic">'+ic(b.icon)+'</div><div class="bc-tx"><div class="bc-asset">'+b.asset+'<span class="bc-zchip" style="color:'+z.color+';background:color-mix(in srgb,'+z.color+' 12%,transparent)">'+z.chip+'</span>'+(played?'<span class="bc-zchip" style="color:var(--cyan);background:color-mix(in srgb,var(--cyan) 14%,transparent)">เล่นแล้ว</span>':'')+'</div><div class="bc-game">'+b.game+'</div></div><button class="howto-btn bc-play'+(played?' played':'')+'" data-play="'+bi+'">'+ic(played?'lc-check':'lc-play-circle')+(played?'เล่นแล้ว':'เล่นเกม')+'</button></div><div class="bc-partners">'+partners+'</div></div>';
+        return '<div class="bc-card"><div class="bc-hd"><div class="bc-ic">'+ic(b.icon)+'</div><div class="bc-tx"><div class="bc-asset">'+b.asset+'<span class="bc-zchip" style="color:'+z.color+';background:color-mix(in srgb,'+z.color+' 12%,transparent)">'+z.chip+'</span>'+(played?'<span class="bc-zchip" style="color:var(--cyan);background:var(--done-fill)">เล่นแล้ว</span>':'')+'</div><div class="bc-game">'+b.game+'</div></div><button class="howto-btn bc-play'+(played?' played':'')+'" data-play="'+bi+'">'+ic(played?'lc-check':'lc-play-circle')+(played?'เล่นแล้ว':'เล่นเกม')+'</button></div><div class="bc-partners">'+partners+'</div></div>';
       }).join('')+'</div>'+
     '</section>'+
   '</main>'+
@@ -3091,7 +3120,7 @@ function renderGames(){
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
     '<section class="home-card">'+
-      '<div class="hcard-t">คู่มือ 6 ด้านของคุณ</div><div class="gh-sub">เล่นเกมแล้วเติมทีละด้าน</div>'+
+      '<div class="s-h">คู่มือ 6 ด้านของคุณ</div><div class="gh-sub">เล่นเกมแล้วเติมทีละด้าน</div>'+
       /* Same .pass-card as Home's "บัตรของคุณ" — plain icon+eyebrow+value text, no chart. Replaces
          the old dark donut ring, which crammed "X/6" into a 66px circle hard to read at a glance
          when the surrounding text already says the same thing. */
