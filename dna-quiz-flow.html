@@ -272,7 +272,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .q-sub{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.5;margin:4px auto 0;text-wrap:pretty;max-width:400px;}
 .q-opts,.int-grid{width:100%;max-width:460px;margin:0 auto;}
 .q-opts{display:flex;flex-direction:column;gap:var(--sp-list);}
-.q-opt{display:grid;grid-template-columns:34px 1fr;gap:13px;align-items:center;padding:15px 16px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
+/* align-items:start (2026-08-15, per direction "align top... ตอนนี้ align center พอตัวเลือกที่มี 2
+   บรรทัด จะเห็นได้ชัด") — the option-key icon was centering against the full height of any answer
+   that wrapped to 2 lines instead of sitting level with its first line. */
+.q-opt{display:grid;grid-template-columns:34px 1fr;gap:13px;align-items:start;padding:15px 16px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
 .q-opt.sel{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,var(--spectrum) border-box;}
 .opt-key{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--fs-label);font-weight:var(--w-head);background:var(--accent);color:var(--muted);flex-shrink:0;transition:background .18s,color .18s;font-family:var(--font);}
 .q-opt.sel .opt-key{background:var(--ink);color:var(--cloud);}
@@ -2403,7 +2406,12 @@ function renderBook(){
       '<div class="efin-d">คัดลอกคำถามที่ปรับตามตัวตน '+h.th+' ของคุณไปคุยกับ efin AI ต่อได้ทันที</div>'+
       '<div class="efin-acts"><button class="btn btn-primary">'+ic('lc-message-circle')+'คัดลอกคำถามไปถาม efin AI</button><button class="btn btn-secondary">เปิดหน้า efin AI</button></div></div>'+
     '<section class="card mb"><div class="s-pad" style="padding-bottom:0">'+
-      '<div class="s-ey">'+ic('lc-sparkles')+'AI Insight</div><h2 class="s-h">คุณเป็นนักลงทุนแบบไหน</h2>'+
+      /* 3 fixes to this header (2026-08-15, per direction): .s-ey bumped to weight 700 · .s-h
+         indented 22px (--ic-sm 16px + --sp-glue 6px, the eyebrow's own icon+gap width) so its text
+         lines up with "AI Insight" itself instead of the icon above it · .s-h given real
+         margin-bottom before .risk-box, since this section (unlike its siblings) has no .s-sub to
+         supply that gap on its own and was reading as glued directly to the content below it. */
+      '<div class="s-ey" style="font-weight:var(--w-label)">'+ic('lc-sparkles')+'AI Insight</div><h2 class="s-h" style="margin-left:22px;margin-bottom:18px">คุณเป็นนักลงทุนแบบไหน</h2>'+
       '<div class="risk-box"><div class="risk-hd"><span class="risk-tag">ความเสี่ยง "บอก" vs "จริง"</span><span class="risk-match">'+(matchOk?('<span class="ld" style="background:var(--cyan)"></span>ตรงกัน'):('ต่างกัน '+(r.gap>0?'+':'')+r.gap))+'</span></div>'+
         '<p class="risk-desc">'+(matchOk?'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน — นักลงทุนที่ self-aware มักตัดสินใจได้ดีกว่าในภาวะตลาดผันผวน':'ความเสี่ยงที่คุณ "บอก" กับที่พฤติกรรมจริงสะท้อนออกมาต่างกันอยู่บ้าง — รู้ gap นี้ช่วยให้วางแผนได้แม่นขึ้น')+'</p>'+
         '<div class="risk-slbl">ระดับความเสี่ยง 1–10</div>'+
@@ -2422,15 +2430,12 @@ function renderBook(){
     '<div class="alloc-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">'+ic('lc-pie-chart')+'แผนจัดพอร์ตที่แนะนำ</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนเริ่มต้นที่เหมาะกับ '+h.th+'</p>'+allocBars()+'</div>'+
     '</section>'+
     sidesHTML(r)+
-    /* Dropped the 2 checkmark strength bullets (2026-08-15, per direction "ตัดทอน รวมข้อมูล อันไหน
-       รวมกันได้") — they repeated h.strengths[0]/[1] verbatim, already shown in full in the "จุดแกร่ง"
-       card above (heroPanelBody's .str-box). The legend line takes over as the card's one real
-       piece of content instead, now carrying legendWhy too (previously only shown in .hero-leg,
-       the pre-tab version) so this closing card still says something the reader hasn't seen yet,
-       and the pink .ld dot is gone per direction ("เอาจุด ชมพูออก"). */
-    '<div class="quote-card"><div class="quote-badge">'+ic('lc-sparkles')+'จากตัวตนของคุณ</div><h2 class="quote-h">คุณคือ '+h.th+' ตัวจริง</h2>'+
-      '<div class="quote-leg">แรงบันดาลใจจาก <span class="ln">'+h.legend+'</span> — '+h.legendWhy+'</div>'+
-      '<div class="quote-acts"><button class="btn btn-primary btn-onink" id="shareTomorrowBtn">'+ic('lc-upload')+'แชร์พรุ่งนี้ของคุณ</button></div></div>'+
+    /* .quote-card removed entirely (2026-08-15, per direction "เอา section นี้ออกเลย เพราะ ถือว่า
+       เอาข้อมูลไปรวม และตัดทอนเข้ากับ section preview card ส่วน โปรไฟล์หลังงานแล้ว") — its remaining
+       job (declare "คุณคือ X ตัวจริง" + legend/inspiration + a share button) was considered fully
+       covered already by the hero-ev-tabs "โปรไฟล์หลังงาน" panel higher up (a full persona preview
+       card with its own share button), once the previous turn trimmed this card down to just that.
+       .quote-badge/.quote-h/.quote-leg/.quote-acts CSS left in place but unconsumed. */
     /* Merged — "ทำอะไรต่อดี" (broad next steps) and "สรุปไว้คุยกับผู้แนะนำการลงทุน" (per-asset
        advisor prep) were two separate cards answering the same underlying question ("what next"),
        just at two different zoom levels; now one card, broad→specific top to bottom. */
