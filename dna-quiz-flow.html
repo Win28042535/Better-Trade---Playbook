@@ -549,8 +549,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .risk-bars{display:flex;flex-direction:column;gap:var(--sp-list);}
 .risk-row{display:flex;align-items:center;gap:var(--sp-inline);}
 .risk-rl{width:86px;flex-shrink:0;font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);}
-.risk-tr{flex:1;height:1px;background:var(--line-soft);overflow:visible;position:relative;}
-.risk-fi{height:1px;background:var(--ink);position:absolute;left:0;top:0;}
+/* Bumped 1px→3px to match .prog-track/.prog-fill (2026-08-15, per Component System review) — the
+   two other single-fill bars in the app (.conf-tr/.conf-fi included) read as noticeably thinner
+   than the Book page's own top progress bar despite the same "one bar, one fill" idea. */
+.risk-tr{flex:1;height:3px;background:var(--line-soft);overflow:visible;position:relative;border-radius:var(--rpill);}
+.risk-fi{height:3px;background:var(--ink);position:absolute;left:0;top:0;border-radius:var(--rpill);}
 .risk-vl{width:44px;text-align:right;font-size:var(--fs-meta);font-weight:var(--w-head);color:var(--ink);font-family:var(--serif);}
 /* confidence highlight — the soft blue wash moved here from the identity card (it read poorly overlapping the card art); a quiet radial glow behind the score corner only */
 .conf-box{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--r2);padding:16px 16px;position:relative;overflow:hidden;}
@@ -639,7 +642,14 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 
 /* ── example-data marker — every section below is populated with illustrative demo values
    (booth games / analysis engine don't exist yet); this tag keeps that honest at a glance ── */
-.ex-tag{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:.04em;color:var(--muted);background:var(--accent);border-radius:20px;padding:3px 9px;text-transform:uppercase;}
+/* Padding unified to 4px 11px (2026-08-15, per Component System review "ให้เป็นแพทเทิร์นเดียวกัน")
+   across every small status badge — this one plus .ds-chip/.route-badge/.rt-badge/.bc-zchip/
+   .gr-played/.prof-vf/.prof-tier — 8 rules that were each independently at their own padding
+   before. .chip stays its own larger established size (icon+text asset tag, a different scale of
+   component, not part of this "small badge" family). radius also moved off its own 20px literal
+   onto --rpill — renders identically at this size (48>=height/2 either way) but stops it being
+   the one pill in the file with a magic-number radius. */
+.ex-tag{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:.04em;color:var(--muted);background:var(--accent);border-radius:var(--rpill);padding:4px 11px;text-transform:uppercase;}
 
 /* trait score bars — thicker filled bars (distinct from the hairline risk/confidence bars) */
 .trait-sec,.alloc-sec{padding:var(--sp-block) var(--sp-card-pad);border-top:1px solid var(--line-soft);}
@@ -697,7 +707,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .lib-cat-n{flex:0 0 auto;font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--violet);background:color-mix(in srgb,var(--violet) 12%,transparent);padding:3px 9px;border-radius:var(--rpill);}
 .lib-cat-cv{width:18px;height:18px;color:var(--muted);flex:0 0 auto;transition:transform .18s var(--ease);}
 .lib-cat.open .lib-cat-cv{transform:rotate(180deg);}
-.lib-cat-body{padding:0 15px 13px;}
+/* Same max-height mechanism as .side-body/.gr-body — body markup is now always present and just
+   collapsed, toggled by direct DOM class changes (see .lib-cat-hd handler) instead of a
+   renderLibrary() re-render (2026-08-15, "11 — List rows & expand/collapse"). Padding moves onto
+   the inner .lib-cat-bi wrapper so the outer max-height:0 collapses fully. */
+.lib-cat-body{max-height:0;overflow:hidden;transition:max-height .28s var(--ease);}
+.lib-cat-body.show{max-height:400px;}
+.lib-cat-bi{padding:0 15px 13px;}
 .lib-stub{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:var(--r1);background:var(--paper);font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;}
 .lib-stub svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;margin-top:1px;}
 .klib-item svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--muted);flex-shrink:0;}
@@ -950,9 +966,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .ds-s{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;}
 .ds-dl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--ink);margin-top:6px;}
 .ds-chips{display:inline-flex;flex-wrap:wrap;gap:6px;margin-left:7px;vertical-align:middle;}
-.ds-chip{display:inline-block;background:color-mix(in srgb,var(--violet) 15%,transparent);color:var(--violet);font-weight:var(--w-head);font-size:var(--fs-eyebrow);padding:3px 10px;border-radius:var(--rpill);white-space:nowrap;}
+.ds-chip{display:inline-block;background:color-mix(in srgb,var(--violet) 15%,transparent);color:var(--violet);font-weight:var(--w-head);font-size:var(--fs-eyebrow);padding:4px 11px;border-radius:var(--rpill);white-space:nowrap;}
 /* hero route */
-.route-badge{font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--accent);padding:5px 11px;border-radius:var(--rpill);white-space:nowrap;}
+.route-badge{font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--accent);padding:4px 11px;border-radius:var(--rpill);white-space:nowrap;}
 /* aspect-ratio matches Map.png's real 1:1 (a top-down floor plan, not a wide banner) — was 16/9,
    which forced object-fit:cover to crop out the top and bottom zones of a square plan. */
 .map-ph{position:relative;border:1px solid var(--line-soft);border-radius:var(--r1);overflow:hidden;background:linear-gradient(135deg,var(--paper),var(--cloud));aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
@@ -1047,7 +1063,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .rt-line{width:2px;flex:1;background:var(--line-soft);margin:2px 0;}
 .rt-body{padding-bottom:14px;min-width:0;}
 .rt-name{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);line-height:1.35;display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
-.rt-badge{font-size:var(--fs-label);font-weight:var(--w-label);padding:2px 7px;border-radius:var(--r0);white-space:nowrap;}
+/* radius moved off --r0 (6px, visibly squarer than every sibling badge) onto --rpill — with
+   padding now matching the rest of this family too, the old squarer corner would have stood out
+   MORE, not less, once it was the only thing left different. */
+.rt-badge{font-size:var(--fs-label);font-weight:var(--w-label);padding:4px 11px;border-radius:var(--rpill);white-space:nowrap;}
 .rt-badge.pick{color:var(--white);background:var(--violet);}
 .rt-badge.feat{color:var(--amber-text);background:var(--amber-bg);}
 .rt-badge.new{color:var(--violet);background:color-mix(in srgb,var(--violet) 15%,transparent);}
@@ -1077,7 +1096,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bc-ic svg{width:var(--ic-md);height:var(--ic-md);}
 .bc-tx{flex:1;min-width:0;}
 .bc-asset{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
-.bc-zchip{font-size:var(--fs-label);font-weight:var(--w-head);padding:2px 8px;border-radius:var(--rpill);white-space:nowrap;}
+.bc-zchip{font-size:var(--fs-label);font-weight:var(--w-head);padding:4px 11px;border-radius:var(--rpill);white-space:nowrap;}
 .bc-game{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;}
 .bc-partners{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
 .bp-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);min-height:36px;padding:0 11px;border-radius:var(--r1);cursor:pointer;transition:background .15s,border-color .15s;}
@@ -1111,13 +1130,21 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .gr-title{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);line-height:1.35;display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
 /* Solid fill, not a tint — a 16%-tint chip on a row that's ALSO 5%-cyan-tinted (.game-row.played)
    just blended into its own background instead of reading as a distinct status. */
-.gr-played{display:inline-flex;align-items:center;gap:3px;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--cyan);padding:2px 8px;border-radius:var(--rpill);}
+.gr-played{display:inline-flex;align-items:center;gap:3px;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--cyan);padding:4px 11px;border-radius:var(--rpill);}
 .gr-played svg{width:var(--ic-sm);height:var(--ic-sm);}
 .gr-status{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.4;margin-top:2px;}
 .gr-chev{width:20px;height:20px;color:var(--muted);flex-shrink:0;cursor:pointer;transition:transform .2s var(--ease);}
 .gr-chev.open{transform:rotate(180deg);}
-.gr-body{padding:0 14px 14px;}
-.gr-bin{border-top:1px dashed var(--line-soft);padding-top:12px;}
+/* Now the SAME max-height CSS-transition mechanism as .side-body (2026-08-15, per Component
+   System review "ใช้กลไกให้เหมือนกัน") — this used to be a conditionally-concatenated body that
+   only existed in the DOM while open, toggled via a full renderGames() re-render, so it snapped
+   open/closed with no animation, unlike .side-row's smooth version. Body markup is now always
+   present (once played) and just collapsed via max-height:0; togGame() below toggles classes
+   directly instead of re-rendering. Padding moves onto the inner .gr-bin wrapper — the outer
+   element can't carry padding itself or it'd peek through at max-height:0. */
+.gr-body{max-height:0;overflow:hidden;transition:max-height .28s var(--ease);}
+.gr-body.show{max-height:400px;}
+.gr-bin{border-top:1px dashed var(--line-soft);padding:12px 14px 14px;}
 .gr-from{font-size:var(--fs-eyebrow);color:var(--muted);margin-bottom:5px;}
 .gr-result{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);line-height:1.6;}
 .games-note{margin-top:12px;display:flex;align-items:center;gap:6px;font-size:var(--fs-eyebrow);color:var(--muted);}
@@ -1132,13 +1159,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .prof-name{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);}
 .prof-org{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:2px;}
 .prof-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:10px;}
-.prof-vf{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--rpill);background:color-mix(in srgb,var(--cyan) 15%,transparent);color:var(--ink);font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
+.prof-vf{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:var(--rpill);background:color-mix(in srgb,var(--cyan) 15%,transparent);color:var(--ink);font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
 .prof-vf svg{width:var(--ic-sm);height:var(--ic-sm);}
 /* Gold, not ink-black — a tier badge (crown icon, paid-tier name) reads as a status label better
    in a premium gold than in the same flat ink-black used for plain UI chrome elsewhere on this
    page. Light tone, matching Home's pass-card icon + the route page's sponsor chip (--amber-*) —
    one gold across the app, not a separate darker one just for this badge. */
-.prof-tier{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--rpill);background:var(--amber-bg);color:var(--amber-text);font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
+.prof-tier{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:var(--rpill);background:var(--amber-bg);color:var(--amber-text);font-size:var(--fs-eyebrow);font-weight:var(--w-head);}
 .prof-tier svg{width:var(--ic-sm);height:var(--ic-sm);}
 .prof-qr{margin-top:16px;padding:16px;border-radius:var(--r1);border:1px dashed var(--line-strong);background:var(--paper);}
 .pq-lbl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
@@ -2378,9 +2405,14 @@ function traitBars(){
   var rows=[{l:'เก็บข้อมูลก่อนตัดสินใจ',v:31,m:35},{l:'ความมีวินัยการลงทุน',v:25,m:25},{l:'การกระจายความเสี่ยง',v:10,m:25},{l:'รับความผันผวนได้',v:11,m:15}];
   return '<div class="trait-list">'+rows.map(function(t){return '<div class="trait-row"><span class="trait-l">'+t.l+'</span><span class="trait-v"><b>'+t.v+'</b>/'+t.m+'</span><div class="trait-tr"><div class="trait-fi" style="width:'+Math.round(t.v/t.m*100)+'%"></div></div></div>';}).join('')+'</div>';
 }
+/* Bar segments now render in a softened tone of each color (2026-08-15, per Component System
+   review "สีเป็น solid เลยค่อนข้างหนัก และสีดูจัดไป") — the thick 14px bar made a full-saturation
+   fill read as loud in a way the same colors don't when they're just a small legend dot, so the
+   dot stays solid (it needs to read clearly at that size) while the segment itself blends 45%
+   toward white. */
 function allocBars(){
   var segs=[{l:'สินทรัพย์แกนหลัก (กองทุน/หุ้นใหญ่)',p:40,c:'var(--violet)'},{l:'สินทรัพย์เติบโต',p:30,c:'var(--cyan)'},{l:'สินทรัพย์ทางเลือก / กระจาย',p:20,c:'var(--pink)'},{l:'เงินสด / สภาพคล่อง',p:10,c:'var(--yellow)'}];
-  var bar=segs.map(function(s){return '<div class="alloc-seg" style="width:'+s.p+'%;background:'+s.c+'"></div>';}).join('');
+  var bar=segs.map(function(s){return '<div class="alloc-seg" style="width:'+s.p+'%;background:color-mix(in srgb,'+s.c+' 55%,var(--white))"></div>';}).join('');
   var legend=segs.map(function(s){return '<div class="alloc-row"><span class="alloc-dot" style="background:'+s.c+'"></span><span class="alloc-l">'+s.l+'</span><span class="alloc-p">'+s.p+'%</span></div>';}).join('');
   return '<div class="alloc-bar">'+bar+'</div><div class="alloc-legend">'+legend+'</div>';
 }
@@ -2418,7 +2450,7 @@ function renderLibrary(){
       '<div class="lib-cats">'+LIBRARY_CATS.map(function(c,i){
         var open=(LIB_OPEN===i);
         return '<div class="lib-cat'+(open?' open':'')+'"><button class="lib-cat-hd" data-i="'+i+'">'+ic(c.icon,'lib-cat-ic')+'<span class="lib-cat-t">'+c.t+'</span><span class="lib-cat-n">'+c.n+'</span>'+ic('lc-chevron-down','lib-cat-cv')+'</button>'+
-          (open?('<div class="lib-cat-body"><div class="lib-stub">'+ic('lc-info')+'<span>เนื้อหาเต็มของ '+c.n+' บทความในหมวดนี้ยังไม่ได้ใส่ในตัวต้นแบบนี้ — ชื่อหมวดและจำนวนบทความเป็นข้อมูลจริงจากต้นฉบับ</span></div></div>'):'')+
+          '<div class="lib-cat-body'+(open?' show':'')+'"><div class="lib-cat-bi"><div class="lib-stub">'+ic('lc-info')+'<span>เนื้อหาเต็มของ '+c.n+' บทความในหมวดนี้ยังไม่ได้ใส่ในตัวต้นแบบนี้ — ชื่อหมวดและจำนวนบทความเป็นข้อมูลจริงจากต้นฉบับ</span></div></div></div>'+
         '</div>';
       }).join('')+'</div>'+
     '</div></section>'+
@@ -2427,7 +2459,12 @@ function renderLibrary(){
   bindTabbar();
   root.querySelector('#devReset').onclick=resetQuiz;
   root.querySelector('#libBack').onclick=function(){st.phase='book';render();};
-  root.querySelectorAll('.lib-cat-hd').forEach(function(b){b.onclick=function(){var i=+b.dataset.i;LIB_OPEN=(LIB_OPEN===i?null:i);renderLibrary();};});
+  root.querySelectorAll('.lib-cat-hd').forEach(function(b){b.onclick=function(){
+    var i=+b.dataset.i,cat=b.closest('.lib-cat'),body=cat.querySelector('.lib-cat-body');
+    var isOpen=cat.classList.contains('open');
+    root.querySelectorAll('.lib-cat.open').forEach(function(c){c.classList.remove('open');var cb=c.querySelector('.lib-cat-body');if(cb)cb.classList.remove('show');});
+    if(!isOpen){cat.classList.add('open');body.classList.add('show');LIB_OPEN=i;}else{LIB_OPEN=null;}
+  };});
 }
 function ddTabs(h){
   var tabs=h.assets.slice(0,4);
@@ -2990,8 +3027,22 @@ function gameRow(i){
   var right=played
     ? '<span class="gr-chev-wrap" data-open="'+i+'">'+ic('lc-chevron-down','gr-chev'+(open?' open':''))+'</span>'
     : '<button class="btn btn-primary gr-play" data-play="'+i+'">'+ic('lc-play-circle')+'เล่นเกม</button>';
-  var body=(played&&open)?'<div class="gr-body"><div class="gr-bin"><div class="gr-from">วัดจาก '+s.from+' · '+s.measures+'</div><div class="gr-result">'+sideResult(i,RESULT&&RESULT.hero,RESULT&&RESULT.heroKey)+'</div></div></div>':'';
+  var body=played?'<div class="gr-body'+(open?' show':'')+'"><div class="gr-bin"><div class="gr-from">วัดจาก '+s.from+' · '+s.measures+'</div><div class="gr-result">'+sideResult(i,RESULT&&RESULT.hero,RESULT&&RESULT.heroKey)+'</div></div></div>':'';
   return '<div class="game-row'+(played?' played':'')+'"><div class="gr-hd"><div class="gr-ic">'+ic(s.icon)+'</div><div class="gr-tx" data-open="'+i+'"><div class="gr-title">'+s.title+(played?'<span class="gr-played">'+ic('lc-check')+'เล่นแล้ว</span>':'')+'</div><div class="gr-status">'+status+'</div></div>'+right+'</div>'+body+'</div>';
+}
+/* Direct-DOM toggle for an already-played game row's result panel — mirrors togSide() so
+   .game-row now animates the same smooth way .side-row does, instead of a jarring full
+   renderGames() re-render (2026-08-15, Component System "11 — List rows & expand/collapse"). */
+function togGame(i){
+  var tx=root.querySelector('.gr-tx[data-open="'+i+'"]');
+  if(!tx)return;
+  var row=tx.closest('.game-row'),body=row.querySelector('.gr-body'),chev=row.querySelector('.gr-chev'),status=row.querySelector('.gr-status');
+  if(!body)return;
+  var isOpen=body.classList.contains('show');
+  root.querySelectorAll('.gr-body.show').forEach(function(b){b.classList.remove('show');});
+  root.querySelectorAll('.gr-chev.open').forEach(function(c){c.classList.remove('open');});
+  root.querySelectorAll('.game-row .gr-status').forEach(function(s){var r=s.closest('.game-row'),tx2=r.querySelector('.gr-tx');if(tx2&&GAME_PLAYED[+tx2.dataset.open])s.textContent='✓ เล่นแล้ว · แตะอ่านผล';});
+  if(!isOpen){body.classList.add('show');if(chev)chev.classList.add('open');if(status)status.textContent='ซ่อนผล';GAME_OPEN=i;}else{GAME_OPEN=null;}
 }
 function renderGames(){
   var filled=gamesPlayedCount();
@@ -3021,7 +3072,7 @@ function renderGames(){
   bindTabbar();
   root.querySelector('#devReset').onclick=resetQuiz;
   root.querySelectorAll('[data-play]').forEach(function(b){b.onclick=function(e){e.stopPropagation();var i=+b.dataset.play;GAME_PLAYED[i]=true;GAME_OPEN=i;renderGames();};});
-  root.querySelectorAll('[data-open]').forEach(function(t){t.onclick=function(){var i=+t.dataset.open;if(!GAME_PLAYED[i])return;GAME_OPEN=(GAME_OPEN===i?null:i);renderGames();};});
+  root.querySelectorAll('[data-open]').forEach(function(t){t.onclick=function(){var i=+t.dataset.open;if(!GAME_PLAYED[i])return;togGame(i);};});
   mountHeaderQR();
   bindHeaderLogo();
   mountNgCta(nextIdx);
