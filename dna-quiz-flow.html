@@ -830,7 +830,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    tier badge), so it gets the same violet tint those already use instead of reading as generic. */
 .bt-ic{width:44px;height:44px;flex:0 0 auto;border-radius:13px;background:color-mix(in srgb,var(--violet) 12%,transparent);display:flex;align-items:center;justify-content:center;color:var(--violet);}
 .bt-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
-.bt-t{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);line-height:1.25;}
+.bt-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);line-height:1.25;}
 .bt-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:2px;}
 .bt-cv{width:20px;height:20px;color:var(--muted);flex-shrink:0;}
 .home-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:18px var(--sp-card-pad);}
@@ -2758,7 +2758,7 @@ function renderHome(){
   '<main class="scroll fade">'+
     '<section class="home-hero"><div class="hh-badge">'+ic('lc-book-open')+'<span class="hh-badge-tx">คู่มือลงทุนของคุณ</span></div>'+
       '<img class="hh-logo" src="'+LOGO_IMG.nwnp+'" alt="New World New Playbook">'+
-      '<p class="hh-sub">คู่มือการลงทุนส่วนตัวของคุณ ประกอบจากการ์ดตัวตนและสิ่งที่คุณทำจริงในงาน <b>ดูย้อนหลังได้บน efin.finance</b></p>'+
+      '<p class="hh-sub"><b>คู่มือการลงทุนส่วนตัวของคุณ ประกอบจากการ์ดตัวตนและสิ่งที่คุณทำจริงในงาน</b> ดูย้อนหลังได้บน efin.finance</p>'+
       '<div class="hh-meta"><span>'+ic('lc-calendar')+'31 ต.ค. – 1 พ.ย. 2569</span><span>'+ic('lc-map-pin')+'Samyan Mitrtown ชั้น 5</span></div></section>'+
     (function(){var tp=(t.meta.sub||'').split(' · ');var benefit=tp[0]||'',price=tp[1]||'';
       return '<button class="pass-card" id="homeTier"><div class="pass-top"><span class="pass-ic'+(t.meta.icon==='lc-crown'?' gold':'')+'">'+ic(t.meta.icon)+'</span><div class="pass-hd"><div class="pass-ey">บัตรของคุณ</div><div class="pass-name">'+t.name+'</div></div>'+ic('lc-chevron-right','pass-cv')+'</div>'+
