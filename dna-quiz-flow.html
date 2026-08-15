@@ -79,14 +79,13 @@
      "three tokens, one size" ambiguity is now only a two-way overlap (eyebrow+meta), not three. */
   --fs-title:32px; --fs-heading:24px; --fs-h2:22px; --fs-sub:18px;
   --fs-body:18px; --fs-bodysm:16px; --fs-label:14px; --fs-eyebrow:12px; --fs-meta:12px;
-  /* Icon scale (2026-08-12) — the old micro(11-12)/small(13-15) tiers collapse into one (icons this
-     small don't read as visually different by 1-3px, so there's no reason for two tiers); medium
-     and large step up to match the bigger type scale. Hero-tier icons (the single dominant icon on
-     a screen) stay sized per-context within roughly 32-44px rather than one fixed token — a reveal
-     splash icon and a card-art glyph are different enough compositions that forcing one number would
-     hurt one of them. The persona card's glyph (64px) is a deliberate exception outside this range —
-     it's the collectible card's own signature art, not a UI icon. */
-  --ic-sm:12px; --ic-md:16px; --ic-lg:24px;
+  /* Icon scale v2 (2026-08-15, per Icon System audit review) — sm/md stepped up a rung (12→16,
+     16→20), lg held at 24. Hero-tier icons (the single dominant icon on a screen) still stay
+     sized per-context within roughly 32-44px rather than one fixed token — a reveal splash icon
+     and a card-art glyph are different enough compositions that forcing one number would hurt one
+     of them. The persona card's glyph (64px) is a deliberate exception outside this range — it's
+     the collectible card's own signature art, not a UI icon. */
+  --ic-sm:16px; --ic-md:20px; --ic-lg:24px;
   /* Card-art type scale (2026-08-15, per Type System audit §06) — the persona card front (.pcE-*)
      and back/dossier (.pcb-*) had 12 independent raw px sizes between them, front and back not
      even agreeing with each other on shared roles (e.g. the Thai name was 13px on the front,
@@ -209,6 +208,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    screen (per direction — the centering is a layout device, not a content change), the icon becomes
    a clearly-reserved placeholder slot instead of a bare inline glyph, and the "font-weight play" is
    automatic (see emphasizeQ() near renderQuiz) rather than hand-authored per question. */
+/* --qc (2026-08-15, per Icon System audit review "ปรับให้เข้ากับ token ที่มี") — this was declared
+   with a fallback on both .q-icon-bare and .q-title b but never actually set anywhere, so every
+   question rendered on the same violet/ink default regardless of section. Now wired to the SAME
+   per-section color already driving this screen's own progress segments/topbar dot (dotColor in
+   renderQuiz — yellow §1 risk, violet §2 DNA, pink §3 interests), set once here on the shared
+   .q-head wrapper and inherited by both children — reuses an existing token, doesn't invent one. */
 .q-head{margin:22px 0 24px;text-align:center;}
 /* Real custom illustrated icons have landed for most questions (q.img → ICON_IMG, see renderQuiz)
    — the --accent circle was only ever a placeholder backdrop for a future icon, and per direction
@@ -439,6 +444,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    updated live on tab switch, see renderBook/heroPanelBody call sites) since they depend on
    whichever persona is currently showing, not a fixed value. */
 .fam-badge{display:flex;width:fit-content;align-items:center;gap:7px;font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-label);letter-spacing:0.01em;margin:0 auto 18px;padding:7px 15px;border-radius:var(--rpill);}
+/* h.famIcon (2026-08-15, per Icon System audit review "ปรับให้เข้ากับ token ที่มี") — every persona
+   already carries this (copied from FAM[fam].icon: lc-shield/lc-compass/lc-sparkles) but nothing
+   rendered it, so the badge showed text only. Now shown at --ic-sm, tinted via currentColor so it
+   automatically matches whatever accent famBadgeStyle() sets on the badge. */
+.fam-badge svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
 .hero-lay{display:flex;gap:15px;align-items:flex-start;}
 .hero-art{flex-shrink:0;width:106px;border-radius:var(--r1);overflow:hidden;border:1px solid var(--line-soft);}
 .hero-art-in{width:106px;height:134px;background:var(--accent);display:flex;align-items:center;justify-content:center;}
@@ -947,7 +957,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    which forced object-fit:cover to crop out the top and bottom zones of a square plan. */
 .map-ph{position:relative;border:1px solid var(--line-soft);border-radius:var(--r1);overflow:hidden;background:linear-gradient(135deg,var(--paper),var(--cloud));aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
 .map-ph .mp-in{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);}
-.map-ph .mp-in svg{width:28px;height:28px;}
+.map-ph .mp-in svg{width:var(--ic-lg);height:var(--ic-lg);}
 .map-ph .mp-img{width:100%;height:100%;object-fit:cover;display:block;}
 .map-ph .mp-cap{position:absolute;left:10px;bottom:9px;font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--cloud);background:var(--ink);padding:4px 9px;border-radius:var(--r0);}
 .map-ph .mp-zoom{position:absolute;right:10px;top:9px;display:flex;align-items:center;gap:5px;background:var(--white);color:var(--ink);border:1px solid var(--line-soft);padding:6px 11px;border-radius:var(--rpill);font-size:var(--fs-eyebrow);font-weight:var(--w-head);box-shadow:0 2px 6px rgba(17,19,24,.1);}
@@ -962,7 +972,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .map-lightbox .ml-body{max-height:74vh;overflow:auto;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--paper),var(--cloud));}
 .map-lightbox .ml-body .ml-img{width:100%;height:auto;display:block;}
 .map-lightbox .ml-body .mp-in{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);}
-.map-lightbox .ml-body .mp-in svg{width:40px;height:40px;}
+/* 44px — same "hero-tier" spirit as .reveal-icon/.q-icon-bare (one dominant icon in this
+   composition, picked per-context rather than forced onto the sm/md/lg UI scale). */
+.map-lightbox .ml-body .mp-in svg{width:44px;height:44px;}
 .map-lightbox .ml-cap{padding:12px 16px;font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);}
 .map-lightbox .ml-close{position:absolute;right:10px;top:10px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(17,19,24,.55);color:var(--white);border:none;cursor:pointer;}
 .map-lightbox .ml-close svg{width:var(--ic-md);height:var(--ic-md);}
@@ -994,7 +1006,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    content keeps every OTHER part of the modal in the same position regardless of which tab is on. */
 .scan-mine{box-sizing:border-box;height:168px;border-radius:var(--r2);border:1px dashed var(--line-strong);background:var(--paper);padding:13px;text-align:center;margin-bottom:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .scan-mine-qr{width:96px;height:96px;margin:0 auto;border-radius:10px;background:var(--white);border:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;color:var(--ink);}
-.scan-mine-qr svg{width:56px;height:56px;}
+/* 64px — a large placeholder icon (no real QR to show yet), one-off, no repeated value elsewhere
+   to consolidate into a token. */
+.scan-mine-qr svg{width:64px;height:64px;}
 .scan-mine-cap{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;margin-top:10px;}
 .scan-note{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:11px;background:color-mix(in srgb,var(--cyan) 8%,transparent);border:1px solid color-mix(in srgb,var(--cyan) 25%,transparent);margin-bottom:13px;}
 .scan-note svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);flex:0 0 auto;margin-top:1px;}
@@ -1019,7 +1033,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .share-row::-webkit-scrollbar{display:none;}
 .share-opt{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:7px;background:none;border:none;cursor:pointer;font-family:var(--font);width:58px;}
 .share-ic{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--white);}
-.share-ic svg{width:22px;height:22px;}
+.share-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
 .share-opt-lbl{font-size:var(--fs-label);color:var(--ink);font-weight:var(--w-head);text-align:center;line-height:1.2;}
 .share-copy{display:flex;align-items:center;gap:10px;border:1px solid var(--line-soft);border-radius:var(--rpill);padding:6px 6px 6px 15px;}
 .share-copy-url{flex:1;min-width:0;font-size:var(--fs-eyebrow);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -1029,7 +1043,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .rt-row.top{background:color-mix(in srgb,var(--violet) 7%,transparent);border-radius:var(--r1);padding:6px 8px;margin:0 -8px;}
 .rt-rail{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;}
 .rt-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--white);flex:0 0 auto;}
-.rt-dot svg{width:15px;height:15px;}
+.rt-dot svg{width:var(--ic-sm);height:var(--ic-sm);}
 .rt-line{width:2px;flex:1;background:var(--line-soft);margin:2px 0;}
 .rt-body{padding-bottom:14px;min-width:0;}
 .rt-name{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);line-height:1.35;display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
@@ -1098,7 +1112,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* Solid fill, not a tint — a 16%-tint chip on a row that's ALSO 5%-cyan-tinted (.game-row.played)
    just blended into its own background instead of reading as a distinct status. */
 .gr-played{display:inline-flex;align-items:center;gap:3px;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--cyan);padding:2px 8px;border-radius:var(--rpill);}
-.gr-played svg{width:11px;height:11px;}
+.gr-played svg{width:var(--ic-sm);height:var(--ic-sm);}
 .gr-status{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.4;margin-top:2px;}
 .gr-chev{width:20px;height:20px;color:var(--muted);flex-shrink:0;cursor:pointer;transition:transform .2s var(--ease);}
 .gr-chev.open{transform:rotate(180deg);}
@@ -1129,7 +1143,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .prof-qr{margin-top:16px;padding:16px;border-radius:var(--r1);border:1px dashed var(--line-strong);background:var(--paper);}
 .pq-lbl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
 .pq-box{width:148px;height:148px;margin:0 auto;border-radius:var(--r1);background:var(--white);border:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;color:var(--ink);}
-.pq-box svg{width:92px;height:92px;}
+/* 96px — the largest placeholder icon in the app (profile QR not generated yet), one-off, no
+   repeated value elsewhere to consolidate into a token. */
+.pq-box svg{width:96px;height:96px;}
 .pq-note{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;margin:11px auto 0;max-width:300px;}
 .prof-rows{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:16px var(--sp-card-pad);display:flex;flex-direction:column;gap:11px;}
 .pr-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;font-size:var(--fs-bodysm);}
@@ -1372,7 +1388,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .go-top{position:fixed;z-index:89;width:44px;height:44px;border-radius:50%;border:1px solid var(--line-soft);background:var(--white);color:var(--ink);box-shadow:0 6px 18px rgba(17,19,24,.16);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .2s var(--ease),transform .2s var(--ease),visibility .2s;}
 .go-top.show{opacity:1;visibility:visible;transform:translateY(0);}
 .go-top:active{transform:scale(.92);}
-.go-top svg{width:20px;height:20px;}
+.go-top svg{width:var(--ic-lg);height:var(--ic-lg);}
 .demo-panel{position:fixed;right:18px;bottom:calc(80px + env(safe-area-inset-bottom,0px));z-index:9999;width:308px;max-height:80vh;overflow-y:auto;background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);box-shadow:var(--shadow-lg);padding:16px 16px 18px;display:none;font-family:var(--font);}
 .demo-panel.open{display:block;animation:fade .28s var(--ease);}
 .demo-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
@@ -2032,7 +2048,7 @@ function renderQuiz(){
     '</header>'+
   progline+
   '<div class="q-scroll fade">'+
-    '<div class="q-head"><div class="q-icon-bare">'+(q.img?'<img src="'+ICON_IMG[q.img]+'" alt="">':ic(q.icon))+'</div>'+
+    '<div class="q-head" style="--qc:'+dotColor+'"><div class="q-icon-bare">'+(q.img?'<img src="'+ICON_IMG[q.img]+'" alt="">':ic(q.icon))+'</div>'+
       '<div class="q-title">'+emphasizeQ(q.q)+'</div>'+(q.cat?('<div class="q-sub">'+q.cat.replace(/·/g,'✦')+'</div>'):'')+'</div>'+
     opts+
     '<div class="q-nav"><button class="btn btn-tertiary" id="backBtn">'+ic('lc-arrow-left','ic-back')+'ย้อนกลับ</button>'+
@@ -2262,7 +2278,7 @@ function renderBook(){
   '</nav>'+
   '<main class="scroll">'+
     '<section class="fade hero-sec" id="hero-sec"><div class="hero-gw"><div class="hero-in">'+
-      '<div class="fam-badge" id="famBadge" style="'+famBadgeStyle(activeHero)+'">'+activeHero.famTh+'</div>'+
+      '<div class="fam-badge" id="famBadge" style="'+famBadgeStyle(activeHero)+'">'+ic(activeHero.famIcon)+'<span>'+activeHero.famTh+'</span></div>'+
       '<div class="bt-tabs bt-tabs--primary hero-ev-tabs" id="heroEvTabs" role="tablist" aria-label="เลือกช่วงเวลาของโปรไฟล์">'+
         '<button class="bt-tab" type="button" role="tab" aria-selected="'+(defaultTab==='pre'?'true':'false')+'" tabindex="'+(defaultTab==='pre'?'0':'-1')+'" data-value="pre"><span class="bt-tab-icon">'+ic('lc-file-text')+'</span><span class="bt-tab-label">โปรไฟล์ก่อนงาน</span></button>'+
         '<button class="bt-tab" type="button" role="tab" aria-selected="'+(defaultTab==='post'?'true':'false')+'" tabindex="'+(defaultTab==='post'?'0':'-1')+'" data-value="post"><span class="bt-tab-icon">'+ic('lc-sparkles')+'</span><span class="bt-tab-label">โปรไฟล์หลังงาน</span></button>'+
@@ -2336,7 +2352,7 @@ function renderBook(){
     root.querySelector('#heroEvPre').style.display=value==='pre'?'':'none';
     root.querySelector('#heroEvPost').style.display=value==='post'?'':'none';
     var badge=root.querySelector('#famBadge'),bh=value==='pre'?h:ev.behHero;
-    if(badge){badge.textContent=bh.famTh;badge.setAttribute('style',famBadgeStyle(bh));}
+    if(badge){badge.innerHTML=ic(bh.famIcon)+'<span>'+bh.famTh+'</span>';badge.setAttribute('style',famBadgeStyle(bh));}
   });
   var evGoGames=root.querySelector('#evGoGames');if(evGoGames)evGoGames.onclick=function(){st.phase='games';render();};
   initBtTabs(root.querySelector('#ddTabs'),function(value){root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===value)?'':'none';});});
