@@ -73,11 +73,12 @@
      directly; there is no longer a second UI typeface in this app, only --font (UI) + --serif
      (display, English/numerals only). Numeric alignment where it mattered is kept via
      font-variant-numeric:tabular-nums on the specific rule, not by switching family. */
-  /* Type scale (2026-08-12) — bumped up a full step system-wide per direction; the eyebrow/meta/
-     label trio collapses to one size (12) since they're the same visual weight-class now, body
-     and sub merge to 16 (one "reading size" for prose and for tappable option text alike). */
-  --fs-title:32px; --fs-heading:24px; --fs-h2:20px; --fs-sub:16px;
-  --fs-body:16px; --fs-bodysm:14px; --fs-label:12px; --fs-eyebrow:12px; --fs-meta:12px;
+  /* Type scale v2 (2026-08-15, per review of the Type System audit) — h2/sub/body/bodysm/label
+     each stepped up one rung (title/heading/eyebrow/meta held, since the audit didn't flag them).
+     --fs-label deliberately moved AWAY from --fs-eyebrow/--fs-meta here (14 vs 12) — the audit's
+     "three tokens, one size" ambiguity is now only a two-way overlap (eyebrow+meta), not three. */
+  --fs-title:32px; --fs-heading:24px; --fs-h2:22px; --fs-sub:18px;
+  --fs-body:18px; --fs-bodysm:16px; --fs-label:14px; --fs-eyebrow:12px; --fs-meta:12px;
   /* Icon scale (2026-08-12) — the old micro(11-12)/small(13-15) tiers collapse into one (icons this
      small don't read as visually different by 1-3px, so there's no reason for two tiers); medium
      and large step up to match the bigger type scale. Hero-tier icons (the single dominant icon on
@@ -86,7 +87,24 @@
      hurt one of them. The persona card's glyph (64px) is a deliberate exception outside this range —
      it's the collectible card's own signature art, not a UI icon. */
   --ic-sm:12px; --ic-md:16px; --ic-lg:24px;
-  --w-body:400; --w-head:500; --w-label:700;
+  /* Card-art type scale (2026-08-15, per Type System audit §06) — the persona card front (.pcE-*)
+     and back/dossier (.pcb-*) had 12 independent raw px sizes between them, front and back not
+     even agreeing with each other on shared roles (e.g. the Thai name was 13px on the front,
+     12.5px on the back). Consolidated to 5 named rungs, one per FUNCTION rather than per side, so
+     front/back now share a token wherever they show the same kind of content. Deliberately its own
+     scale, not folded into --fs-*: this is the card's own signature art, not app UI chrome. */
+  --pc-fs-1:24px;  /* display name (EN) — pcE-en, pcb-en */
+  --pc-fs-2:13px;  /* secondary name (TH) — pcE-th2, pcb-th */
+  --pc-fs-3:11px;  /* reading copy — pcE-def, pcb-li, pcb-leg — plus the decorative sparkle pcE-spk */
+  --pc-fs-4:10px;  /* eyebrow / section head / stat row — pcb-ey, pcb-hd, pcb-stl, pcb-stv */
+  --pc-fs-5:8.5px; /* smallest — edition number, tag label, list/tag bullets */
+  /* Weight scale v2 (2026-08-15) — --w-body merged into --w-head's value (500) per direction
+     ("ให้ในระบบเหลือใช้แค่ 500, 700") — the system now genuinely has 2 rendered weights, not 3.
+     Both tokens are kept (rather than deleting --w-body) since ~30 selectors still reference it
+     by name for its semantic role ("this is baseline body copy," not "this is emphasized") —
+     collapsing the VALUE removes the visual drift; collapsing the NAME too would just be a
+     larger, riskier find-replace for zero further benefit. */
+  --w-body:500; --w-head:500; --w-label:700;
 }
 /* Light theme only — dark mode intentionally removed (per direction: keep the original editorial theme). */
 
@@ -345,7 +363,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* Same 2-weight device as .q-title (see the comment there) — ch-1 (the statement itself) at 500,
    ch-2 (the trailing "...is coming"/"...for you" continuation) at 700, so the two lines read as one
    composed thought instead of one flat weight. */
-.consent-h{font-size:36px;letter-spacing:-0.01em;line-height:1.06;margin-bottom:16px;}
+.consent-h{font-size:var(--fs-title);letter-spacing:-0.01em;line-height:1.06;margin-bottom:16px;}
 /* Colors swapped per direction: the lighter 500 line (ch-1) is now the muted/gray one and the
    heavier 700 line (ch-2) is now the solid ink one — previously the bold line was the faint gray
    and the light line was dark, which read upside-down. Weights stay 500/700; only the colors moved. */
@@ -466,7 +484,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .hero-leg-lbl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
 .hero-leg-txt{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.55;}
 .ld{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.ln{font-family:var(--serif);font-weight:600;color:var(--ink);}
+.ln{font-family:var(--serif);font-weight:var(--w-label);color:var(--ink);}
 /* Right-aligned+secondary (prior pass) → full-width+primary per direction: this is the ONE action
    on the identity card worth an ink-filled CTA, so it should read with the same weight as any
    other primary button in the app, not a quiet outlined pill off to one side. */
@@ -723,7 +741,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    every other eyebrow in the app (.s-ey etc. — see design.md's eyebrow convention). Was flipped to
    700 + a spectrum-gradient-clip in an earlier pass; reverted per direction, this time for good —
    an eyebrow reading louder than the heading under it fought the system's own hierarchy. */
-.hh-badge{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:var(--w-head);letter-spacing:0.04em;color:var(--muted);}
+.hh-badge{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.04em;color:var(--muted);}
 .hh-badge svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--muted);}
 .hh-badge-tx{font-weight:var(--w-head);color:var(--muted);}
 /* Smaller hero logo, bigger emphasis on .hh-sub below — the eyebrow badge/logo were carrying more
@@ -1143,7 +1161,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 @keyframes spDrift{from{transform:translate3d(0,0,0) rotate(var(--r0,0deg)) scale(var(--sc,1));}to{transform:translate3d(var(--dx,10px),var(--dy,-16px),0) rotate(var(--r1,6deg)) scale(var(--sc,1));}}
 .sp-top{position:relative;z-index:2;text-align:center;width:100%;}
 .sp-kick{font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:0.14em;color:var(--muted);margin-bottom:16px;}
-.sp-h{font-family:var(--serif);font-weight:600;font-size:clamp(34px,12vw,50px);line-height:0.96;letter-spacing:-0.015em;text-wrap:balance;}
+.sp-h{font-family:var(--serif);font-weight:var(--w-label);font-size:clamp(34px,12vw,50px);line-height:0.96;letter-spacing:-0.015em;text-wrap:balance;}
 .sp-h .l1{display:block;color:var(--ink);}
 .sp-h .l2{display:block;color:var(--muted);}
 /* subtitle carries the "what am I here to do" message — kept prominent (ink, slightly larger) so it out-reads the decorative hero logo; the key phrase is bolded via <b> in render */
@@ -1209,7 +1227,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pcE-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#f4f1e9;}
 .pcE::before{content:"";position:absolute;inset:0;opacity:.55;background-image:radial-gradient(rgba(17,19,24,0.05) 0.5px,transparent 0.6px);background-size:3px 3px;pointer-events:none;}
 .pcE-name{flex:0 0 auto;text-align:center;position:relative;z-index:3;margin-bottom:6px;}
-.pcE-en{font-family:var(--serif);font-weight:600;font-size:20px;line-height:1.05;color:#15171d;letter-spacing:-0.01em;}
+.pcE-en{font-family:var(--serif);font-weight:var(--w-label);font-size:var(--pc-fs-1);line-height:1.05;color:#15171d;letter-spacing:-0.01em;}
 @supports(width:1cqw){.pcE-en{font-size:clamp(20px,10cqw,30px);}}
 .pcE-art{flex:1 1 auto;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;z-index:1;}
 /* Halo (a big conic-gradient CIRCLE FILL behind the icon) removed, and the glyph's solid-black
@@ -1224,37 +1242,37 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pcE-glyph svg{width:64px;height:64px;color:rgba(17,19,24,0.45);stroke-width:1.2;}
 /* ✦ sparkles carry the spectrum accent via the same background-clip:text technique used for
    .spec-label elsewhere in the file, instead of a flat muted color. */
-.pcE-spk{position:absolute;z-index:2;font-size:11px;background:var(--spectrum);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.pcE-spk{position:absolute;z-index:2;font-size:var(--pc-fs-3);background:var(--spectrum);-webkit-background-clip:text;background-clip:text;color:transparent;}
 /* Bottom info rebuilt as ONE centered column (name → description → asset tags → edition #) —
    was a left/right split (text vs. a 2×2 tag grid) per direction "ให้กลุ่ม text ทั้งหมด align
    กลาง". The hairline divider is now a short spectrum-gradient bar instead of a flat rgba line —
    the card's one deliberate accent moment, echoing the sparkles above it. */
 .pcE-bot{flex:0 0 auto;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;padding-top:12px;}
 .pcE-divider{width:52px;height:2px;border-radius:2px;background:var(--spectrum);}
-.pcE-th2{font-family:var(--font);font-weight:var(--w-label);font-size:13px;color:#15171d;}
-.pcE-def{font-family:var(--font);font-weight:var(--w-body);font-size:9.5px;line-height:1.45;color:rgba(17,19,24,0.6);max-width:34ch;}
-.pcE-ed{font-family:var(--font);font-size:9px;color:rgba(17,19,24,0.4);}
+.pcE-th2{font-family:var(--font);font-weight:var(--w-label);font-size:var(--pc-fs-2);color:#15171d;}
+.pcE-def{font-family:var(--font);font-weight:var(--w-body);font-size:var(--pc-fs-3);line-height:1.45;color:rgba(17,19,24,0.6);max-width:34ch;}
+.pcE-ed{font-family:var(--font);font-size:var(--pc-fs-5);color:rgba(17,19,24,0.4);}
 .pcE-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;}
-.pcE-tag{display:flex;align-items:center;gap:4px;font-family:var(--font);font-size:8.5px;color:rgba(17,19,24,0.75);white-space:nowrap;}
-.pcE-tag i{font-style:normal;font-size:8px;background:var(--spectrum);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.pcE-tag{display:flex;align-items:center;gap:4px;font-family:var(--font);font-size:var(--pc-fs-5);color:rgba(17,19,24,0.75);white-space:nowrap;}
+.pcE-tag i{font-style:normal;font-size:var(--pc-fs-5);background:var(--spectrum);-webkit-background-clip:text;background-clip:text;color:transparent;}
 /* ══ EDITORIAL CARD (back — dossier) ══ */
 .pcb{position:absolute;inset:0;background:#f4f1e9;color:#15171d;padding:20px 18px;display:flex;flex-direction:column;overflow-y:auto;}
 .pcb::before{content:"";position:absolute;inset:9px;border:1px solid rgba(17,19,24,0.22);border-radius:9px;pointer-events:none;}
-.pcb-ey{font-family:var(--font);font-size:9.5px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(17,19,24,0.5);}
-.pcb-en{font-family:var(--serif);font-weight:600;font-size:24px;color:#15171d;line-height:1.02;margin-top:3px;}
-.pcb-th{font-size:12.5px;color:rgba(17,19,24,0.6);margin:2px 0 10px;}
+.pcb-ey{font-family:var(--font);font-size:var(--pc-fs-4);letter-spacing:0.12em;text-transform:uppercase;color:rgba(17,19,24,0.5);}
+.pcb-en{font-family:var(--serif);font-weight:var(--w-label);font-size:var(--pc-fs-1);color:#15171d;line-height:1.02;margin-top:3px;}
+.pcb-th{font-size:var(--pc-fs-2);color:rgba(17,19,24,0.6);margin:2px 0 10px;}
 .pcb-sec{margin-top:11px;}
-.pcb-hd{display:flex;align-items:center;gap:var(--sp-glue);font-family:var(--font);font-size:9.5px;font-weight:var(--w-label);letter-spacing:0.06em;text-transform:uppercase;color:#15171d;margin-bottom:5px;}
+.pcb-hd{display:flex;align-items:center;gap:var(--sp-glue);font-family:var(--font);font-size:var(--pc-fs-4);font-weight:var(--w-label);letter-spacing:0.06em;text-transform:uppercase;color:#15171d;margin-bottom:5px;}
 .pcb-hd svg{width:var(--ic-sm);height:var(--ic-sm);}
-.pcb-li{font-size:11.5px;font-weight:var(--w-body);color:rgba(17,19,24,0.72);line-height:1.45;padding-left:12px;position:relative;margin-bottom:3px;}
-.pcb-li::before{content:"✦";position:absolute;left:0;top:0;font-size:8px;color:rgba(17,19,24,0.5);}
+.pcb-li{font-size:var(--pc-fs-3);font-weight:var(--w-body);color:rgba(17,19,24,0.72);line-height:1.45;padding-left:12px;position:relative;margin-bottom:3px;}
+.pcb-li::before{content:"✦";position:absolute;left:0;top:0;font-size:var(--pc-fs-5);color:rgba(17,19,24,0.5);}
 .pcb-strow{display:grid;grid-template-columns:46px 1fr 20px;gap:8px;align-items:center;margin-bottom:5px;}
-.pcb-stl{font-family:var(--font);font-size:10px;color:rgba(17,19,24,0.6);}
+.pcb-stl{font-family:var(--font);font-size:var(--pc-fs-4);color:rgba(17,19,24,0.6);}
 .pcb-sttrack{height:5px;border-radius:3px;background:rgba(17,19,24,0.12);overflow:hidden;}
 .pcb-stfill{height:100%;border-radius:3px;background:var(--spectrum);}
-.pcb-stv{font-family:var(--font);font-size:10px;color:#15171d;text-align:right;font-variant-numeric:tabular-nums;}
-.pcb-leg{margin-top:auto;padding-top:12px;font-family:var(--font);font-size:10.5px;color:rgba(17,19,24,0.6);}
-.pcb-leg b{font-family:var(--serif);font-weight:600;color:#15171d;}
+.pcb-stv{font-family:var(--font);font-size:var(--pc-fs-4);color:#15171d;text-align:right;font-variant-numeric:tabular-nums;}
+.pcb-leg{margin-top:auto;padding-top:12px;font-family:var(--font);font-size:var(--pc-fs-3);color:rgba(17,19,24,0.6);}
+.pcb-leg b{font-family:var(--serif);font-weight:var(--w-label);color:#15171d;}
 /* viewer controls (book) */
 .pcv-wrap{position:relative;padding-top:30px;}
 .pcv-hint{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:3;display:inline-flex;align-items:center;gap:var(--sp-glue);padding:5px 11px;border-radius:var(--rpill);background:rgba(9,10,13,0.55);backdrop-filter:blur(4px);font-family:var(--font);font-size:var(--fs-meta);color:rgba(255,255,255,0.92);white-space:nowrap;pointer-events:none;opacity:1;transition:opacity .4s var(--ease);}
@@ -1304,7 +1322,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    states what you're here to do — find your 1-of-12 type), roomier side padding */
 :root[data-view="tablet"] .sp-hero-logo,:root[data-view="pc"] .sp-hero-logo{width:min(58%,280px);}
 :root[data-view="tablet"] .sp-logo,:root[data-view="pc"] .sp-logo{height:28px;}
-:root[data-view="tablet"] .sp-sub,:root[data-view="pc"] .sp-sub{font-size:17px;max-width:32ch;}
+/* font-size:17px override removed (2026-08-15) — it existed to nudge desktop 1px above the old
+   16px mobile base; --fs-sub is now 18px everywhere, already past that old override's value, so
+   the raw literal was actively backwards (17 < 18) rather than just untokenized. max-width kept —
+   that part was a real responsive choice, unrelated to the size drift. */
+:root[data-view="tablet"] .sp-sub,:root[data-view="pc"] .sp-sub{max-width:32ch;}
 :root[data-view="tablet"] .splash,:root[data-view="pc"] .splash{padding-left:40px;padding-right:40px;}
 /* desktop splash is a CENTERED poster, not a stretched full-width band: CTA + caption hold a
    button-scale measure instead of spanning the whole page */
@@ -1787,7 +1809,7 @@ var S2=[
   opts:[{k:'A',t:'มองเป็นโอกาส ของดีถูกลง ขอเก็บเพิ่ม',p:'diamondhand'},{k:'B',t:'ใจเย็น ถือของดีไว้ยาวๆ เชื่อในสิ่งที่เลือก',p:'steadyhand'},{k:'C',t:'หันไปมองตลาดต่างประเทศ ที่นี่ร่วง ที่อื่นอาจมีของดี',p:'explorer'},{k:'D',t:'ย้ายบางส่วนไปที่ปลอดภัยก่อน แล้วค่อยประเมินใหม่',p:'guardian'},{k:'E',t:'ยังใหม่กับเรื่องนี้ ขอตั้งสติ หาข้อมูล และปรึกษาคนที่ไว้ใจก่อน',p:'analyst'}]},
  {icon:'lc-coins',img:'s2q4',tag:'การจัดสรรเงิน',cat:'',q:'ถ้ามีเงินก้อนแรกให้เริ่ม คุณอยากทำอะไรกับมันมากที่สุด?',
   opts:[{k:'A',t:'เก็บไว้ในที่ปลอดภัยก่อน อุ่นใจกว่า',p:'guardian'},{k:'B',t:'แบ่งลงทีละน้อยทุกเดือน สม่ำเสมอไม่ขาด',p:'steadyhand'},{k:'C',t:'แบ่งกระจายหลายอย่าง ไม่ทุ่มไปทางเดียว',p:'planner'},{k:'D',t:'ลงกับสิ่งที่เชื่อว่าจะโตแรงในอนาคต',p:'maverick'},{k:'E',t:'ลงกับของที่ตัวเองรู้จริง เช่น ของสะสม การ์ด พระ ของแบรนด์เนม',p:'collector'}]},
- {icon:'lc-zap',img:'s2q5',tag:'ปฏิกิริยาต่อกระแส (FOMO)',cat:'',q:'คนรอบตัวกำลังแห่ซื้อหุ้นหรือเหรียญ<span style="white-space:nowrap">คริปโต</span>ที่ขึ้น<span style="white-space:nowrap">แรงมาก</span> คุณจะ...?',
+ {icon:'lc-zap',img:'s2q5',tag:'ปฏิกิริยาต่อกระแส (FOMO)',cat:'',q:'คนรอบตัวกำลังแห่ซื้อหุ้นหรือ<span style="white-space:nowrap">เหรียญคริปโต</span>ที่ขึ้น<span style="white-space:nowrap">แรงมาก</span> คุณจะ...?',
   opts:[{k:'A',t:'เชื่อว่าของที่กำลังขึ้นมักขึ้นต่อ ขอตามไปด้วยแบบมีจังหวะเข้า-ออกของตัวเอง',p:'waverider'},{k:'B',t:'ยิ่งคนแห่ ยิ่งต้องระวัง ตอนคนกล้ามากมักเป็นจังหวะอันตราย',p:'contrarian'},{k:'C',t:'ไม่วอกแวก ทำตามแผนของตัวเอง เดินตามจังหวะของเรา',p:'planner'},{k:'D',t:'เฉยๆ ให้ความสำคัญกับเรื่องอื่นในชีวิตมากกว่า',p:'sage'},{k:'E',t:'ไม่แตะสิ่งที่ยังไม่เข้าใจ ขอตั้งหลักให้มั่นก่อน',p:'guardian'}]},
  {icon:'lc-book-open',tag:'ความสนใจ / สิ่งที่อยากเรียน',cat:'',q:'ถ้ามีเวลาว่าง อยากเรียนรู้เรื่องเงินเรื่องไหนมากที่สุด?',
   opts:[{k:'A',t:'ขอปูพื้นให้แน่นก่อน เข้าใจหุ้นกับกองทุนแล้วเริ่มอย่างมั่นใจ',p:'steadyhand'},{k:'B',t:'ชอบเจาะลึกทีละบริษัทจนเข้าใจธุรกิจก่อนลงเงิน',p:'analyst'},{k:'C',t:'อยากรู้เรื่องลงทุนต่างประเทศ โอกาสที่ในไทยไม่มี',p:'explorer'},{k:'D',t:'ของสะสมและของที่ตัวเองรัก เช่น การ์ด พระ ของแบรนด์เนม',p:'collector'},{k:'E',t:'วิธีสร้างรายได้ประจำที่จับต้องได้ เช่น หุ้นปันผล บ้านให้เช่า',p:'harvester'}]},
