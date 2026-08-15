@@ -355,7 +355,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    pulse still applies regardless of which one is inside. */
 .reveal-icon.analyzing{position:relative;}
 .reveal-icon.analyzing svg,.reveal-icon.analyzing img{animation:revealPulse 1.4s ease-in-out infinite;}
-.reveal-spin{position:absolute;inset:-6px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0deg,transparent 250deg,var(--cyan) 300deg,var(--violet) 340deg,transparent 360deg);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));animation:revealSpin 1s linear infinite;}
+/* Monochrome now (was cyan→violet) — the hourglass icon itself is the one full-color moment on
+   this screen; a colorful ring around it competed for attention instead of reading as a quiet
+   loading indicator. Gray-to-ink sweep instead, same structure (arc fades in from nothing, darkens
+   toward the leading edge, fades back to nothing). */
+.reveal-spin{position:absolute;inset:-6px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0deg,transparent 250deg,var(--line-strong) 300deg,var(--ink) 340deg,transparent 360deg);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));animation:revealSpin 1s linear infinite;}
 @keyframes revealSpin{to{transform:rotate(360deg);}}
 @keyframes revealPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.08);opacity:.72;}}
 @media(prefers-reduced-motion:reduce){.reveal-icon.analyzing svg,.reveal-icon.analyzing img,.reveal-spin{animation:none!important;}}
@@ -1153,10 +1157,27 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    (already the smallest/blurriest/faintest of the 3 depth planes) while sitting close enough to
    the headline to still register as clutter, so it's dropped entirely on mobile instead of just
    shrunk; MID/NEAR shrink further too. */
+/* Second pass: shrinking alone still wasn't enough — measured the actual rendered boxes at 375px
+   and two of the four remaining assets genuinely OVERLAP real content, not just each other:
+   "card" sits 32px into the CTA button's own footprint (the CTA is nearly full-width on mobile,
+   so almost no side margin exists at that height for anything to float beside it), and "bitcoin"
+   nearly touches the NWNP hero logo (which is also close to full-width). Percentage positions
+   tuned against a wide desktop canvas just don't leave the same margins once the layout narrows —
+   no amount of shrinking fixes a position that's already inside the content's own box. Dropping
+   "efin"/"card" on mobile (same precedent as the far plane above) and re-anchoring "candle" +
+   "bitcoin" to the ONE band that actually has wide, genuine side margins on a narrow phone: level
+   with .sp-sub, which measures ~73px of clear space on each side (vs. single-digit margins
+   everywhere else content stacks near-full-width). */
 @media(max-width:575px){
-  .sp-el-far{display:none;}
+  .sp-el-far, .sp-el-efin, .sp-el-card{display:none;}
   .sp-el-mid{width:calc(var(--w,88px) * 0.42);opacity:calc(var(--op,.85) * 0.55);}
   .sp-el-near{width:calc(var(--w,88px) * 0.42);opacity:calc(var(--op,.85) * 0.65);}
+  /* dy also capped here — candle's rest position sits only ~20px under the hero logo, so its
+     original -16px upward drift (tuned for the old top:6% spot, which had a full screen of
+     headroom above it) would have clipped back into the logo mid-animation even with the rest
+     position fixed. Halved to -8px so the full oscillation stays clear. */
+  .sp-el-candle{top:29%!important;left:3%!important;bottom:auto!important;right:auto!important;--dy:-8px!important;}
+  .sp-el-bitcoin{top:28%!important;right:3%!important;left:auto!important;bottom:auto!important;}
 }
 @keyframes spDrift{from{transform:translate3d(0,0,0) rotate(var(--r0,0deg)) scale(var(--sc,1));}to{transform:translate3d(var(--dx,10px),var(--dy,-16px),0) rotate(var(--r1,6deg)) scale(var(--sc,1));}}
 .sp-top{position:relative;z-index:2;text-align:center;width:100%;}
@@ -1753,7 +1774,7 @@ function renderSplash(){
    /* NEAR plane — corners, biggest & sharpest, most parallax */
    {k:'candle', s:'top:6%;left:4%',     w:98, sc:1.08,op:.9, bl:0,  z:2, sh:18,shb:34,sha:.26,sat:1.04,d:'9s',  dl:'0s',  dx:'16px', dy:'-16px',r0:'-8deg', r1:'3deg'},
    {k:'card',   s:'bottom:12%;right:2%',w:106,sc:1.12,op:.92,bl:0,  z:2, sh:20,shb:38,sha:.28,sat:1.04,d:'9.5s',dl:'.3s', dx:'-18px',dy:'-15px',r0:'10deg', r1:'-1deg'}
-  ].map(function(a){var src=ASSET_IMG[a.k]||'';var plane=a.z===0?'far':(a.z===1?'mid':'near');return '<img class="sp-el sp-el-'+plane+'" alt="" src="'+src+'" style="'+a.s+';--w:'+a.w+'px;--sc:'+a.sc+';--op:'+a.op+';--bl:'+a.bl+'px;--z:'+a.z+';--sh:'+a.sh+'px;--shb:'+a.shb+'px;--sha:'+a.sha+';--sat:'+a.sat+';--d:'+a.d+';--dl:'+a.dl+';--dx:'+a.dx+';--dy:'+a.dy+';--r0:'+a.r0+';--r1:'+a.r1+'">';}).join('');
+  ].map(function(a){var src=ASSET_IMG[a.k]||'';var plane=a.z===0?'far':(a.z===1?'mid':'near');return '<img class="sp-el sp-el-'+plane+' sp-el-'+a.k+'" alt="" src="'+src+'" style="'+a.s+';--w:'+a.w+'px;--sc:'+a.sc+';--op:'+a.op+';--bl:'+a.bl+'px;--z:'+a.z+';--sh:'+a.sh+'px;--shb:'+a.shb+'px;--sha:'+a.sha+';--sat:'+a.sat+';--d:'+a.d+';--dl:'+a.dl+';--dx:'+a.dx+';--dy:'+a.dy+';--r0:'+a.r0+';--r1:'+a.r1+'">';}).join('');
   root.innerHTML=
   '<div class="splash">'+
     '<div class="sp-scatter">'+scatter+'</div>'+
