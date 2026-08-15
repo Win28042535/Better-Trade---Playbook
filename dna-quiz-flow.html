@@ -735,9 +735,17 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .klib-ic{width:40px;height:40px;border-radius:var(--r1);background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .klib-ic svg{width:var(--ic-md);height:var(--ic-md);color:var(--ink);}
 .klib-tx{flex:1;min-width:0;}
-.klib-t{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);}
+/* weight bumped 500->700 to match .bt-t (2026-08-15, per direction "title และ subtitle สัมพันธ์ เป็น
+   system เดียวกันกับ section card อื่นๆ") — .bt-t (the "คู่มือลงทุนของคุณ" list-row teaser on Home)
+   already reads at --w-label; this near-identical list-row teaser was still the older --w-head. */
+.klib-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);}
 .klib-s{font-size:var(--fs-bodysm);color:var(--muted);margin-top:2px;}
 .klib-cv{width:20px;height:20px;color:var(--muted);flex-shrink:0;}
+/* align-items:flex-start (2026-08-15, per direction "ตอนนี้ align center") — .klib-s can run to 2
+   lines ("41 บทความที่คัดมาสำหรับ [ตัวตน]... ✦ จัดเป็น 8 หมวด"), which was centering the icon and
+   chevron against the full wrapped block instead of the title's own line. Scoped to this row only —
+   .list-row's shared align-items:center is still right for its other, single-line consumers. */
+.klib-row{align-items:flex-start;}
 .klib-list{display:flex;flex-direction:column;margin-top:14px;border-top:1px solid var(--line-soft);}
 .klib-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line-soft);font-size:var(--fs-bodysm);color:var(--ink);}
 .klib-item:last-child{border-bottom:none;}
@@ -997,9 +1005,15 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    it down relative to whatever heading it sits in (em, not a fixed px) and mutes the color. */
 .hd-star{font-size:0.6em;color:var(--muted);}
 .booth-hd .booth-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:3px;}
-.booth-prog{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+/* margin-bottom added (2026-08-15, per direction "ตอนนี้ติดกันอยู่ ให้แยก spacing ตาม system dna") —
+   this row and the draw-status callout right after it had no gap between them at all. --sp-list is
+   the token for "next row in the same stack", the same relationship these two blocks have. */
+.booth-prog{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:var(--sp-list);}
 .bp-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad-sm);}
-.bp-hd{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+/* align-items:flex-start (2026-08-15, per direction "ตอนนี้ดู align กลาง card เป็นหลัก ต้อง align
+   top") — .bp-lbl can wrap to 2 lines ("กิจกรรมประจำบูธ" at narrow widths), which was centering the
+   icon and .bp-frac number against the full wrapped height instead of the label's first line. */
+.bp-hd{display:flex;align-items:flex-start;gap:6px;margin-bottom:8px;}
 .bp-hd svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
 .bp-lbl{flex:1;font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
 .bp-frac{font-size:var(--fs-bodysm);font-weight:var(--w-label);white-space:nowrap;}
@@ -2317,14 +2331,13 @@ function heroPanelBody(key,hero,suffix){
   var chips=hero.assets.map(function(a){return '<span class="chip" style="background:color-mix(in srgb,'+hero.accent+' 26%,var(--white));color:'+hero.accent+'">'+ic(a.icon)+a.t+'</span>';}).join('');
   return '<div class="hero-cardwrap">'+pcViewer(key,suffix)+'</div>'+
     '<div class="hero-sig-c">'+hero.sig+'</div>'+
-    /* Background/border desaturated to neutral (2026-08-15, per direction "3 card นี้ยังดูแข่งๆ กัน
-       น่าจะด้วยสี") — this + .str-box + .str-box.wn used to each carry their own full-saturation
-       tint (persona accent / green / amber), competing for attention stacked back to back. Now all
-       three share the same neutral --paper/--line-soft card, and the colored label/heading text
-       (still hero.accent here, still --green-text/--amber-text on its siblings) is the one signal
-       left to tell them apart — separable without fighting each other. */
-    '<div class="ast-block" style="background:var(--paper);border:1px solid var(--line-soft)">'+
-      '<div class="ast-lbl" style="color:'+hero.accent+'">'+ic('lc-sparkles')+'สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div></div>'+
+    /* Revised (2026-08-15, per direction "border card สีอิงตาม สีสินทรัพย์ แต่ title เป็นสีดำ และ bg
+       เป็นสีอิงตามสินทรัพย์ แต่ soft") — the neutral --paper/--line-soft version from the same day's
+       earlier pass read as TOO flat next to .str-box/.str-box.wn once those went neutral too; this
+       card gets its color signal back (a soft accent wash + accent border), but the title itself
+       goes to plain --ink instead of hero.accent — color lives in the surface now, not the text. */
+    '<div class="ast-block" style="background:color-mix(in srgb,'+hero.accent+' 8%,var(--white));border:1px solid color-mix(in srgb,'+hero.accent+' 24%,transparent)">'+
+      '<div class="ast-lbl">'+ic('lc-sparkles')+'สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div></div>'+
     '<div class="str-grid" style="margin-top:16px"><div class="str-box"><div class="str-hd">'+ic('lc-zap')+'จุดแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'จุดระวัง</div>'+watch+'</div></div>';
 }
 function evoPanelHTML(ev){
@@ -2374,7 +2387,7 @@ function renderBook(){
   '</nav>'+
   '<main class="scroll">'+
     '<section class="fade hero-sec" id="hero-sec"><div class="hero-gw"><div class="hero-in">'+
-      '<div class="fam-badge" id="famBadge" style="'+famBadgeStyle(activeHero)+'">'+ic(activeHero.famIcon)+'<span>'+activeHero.famTh+'</span></div>'+
+      '<div class="fam-badge" id="famBadge" style="'+famBadgeStyle(activeHero)+'"><span>'+activeHero.famTh+'</span></div>'+
       '<div class="bt-tabs bt-tabs--primary hero-ev-tabs" id="heroEvTabs" role="tablist" aria-label="เลือกช่วงเวลาของโปรไฟล์">'+
         '<button class="bt-tab" type="button" role="tab" aria-selected="'+(defaultTab==='pre'?'true':'false')+'" tabindex="'+(defaultTab==='pre'?'0':'-1')+'" data-value="pre"><span class="bt-tab-icon">'+ic('lc-file-text')+'</span><span class="bt-tab-label">โปรไฟล์ก่อนงาน</span></button>'+
         '<button class="bt-tab" type="button" role="tab" aria-selected="'+(defaultTab==='post'?'true':'false')+'" tabindex="'+(defaultTab==='post'?'0':'-1')+'" data-value="post"><span class="bt-tab-icon">'+ic('lc-sparkles')+'</span><span class="bt-tab-label">โปรไฟล์หลังงาน</span></button>'+
@@ -2452,7 +2465,7 @@ function renderBook(){
     root.querySelector('#heroEvPre').style.display=value==='pre'?'':'none';
     root.querySelector('#heroEvPost').style.display=value==='post'?'':'none';
     var badge=root.querySelector('#famBadge'),bh=value==='pre'?h:ev.behHero;
-    if(badge){badge.innerHTML=ic(bh.famIcon)+'<span>'+bh.famTh+'</span>';badge.setAttribute('style',famBadgeStyle(bh));}
+    if(badge){badge.innerHTML='<span>'+bh.famTh+'</span>';badge.setAttribute('style',famBadgeStyle(bh));}
   });
   var evGoGames=root.querySelector('#evGoGames');if(evGoGames)evGoGames.onclick=function(){st.phase='games';render();};
   initBtTabs(root.querySelector('#ddTabs'),function(value){root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===value)?'':'none';});});
@@ -3020,12 +3033,10 @@ function renderBooth(){
   var need=[];if(!chkOK)need.push('เช็คอินอีก '+(CHECKIN_NEED-chk)+' บูธ');if(!actOK)need.push('ร่วมกิจกรรมอีก '+(ACTIVITY_NEED-act)+' บูธ');
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
-    /* "เดินบูธ ✦ ลุ้นรางวัล" (title/progress/draw-status) merged into the SAME card as the map
-       section below it (2026-08-15, per direction "จัดรวมใน card ใหญ่... จะได้เชื่อมเหมือนกันกับ
-       section card อื่นๆ") — this used to float bare on the page background above the first
-       .home-card, the one section on this screen not actually inside a card. The map/route content
-       now sits in a labeled sub-block (.sub-divider) within the same card, same pattern as the
-       Book page's AI Insight card holding multiple labeled sub-sections. */
+    /* Split back into 2 separate cards (2026-08-15, per direction "ให้แยก card กับ section
+       แผนที่เดินบูธ") — the previous turn's merge into one card didn't read right in practice, so
+       "เดินบูธ ✦ ลุ้นรางวัล" (title/progress/draw-status) is its own .home-card again, same as the
+       map/route section right after it. */
     '<section class="home-card"><div class="hcard-hd"><div class="s-h">เดินบูธ <span class="hd-star">✦</span> ลุ้นรางวัล</div><div class="hcard-s">เช็คอินบูธ · กิจกรรมประจำบูธ · ลุ้นรางวัลใหญ่</div></div>'+
       '<div class="booth-prog">'+
         '<div class="bp-card"><div class="bp-hd">'+ic('lc-qr-code')+'<span class="bp-lbl">เช็คอินบูธ</span><span class="bp-frac" style="color:'+(chkOK?'var(--cyan)':'var(--violet)')+'">'+(chkOK?('ครบแล้ว · '+chk+' บูธ'):(chk+'/'+CHECKIN_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,chk/CHECKIN_NEED*100)+'%;background:'+(chkOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
@@ -3034,13 +3045,13 @@ function renderBooth(){
       (eligible
         ? '<div class="draw-status ok">'+ic('lc-gift')+'<div><div class="ds-h">ครบเงื่อนไขแล้ว · กดร่วมลุ้นรางวัลใหญ่ได้เลย</div><div class="ds-s">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">✓ กดร่วมลุ้นก่อน 16:00 น. ของวันที่ 2</div></div></div>'
         : '<div class="draw-status need">'+ic('lc-gift')+'<div><div class="ds-h">ยังขาด<span class="ds-chips">'+need.map(function(n){return '<span class="ds-chip">'+n+'</span>';}).join('')+'</span></div><div class="ds-s">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">ครบเมื่อไหร่ ปุ่มร่วมลุ้นรางวัลใหญ่จะขึ้นตรงนี้ให้กด</div></div></div>')+
-      '<div class="sub-divider"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="s-h" style="margin-bottom:0">'+(RESULT?'แผนที่เดินบูธเฉพาะคุณ':'แผนที่เดินบูธ (เส้นทางแนะนำ)')+'</div><span class="route-badge">'+visited+'/'+route.length+' จุด</span></div>'+
-        '<div class="map-ph has-img"><img class="mp-img" src="'+MAP_IMG+'" alt="ผังงาน Better Trade 2026 · Samyan Mitrtown ชั้น 5"><span class="mp-cap">ผังงาน · Samyan Mitrtown ชั้น 5</span><button class="mp-zoom" id="mapZoomBtn">'+ic('lc-maximize-2')+'<span>ดูแบบเต็มจอ</span></button></div>'+
-        '<div class="route-list">'+route.map(function(p,i){
-          var badge=(p.topPick?'<span class="rt-badge pick">อันดับ 1 สำหรับคุณ</span>':'')+(p.featured?'<span class="rt-badge feat">ผู้สนับสนุน</span>':'')+(p.newAngle?'<span class="rt-badge new">มุมใหม่</span>':'');
-          return '<div class="rt-row'+(p.topPick?' top':'')+'"><div class="rt-rail"><div class="rt-dot" style="background:'+p.dotColor+'">'+ic(p.icon)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+'</div><div class="rt-meta">'+p.zone+' · '+p.status+'</div></div></div>';
-        }).join('')+'</div>'+
-      '</div>'+
+    '</section>'+
+    '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="s-h" style="margin-bottom:0">'+(RESULT?'แผนที่เดินบูธเฉพาะคุณ':'แผนที่เดินบูธ (เส้นทางแนะนำ)')+'</div><span class="route-badge">'+visited+'/'+route.length+' จุด</span></div>'+
+      '<div class="map-ph has-img"><img class="mp-img" src="'+MAP_IMG+'" alt="ผังงาน Better Trade 2026 · Samyan Mitrtown ชั้น 5"><span class="mp-cap">ผังงาน · Samyan Mitrtown ชั้น 5</span><button class="mp-zoom" id="mapZoomBtn">'+ic('lc-maximize-2')+'<span>ดูแบบเต็มจอ</span></button></div>'+
+      '<div class="route-list">'+route.map(function(p,i){
+        var badge=(p.topPick?'<span class="rt-badge pick">อันดับ 1 สำหรับคุณ</span>':'')+(p.featured?'<span class="rt-badge feat">ผู้สนับสนุน</span>':'')+(p.newAngle?'<span class="rt-badge new">มุมใหม่</span>':'');
+        return '<div class="rt-row'+(p.topPick?' top':'')+'"><div class="rt-rail"><div class="rt-dot" style="background:'+p.dotColor+'">'+ic(p.icon)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+'</div><div class="rt-meta">'+p.zone+' · '+p.status+'</div></div></div>';
+      }).join('')+'</div>'+
     '</section>'+
     '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div class="s-h" style="margin-bottom:0">กิจกรรมประจำโซน</div><button class="howto-btn" id="howtoBtn">'+ic('lc-info')+'วิธีเล่น</button></div>'+
       '<div class="hcard-s" style="margin-top:-6px">แตะชื่อบูธเพื่อเช็คอิน — เช็คอินก่อน แล้วเกมของโซนนั้นจะปลดให้เล่น</div>'+
