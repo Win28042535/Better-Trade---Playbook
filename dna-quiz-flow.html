@@ -375,17 +375,25 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    ch-2 (the trailing "...is coming"/"...for you" continuation) at 700, so the two words read as one
    composed thought instead of one flat weight. Kept on ONE line now (display:block -> inline, plus
    a space between them in the markup) per direction ("รู้จัก / ตัวคุณ อยากให้อยู่บรรทัดเดียวกัน"). */
-.consent-h{font-size:var(--fs-title);letter-spacing:-0.01em;line-height:1.06;margin-bottom:16px;}
+/* position:relative;z-index:2 added (2026-08-15, real bug found while investigating "fix bug") —
+   .sp-scatter is position:absolute;z-index:0, and per CSS stacking rules a positioned element with
+   z-index:0 paints ABOVE plain static (position:static, z-index:auto) content regardless of DOM
+   order — so without this, the scatter assets would sit on TOP of the title/paragraph/round-cards
+   instead of behind them, at any width/asset position where they happen to overlap. Splash's own
+   .sp-top/.sp-stage already do exactly this for the identical reason; .consent-h/.consent-p/
+   .round-cards were missing the same treatment. .consent-btn already has z-index:6 from its own
+   sticky rule, so it didn't need it. */
+.consent-h{position:relative;z-index:2;font-size:var(--fs-title);letter-spacing:-0.01em;line-height:1.06;margin-bottom:16px;}
 /* Colors swapped per direction: the lighter 500 line (ch-1) is now the muted/gray one and the
    heavier 700 line (ch-2) is now the solid ink one — previously the bold line was the faint gray
    and the light line was dark, which read upside-down. Weights stay 500/700; only the colors moved. */
 .consent-h .ch-1{color:var(--muted);font-weight:var(--w-head);}
 .consent-h .ch-2{color:var(--ink);font-weight:var(--w-label);}
-.consent-p{font-size:var(--fs-body);font-weight:var(--w-body);color:var(--muted);line-height:1.65;max-width:280px;margin:0 auto;}
+.consent-p{position:relative;z-index:2;font-size:var(--fs-body);font-weight:var(--w-body);color:var(--muted);line-height:1.65;max-width:280px;margin:0 auto;}
 /* "คู่มือลงทุนของคุณ" emphasis (2026-08-15, per direction) — ink/700 against the paragraph's own
    muted/500 base, same two-weight device used elsewhere in the file rather than a new pattern. */
 .consent-p b{color:var(--ink);font-weight:var(--w-label);}
-.round-cards{display:flex;gap:10px;width:100%;margin:32px 0 4px;}
+.round-cards{position:relative;z-index:2;display:flex;gap:10px;width:100%;margin:32px 0 4px;}
 .round-card{flex:1;border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad-sm);background:var(--white);}
 .rc-top{display:flex;align-items:center;justify-content:center;gap:var(--sp-glue);margin-bottom:9px;}
 .rc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
