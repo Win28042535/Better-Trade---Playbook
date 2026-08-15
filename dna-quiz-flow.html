@@ -18,15 +18,10 @@
   --line:rgba(17,19,24,0.09); --line-soft:rgba(17,19,24,0.08); --line-strong:rgba(17,19,24,0.17); --line-header:rgba(17,19,24,0.06);
   /* 2026-08-15, per Color DNA review — --shadow-cta-ink (previously here) had zero consumers
      anywhere in the file despite its own comment claiming one use-site; deleted rather than kept
-     around unread. --ring-idle is still real (.spec-bd's static ring), kept as-is. */
-  --ring-idle:rgba(17,19,24,0.14);
+     around unread. --ring-idle retired the same way once .spec-bd (its only consumer) was deleted
+     entirely (see Design DNA review "✦1 ทางเลือก A"). */
   --focus:#2b6cff; --popover:rgba(255,255,255,0.96);
   --cyan:#61e8ed; --violet:#9c91ff; --pink:#f178d8; --yellow:#f2ea83;
-  /* --cyan-ink (2026-08-15, per Color DNA review "01") — .pe-report.on svg read this via
-     var(--cyan-ink,var(--ink)) but it was never defined, so the "unlocked progress report" icon
-     silently fell back to plain ink instead of the cyan its name promises. Wired to the real
-     value rather than deleted, since cyan genuinely is the intended "unlocked/done" tint here. */
-  --cyan-ink:var(--cyan);
   --spectrum:linear-gradient(90deg,#61e8ed,#9c91ff,#f178d8,#f2ea83,#61e8ed);
   /* "Gold/amber" status color (2026-08-14) — was the exact same 3-hex combo hand-copied into 5
      separate rules (str-box.wn, redeem-card.on, pass-ic.gold, rt-badge.feat, prof-tier) plus a 6th
@@ -153,47 +148,12 @@ html{font-size:16px;}
 body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weight:var(--w-body);-webkit-font-smoothing:antialiased;min-height:100vh;min-height:100dvh;display:flex;justify-content:center;}
 .shell{width:100%;max-width:430px;min-height:100vh;min-height:100dvh;background:var(--paper);position:relative;display:flex;flex-direction:column;}
 
-/* spectrum border technique — the one accent per scene */
-/* CTA spectrum border (.spec-bd) — rebuilt around the actual constraint that broke every earlier CSS
-   attempt: a soft glow positioned by offset-path can only ever sit INSIDE the border, never ON it.
-   overflow:hidden clips at the padding edge (i.e. just inside the 2px border), so no matter how the
-   glow was sized, it always read as "a blob near the edge on the inside", not "the border lit up" —
-   that's why it kept looking like a floating circle no matter how much it was resized.
-   The fix: stop trying to fake it with a positioned shape, and draw the light directly ON the frame
-   instead — an SVG <path> stroked along the button's own rounded-rect outline, with stroke-dasharray/
-   stroke-dashoffset drawing one moving arc-length of that stroke (exactly the technique browsers use
-   for "drawing" animations). The stroke IS the path, so there's no gap between "where the light is"
-   and "where the border is" to begin with — it hugs the frame by construction, at any button size,
-   with no separate blob to size or clip.
-   JS (layoutSpecComets → setSpecPath, near renderQuiz) writes each .spec-bd's own <path> `d` (a
-   rounded-rect matching its live padding-box, r = half the short side — a stadium for pills, a circle
-   for the square reveal-icon) plus its exact perimeter as --spec-perim, recomputed on resize via
-   ResizeObserver. --spec-perim sizes stroke-dasharray (one ~20%-of-perimeter arc + the remaining gap)
-   and is also the animation's dashoffset travel distance, so the loop repeats with no visible seam
-   regardless of the button's size.
-   The plain ring underneath is still --ring-idle (static, no animation) — the moving arc is the only
-   thing that reads as "this is animating", same principle as every earlier pass, just finally landing
-   ON the frame instead of near it. FILL stays decoupled via --spec-fill so .spec-bd-dark flips to dark
-   fill / cloud text with the identical ring + comet. */
-.spec-bd{position:relative;overflow:hidden;border:2px solid transparent;background:var(--spec-fill,linear-gradient(var(--white),var(--white))) padding-box,var(--ring-idle) border-box;}
-.spec-bd-dark{--spec-fill:linear-gradient(var(--ink),var(--ink));color:var(--cloud);}
-.spec-bd::before{content:"";position:absolute;inset:0;border-radius:inherit;background-image:radial-gradient(circle .6px at center,rgba(17,19,24,.4),transparent 100%);background-size:10px 9px;pointer-events:none;opacity:.7;}
-.spec-bd-dark::before{background-image:radial-gradient(circle .6px at center,rgba(255,255,255,.4),transparent 100%);}
-.spec-bd .spec-label{position:relative;background:linear-gradient(to top,var(--ink),var(--muted));-webkit-background-clip:text;background-clip:text;color:transparent;}
-.spec-bd-dark .spec-label{background:linear-gradient(to top,var(--cloud),var(--muted));-webkit-background-clip:text;background-clip:text;color:transparent;}
-/* .spec-bd svg.spec-comet (2 classes + type = specificity 0,2,1) is deliberately more specific than
-   ANY of the file's icon-sizing rules (.btn svg / .tb-pill svg / .reveal-icon svg etc., each just
-   1 class + type = 0,1,1) — every one of those contexts a .spec-bd sits inside was silently winning
-   the cascade and shrinking this SVG down to that context's icon size (16px on .btn, 12px on
-   .tb-pill, 32px on .reveal-icon) instead of the full button it's meant to cover. Confirmed via
-   getBoundingClientRect: the comet's <svg> measured 16×16px on the splash CTA, not the button's
-   actual ~350×52 — the path/animation/dasharray math was all correct, but the SVG viewport itself was
-   being squashed to icon-size by an unrelated rule elsewhere, so the stroke was rendering into a tiny
-   invisible corner instead of across the frame. This is the actual bug the "still not fixed" reports
-   were catching — not a mechanism problem. */
-.spec-bd svg.spec-comet{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
-.spec-comet path{fill:none;stroke:var(--violet);stroke-width:3px;stroke-linecap:round;filter:drop-shadow(0 0 4px var(--cyan));animation:cometDash 3s linear infinite;}
-@keyframes cometDash{to{stroke-dashoffset:calc(-1 * var(--spec-perim,300));}}
+/* The .spec-bd spectrum-comet accent system (CSS + --ring-idle token + ensureCometSVG/setSpecPath/
+   layoutSpecComets in JS) was deleted entirely 2026-08-15, per Design DNA review "✦1 ทางเลือก A" —
+   it had zero live consumers anywhere in the file (verified against markup and both liquid-metal-*.js
+   files); the Liquid Metal button now owns every "CTA that shouts" moment this used to cover, and
+   layoutSpecComets() was still being called on every navigation (5 call sites) to iterate an
+   always-empty NodeList. */
 
 /* Lucide icons — stroke-only per Design DNA §07; fill/stroke inherit to all children */
 .lucide{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;}
@@ -336,10 +296,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
      Tertiary  — no fill, no border → the least-emphasized action (e.g. ย้อนกลับ)
    .btn-outline and .btn-plain are RETIRED — folded into .btn-secondary and
    .btn-tertiary respectively, so there's exactly one class per tier, not two
-   overlapping ones. The old spectrum-animated border (previously baked
-   straight into .btn-secondary) is now a separate opt-in ACCENT, not part of
-   the tier definition — stack the existing `.spec-bd` utility on top of any
-   tier's button when one specific CTA needs to visually shout.
+   overlapping ones. The old spectrum-animated-border accent (.spec-bd) that
+   used to stack on top of any tier for a shouting CTA was deleted entirely
+   2026-08-15 (Design DNA review "✦1") — the Liquid Metal button owns that
+   job now.
    ============================================================================ */
 .btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 24px;border-radius:var(--rpill);font-family:var(--font);font-weight:var(--w-head);font-size:var(--fs-sub);cursor:pointer;white-space:nowrap;border:1.5px solid transparent;line-height:1;transition:box-shadow .18s var(--ease),filter .18s var(--ease),transform .18s var(--ease),background-color .18s var(--ease),border-color .18s var(--ease),color .18s var(--ease);}
 .btn svg{width:var(--ic-md);height:var(--ic-md);transition:transform .2s cubic-bezier(.4,0,.2,1);}
@@ -347,12 +307,6 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .btn-primary{flex:1;background:var(--ink);color:var(--cloud);border-color:var(--ink);box-shadow:var(--shadow-primary);}
 .btn-secondary{background:var(--white);color:var(--ink);border-color:var(--line-strong);box-shadow:var(--shadow-action);}
 .btn-tertiary{background:none;color:var(--muted);border-color:transparent;box-shadow:none;padding:0 16px;}
-/* .spec-bd comes BEFORE the tier rules in the stylesheet, so a plain .btn-primary/.btn-secondary
-   background (declared later) would otherwise win the cascade and silently erase the spectrum
-   border layer when the two are combined. This compound selector re-asserts it with higher
-   specificity (2 classes) so .spec-bd's animated border always wins, on any tier, regardless of
-   source order — e.g. class="btn btn-primary spec-bd spec-bd-dark". */
-.btn.spec-bd{border:2px solid transparent;background:var(--spec-fill,linear-gradient(var(--white),var(--white))) padding-box,var(--ring-idle) border-box;}
 /* ── button hover system ── adapted from a jakobhoeg/21st.dev "expandIcon" button reference (icon
    nudges in its direction of travel on hover, fill darkens slightly). Icons stay visible always —
    unlike the reference's hide-until-hover reveal, hiding by default would mean touch users (this
@@ -367,7 +321,6 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
   .btn-primary:hover{filter:brightness(1.08);}
   .btn-secondary:hover{border-color:var(--line);box-shadow:var(--shadow-md);}
   .btn-tertiary:hover{color:var(--ink);}
-  .btn.spec-bd:hover{border-color:transparent;}
   .btn:hover svg{transform:scale(1.1);}
   .btn:hover svg.ic-fwd{transform:translateX(3px);}
   .btn:hover svg.ic-back{transform:translateX(-3px);}
@@ -959,7 +912,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pe-report{display:flex;gap:10px;align-items:flex-start;padding:12px 13px;border-radius:var(--r1);background:var(--paper);margin-top:2px;}
 .pe-report.on{background:var(--done-wash);}
 .pe-report svg{width:var(--ic-md);height:var(--ic-md);flex:0 0 auto;margin-top:1px;color:var(--muted);}
-.pe-report.on svg{color:var(--cyan-ink,var(--ink));}
+/* --cyan-ink (which this used to read via a fallback) was retired again 2026-08-15, per Design DNA
+   review "--cyan-ink ทางเลือก B" — reverted to a flat --ink instead of wiring the token, since the
+   chosen answer this time was to keep the icon's current (ink) look, not make it cyan. */
+.pe-report.on svg{color:var(--ink);}
 .pe-report-t{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.4;}
 .pe-report-s{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;}
 /* Sized/weighted to match .pe-track-lbl (the "Conference"/"Workshop"/"Private Class" sub-section
@@ -1091,9 +1047,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    their own content (the camera box vs. this QR+caption block), so switching tabs resized the
    whole modal and visibly shifted the title bar/confirm button. Fixed height + flex-centered
    content keeps every OTHER part of the modal in the same position regardless of which tab is on. */
-/* --r2 -> --r1 (2026-08-15, per Card & Section review "10") — every other dashed placeholder panel
-   of this size (.lib-stub, .hero-note, .ann-row) uses --r1; this was the one outlier at --r2. */
-.scan-mine{box-sizing:border-box;height:168px;border-radius:var(--r1);border:1px dashed var(--line-strong);background:var(--paper);padding:13px;text-align:center;margin-bottom:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+/* Reverted --r1 -> --r2 (2026-08-15, per Design DNA review "scan-mine ทางเลือก B") — kept as a
+   deliberate exception this time around: the "my QR" placeholder can read as more prominent than
+   the app's other dashed panels on purpose. */
+.scan-mine{box-sizing:border-box;height:168px;border-radius:var(--r2);border:1px dashed var(--line-strong);background:var(--paper);padding:13px;text-align:center;margin-bottom:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .scan-mine-qr{width:96px;height:96px;margin:0 auto;border-radius:10px;background:var(--white);border:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;color:var(--ink);}
 /* 64px — a large placeholder icon (no real QR to show yet), one-off, no repeated value elsewhere
    to consolidate into a token. */
@@ -1216,10 +1173,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    element can't carry padding itself or it'd peek through at max-height:0. */
 .gr-body{max-height:0;overflow:hidden;transition:max-height .28s var(--ease);}
 .gr-body.show{max-height:400px;}
-/* --line-soft -> --line-strong (2026-08-15, per Card & Section review "13") — every other dashed
-   "not yet unlocked" border in the app (.redeem-card.locked, .ev-empty, .prof-qr, .scan-mine) uses
-   --line-strong; this was the one dashed border on the fainter token. */
-.gr-bin{border-top:1px dashed var(--line-strong);padding:12px 14px 14px;}
+/* Reverted --line-strong -> --line-soft (2026-08-15, per Design DNA review "gr-bin ทางเลือก B") —
+   kept as a deliberate exception this time: this divider isn't really a "locked" state, just an
+   unopened game result, and reads better lighter than the app's other dashed panels. */
+.gr-bin{border-top:1px dashed var(--line-soft);padding:12px 14px 14px;}
 .gr-from{font-size:var(--fs-eyebrow);color:var(--muted);margin-bottom:5px;}
 .gr-result{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);line-height:1.6;}
 .games-note{margin-top:12px;display:flex;align-items:center;gap:6px;font-size:var(--fs-eyebrow);color:var(--muted);}
@@ -1919,7 +1876,7 @@ function renderSplash(){
    actually loaded, but only if we're still showing the splash (the user could have already tapped
    through to the quiz by then). Every later renderSplash() call (e.g. resetQuiz) finds the export
    already in place and mounts immediately, same as the rest of the app's post-render bindings
-   (layoutSpecComets, bindTabbar, ...). */
+   (bindTabbar, mountHeaderQR, ...). */
 function mountSplashCTA(){
   if(!window.mountLiquidMetalCta)return;
   window.mountLiquidMetalCta({
@@ -2033,40 +1990,6 @@ function initBtTabs(tablist,onSelect){
   if(!preSelected.length){var firstEnabled=tabs.filter(function(t){return !isDisabled(t);})[0];if(firstEnabled)firstEnabled.tabIndex=0;}
 }
 
-/* --- CTA comet: SVG stroke drawn on the button's own rounded-rect outline (see the .spec-bd comment
-   in the stylesheet for why this replaced the earlier offset-path+blob approach) ---
-   ensureCometSVG lazily injects one <svg class="spec-comet"><path/></svg> as each .spec-bd's first
-   real child (after any ::before, before its icon/text — so it paints under the label). setSpecPath
-   then (re)computes that path's `d` from the element's live padding-box size — r = half the short
-   side, a stadium for pills, a circle for the square reveal-icon — plus its exact perimeter, written
-   as --spec-perim for the dashoffset keyframe's travel distance. stroke-dasharray is [~22% of
-   perimeter, ~78%] so exactly one arc is visible and the loop has no seam, at any button size.
-   Recomputed on resize via ResizeObserver so it survives breakpoint stretches (.btn-primary{flex:1}). */
-function ensureCometSVG(el){
-  if(el.querySelector(':scope > svg.spec-comet'))return el.querySelector(':scope > svg.spec-comet path');
-  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-  svg.setAttribute('class','spec-comet');
-  var path=document.createElementNS('http://www.w3.org/2000/svg','path');
-  svg.appendChild(path);
-  el.insertBefore(svg,el.firstChild);
-  return path;
-}
-function setSpecPath(el){
-  var w=el.clientWidth,h=el.clientHeight;if(!w||!h)return;
-  var r=Math.min(w,h)/2;
-  var d="M "+r+" 0 H "+(w-r)+" A "+r+" "+r+" 0 0 1 "+w+" "+r+" V "+(h-r)+" A "+r+" "+r+" 0 0 1 "+(w-r)+" "+h+" H "+r+" A "+r+" "+r+" 0 0 1 0 "+(h-r)+" V "+r+" A "+r+" "+r+" 0 0 1 "+r+" 0 Z";
-  var perim=2*w+2*h-8*r+2*Math.PI*r;
-  var path=ensureCometSVG(el);
-  path.setAttribute('d',d);
-  path.style.strokeDasharray=(perim*0.22).toFixed(1)+' '+(perim*0.78).toFixed(1);
-  el.style.setProperty('--spec-perim',perim.toFixed(1));
-}
-var _specRO=(typeof ResizeObserver!=='undefined')?new ResizeObserver(function(es){es.forEach(function(e){setSpecPath(e.target);});}):null;
-function layoutSpecComets(){
-  if(_specRO)_specRO.disconnect();
-  root.querySelectorAll('.spec-bd').forEach(function(el){setSpecPath(el);if(_specRO)_specRO.observe(el);});
-}
-
 function render(){
   if(st.phase!=='splash')stopSplashTimer();
   if(st.phase!=='reveal')clearRevealTimer(); // don't force-advance to Book if the user left the analyzing screen
@@ -2081,7 +2004,6 @@ function render(){
   else if(st.phase==='games')renderGames();
   else if(st.phase==='profile')renderProfile();
   window.scrollTo(0,0);
-  layoutSpecComets();
 }
 
 function renderConsent(){
@@ -2881,7 +2803,6 @@ function renderHome(){
   bindHeaderLogo();
   mountHomeNsCta(ns);
   bindPostEvent(t);
-  layoutSpecComets();
 }
 /* ══ BOOTH / PASSPORT TAB ══ content ported from Playbook Final's Passport screen (BOOTHS/ZONES/
    ZONE_BOOTHS + hero-route builder). Check-in/activity is real (toggled locally) so the top progress
@@ -3088,7 +3009,6 @@ function renderBooth(){
   root.querySelector('#mlClose').onclick=closeMap;
   mountHeaderQR();
   bindHeaderLogo();
-  layoutSpecComets();
 }
 
 /* ══ GAMES TAB ══ content ported from Playbook Final: SIDES (6 mini-games) + sideResult() narratives.
@@ -3176,7 +3096,6 @@ function renderGames(){
   mountHeaderQR();
   bindHeaderLogo();
   mountNgCta(nextIdx);
-  layoutSpecComets();
 }
 
 /* ══ PROFILE TAB ══ content ported from Playbook Final's Profile screen — userName/userOrg/
@@ -3211,7 +3130,6 @@ function renderProfile(){
   root.querySelector('#devReset').onclick=resetQuiz;
   mountHeaderQR();
   bindHeaderLogo();
-  layoutSpecComets();
 }
 
 /* ── RESPONSIVE VIEW (mobile | tablet | pc) ── driven by window, overridable via demo panel ── */
