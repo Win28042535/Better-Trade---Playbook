@@ -773,11 +773,15 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    an eyebrow reading louder than the heading under it fought the system's own hierarchy. */
 .hh-badge{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.04em;color:var(--muted);}
 .hh-badge svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--muted);}
-.hh-badge-tx{font-weight:var(--w-head);color:var(--muted);}
+.hh-badge-tx{font-weight:var(--w-label);color:var(--muted);}
 /* Smaller hero logo, bigger emphasis on .hh-sub below — the eyebrow badge/logo were carrying more
    visual weight than the sentence that actually says what this screen is for. */
 .hh-logo{display:block;width:min(56%,210px);height:auto;margin:12px auto 0;}
 .hh-sub{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);line-height:1.55;max-width:34ch;margin:14px auto 0;}
+/* 500 base / 700 emphasized trailing clause — same "text weight play" convention as .q-title/
+   .q-title b (emphasizeQ()), hand-authored here since this is one static string, not a per-item
+   render. Bolds "ดูย้อนหลังได้บน efin.finance" so the poster subtext isn't one flat weight. */
+.hh-sub b{font-weight:var(--w-label);}
 .hh-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 18px;margin-top:16px;}
 .hh-meta span{display:inline-flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);}
 .hh-meta svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--violet);}
@@ -898,9 +902,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pe-report.on{background:color-mix(in srgb,var(--cyan) 10%,transparent);}
 .pe-report svg{width:var(--ic-md);height:var(--ic-md);flex:0 0 auto;margin-top:1px;color:var(--muted);}
 .pe-report.on svg{color:var(--cyan-ink,var(--ink));}
-.pe-report-t{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);line-height:1.4;}
+.pe-report-t{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.4;}
 .pe-report-s{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;}
-.pe-vlbl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);margin:14px 0 6px;}
+/* Sized/weighted to match .pe-track-lbl (the "Conference"/"Workshop"/"Private Class" sub-section
+   titles further down this same card) — was a small muted eyebrow, reading as a lesser tier than
+   its sibling sub-titles despite doing the same job. Color matched to --ink too: at this size/
+   weight, muted gray would look like a mismatch against its now-equal-sized siblings. */
+.pe-vlbl{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);margin:14px 0 6px;}
 .pe-vlist{display:flex;flex-direction:column;gap:8px;}
 .pe-vitem{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r1);border:1px solid var(--line-soft);background:var(--white);}
 .pe-vic{width:36px;height:36px;flex:0 0 auto;border-radius:10px;background:color-mix(in srgb,var(--violet) 14%,transparent);color:var(--violet);display:flex;align-items:center;justify-content:center;}
@@ -962,7 +970,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .draw-status.need{background:color-mix(in srgb,var(--violet) 8%,transparent);border-color:color-mix(in srgb,var(--violet) 26%,transparent);}
 .draw-status svg{width:var(--ic-lg);height:var(--ic-lg);flex:0 0 auto;color:var(--muted);}
 .draw-status.need svg{color:var(--violet);}
-.ds-h{font-size:var(--fs-body);font-weight:var(--w-head);color:var(--ink);line-height:1.45;}
+.ds-h{font-size:var(--fs-body);font-weight:var(--w-label);color:var(--ink);line-height:1.45;}
 .ds-s{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;}
 .ds-dl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--ink);margin-top:6px;}
 .ds-chips{display:inline-flex;flex-wrap:wrap;gap:6px;margin-left:7px;vertical-align:middle;}
@@ -1095,7 +1103,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bc-ic{width:36px;height:36px;flex:0 0 auto;border-radius:var(--r1);background:var(--accent);display:flex;align-items:center;justify-content:center;}
 .bc-ic svg{width:var(--ic-md);height:var(--ic-md);}
 .bc-tx{flex:1;min-width:0;}
-.bc-asset{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+.bc-asset{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
 .bc-zchip{font-size:var(--fs-label);font-weight:var(--w-head);padding:4px 11px;border-radius:var(--rpill);white-space:nowrap;}
 .bc-game{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;}
 .bc-partners{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
@@ -2750,7 +2758,7 @@ function renderHome(){
   '<main class="scroll fade">'+
     '<section class="home-hero"><div class="hh-badge">'+ic('lc-book-open')+'<span class="hh-badge-tx">คู่มือลงทุนของคุณ</span></div>'+
       '<img class="hh-logo" src="'+LOGO_IMG.nwnp+'" alt="New World New Playbook">'+
-      '<p class="hh-sub">คู่มือการลงทุนส่วนตัวของคุณ ประกอบจากการ์ดตัวตนและสิ่งที่คุณทำจริงในงาน ดูย้อนหลังได้บน efin.finance</p>'+
+      '<p class="hh-sub">คู่มือการลงทุนส่วนตัวของคุณ ประกอบจากการ์ดตัวตนและสิ่งที่คุณทำจริงในงาน <b>ดูย้อนหลังได้บน efin.finance</b></p>'+
       '<div class="hh-meta"><span>'+ic('lc-calendar')+'31 ต.ค. – 1 พ.ย. 2569</span><span>'+ic('lc-map-pin')+'Samyan Mitrtown ชั้น 5</span></div></section>'+
     (function(){var tp=(t.meta.sub||'').split(' · ');var benefit=tp[0]||'',price=tp[1]||'';
       return '<button class="pass-card" id="homeTier"><div class="pass-top"><span class="pass-ic'+(t.meta.icon==='lc-crown'?' gold':'')+'">'+ic(t.meta.icon)+'</span><div class="pass-hd"><div class="pass-ey">บัตรของคุณ</div><div class="pass-name">'+t.name+'</div></div>'+ic('lc-chevron-right','pass-cv')+'</div>'+
@@ -3093,7 +3101,6 @@ function renderProfile(){
   var t=curTier();
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
-    '<div class="prof-t">โปรไฟล์</div>'+
     '<section class="prof-card">'+
       '<div class="prof-av">'+ic('lc-user')+'</div>'+
       '<div class="prof-name">ตรีนุช รัตนมณี</div>'+
