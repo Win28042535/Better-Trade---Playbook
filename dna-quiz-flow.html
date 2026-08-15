@@ -404,10 +404,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* Fixed to the bottom on mobile (2026-08-15, per direction "ตำแหน่งเดียวกับ button ในหน้าแบบทดสอบ")
    — same technique as .q-nav's mobile rule right above: margin-top:auto already parks it at the
    bottom of .consent's own flex column; position:sticky;bottom:0 then holds it at the visible
-   viewport bottom. width:auto (not 100%) is required for the same reason as .q-nav — with
-   width:100%, that resolves against the box BEFORE the negative margins apply, so the full-bleed
-   edges fall short. pc/tablet keep the roomy centered layout below, untouched. */
-:root[data-view="mobile"] .consent-btn{position:sticky;bottom:0;z-index:6;width:auto;margin:auto calc(-1*var(--sp-edge)) 0;padding:14px var(--sp-edge) calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper) 45%,color-mix(in srgb,var(--paper) 50%,transparent) 75%,transparent);}
+   viewport bottom. Bug fix (same day): q-nav's own comment relies on width:auto + "q-scroll's
+   default align-items" (stretch) to size the box to the full bleed width — but .consent sets
+   align-items:CENTER (needed for its own centered text block), so width:auto alone just shrinks
+   the box to its content instead. align-self:stretch overrides the parent's center alignment for
+   this one child specifically, so it stretches to the cross-axis exactly like q-nav's does. */
+:root[data-view="mobile"] .consent-btn{position:sticky;bottom:0;z-index:6;width:auto;align-self:stretch;margin:auto calc(-1*var(--sp-edge)) 0;padding:14px var(--sp-edge) calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper) 45%,color-mix(in srgb,var(--paper) 50%,transparent) 75%,transparent);}
 .consent-caption b{font-weight:var(--w-label);color:var(--ink);}
 
 /* ── BOOK — scene-based: hairlines, not shadows ── */
@@ -1245,7 +1247,14 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    viewport — on short/awkward viewports that silently ate the caption and, worse, could eat the
    CTA itself. -x keeps the corner-bleed asset scatter from causing a horizontal scrollbar; -y left
    open means if content is ever taller than the screen the page just scrolls, never traps content. */
-.splash{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;padding:24px var(--sp-edge) 18px;overflow-x:hidden;min-height:100vh;min-height:100dvh;}
+/* overflow-x:hidden -> clip (2026-08-15, real bug found while fixing .sp-cta's mobile sticky rule)
+   — per spec, setting only ONE axis to 'hidden' silently promotes the OTHER axis from 'visible' to
+   'auto' (both become scroll containers), which was interfering with .sp-cta's align-self:stretch
+   + negative-margin bleed calculation and clipping it ~15px short of full width. 'clip' doesn't
+   carry that same-axis promotion rule, so it contains the fan-card carousel / scatter assets the
+   same way without the side effect. Confirmed via direct measurement: .sp-cta went from 413px to
+   the correct 428px width with this one change, no other visual difference. */
+.splash{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;padding:24px var(--sp-edge) 18px;overflow-x:clip;min-height:100vh;min-height:100dvh;}
 .sp-scatter{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
 /* depth-tiered scatter: near = bigger/sharper/stronger shadow/higher z · far = smaller/blurred/faint/behind. Parallax = near drifts more (--dx/--dy larger) */
 .sp-el{position:absolute;width:var(--w,88px);opacity:var(--op,.85);z-index:var(--z,1);filter:drop-shadow(0 var(--sh,10px) var(--shb,22px) rgba(17,19,24,var(--sha,0.16))) blur(var(--bl,0px)) saturate(var(--sat,1));animation:spDrift var(--d,9s) var(--ease) infinite alternate;animation-delay:var(--dl,0s);will-change:transform;}
@@ -1314,8 +1323,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    button ในหน้าแบบทดสอบ)") — same technique as .q-nav/.consent-btn's mobile rules: margin-top:auto
    already parks it at the bottom of .splash's own flex column; position:sticky;bottom:0 then holds
    it at the visible viewport bottom instead of scrolling away with the rest of the content.
-   width:auto + negative margins for the same full-bleed reason those two need them. */
-:root[data-view="mobile"] .sp-cta{position:sticky;bottom:0;z-index:6;width:auto;margin:auto calc(-1*var(--sp-edge)) 0;padding:24px var(--sp-edge) calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper) 45%,color-mix(in srgb,var(--paper) 50%,transparent) 75%,transparent);}
+   align-self:stretch, not just width:auto — .splash sets align-items:center (like .consent), so
+   width:auto alone just shrinks to content; see .consent-btn's comment for the full explanation. */
+:root[data-view="mobile"] .sp-cta{position:sticky;bottom:0;z-index:6;width:auto;align-self:stretch;margin:auto calc(-1*var(--sp-edge)) 0;padding:24px var(--sp-edge) calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper) 45%,color-mix(in srgb,var(--paper) 50%,transparent) 75%,transparent);}
 /* brand logos */
 .sp-logo{display:block;height:24px;width:auto;margin:0 auto 16px;opacity:.92;}
 .sp-hero-logo{display:block;width:min(84%,420px);height:auto;margin:2px auto 0;}
@@ -2050,17 +2060,22 @@ function render(){
    set it. ch-1/ch-2 now sit on one line (their CSS lost display:block, and there's a real space
    between the two spans below) instead of stacking as two lines. */
 /* Same depth-tiered asset scatter as the splash screen (2026-08-15, per direction "ลองเอา asset
-   element (แบบ splash มา preview + ใช้การ animate) ด้วย") — reuses .sp-el/spDrift verbatim so the
-   drift animation and per-asset shadow/blur/saturate custom properties all just work. Deliberately
-   a lighter composition than splash's 6-asset spread, not a 1:1 copy: only 2 assets (both far-plane
-   sized/opacity — faint, small, blurred), placed above the title where the only real open space on
-   this screen is, and hidden outright on mobile rather than shrunk — this screen's round-cards
-   already claim the full width at that size, and mobile is exactly where the splash version's own
-   crowding problem showed up before, so the safer call here is "not present" rather than "smaller". */
+   element (แบบ splash มา preview + ใช้การ animate) ด้วย"; expanded from 2 to 3 the same day per
+   follow-up "อยากให้มีแสดงเพิ่มขึ้นอีกหน่อย (โดยรวมยังดูว่างไปนิด) แต่ไม่ต้องเยอะ") — reuses
+   .sp-el/spDrift verbatim so the drift animation and per-asset shadow/blur/saturate custom
+   properties all just work. Deliberately lighter than splash's 6-asset spread, not a 1:1 copy:
+   gold/bitcoin sit above the title (the widest open band on this screen), 'card' now anchors the
+   lower-left — in the gap between the round-cards and the fixed .consent-btn — for a scattered
+   triangle instead of two assets clustered on one edge, still far-plane-sized/faint/blurred so
+   none of the three compete with the round-cards or title. bottom:22% (not closer to the true
+   edge) is deliberate: once .consent-btn's own full-bleed-width bug was fixed, its sticky band
+   reaches much further left than before, so anything much lower here would sit under the button
+   instead of beside it. Shrunk (not hidden) on mobile, see the .cs-el media-query rule for why. */
 function consentScatter(){
   var items=[
     {k:'gold',s:'top:2%;left:4%',w:52,sc:.8,op:.4,bl:2.2,sh:6,shb:14,sha:.12,sat:.92,d:'13s',dl:'0s',dx:'7px',dy:'8px',r0:'4deg',r1:'-3deg'},
-    {k:'bitcoin',s:'top:1%;right:5%',w:50,sc:.78,op:.38,bl:2.4,sh:6,shb:14,sha:.12,sat:.92,d:'14s',dl:'.6s',dx:'-8px',dy:'8px',r0:'-5deg',r1:'4deg'}
+    {k:'bitcoin',s:'top:1%;right:5%',w:50,sc:.78,op:.38,bl:2.4,sh:6,shb:14,sha:.12,sat:.92,d:'14s',dl:'.6s',dx:'-8px',dy:'8px',r0:'-5deg',r1:'4deg'},
+    {k:'card',s:'bottom:22%;left:3%',w:58,sc:.84,op:.36,bl:2,sh:7,shb:15,sha:.13,sat:.94,d:'12s',dl:'.3s',dx:'9px',dy:'-8px',r0:'-4deg',r1:'5deg'}
   ];
   return items.map(function(a){return '<img class="sp-el cs-el" alt="" src="'+(ASSET_IMG[a.k]||'')+'" style="'+a.s+';--w:'+a.w+'px;--sc:'+a.sc+';--op:'+a.op+';--bl:'+a.bl+'px;--z:0;--sh:'+a.sh+'px;--shb:'+a.shb+'px;--sha:'+a.sha+';--sat:'+a.sat+';--d:'+a.d+';--dl:'+a.dl+';--dx:'+a.dx+';--dy:'+a.dy+';--r0:'+a.r0+';--r1:'+a.r1+'">';}).join('');
 }
