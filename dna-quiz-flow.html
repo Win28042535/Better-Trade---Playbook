@@ -1270,10 +1270,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    everywhere else content stacks near-full-width). */
 @media(max-width:575px){
   .sp-el-far, .sp-el-efin, .sp-el-card{display:none;}
-  /* Consent screen's 2 scatter assets hidden outright on mobile, not shrunk — this screen's
-     round-cards already claim the full width at that size, and mobile is exactly where the
-     splash version's own crowding problem showed up before fixing it above. */
-  .cs-el{display:none;}
+  /* Reverted from display:none (2026-08-15, "Asset scatter ยังไม่มาแสดง") — this environment's own
+     common preview width (~375-575px) sits entirely inside this media query, so the previous
+     "hide outright on mobile" call meant the scatter never actually rendered in the one width range
+     it's most often checked at. Shrunk instead, same idea as .sp-el-mid/.sp-el-near above — still
+     present, just small/faint enough to stay clear of the round-cards below. */
+  .cs-el{width:calc(var(--w,88px) * 0.5);}
   .sp-el-mid{width:calc(var(--w,88px) * 0.42);opacity:calc(var(--op,.85) * 0.55);}
   .sp-el-near{width:calc(var(--w,88px) * 0.42);opacity:calc(var(--op,.85) * 0.65);}
   /* dy also capped here — candle's rest position sits only ~20px under the hero logo, so its
@@ -1300,16 +1302,20 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .fan-stage{position:relative;width:100%;height:clamp(250px,34vh,330px);}
 .fan-card{--fw:172px;position:absolute;top:50%;left:50%;width:var(--fw);aspect-ratio:5/7;transition:transform 1s cubic-bezier(.22,1,.36,1),opacity .6s var(--ease);will-change:transform,opacity;pointer-events:none;}
 :root[data-view="tablet"] .fan-card,:root[data-view="pc"] .fan-card{--fw:204px;}
-/* passive preview-cover caption (manual arrows/dots removed — carousel auto-cycles as a showcase) */
-.sp-preview-note{position:relative;z-index:3;display:inline-flex;align-items:center;gap:var(--sp-glue);margin-top:24px;font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:0.06em;color:var(--muted);}
-.sp-preview-note svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--violet);}
+/* .sp-preview-note ("พรีวิวการ์ดตัวตนนักลงทุน 12 แบบ") and .sp-cap (the PDPA acceptance line)
+   removed entirely 2026-08-15, per direction. */
 /* The ONE action on this screen that matters — was a styled .btn-primary, now the Liquid Metal CTA
    mounted into #cta-slot by mountSplashCTA() (see the script near renderSplash). The button sizes
    itself from its own measured label, so it's an inline-block — text-align:center here (inherited
    down through the plain #cta-slot div) centers it instead of stretching it full-width. */
 .sp-cta{position:relative;z-index:2;width:100%;margin-top:auto;padding-top:24px;text-align:center;}
 #cta-slot{min-height:56px;}
-.sp-cap{position:relative;z-index:2;font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);margin-top:12px;text-align:center;line-height:1.5;}
+/* Fixed to the bottom on mobile (2026-08-15, per direction "ให้ cta ฟิ๊ก bottom (ตำแหน่งเดียวกับ
+   button ในหน้าแบบทดสอบ)") — same technique as .q-nav/.consent-btn's mobile rules: margin-top:auto
+   already parks it at the bottom of .splash's own flex column; position:sticky;bottom:0 then holds
+   it at the visible viewport bottom instead of scrolling away with the rest of the content.
+   width:auto + negative margins for the same full-bleed reason those two need them. */
+:root[data-view="mobile"] .sp-cta{position:sticky;bottom:0;z-index:6;width:auto;margin:auto calc(-1*var(--sp-edge)) 0;padding:24px var(--sp-edge) calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper) 45%,color-mix(in srgb,var(--paper) 50%,transparent) 75%,transparent);}
 /* brand logos */
 .sp-logo{display:block;height:24px;width:auto;margin:0 auto 16px;opacity:.92;}
 .sp-hero-logo{display:block;width:min(84%,420px);height:auto;margin:2px auto 0;}
@@ -1457,10 +1463,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    that part was a real responsive choice, unrelated to the size drift. */
 :root[data-view="tablet"] .sp-sub,:root[data-view="pc"] .sp-sub{max-width:32ch;}
 :root[data-view="tablet"] .splash,:root[data-view="pc"] .splash{padding-left:40px;padding-right:40px;}
-/* desktop splash is a CENTERED poster, not a stretched full-width band: CTA + caption hold a
+/* desktop splash is a CENTERED poster, not a stretched full-width band: the CTA holds a
    button-scale measure instead of spanning the whole page */
-:root[data-view="tablet"] .sp-cta,:root[data-view="pc"] .sp-cta,
-:root[data-view="tablet"] .sp-cap,:root[data-view="pc"] .sp-cap{max-width:460px;margin-left:auto;margin-right:auto;}
+:root[data-view="tablet"] .sp-cta,:root[data-view="pc"] .sp-cta{max-width:460px;margin-left:auto;margin-right:auto;}
 /* reveal/analysis hero on desktop: let the scene fill a wide band (full-bleed feel) while the
    interactive content stays centered — the CTA is capped separately (.consent-btn) so it never
    stretches to the full band width. */
@@ -1891,9 +1896,7 @@ function renderSplash(){
       '<img class="sp-hero-logo" src="'+LOGO_IMG.nwnp+'" alt="New World, New Playbook · Better Trade 2026">'+
       '<p class="sp-sub">โลกการลงทุนใบใหม่ เริ่มจากรู้จักตัวเอง พบตัวตนนักลงทุน 1 ใน 12 แบบที่เป็นคุณ</p></div>'+
     '<div class="sp-stage"><div class="fan-stage" id="fanStage">'+slides+'</div></div>'+
-    '<div class="sp-preview-note">พรีวิวการ์ดตัวตนนักลงทุน '+ic('lc-sparkles')+' 12 แบบ</div>'+
     '<div class="sp-cta"><div id="cta-slot"></div></div>'+
-    '<div class="sp-cap">เริ่มทำแบบทดสอบถือว่ายอมรับ<b> การเก็บข้อมูลเพื่อพัฒนาระบบ (PDPA)</b> ✦ ไม่เปิดเผยรายบุคคล</div>'+
   '</div>';
   paintFan();
   mountSplashCTA();
