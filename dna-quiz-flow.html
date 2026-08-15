@@ -236,7 +236,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    2-weight emphasis this file's own comment above (.q-head) describes as intentional. Restored:
    .q-title itself back to --w-head (500), .q-title b stays at --w-label (700). */
 .q-title{font-size:var(--fs-title);font-weight:var(--w-head);line-height:1.2;letter-spacing:0;color:var(--ink);margin-bottom:10px;}
-.q-title b{font-weight:var(--w-label);color:var(--qc,var(--ink));}
+/* 2026-08-15 bug: --qc got wired to the quiz's real per-section color (yellow §1 / violet §2 /
+   pink §3, see the --qc comment above), which also fed straight into this rule via its fallback —
+   so the emphasized word in every question title started rendering in whichever section's color
+   instead of staying black. Only .q-icon-bare was meant to track section color; the emphasized
+   text itself goes back to a flat --ink regardless of section. */
+.q-title b{font-weight:var(--w-label);color:var(--ink);}
 .q-sub{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.5;margin:4px auto 0;text-wrap:pretty;max-width:400px;}
 .q-opts,.int-grid{width:100%;max-width:460px;margin:0 auto;}
 .q-opts{display:flex;flex-direction:column;gap:var(--sp-list);}
@@ -541,20 +546,27 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .upd-pill svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);}
 .risk-box{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--r2);padding:16px 16px;margin-bottom:14px;}
 .risk-hd{display:flex;align-items:center;gap:var(--sp-inline);margin-bottom:8px;}
-.risk-tag{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--muted);flex:1;}
-.risk-match{display:inline-flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);padding:3px 0;}
+/* Hierarchy pass (2026-08-15, "ตอนนี้ดูเท่าๆ กันไปหมด") — .risk-tag/.risk-match/.risk-desc were all
+   --fs-bodysm (16px), so the box's one real headline (the "ตรงกัน"/"ต่างกัน N" finding) never stood
+   out from its own label or the explanatory paragraph under it. .risk-tag demoted to a small label,
+   .risk-match promoted to the actual headline, .risk-desc receded to muted supporting copy. */
+.risk-tag{font-size:var(--fs-label);font-weight:var(--w-body);color:var(--muted);flex:1;}
+.risk-match{display:inline-flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);padding:3px 0;}
 .risk-match .ld{width:6px;height:6px;}
-.risk-desc{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--ink);line-height:1.65;margin-bottom:14px;}
+.risk-desc{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.65;margin-bottom:14px;}
 .risk-slbl{font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);letter-spacing:0.06em;margin-bottom:var(--sp-list);text-transform:uppercase;}
 .risk-bars{display:flex;flex-direction:column;gap:var(--sp-list);}
 .risk-row{display:flex;align-items:center;gap:var(--sp-inline);}
-.risk-rl{width:86px;flex-shrink:0;font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);}
+.risk-rl{width:86px;flex-shrink:0;font-size:var(--fs-label);font-weight:var(--w-body);color:var(--muted);}
 /* Bumped 1px→3px to match .prog-track/.prog-fill (2026-08-15, per Component System review) — the
    two other single-fill bars in the app (.conf-tr/.conf-fi included) read as noticeably thinner
    than the Book page's own top progress bar despite the same "one bar, one fill" idea. */
 .risk-tr{flex:1;height:3px;background:var(--line-soft);overflow:visible;position:relative;border-radius:var(--rpill);}
 .risk-fi{height:3px;background:var(--ink);position:absolute;left:0;top:0;border-radius:var(--rpill);}
-.risk-vl{width:44px;text-align:right;font-size:var(--fs-meta);font-weight:var(--w-head);color:var(--ink);font-family:var(--serif);}
+/* The actual risk numbers (8, 6.3) were the smallest text in the whole box (--fs-meta, 12px) despite
+   being the data point this section exists to show — bumped to a real stat-number size/weight, same
+   serif-numeral language as .conf-sc just below it in the same card. */
+.risk-vl{width:50px;text-align:right;font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);font-family:var(--serif);}
 /* confidence highlight — the soft blue wash moved here from the identity card (it read poorly overlapping the card art); a quiet radial glow behind the score corner only */
 .conf-box{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--r2);padding:16px 16px;position:relative;overflow:hidden;}
 .conf-glow{position:absolute;top:-45%;right:-15%;width:60%;height:150%;background:radial-gradient(closest-side,rgba(101,152,255,0.18),rgba(101,152,255,0) 70%);pointer-events:none;z-index:0;}
@@ -857,6 +869,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    this app's two real instances yet, both of which matched the pill look — kept in the toolkit
    since the brief explicitly asked for both variants to exist). */
 .bt-tabs--primary{border-bottom:1px solid var(--line-soft);gap:20px;}
+/* Per direction, the horizontal line under THIS specific tab row (asset drilldown, "เจาะรายสินทรัพย์")
+   reads as an unwanted extra divider right under the section header — scoped to just this consumer
+   via its own .dd-tablist hook, not the shared .bt-tabs--primary base, since the other two consumers
+   (profile before/after toggle, scan-mode switcher) still want the underline track. */
+.dd-tablist{border-bottom:none;}
 .bt-tabs--primary .bt-tab{padding:10px 1px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border-bottom:2px solid transparent;margin-bottom:-1px;}
 .bt-tabs--primary .bt-tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:var(--w-label);}
 @media(max-width:420px){.bt-tabs--primary{overflow-x:auto;scrollbar-width:none;}.bt-tabs--primary::-webkit-scrollbar{display:none;}}
@@ -1347,7 +1364,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pcb-leg b{font-family:var(--serif);font-weight:var(--w-label);color:#15171d;}
 /* viewer controls (book) */
 .pcv-wrap{position:relative;padding-top:30px;}
-.pcv-hint{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:3;display:inline-flex;align-items:center;gap:var(--sp-glue);padding:5px 11px;border-radius:var(--rpill);background:rgba(9,10,13,0.55);backdrop-filter:blur(4px);font-family:var(--font);font-size:var(--fs-meta);color:rgba(255,255,255,0.92);white-space:nowrap;pointer-events:none;opacity:1;transition:opacity .4s var(--ease);}
+/* Resting state lightened per direction ("อยากให้สีอ่อน ไม่เด่นเท่านี้") — .55 is now reserved for
+   the :hover state below (on .pcv-wrap, since this element itself is pointer-events:none so it
+   can't take its own hover). */
+.pcv-hint{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:3;display:inline-flex;align-items:center;gap:var(--sp-glue);padding:5px 11px;border-radius:var(--rpill);background:rgba(9,10,13,0.3);backdrop-filter:blur(4px);font-family:var(--font);font-size:var(--fs-meta);color:rgba(255,255,255,0.92);white-space:nowrap;pointer-events:none;opacity:1;transition:background .2s var(--ease),opacity .4s var(--ease);}
+.pcv-wrap:hover .pcv-hint{background:rgba(9,10,13,0.55);}
 .pcv-hint svg{width:var(--ic-sm);height:var(--ic-sm);}
 .pcv-wrap.touched .pcv-hint{opacity:0;}
 .pcv-ctas{display:flex;gap:9px;margin-top:16px;}
@@ -2251,7 +2272,11 @@ function evoCompute(r){
 /* #famBadge's tint+text color track whichever persona is currently active (pre vs post can be a
    different family entirely) — shared by the initial render and the tab-switch handler below so
    the two never drift apart. */
-function famBadgeStyle(hero){return 'background:color-mix(in srgb,'+hero.accent+' 16%,var(--white));color:'+hero.accent+';';}
+/* Desaturated to white/gray/black per direction ("อยากให้ส่วนนี้เป็นโทนสี ขาว เทา ดำแทน") — was
+   tinted to the persona's own family accent (cyan/violet/pink), which is now the one deliberate
+   colored moment saved for the card's asset chips (.chip) instead; this badge stays neutral for
+   all 12 personas. hero param no longer used for color but kept for call-site compatibility. */
+function famBadgeStyle(hero){return 'background:linear-gradient(135deg,var(--white),var(--cloud));color:var(--ink);';}
 /* Shared by both hero-sec tab panels (renderBook's pre-event one and evoPanelHTML's post-event
    one) so the two are structurally guaranteed to stay in lockstep — card viewer → signature →
    asset chips → strengths/watchouts, same order, same classes, just fed a different persona +
@@ -2330,7 +2355,6 @@ function renderBook(){
       '<div class="efin-acts"><button class="btn btn-primary">'+ic('lc-message-circle')+'คัดลอกคำถามไปถาม efin AI</button><button class="btn btn-secondary">เปิดหน้า efin AI</button></div></div>'+
     '<section class="card mb"><div class="s-pad" style="padding-bottom:0">'+
       '<div class="s-ey">'+ic('lc-sparkles')+'AI Insight</div><h2 class="s-h">คุณเป็นนักลงทุนแบบไหน</h2>'+
-      '<div class="upd-pill">'+ic('lc-zap')+'อัปเดตจาก DNA Quiz</div>'+
       '<div class="risk-box"><div class="risk-hd"><span class="risk-tag">ความเสี่ยง "บอก" vs "จริง"</span><span class="risk-match">'+(matchOk?('<span class="ld" style="background:var(--cyan)"></span>ตรงกัน'):('ต่างกัน '+(r.gap>0?'+':'')+r.gap))+'</span></div>'+
         '<p class="risk-desc">'+(matchOk?'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน — นักลงทุนที่ self-aware มักตัดสินใจได้ดีกว่าในภาวะตลาดผันผวน':'ความเสี่ยงที่คุณ "บอก" กับที่พฤติกรรมจริงสะท้อนออกมาต่างกันอยู่บ้าง — รู้ gap นี้ช่วยให้วางแผนได้แม่นขึ้น')+'</p>'+
         '<div class="risk-slbl">ระดับความเสี่ยง 1–10</div>'+
