@@ -1553,6 +1553,21 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 :root[data-view="tablet"] .consent-h,:root[data-view="pc"] .consent-h,
 :root[data-view="tablet"] .consent-btn,:root[data-view="pc"] .consent-btn{max-width:440px;margin-left:auto;margin-right:auto;}
 :root[data-view="tablet"] .hero-cardwrap,:root[data-view="pc"] .hero-cardwrap{max-width:268px;}
+/* Real bug found via a targeted bug hunt (2026-08-16): the "card"/"efin" near-plane scatter assets
+   were positioned bottom:19-20% — safe on mobile, where .consent-btn is position:sticky and pinned
+   to the TRUE viewport bottom regardless of content height, leaving that band reliably clear. On
+   tablet/pc .consent-btn is NOT sticky — it sits in normal flow right after the centered content
+   block, which (per .consent's own justify-content:center) can land anywhere in the box's vertical
+   middle depending on content height — so a fixed bottom:19-20% could and did visually collide with
+   it (confirmed via getBoundingClientRect overlap: the button's own box and the "card" asset's box
+   overlapped by ~16px at both tablet and pc widths). Not a click-blocker (`.sp-scatter`'s
+   pointer-events:none is inherited down to every .sp-el), but a real visual overlap. Fixed by moving
+   both near-plane assets down into the TRUE bottom band instead (~24% of the box height reliably
+   clear of the centered content on both current tablet/pc measurements). !important is required to
+   beat each asset's own inline `style="bottom:...` set in consentScatter(), same technique already
+   used for the splash screen's .sp-el-candle/.sp-el-bitcoin mobile repositioning. */
+:root[data-view="tablet"] .cs-el-card,:root[data-view="pc"] .cs-el-card{bottom:5%!important;top:auto!important;}
+:root[data-view="tablet"] .cs-el-efin,:root[data-view="pc"] .cs-el-efin{bottom:4%!important;top:auto!important;}
 
 /* ══ DEMO SIMULATION PANEL ══ */
 .demo-fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:9998;width:52px;height:52px;border-radius:50%;border:2px solid transparent;background:linear-gradient(var(--ink),var(--ink)) padding-box,var(--spectrum) border-box;color:var(--cloud);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-primary);transition:transform .18s var(--ease);}
@@ -2160,7 +2175,7 @@ function consentScatter(){
     {k:'card',   s:'bottom:20%;left:4%',  w:60,sc:.88,op:.46,bl:.3, z:2,sh:9,shb:18,sha:.15,sat:1,  d:'12s',dl:'.2s',dx:'9px', dy:'-8px',r0:'-4deg',r1:'5deg'},
     {k:'efin',   s:'bottom:19%;right:5%', w:56,sc:.86,op:.44,bl:.5, z:2,sh:9,shb:18,sha:.15,sat:1,  d:'13s',dl:'.7s',dx:'-9px',dy:'-7px',r0:'5deg', r1:'-4deg'}
   ];
-  return items.map(function(a){return '<img class="sp-el cs-el" alt="" src="'+(ASSET_IMG[a.k]||'')+'" style="'+a.s+';--w:'+a.w+'px;--sc:'+a.sc+';--op:'+a.op+';--bl:'+a.bl+'px;--z:'+a.z+';--sh:'+a.sh+'px;--shb:'+a.shb+'px;--sha:'+a.sha+';--sat:'+a.sat+';--d:'+a.d+';--dl:'+a.dl+';--dx:'+a.dx+';--dy:'+a.dy+';--r0:'+a.r0+';--r1:'+a.r1+'">';}).join('');
+  return items.map(function(a){return '<img class="sp-el cs-el cs-el-'+a.k+'" alt="" src="'+(ASSET_IMG[a.k]||'')+'" style="'+a.s+';--w:'+a.w+'px;--sc:'+a.sc+';--op:'+a.op+';--bl:'+a.bl+'px;--z:'+a.z+';--sh:'+a.sh+'px;--shb:'+a.shb+'px;--sha:'+a.sha+';--sat:'+a.sat+';--d:'+a.d+';--dl:'+a.dl+';--dx:'+a.dx+';--dy:'+a.dy+';--r0:'+a.r0+';--r1:'+a.r1+'">';}).join('');
 }
 function renderConsent(){
   root.innerHTML=
