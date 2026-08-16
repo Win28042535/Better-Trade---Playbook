@@ -460,7 +460,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .tab-item svg{width:var(--ic-lg);height:var(--ic-lg);}
 .tab-item span{font-size:var(--fs-label);font-weight:var(--w-label);}
 .tab-item.active{color:var(--violet);}
-/* ══ คู่มือ 2 (Book v2) ══ version toggle · compare-reveal slider · bottom content-nav */
+/* ══ คู่มือ 2 (Book v2) ══ version toggle · compare-reveal slider · top content-nav (reuses .toc) */
 .bookver{display:flex;gap:var(--sp-stack-tight);justify-content:center;padding:10px var(--sp-edge) 0;flex-shrink:0;}
 .bookver-b{flex:0 0 auto;min-height:34px;padding:0 var(--sp-stack);border-radius:var(--rpill);border:1px solid var(--line-soft);background:var(--white);color:var(--muted);font-family:var(--font);font-weight:var(--w-label);font-size:var(--fs-label);cursor:pointer;transition:background .15s,color .15s,border-color .15s;}
 .bookver-b.on{background:var(--ink);color:var(--cloud);border-color:var(--ink);}
@@ -478,20 +478,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .cr2-handle:hover{transform:translate(-50%,-50%) scale(1.05);}
 .cr2-cap{text-align:center;font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;margin:10px auto 0;max-width:280px;}
 .cr2-cap b{color:var(--ink);font-weight:var(--w-label);}
-/* bottom content-nav (the tab menu, moved off the top .toc onto a bottom bar) — floats just above the
-   app tabbar; the offset is set from JS (see positionBook2Nav) to the app tabbar's OWN measured
-   height rather than a hardcoded px, so the two bars stay flush even if the tabbar's own padding
-   tokens change later. --b2-offset defaults to 66px here only as a pre-JS fallback. */
-.book2-scroll{padding-bottom:160px;}
 .b2-panel{display:none;}
 .b2-panel.show{display:flex;flex-direction:column;gap:var(--sp-section);}
-/* book2-subnav reuses .book-tabbar/.tab-item VERBATIM (2026-08-16, per direction "ส่วน tab-display
-   อยากให้ใช้เวอร์เดียวกับเวอร์ คู่มือ") — rendered with class="book-tabbar book2-subnav" / "tab-item"
-   on its buttons, so it's pixel-identical to the real app tabbar (icon-over-label, same sizing,
-   same active-violet color) rather than a bespoke second bottom-bar style; only the position
-   (floats above the real tabbar, offset JS-computed — see positionBook2Nav) and z-index are
-   overridden here. The DATA it shows stays Book v2's own 4 categories, only the tab CHROME matches. */
-.book2-subnav{bottom:calc(var(--b2-offset,66px) + env(safe-area-inset-bottom,0px));z-index:89;padding-bottom:var(--sp-list);}
 .toc{display:flex;gap:var(--sp-glue);padding:var(--sp-inline) var(--sp-stack) 4px;flex-shrink:0;}
 /* TOC jump-nav is .bt-tabs.bt-tabs--secondary (pill) — per direction, swapped with the in-card
    pickers below: the page-level section switcher (TOC) now reads as pills, while the small
@@ -2601,27 +2589,21 @@ function bookVerToggle(active){
   return '<div class="bookver"><button class="bookver-b'+(active===1?' on':'')+'" data-bv="1">คู่มือ</button><button class="bookver-b'+(active===2?' on':'')+'" data-bv="2">คู่มือ 2</button></div>';
 }
 function bindBookVer(){root.querySelectorAll('.bookver-b').forEach(function(b){b.onclick=function(){var v=+b.dataset.bv;if(v===BOOK_VER)return;BOOK_VER=v;render();};});}
-/* Markup reuses .book-tabbar/.tab-item verbatim (see the CSS comment above .book2-subnav) — same
-   classes as the real app tabbar rendered right after it, just with book2-subnav ADDED so the
-   position-override rule can target it specifically. */
+/* Moved to the TOP, right under the คู่มือ/คู่มือ 2 version pill (2026-08-16, per direction "อยากให้
+   อยู่ด้านบน...เหมือนคู่มือเวอร์ 1") — was a fixed-bottom bar stacked above the app tabbar; now reuses
+   v1's OWN .toc position + exact style (.bt-tabs.bt-tabs--secondary pill tabs) instead of a bottom
+   bar, matching Book v1's own top jump-nav slot precisely. The panel-SWITCH behavior (not v1's
+   anchor-scroll) stays custom — see bindBook2Nav — only the position+chrome match v1. */
 function book2Subnav(active){
-  return '<nav class="book-tabbar book2-subnav" role="tablist" aria-label="หมวดคู่มือ 2">'+BOOK2_TABS.map(function(t){
-    return '<button class="tab-item'+(t.k===active?' active':'')+'" type="button" role="tab" aria-selected="'+(t.k===active?'true':'false')+'" data-b2="'+t.k+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>';
+  return '<nav class="toc bt-tabs bt-tabs--secondary" role="tablist" aria-label="หมวดคู่มือ 2">'+BOOK2_TABS.map(function(t){
+    return '<button class="bt-tab" type="button" role="tab" aria-selected="'+(t.k===active?'true':'false')+'" data-b2="'+t.k+'"><span class="bt-tab-icon">'+ic(t.icon)+'</span><span class="bt-tab-label">'+t.label+'</span></button>';
   }).join('')+'</nav>';
 }
-/* Sets --b2-offset from the REAL app tabbar's own rendered height (not a guessed px) so the two
-   fixed bars always sit flush regardless of any spacing-token change to either one. :not(.book2-
-   subnav) is required now that both bars share the .book-tabbar class — without it this would
-   measure itself. */
-function positionBook2Nav(){
-  var tb=root.querySelector('.book-tabbar:not(.book2-subnav)');
-  if(tb)document.documentElement.style.setProperty('--b2-offset',Math.ceil(tb.getBoundingClientRect().height)+'px');
-}
 function bindBook2Nav(){
-  root.querySelectorAll('.book2-subnav .tab-item').forEach(function(b){b.onclick=function(){
+  root.querySelectorAll('.toc .bt-tab').forEach(function(b){b.onclick=function(){
     var k=b.dataset.b2;BOOK2_TAB=k;
     root.querySelectorAll('.b2-panel').forEach(function(p){p.classList.toggle('show',p.dataset.panel===k);});
-    root.querySelectorAll('.book2-subnav .tab-item').forEach(function(x){var on=x===b;x.classList.toggle('active',on);x.setAttribute('aria-selected',on?'true':'false');});
+    root.querySelectorAll('.toc .bt-tab').forEach(function(x){x.setAttribute('aria-selected',x===b?'true':'false');});
     window.scrollTo(0,0);
   };});
 }
@@ -2678,22 +2660,31 @@ function renderBook2(){
   if(!RESULT){st.phase='splash';render();return;}
   var r=RESULT,h=r.hero,ev=evoCompute(r),matchOk=Math.abs(r.gap)<=1.5,tab=BOOK2_TAB;
   var arrows='<svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden="true"><path d="M6 1 L1 7 L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 1 L17 7 L12 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  var compareBlock;
-  if(ev.state==='building'){
-    compareBlock='<div class="hero-cardwrap">'+pcViewer(r.heroKey,'')+'</div>'+
-      '<div class="hero-note">'+ic('lc-info')+'ยังไม่มีข้อมูลจากในงาน — เล่นกิจกรรมก่อน แล้วการ์ด "หลังงาน" จะมาเทียบให้เห็นตรงนี้</div>';
-  }else{
-    compareBlock='<div class="cr2" data-cr2 data-start="52"><div class="cr2-side cr2-after">'+pcStatic(ev.behKey)+'</div>'+
+  /* Compare-reveal ALWAYS previews two genuinely DIFFERENT persona cards now (2026-08-16, per
+     direction "อยากให้ preview ตัวอย่าง character card ผลลัพธ์จริงที่ออกมาต่างกันเสมอ เพื่อให้เห็นถึง
+     ความแตกต่างของก่อน และหลังงาน") — v1's evoCompute() is evidence-gated (needs sig>=3 measured booth
+     activity AND a real |gap|>=2 before it shifts family at all), so a fresh quiz-taker with zero
+     activity, or one whose real behavior happens to confirm the SAME persona, would previously show
+     either a "no data yet" single card or two IDENTICAL cards — neither demonstrates what this
+     feature is for. Real measured divergence (ev.behKey!==r.heroKey while ev.state!=='building')
+     is used as-is when it already differs; otherwise an illustrative "after" persona is substituted
+     — same divergence technique forcePersona()'s own demo mode already uses (shift to the opposite
+     family's flagship, EVO_REP) — and tagged "ตัวอย่าง" so it's never presented as if it were the
+     user's own real result. */
+  var realPost=ev.state!=='building'&&ev.behKey!==r.heroKey;
+  var postKey=realPost?ev.behKey:EVO_REP[h.fam==='V'?'G':'V'];
+  var postHero=HEROES[postKey];
+  var compareBlock='<div class="cr2" data-cr2 data-start="52"><div class="cr2-side cr2-after">'+pcStatic(postKey)+'</div>'+
       '<div class="cr2-side cr2-before">'+pcStatic(r.heroKey)+'</div>'+
-      '<span class="cr2-chip cr2-chip-b">ก่อนงาน</span><span class="cr2-chip cr2-chip-a">หลังงาน</span>'+
+      '<span class="cr2-chip cr2-chip-b">ก่อนงาน</span><span class="cr2-chip cr2-chip-a">หลังงาน'+(realPost?'':' · ตัวอย่าง')+'</span>'+
       '<div class="cr2-divider"><button class="cr2-handle" type="button" aria-label="เลื่อนเทียบการ์ดก่อนงานและหลังงาน">'+arrows+'</button></div></div>'+
-      '<p class="cr2-cap">ลากเส้นแบ่งเพื่อเทียบการ์ดตัวตน <b>ก่อนงาน</b> ↔ <b>หลังงาน</b> — ข้อมูลด้านล่างจะเปลี่ยนตามฝั่งที่เห็นเต็ม</p>';
-  }
+      '<p class="cr2-cap">ลากเส้นแบ่งเพื่อเทียบการ์ดตัวตน <b>ก่อนงาน</b> ↔ <b>หลังงาน</b> — ข้อมูลด้านล่างจะเปลี่ยนตามฝั่งที่เห็นเต็ม'+(realPost?'':' (ฝั่งหลังงานเป็นตัวอย่าง จนกว่าจะมีข้อมูลกิจกรรมจริงในงาน)')+'</p>';
   root.innerHTML=
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
   '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="Better Trade — กลับหน้าหลัก" style="margin-right:auto"><div id="qr-cta-slot"></div></header>'+
   bookVerToggle(2)+
-  '<main class="scroll book2-scroll">'+
+  book2Subnav(tab)+
+  '<main class="scroll">'+
     '<div class="b2-panel'+(tab==='identity'?' show':'')+'" data-panel="identity">'+
       '<section class="hero-sec"><div class="hero-gw"><div class="hero-in">'+
         compareBlock+
@@ -2718,27 +2709,23 @@ function renderBook2(){
       '<section class="card"><div class="s-pad"><div class="list-row klib-row" id="klibRow"><div class="klib-ic">'+ic('lc-library')+'</div><div class="klib-tx"><div class="klib-t">คลังความรู้</div><div class="klib-s">41 บทความที่คัดมาสำหรับ '+h.th+'</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
     '</div>'+
   '</main>'+
-  book2Subnav(tab)+
   appTabbar('book');
-  bindTabbar();bindBookVer();bindBook2Nav();positionBook2Nav();
+  bindTabbar();bindBookVer();bindBook2Nav();
   root.querySelector('#devReset').onclick=resetQuiz;
-  if(ev.state==='building'){
-    bindViewer('');
-    initCompareReveal();
-  }else{
-    // Linked preview: crossing the slider's 50% midpoint swaps #b2ident-detail to whichever
-    // persona is now showing MORE of its card (pos>=50 -> pre-event's .cr2-before layer covers
-    // more of the frame; see initCompareReveal's clip-path math) — threshold-gated so this only
-    // fires on an actual crossing, not every pixel of drag.
-    var activeIsPre=true;
-    initCompareReveal({onMove:function(pos){
-      var wantPre=pos>=50;
-      if(wantPre===activeIsPre)return;
-      activeIsPre=wantPre;
-      var det=root.querySelector('#b2ident-detail');
-      if(det)det.innerHTML=book2IdentityDetail(wantPre?h:ev.behHero);
-    }});
-  }
+  // Linked preview: crossing the slider's 50% midpoint swaps #b2ident-detail to whichever persona
+  // is now showing MORE of its card (pos>=50 -> pre-event's .cr2-before layer covers more of the
+  // frame; see initCompareReveal's clip-path math) — threshold-gated so this only fires on an
+  // actual crossing, not every pixel of drag. postHero/postKey are always a genuinely different
+  // persona from r.hero now (see the compareBlock comment above), so this always has something
+  // real to demonstrate regardless of whether ev's own real divergence produced one.
+  var activeIsPre=true;
+  initCompareReveal({onMove:function(pos){
+    var wantPre=pos>=50;
+    if(wantPre===activeIsPre)return;
+    activeIsPre=wantPre;
+    var det=root.querySelector('#b2ident-detail');
+    if(det)det.innerHTML=book2IdentityDetail(wantPre?h:postHero);
+  }});
   initBtTabs(root.querySelector('#ddTabs'),function(value){root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===value)?'':'none';});});
   root.querySelectorAll('.side-row').forEach(function(rw){rw.onclick=function(){togSide(rw);};});
   var kr=root.querySelector('#klibRow');if(kr)kr.onclick=function(){LIB_OPEN=null;st.phase='library';render();};
@@ -2757,10 +2744,7 @@ var APP_TABS=[
   {k:'profile',icon:'lc-user',label:'โปรไฟล์'}
 ];
 function appTabbar(active){return '<nav class="book-tabbar">'+APP_TABS.map(function(t){return '<button class="tab-item'+(t.k===active?' active':'')+'" data-tab="'+t.k+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>';}).join('')+'</nav>';}
-/* :not(.book2-subnav) — Book v2's content-subnav reuses this exact .book-tabbar/.tab-item markup
-   (see book2Subnav's comment) so its buttons would otherwise also match this selector; they carry
-   data-b2, not data-tab, and are bound separately by bindBook2Nav(). */
-function bindTabbar(){root.querySelectorAll('.book-tabbar:not(.book2-subnav) .tab-item').forEach(function(b){b.onclick=function(){var k=b.dataset.tab;if(k===st.phase)return;st.phase=k;render();};});}
+function bindTabbar(){root.querySelectorAll('.book-tabbar .tab-item').forEach(function(b){b.onclick=function(){var k=b.dataset.tab;if(k===st.phase)return;st.phase=k;render();};});}
 /* ── deferred Book sections — all populated with EXAMPLE data (booth games + analysis engine
    don't exist yet); each carries an .ex-tag in the UI so nothing here reads as a real measurement. ── */
 function traitBars(){
@@ -3507,7 +3491,7 @@ function applyView(){
   else{var w=window.innerWidth;v=w<768?'mobile':(w<1440?'tablet':'pc');}
   document.documentElement.setAttribute('data-view',v);
 }
-window.addEventListener('resize',function(){if(DEMO.view==='auto')applyView();if(BOOK_VER===2&&st.phase==='book')positionBook2Nav();});
+window.addEventListener('resize',function(){if(DEMO.view==='auto')applyView();});
 
 /* synthesize a plausible RESULT for a forced persona and jump to the Book (demo shortcut).
    gap:0 here used to mean the demo persona picker could NEVER show a real post-event difference —
