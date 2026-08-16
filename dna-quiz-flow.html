@@ -430,8 +430,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* .consent-check-row/.cc-box/.consent-check/.cc-text (the PDPA data-consent checkbox) and
    .consent-caption removed entirely 2026-08-15, per direction ("เอาส่วนยอมรับให้เก็บคำตอบออก",
    "เอาคำว่า ตอบตามใจจริง...ออก") — #startBtn's gating on st.consent was removed to match. */
-.consent-btn{width:100%;margin-top:26px;}
-.consent-btn .btn-primary{width:100%;}
+/* Button now hugs its own label width instead of stretching full-bleed (2026-08-16, per direction
+   "อยากให้ความกว้าง button ไม่ฟิ๊กยาว อยากให้ยืดหยุ่นตาม padding hug ของ button") — matches how the
+   splash CTA (#cta-slot) and quiz nav's primary button already behave (both content-sized + centered
+   within their own bar, never stretched). .btn's own base rule is already display:inline-flex with
+   padding:0 24px, so it hugs on its own once width:100% is removed here; text-align:center on the
+   wrapper centers it in the (still full-width, for the sticky-bar background) .consent-btn box. */
+.consent-btn{width:100%;margin-top:26px;text-align:center;}
 /* Fixed to the bottom on mobile (2026-08-15, per direction "ตำแหน่งเดียวกับ button ในหน้าแบบทดสอบ")
    — same technique as .q-nav's mobile rule right above: margin-top:auto already parks it at the
    bottom of .consent's own flex column; position:sticky;bottom:0 then holds it at the visible
@@ -2304,7 +2309,12 @@ function renderReveal(){
   clearRevealTimer();
   root.innerHTML=
   '<header class="topbar"><div class="tb-ic" id="rvBack">'+ic('lc-arrow-left')+'</div><span class="tb-title">วิเคราะห์ตัวตนของคุณ</span></header>'+
-  '<div class="consent reveal-scene fade" style="padding-top:88px">'+
+  /* padding-top was a hardcoded 88px against .consent's own asymmetric bottom padding (32px base,
+     0 on mobile) — pushed the icon/kicker/headline group ~40px below true vertical-center of the
+     available space (2026-08-16, per direction "กลุ่มเนื้อหา...อยู่กึ่งกลาง...ตอนนี้เหมือนจะลงมาทาง
+     ล่างกว่า"). --sp-edge (20px) — already this screen's own horizontal edge padding via .consent's
+     base rule — closes most of that gap (measured offset 40px -> 4-10px across mobile/tablet/pc). */
+  '<div class="consent reveal-scene fade" style="padding-top:var(--sp-edge)">'+
     '<div class="reveal-icon analyzing"><img src="'+ICON_IMG.hourglass+'" alt=""><span class="reveal-spin"></span></div>'+
     '<div class="consent-kicker">กำลังวิเคราะห์คำตอบของคุณ</div>'+
     /* Per direction, this screen wants the OPPOSITE weight/color order from renderConsent's
