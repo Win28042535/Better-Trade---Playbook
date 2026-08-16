@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Tab Component Display</title>
+  <style>
+    :root {
+      --page: #f7f7f7;
+      --surface: #ffffff;
+      --surface-subtle: #fafafa;
+      --text: #171717;
+      --muted: #666666;
+      --disabled: #a3a3a3;
+      --line: #eaeaea;
+      --soft-fill: rgba(0, 0, 0, 0.08);
+      --focus: #0070f3;
+      --shadow: 0 18px 55px rgba(0, 0, 0, 0.08);
+      --radius: 16px;
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(0, 112, 243, 0.08), transparent 32rem),
+        var(--page);
+    }
+
+    button { font: inherit; }
+
+    .page {
+      width: min(920px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 64px 0 80px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 6vw, 52px);
+      line-height: 1;
+      letter-spacing: -0.045em;
+    }
+
+    .intro {
+      max-width: 610px;
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .theme-toggle {
+      flex: none;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--text);
+      background: var(--surface);
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    }
+
+    .theme-toggle:hover { transform: translateY(-1px); }
+    .theme-toggle svg { width: 18px; height: 18px; }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .demo-card {
+      min-width: 0;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .demo-card--wide { grid-column: 1 / -1; }
+
+    .demo-title {
+      margin: 0 0 20px;
+      font-size: 18px;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      align-items: stretch;
+      min-width: 0;
+    }
+
+    .tabs--primary {
+      gap: 24px;
+      padding-bottom: 1px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tabs--secondary {
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      transition: color 100ms ease, background-color 100ms ease, transform 100ms ease;
+      white-space: nowrap;
+    }
+
+    .tab:hover:not(:disabled) { color: var(--text); }
+    .tab:active:not(:disabled) { transform: translateY(1px); }
+
+    .tab:focus-visible,
+    .theme-toggle:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .tabs--primary .tab {
+      margin-bottom: -2px;
+      padding: 0 0 7px;
+      border-bottom: 2px solid transparent;
+      font-size: 14px;
+    }
+
+    .tabs--primary .tab[aria-selected="true"] {
+      border-bottom-color: var(--text);
+      color: var(--text);
+    }
+
+    .tabs--secondary .tab {
+      min-height: 28px;
+      padding: 4px 9px;
+      border-radius: 7px;
+      color: var(--text);
+      background: var(--soft-fill);
+      font-size: 13px;
+    }
+
+    .tabs--secondary .tab[aria-selected="true"] {
+      color: var(--surface);
+      background: var(--text);
+    }
+
+    .tab:disabled {
+      color: var(--disabled);
+      cursor: not-allowed;
+    }
+
+    .tabs--secondary .tab:disabled { background: var(--line); }
+
+    .tab-icon {
+      width: 16px;
+      height: 16px;
+      flex: none;
+    }
+
+    .tab-label:empty { display: none; }
+
+    /* Native, dependency-free tooltip */
+    .tab[data-tooltip]::after,
+    .tab[data-tooltip]::before {
+      position: absolute;
+      left: 50%;
+      z-index: 10;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, 4px);
+      transition: opacity 120ms ease 380ms, transform 120ms ease 380ms;
+    }
+
+    .tab[data-tooltip]::after {
+      content: attr(data-tooltip);
+      bottom: calc(100% + 9px);
+      width: max-content;
+      max-width: 208px;
+      padding: 7px 9px;
+      border-radius: 8px;
+      color: var(--surface);
+      background: var(--text);
+      font-size: 12px;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .tab[data-tooltip]::before {
+      content: "";
+      bottom: calc(100% + 4px);
+      border: 5px solid transparent;
+      border-top-color: var(--text);
+    }
+
+    .tab[data-tooltip]:hover::after,
+    .tab[data-tooltip]:hover::before,
+    .tab[data-tooltip]:focus-visible::after,
+    .tab[data-tooltip]:focus-visible::before {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .tab-panel {
+      min-height: 58px;
+      margin-top: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--muted);
+      background: var(--surface-subtle);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .tab-panel strong { color: var(--text); }
+
+    .tabs[data-disabled="true"] { cursor: not-allowed; }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --page: #0a0a0a;
+        --surface: #111111;
+        --surface-subtle: #161616;
+        --text: #ededed;
+        --muted: #a1a1a1;
+        --disabled: #666666;
+        --line: #333333;
+        --soft-fill: rgba(255, 255, 255, 0.09);
+        --shadow: 0 18px 55px rgba(0, 0, 0, 0.25);
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --page: #0a0a0a;
+      --surface: #111111;
+      --surface-subtle: #161616;
+      --text: #ededed;
+      --muted: #a1a1a1;
+      --disabled: #666666;
+      --line: #333333;
+      --soft-fill: rgba(255, 255, 255, 0.09);
+      --shadow: 0 18px 55px rgba(0, 0, 0, 0.25);
+    }
+
+    :root[data-theme="light"] { color-scheme: light; }
+    :root[data-theme="dark"] { color-scheme: dark; }
+
+    @media (max-width: 680px) {
+      .page { padding-top: 36px; }
+      .demo-grid { grid-template-columns: 1fr; }
+      .demo-card--wide { grid-column: auto; }
+      .tabs--primary { gap: 18px; overflow-x: auto; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Vanilla HTML Component</p>
+        <h1>Tabs</h1>
+        <p class="intro">ตัวอย่าง Tab component ที่แปลงจาก React ให้ใช้งานด้วย HTML, CSS และ JavaScript ล้วน รองรับเมาส์ คีย์บอร์ด สถานะ disabled, tooltip และ dark mode</p>
+      </div>
+      <button class="theme-toggle" type="button" aria-label="เปลี่ยนธีม" title="เปลี่ยนธีม">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"/>
+        </svg>
+      </button>
+    </header>
+
+    <div class="demo-grid">
+      <section class="demo-card" data-tab-demo>
+        <h2 class="demo-title">Default</h2>
+        <div class="tabs tabs--primary" role="tablist" aria-label="Default fruit tabs">
+          <button class="tab" type="button" role="tab" aria-selected="true" data-value="apple"><span class="tab-label">Apple</span></button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-value="orange"><span class="tab-label">Orange</span></button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-value="mango"><span class="tab-label">Mango</span></button>
+        </div>
+        <div class="tab-panel" role="tabpanel">Selected: <strong>Apple</strong></div>
+      </section>
+
+      <section class="demo-card" data-tab-demo>
+        <h2 class="demo-title">Disabled</h2>
+        <div class="tabs tabs--primary" role="tablist" aria-label="Disabled fruit tabs" data-disabled="true">
+          <button class="tab" type="button" role="tab" aria-selected="true" data-value="apple" disabled><span class="tab-label">Apple</span></button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-value="orange" disabled><span class="tab-label">Orange</span></button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-value="mango" disabled><span class="tab-label">Mango</span></button>
+        </div>
+        <div class="tab-panel" role="tabpanel">ทั้งชุดถูกปิดการใช้งาน</div>
+      </section>
+
+      <section class="demo-card" data-tab-demo>
+        <h2 class="demo-title">Disable specific tabs</h2>
+        <div class="tabs tabs--primary" role="tablist" aria-label="Fruit tabs with disabled item">
+          <button class="tab" type="button" role="tab" aria-selected="true" data-value="apple"><span class="tab-label">Apple</span></button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-value="orange"><span class="tab-label">Orange</span></button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-value="disabled" data-tooltip="Disabled tooltip" disabled><span class="tab-label">Disabled</span></button>
+        </div>
+        <div class="tab-panel" role="tabpanel">Selected: <strong>Apple</strong></div>
+      </section>
+
+      <section class="demo-card" data-tab-demo>
+        <h2 class="demo-title">With icons</h2>
+        <div class="tabs tabs--primary" role="tablist" aria-label="Fruit tabs with icons">
+          <button class="tab" type="button" role="tab" aria-selected="true" data-value="apple">
+            <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="#ef4444" d="M17.6 12.4c0-3.2 2.7-4.7 2.8-4.8A6 6 0 0 0 15.7 5c-2-.2-3.9 1.2-4.9 1.2S8.2 5 6.5 5C3.2 5.1 0 7.7 0 13c0 3.1 1.2 6.4 2.7 8.6.7 1.1 1.6 2.3 2.8 2.3 1.2 0 1.6-.7 3-.7 1.5 0 1.9.7 3.1.7 1.3 0 2.1-1.1 2.8-2.2a19 19 0 0 0 2.6-5.2 4.7 4.7 0 0 1 .6-4.1ZM14.4 3c.6-.8 1-1.9.9-3-1 .1-2.2.7-2.9 1.5a4 4 0 0 0-1 2.9c1.1.1 2.3-.6 3-1.4Z" transform="scale(.9) translate(1.5 0)"/></svg>
+            <span class="tab-label">Apple</span>
+          </button>
+          <button class="tab" type="button" role="tab" aria-label="Orange" aria-selected="false" data-value="orange">
+            <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8" fill="#f59e0b"/><path d="M12 5c.2-2 1.4-3.1 3.6-3.2-.2 2.1-1.4 3.2-3.6 3.2Z" fill="#22c55e"/><path d="M12 6V4" stroke="#713f12" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <span class="tab-label"></span>
+          </button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-value="mango"><span class="tab-label">Mango</span></button>
+        </div>
+        <div class="tab-panel" role="tabpanel">Selected: <strong>Apple</strong></div>
+      </section>
+
+      <section class="demo-card demo-card--wide" data-tab-demo>
+        <h2 class="demo-title">Secondary</h2>
+        <div class="tabs tabs--secondary" role="tablist" aria-label="Secondary fruit tabs">
+          <button class="tab" type="button" role="tab" aria-selected="true" data-value="apple"><span class="tab-label">Apple</span></button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-value="orange"><span class="tab-label">Orange</span></button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-value="disabled" data-tooltip="Disabled tooltip" disabled><span class="tab-label">Disabled</span></button>
+        </div>
+        <div class="tab-panel" role="tabpanel">Selected: <strong>Apple</strong></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const labelFor = (tab) => tab.querySelector('.tab-label')?.textContent.trim() || tab.getAttribute('aria-label') || tab.dataset.value;
+
+      document.querySelectorAll('[data-tab-demo]').forEach((demo, demoIndex) => {
+        const tablist = demo.querySelector('[role="tablist"]');
+        const tabs = [...tablist.querySelectorAll('[role="tab"]')];
+        const panel = demo.querySelector('[role="tabpanel"]');
+        const usableTabs = () => tabs.filter((tab) => !tab.disabled);
+
+        tabs.forEach((tab, tabIndex) => {
+          const tabId = `demo-${demoIndex}-tab-${tabIndex}`;
+          const panelId = `demo-${demoIndex}-panel`;
+          tab.id = tabId;
+          tab.setAttribute('aria-controls', panelId);
+          tab.tabIndex = tab.getAttribute('aria-selected') === 'true' && !tab.disabled ? 0 : -1;
+          panel.id = panelId;
+          if (tab.getAttribute('aria-selected') === 'true') panel.setAttribute('aria-labelledby', tabId);
+        });
+
+        const selectTab = (nextTab) => {
+          if (!nextTab || nextTab.disabled || tablist.dataset.disabled === 'true') return;
+
+          tabs.forEach((tab) => {
+            const selected = tab === nextTab;
+            tab.setAttribute('aria-selected', String(selected));
+            tab.tabIndex = selected ? 0 : -1;
+          });
+
+          panel.innerHTML = `Selected: <strong>${labelFor(nextTab)}</strong>`;
+          panel.setAttribute('aria-labelledby', nextTab.id);
+        };
+
+        tablist.addEventListener('click', (event) => selectTab(event.target.closest('[role="tab"]')));
+
+        tablist.addEventListener('keydown', (event) => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+          const available = usableTabs();
+          if (!available.length) return;
+
+          event.preventDefault();
+          const currentIndex = Math.max(0, available.indexOf(document.activeElement));
+          let nextIndex = event.key === 'Home' ? 0 : event.key === 'End' ? available.length - 1 : currentIndex + (event.key === 'ArrowRight' ? 1 : -1);
+          nextIndex = (nextIndex + available.length) % available.length;
+          available[nextIndex].focus();
+          selectTab(available[nextIndex]);
+        });
+      });
+
+      const root = document.documentElement;
+      const themeButton = document.querySelector('.theme-toggle');
+      themeButton.addEventListener('click', () => {
+        const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const currentIsDark = root.dataset.theme ? root.dataset.theme === 'dark' : systemIsDark;
+        root.dataset.theme = currentIsDark ? 'light' : 'dark';
+      });
+    })();
+  </script>
+</body>
+</html>

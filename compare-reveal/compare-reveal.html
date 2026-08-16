@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Compare Reveal</title>
+  <style>
+    :root {
+      --cr-page: #f7f9fc;
+      --cr-surface: #ffffff;
+      --cr-surface-2: #eef3fa;
+      --cr-text: #101828;
+      --cr-muted: #667085;
+      --cr-border: #dce4ef;
+      --cr-border-strong: #c5d1e1;
+      --cr-accent: #315fea;
+      --cr-signature: #e9564a;
+      --cr-chip-bg: rgba(6, 10, 20, 0.56);
+      --cr-chip-border: rgba(160, 186, 224, 0.34);
+      --cr-shadow: 0 20px 60px rgba(16, 24, 40, 0.13);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    :root[data-theme="dark"] {
+      --cr-page: #080c14;
+      --cr-surface: #111827;
+      --cr-surface-2: #192337;
+      --cr-text: #f8fafc;
+      --cr-muted: #9caabd;
+      --cr-border: #263449;
+      --cr-border-strong: #354863;
+      --cr-accent: #4f7cff;
+      --cr-signature: #ff6b5e;
+      --cr-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+      color-scheme: dark;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --cr-page: #080c14;
+        --cr-surface: #111827;
+        --cr-surface-2: #192337;
+        --cr-text: #f8fafc;
+        --cr-muted: #9caabd;
+        --cr-border: #263449;
+        --cr-border-strong: #354863;
+        --cr-accent: #4f7cff;
+        --cr-signature: #ff6b5e;
+        --cr-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--cr-text);
+      background:
+        radial-gradient(circle at 18% 8%, color-mix(in srgb, var(--cr-accent) 16%, transparent), transparent 24rem),
+        linear-gradient(180deg, var(--cr-page), color-mix(in srgb, var(--cr-surface-2) 72%, var(--cr-page)));
+    }
+
+    button { font: inherit; }
+
+    .page {
+      width: min(1040px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 56px 0 72px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--cr-muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 6vw, 56px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .intro {
+      max-width: 650px;
+      margin: 16px 0 0;
+      color: var(--cr-muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .theme-toggle {
+      flex: none;
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--cr-border);
+      border-radius: 50%;
+      color: var(--cr-text);
+      background: var(--cr-surface);
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(16, 24, 40, 0.08);
+    }
+
+    .theme-toggle:hover { transform: translateY(-1px); }
+    .theme-toggle svg { width: 18px; height: 18px; }
+
+    .demo-shell {
+      padding: clamp(14px, 3vw, 28px);
+      border: 1px solid var(--cr-border);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--cr-surface) 86%, transparent);
+      box-shadow: var(--cr-shadow);
+    }
+
+    .compare-reveal {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      border: 1px solid var(--cr-border-strong);
+      border-radius: 8px;
+      background: var(--cr-surface-2);
+      cursor: ew-resize;
+      touch-action: pan-y;
+      user-select: none;
+      isolation: isolate;
+    }
+
+    .compare-side {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .compare-side svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .compare-before {
+      clip-path: inset(0 50% 0 0);
+      will-change: clip-path;
+      z-index: 2;
+    }
+
+    .compare-chip {
+      position: absolute;
+      top: 16px;
+      z-index: 6;
+      pointer-events: none;
+      padding: 7px 11px;
+      border: 1px solid var(--cr-chip-border);
+      border-radius: 999px;
+      color: #eef4ff;
+      background: var(--cr-chip-bg);
+      backdrop-filter: blur(8px);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      line-height: 1;
+      text-transform: uppercase;
+      transition: opacity 180ms ease;
+    }
+
+    .compare-chip--before { left: 16px; }
+    .compare-chip--after { right: 16px; }
+
+    .compare-divider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      z-index: 10;
+      width: 2px;
+      margin-left: -1px;
+      background: color-mix(in srgb, var(--cr-signature) 86%, white);
+      will-change: left;
+      pointer-events: none;
+    }
+
+    .compare-handle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 2px solid var(--cr-signature);
+      border-radius: 50%;
+      color: var(--cr-signature);
+      background: color-mix(in srgb, var(--cr-surface-2) 82%, transparent);
+      box-shadow:
+        0 0 0 6px color-mix(in srgb, var(--cr-signature) 18%, transparent),
+        0 0 26px color-mix(in srgb, var(--cr-signature) 45%, transparent);
+      cursor: ew-resize;
+      pointer-events: auto;
+      transform: translate(-50%, -50%);
+      transition: box-shadow 180ms ease, transform 120ms ease;
+      backdrop-filter: blur(4px);
+    }
+
+    .compare-handle:hover {
+      transform: translate(-50%, -50%) scale(1.04);
+    }
+
+    .compare-handle:focus-visible,
+    .theme-toggle:focus-visible {
+      outline: 2px solid var(--cr-signature);
+      outline-offset: 4px;
+    }
+
+    .compare-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 14px;
+      color: var(--cr-muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .compare-value {
+      color: var(--cr-text);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 720px) {
+      .page { padding-top: 34px; }
+      .topbar { align-items: flex-start; }
+      .compare-chip {
+        top: 10px;
+        padding: 6px 9px;
+        font-size: 9.5px;
+      }
+      .compare-chip--before { left: 10px; }
+      .compare-chip--after { right: 10px; }
+      .compare-handle {
+        width: 40px;
+        height: 40px;
+      }
+      .compare-meta {
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Vanilla HTML Component</p>
+        <h1>Compare Reveal</h1>
+        <p class="intro">ตัวอย่าง before/after comparison ที่แปลงจาก React เป็น HTML, CSS และ JavaScript ล้วน รองรับการลาก divider, keyboard slider, intro sweep, double-click reset และ reduced motion</p>
+      </div>
+      <button class="theme-toggle" type="button" aria-label="เปลี่ยนธีม" title="เปลี่ยนธีม">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"/>
+        </svg>
+      </button>
+    </header>
+
+    <section class="demo-shell" aria-label="Compare reveal demo">
+      <div class="compare-reveal" data-compare-reveal data-before-label="Wireframe" data-after-label="Render" data-default-position="50" data-snap-position="50" role="group" aria-label="Comparison: Wireframe versus Render">
+        <div class="compare-side compare-after" aria-hidden="true">
+          <svg viewBox="0 0 640 400" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <linearGradient id="render-sky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#2a1a4a"/>
+                <stop offset="55%" stop-color="#c2503f"/>
+                <stop offset="100%" stop-color="#f6b94a"/>
+              </linearGradient>
+              <linearGradient id="render-water" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#243c68"/>
+                <stop offset="100%" stop-color="#111827"/>
+              </linearGradient>
+            </defs>
+            <rect width="640" height="400" fill="url(#render-sky)"/>
+            <circle cx="470" cy="110" r="34" fill="#ffe9b0" opacity="0.96"/>
+            <path d="M0 300 L120 240 L210 275 L320 205 L430 255 L540 195 L640 235 V400 H0Z" fill="#3a2340"/>
+            <path d="M0 340 L150 300 L260 325 L380 270 L500 305 L640 275 V400 H0Z" fill="#231630"/>
+            <path d="M0 350 C90 326 150 360 230 336 C310 312 376 348 455 322 C538 294 592 320 640 298 V400 H0Z" fill="url(#render-water)" opacity="0.86"/>
+            <path d="M75 352 C135 340 170 358 220 346 M345 343 C410 322 462 338 520 318" fill="none" stroke="#f9d27a" stroke-width="3" opacity="0.42"/>
+          </svg>
+        </div>
+
+        <div class="compare-side compare-before" aria-hidden="true">
+          <svg viewBox="0 0 640 400" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <pattern id="wire-grid" width="32" height="32" patternUnits="userSpaceOnUse">
+                <path d="M32 0H0v32" fill="none" stroke="#2b4a7a" stroke-width="1"/>
+              </pattern>
+            </defs>
+            <rect width="640" height="400" fill="#0b1220"/>
+            <rect width="640" height="400" fill="url(#wire-grid)" opacity="0.88"/>
+            <path d="M0 300 L120 240 L210 275 L320 205 L430 255 L540 195 L640 235 V400 H0Z" fill="none" stroke="#4f7cff" stroke-width="2"/>
+            <path d="M0 340 L150 300 L260 325 L380 270 L500 305 L640 275" fill="none" stroke="#2b4a7a" stroke-width="1.5" stroke-dasharray="5 5"/>
+            <circle cx="470" cy="110" r="34" fill="none" stroke="#4f7cff" stroke-width="2" stroke-dasharray="4 6"/>
+            <path d="M75 352 C135 340 170 358 220 346 M345 343 C410 322 462 338 520 318" fill="none" stroke="#7f9fff" stroke-width="1.5" stroke-dasharray="7 7"/>
+          </svg>
+        </div>
+
+        <span class="compare-chip compare-chip--before" data-compare-before-chip aria-hidden="true">Wireframe</span>
+        <span class="compare-chip compare-chip--after" data-compare-after-chip aria-hidden="true">Render</span>
+
+        <div class="compare-divider" data-compare-divider>
+          <button class="compare-handle" type="button" role="slider" aria-label="Reveal divider, Wireframe to Render" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-valuetext="50% Wireframe" data-compare-handle>
+            <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden="true">
+              <path d="M6 1 L1 7 L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 1 L17 7 L12 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="compare-meta">
+        <span>ลากเส้นแบ่งเพื่อเทียบก่อนและหลัง หรือใช้ปุ่มลูกศรเมื่อ focus อยู่บน handle</span>
+        <span class="compare-value" data-compare-value>Wireframe 50%</span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+      const lerp = (a, b, t) => a + (b - a) * t;
+      const easeInOutCubic = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const sweepAt = (u) => {
+        if (u < 0.38) return lerp(50, 96, easeInOutCubic(u / 0.38));
+        if (u < 0.78) return lerp(96, 4, easeInOutCubic((u - 0.38) / 0.4));
+        return lerp(4, 50, easeInOutCubic((u - 0.78) / 0.22));
+      };
+
+      document.querySelectorAll("[data-compare-reveal]").forEach((root) => {
+        const before = root.querySelector(".compare-before");
+        const divider = root.querySelector("[data-compare-divider]");
+        const handle = root.querySelector("[data-compare-handle]");
+        const beforeChip = root.querySelector("[data-compare-before-chip]");
+        const afterChip = root.querySelector("[data-compare-after-chip]");
+        const value = document.querySelector("[data-compare-value]");
+        const beforeLabel = root.dataset.beforeLabel || "Before";
+        const afterLabel = root.dataset.afterLabel || "After";
+        const snapPosition = Number(root.dataset.snapPosition || 50);
+        const reducedMotion = prefersReducedMotion();
+        const labelFade = 12;
+        const springK = 140;
+        const springC = 18;
+        const sweepSeconds = 2.6;
+        const state = {
+          x: clamp(Number(root.dataset.defaultPosition || 50), 0, 100),
+          v: 0,
+          target: clamp(Number(root.dataset.defaultPosition || 50), 0, 100),
+          dragging: false,
+          pointerId: null,
+          introActive: !reducedMotion,
+          introDone: reducedMotion,
+          introStart: performance.now() / 1000,
+          visible: true
+        };
+
+        const paint = () => {
+          const x = clamp(state.x, 0, 100);
+          before.style.clipPath = `inset(0 ${(100 - x).toFixed(3)}% 0 0)`;
+          divider.style.left = `${x.toFixed(3)}%`;
+          handle.setAttribute("aria-valuenow", String(Math.round(x)));
+          handle.setAttribute("aria-valuetext", `${Math.round(x)}% ${beforeLabel}`);
+          beforeChip.style.opacity = x > labelFade ? "1" : "0";
+          afterChip.style.opacity = x < 100 - labelFade ? "1" : "0";
+          if (value) value.textContent = `${beforeLabel} ${Math.round(x)}%`;
+        };
+
+        const commit = (next) => {
+          state.introActive = false;
+          state.introDone = true;
+          state.target = clamp(next, 0, 100);
+          if (reducedMotion) {
+            state.x = state.target;
+            state.v = 0;
+            paint();
+          }
+        };
+
+        const positionFromClientX = (clientX) => {
+          const rect = root.getBoundingClientRect();
+          commit(((clientX - rect.left) / Math.max(1, rect.width)) * 100);
+        };
+
+        root.addEventListener("pointerdown", (event) => {
+          if (event.pointerType === "mouse" && event.button !== 0) return;
+          state.dragging = true;
+          state.pointerId = event.pointerId;
+          root.setPointerCapture?.(event.pointerId);
+          positionFromClientX(event.clientX);
+        });
+
+        root.addEventListener("pointermove", (event) => {
+          if (!state.dragging || event.pointerId !== state.pointerId) return;
+          positionFromClientX(event.clientX);
+        });
+
+        const endDrag = () => {
+          state.dragging = false;
+          state.pointerId = null;
+        };
+
+        root.addEventListener("pointerup", endDrag);
+        root.addEventListener("pointercancel", endDrag);
+        root.addEventListener("dblclick", () => commit(snapPosition));
+
+        handle.addEventListener("keydown", (event) => {
+          const step = event.shiftKey ? 10 : 2;
+          let next = state.target;
+          if (event.key === "ArrowRight" || event.key === "ArrowUp") next += step;
+          else if (event.key === "ArrowLeft" || event.key === "ArrowDown") next -= step;
+          else if (event.key === "Home") next = 0;
+          else if (event.key === "End") next = 100;
+          else return;
+
+          event.preventDefault();
+          commit(next);
+        });
+
+        if ("IntersectionObserver" in window) {
+          const observer = new IntersectionObserver((entries) => {
+            state.visible = entries.some((entry) => entry.isIntersecting);
+            if (!state.visible && state.introActive) {
+              state.introActive = false;
+              state.introDone = false;
+              state.target = 50;
+            }
+          }, { threshold: 0.2 });
+          observer.observe(root);
+        }
+
+        document.addEventListener("visibilitychange", () => {
+          state.visible = document.visibilityState !== "hidden";
+        });
+
+        const frame = (timestamp) => {
+          if (!reducedMotion && state.visible) {
+            const now = timestamp / 1000;
+            if (state.introActive) {
+              const u = (now - state.introStart) / sweepSeconds;
+              if (u >= 1) {
+                state.introActive = false;
+                state.introDone = true;
+                state.target = 50;
+              } else {
+                state.target = sweepAt(u);
+              }
+            }
+
+            const dt = Math.min(0.05, 1 / 60);
+            state.v += ((state.target - state.x) * springK - state.v * springC) * dt;
+            state.x += state.v * dt;
+            if (state.x < 0 || state.x > 100) {
+              state.x = clamp(state.x, 0, 100);
+              state.v = 0;
+            }
+            paint();
+          }
+          requestAnimationFrame(frame);
+        };
+
+        paint();
+        requestAnimationFrame(frame);
+      });
+
+      const root = document.documentElement;
+      const themeButton = document.querySelector(".theme-toggle");
+      themeButton.addEventListener("click", () => {
+        const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const currentIsDark = root.dataset.theme ? root.dataset.theme === "dark" : systemIsDark;
+        root.dataset.theme = currentIsDark ? "light" : "dark";
+      });
+    })();
+  </script>
+</body>
+</html>

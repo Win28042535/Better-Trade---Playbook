@@ -1,0 +1,139 @@
+You are an expert frontend engineer. I have a standalone HTML before/after comparison component based on `compare-reveal.html`. Please adapt it for the target project described below.
+
+Target project:
+- Tech stack: plain HTML, CSS, and vanilla JavaScript
+- No React
+- No Tailwind
+- No shadcn
+- No TypeScript
+- No npm/build step unless the target project already uses one
+- Output should be easy to paste or save directly into the project
+
+Goal:
+Create or adapt a Compare Reveal component with the same behavior as the reference implementation.
+
+Required behavior:
+- Show an "after" layer as the full background
+- Show a "before" layer clipped from the left edge to the divider
+- Include a draggable vertical divider
+- Include a circular handle centered on the divider
+- Support pointer drag with mouse, touch, and pen
+- Support keyboard control through the handle:
+  - ArrowRight or ArrowUp moves the divider right by 2%
+  - ArrowLeft or ArrowDown moves the divider left by 2%
+  - Shift + arrow key moves by 10%
+  - Home moves to 0%
+  - End moves to 100%
+- Support a one-time intro sweep animation: 50 -> 96 -> 4 -> 50
+- Support double-click reset to a configurable snap position
+- Support label chips for the before and after sides
+- Fade label chips near the edges
+- Support reduced-motion preference
+- Support responsive layout
+- Support light and dark theme styling
+
+Accessibility requirements:
+- Use `role="group"` on the component root
+- Use a real `<button>` for the handle
+- Use `role="slider"` on the handle
+- Keep `aria-valuemin="0"`
+- Keep `aria-valuemax="100"`
+- Keep `aria-valuenow` updated with the current divider percentage
+- Keep `aria-valuetext` updated with human-readable text
+- Provide an accessible `aria-label` such as "Reveal divider, Before to After"
+- Keep visible focus styles on the handle
+- Mark purely decorative visual layers with `aria-hidden="true"` when appropriate
+
+Implementation requirements:
+- Keep HTML, CSS, and JavaScript in one file if I ask for a standalone test file
+- If integrating into an existing project, place CSS and JS wherever that project normally keeps them
+- Do not introduce external libraries unless I explicitly request them
+- Make sure the component works by opening the HTML file directly in a browser
+- Use inline SVG demo artwork if no images are provided
+- If images are provided, place them inside `.compare-before` and `.compare-after`
+- Use `object-fit: cover` for image-based sides
+- Use project-specific class prefixes if there is a risk of CSS naming conflict
+- Preserve the component's interaction behavior
+
+Recommended class names:
+- `.compare-reveal`
+- `.compare-side`
+- `.compare-before`
+- `.compare-after`
+- `.compare-divider`
+- `.compare-handle`
+- `.compare-chip`
+- `.compare-chip--before`
+- `.compare-chip--after`
+
+Recommended data attributes:
+- `data-compare-reveal`
+- `data-before-label`
+- `data-after-label`
+- `data-default-position`
+- `data-snap-position`
+- `data-compare-divider`
+- `data-compare-handle`
+- `data-compare-before-chip`
+- `data-compare-after-chip`
+
+Reference HTML structure:
+
+```html
+<div
+  class="compare-reveal"
+  data-compare-reveal
+  data-before-label="Before"
+  data-after-label="After"
+  data-default-position="50"
+  data-snap-position="50"
+  role="group"
+  aria-label="Comparison: Before versus After"
+>
+  <div class="compare-side compare-after" aria-hidden="true">
+    <!-- after visual -->
+  </div>
+
+  <div class="compare-side compare-before" aria-hidden="true">
+    <!-- before visual -->
+  </div>
+
+  <span class="compare-chip compare-chip--before" data-compare-before-chip aria-hidden="true">Before</span>
+  <span class="compare-chip compare-chip--after" data-compare-after-chip aria-hidden="true">After</span>
+
+  <div class="compare-divider" data-compare-divider>
+    <button
+      class="compare-handle"
+      type="button"
+      role="slider"
+      aria-label="Reveal divider, Before to After"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="50"
+      aria-valuetext="50% Before"
+      data-compare-handle
+    >
+      <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden="true">
+        <path d="M6 1 L1 7 L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 1 L17 7 L12 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</div>
+```
+
+Reference JavaScript behavior:
+- Find every `[data-compare-reveal]` root
+- Read `data-before-label`, `data-after-label`, `data-default-position`, and `data-snap-position`
+- Update `.compare-before` with `clip-path: inset(0 X% 0 0)`
+- Update `[data-compare-divider]` with `left: X%`
+- Update slider ARIA values on every paint
+- Commit pointer and keyboard input to a clamped value between 0 and 100
+- Use requestAnimationFrame for animated movement
+- Respect `prefers-reduced-motion: reduce`
+
+Please deliver:
+1. The complete adapted code
+2. A short note explaining where to paste each part
+3. Any assumptions you made about the destination project
+4. A brief checklist for testing drag, keyboard, double-click reset, reduced motion, and responsive layout

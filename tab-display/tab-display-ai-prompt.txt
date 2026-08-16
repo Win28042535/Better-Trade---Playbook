@@ -1,0 +1,96 @@
+You are an expert frontend engineer. I have an existing standalone HTML tab component based on `tab-display.html`. Please adapt it for the target project described below.
+
+Target project:
+- Tech stack: plain HTML, CSS, and vanilla JavaScript
+- No React
+- No Tailwind
+- No npm/build step unless the project already uses one
+- Output should be easy to paste or save directly into the project
+
+Goal:
+Create or adapt a tab component with the same behavior as the reference implementation.
+
+Required behavior:
+- Support primary tabs with underline active state
+- Support secondary tabs with compact/pill active state
+- Support disabled whole tab groups
+- Support disabled individual tabs
+- Support optional icons inside tabs
+- Support optional CSS-only tooltip through `data-tooltip`
+- Support light and dark theme styling
+- Support responsive layout on mobile
+- Support keyboard navigation:
+  - ArrowLeft selects the previous enabled tab
+  - ArrowRight selects the next enabled tab
+  - Home selects the first enabled tab
+  - End selects the last enabled tab
+- Disabled tabs must not be selectable by mouse or keyboard
+
+Accessibility requirements:
+- Use `role="tablist"` for the tab container
+- Use `role="tab"` for each tab button
+- Use `role="tabpanel"` for the panel
+- Keep `aria-selected` updated
+- Assign `aria-controls` and `aria-labelledby`
+- Use `tabIndex="0"` only on the selected enabled tab
+- Use `tabIndex="-1"` on inactive or disabled tabs
+- Provide `aria-label` when an icon-only tab has no visible text
+- Keep visible focus styles
+
+Implementation requirements:
+- Keep HTML, CSS, and JavaScript in one file if I ask for a standalone test file
+- If integrating into an existing project, place CSS and JS wherever that project normally keeps them
+- Do not introduce external libraries unless I explicitly request them
+- Use project-specific class prefixes if there is a risk of CSS naming conflict
+- Preserve the component's existing interaction behavior
+- Make sure the code works by opening the HTML file directly in a browser
+
+Recommended class names:
+- `.tabs`
+- `.tabs--primary`
+- `.tabs--secondary`
+- `.tab`
+- `.tab-icon`
+- `.tab-label`
+- `.tab-panel`
+
+If the target project is large or has existing `.tabs` or `.tab` classes, rename them with a prefix such as:
+- `.bt-tabs`
+- `.bt-tabs--primary`
+- `.bt-tabs--secondary`
+- `.bt-tab`
+- `.bt-tab-icon`
+- `.bt-tab-label`
+- `.bt-tab-panel`
+
+Reference HTML structure:
+
+```html
+<section data-tab-demo>
+  <div class="tabs tabs--primary" role="tablist" aria-label="Example tabs">
+    <button class="tab" type="button" role="tab" aria-selected="true" data-value="apple">
+      <span class="tab-label">Apple</span>
+    </button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-value="orange">
+      <span class="tab-label">Orange</span>
+    </button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-value="disabled" data-tooltip="Disabled tooltip" disabled>
+      <span class="tab-label">Disabled</span>
+    </button>
+  </div>
+  <div class="tab-panel" role="tabpanel">Selected: <strong>Apple</strong></div>
+</section>
+```
+
+Reference JavaScript behavior:
+- Find every `[data-tab-demo]` wrapper
+- Within each wrapper, find `[role="tablist"]`, `[role="tab"]`, and `[role="tabpanel"]`
+- Initialize unique IDs for each tab and panel
+- On click, select the clicked tab only if it is enabled and the group is not disabled
+- On keyboard navigation, move only through enabled tabs
+- Update the panel content or show the related panel for the selected tab
+
+Please deliver:
+1. The complete adapted code
+2. A short note explaining where to paste each part
+3. Any assumptions you made about the destination project

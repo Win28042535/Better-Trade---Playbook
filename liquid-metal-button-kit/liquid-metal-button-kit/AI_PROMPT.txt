@@ -1,0 +1,36 @@
+ช่วยนำ Liquid Metal Button Kit ไปใช้ในโปรเจคนี้ให้เหมือนต้นฉบับ Better Trade 2026
+
+ไฟล์ต้นทางอยู่ในโฟลเดอร์ liquid-metal-button-kit
+
+ให้ทำตามนี้:
+1. อ่าน liquid-metal-button-kit/README.md ให้ครบก่อนเริ่ม
+2. คัดลอกไฟล์ทั้งหมดจาก liquid-metal-button-kit ไปยังโปรเจคนี้ โดยรักษาโครงสร้าง:
+   - js/liquid-metal-button.js
+   - js/liquid-metal-cta.js
+   - vendor/paper-shaders/shader-mount.js
+   - vendor/paper-shaders/shader-sizing.js
+   - vendor/paper-shaders/shader-utils.js
+   - vendor/paper-shaders/vertex-shader.js
+   - vendor/paper-shaders/shaders/liquid-metal.js
+3. ตรวจและแก้ import path ให้ตรงกับโครงสร้างโปรเจคนี้
+4. เพิ่ม target ใน HTML:
+   <div id="cta-slot"></div>
+5. import script แบบ module:
+   <script type="module" src="js/liquid-metal-cta.js"></script>
+6. ใช้ config เดิมจาก README เพื่อให้หน้าตาเหมือน Better Trade:
+   - desktop: height 56, fontSize 20, paddingX 48
+   - mobile max-width 575px: height 49, fontSize 18, paddingX 42
+   - rimPalette ใช้ spectrum #00d4fe, #1f87e6, #113cf3, #722df4, #e63bd8, #f79319
+7. รอ document.fonts.ready ก่อน mount
+8. เพิ่ม CSS focus-visible ให้ .lmb button
+9. ตรวจด้วย browser ว่า:
+   - ปุ่มแสดงใน #cta-slot
+   - liquid metal rim ทำงาน
+   - hover แล้ว shader ขยับ
+   - click แล้วมี ripple
+   - press แล้วปุ่มยุบเล็กน้อย
+   - mobile 575px ลงมา font เป็น 18 และปุ่มเล็กลง
+   - ไม่มี console error และไม่มี horizontal overflow
+10. อย่าเปลี่ยน shader parameters หรือ animation behavior เว้นแต่จำเป็นจริง ๆ
+
+ถ้าโปรเจคนี้ไม่มีฟอนต์ FC Minimal ให้ใช้ฟอนต์หลักของโปรเจคแทน แต่ต้องคงสัดส่วนปุ่มและ spacing ให้ใกล้ต้นฉบับที่สุด
