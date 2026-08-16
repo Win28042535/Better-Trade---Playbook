@@ -485,11 +485,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .book2-scroll{padding-bottom:160px;}
 .b2-panel{display:none;}
 .b2-panel.show{display:flex;flex-direction:column;gap:var(--sp-section);}
-.book2-subnav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--b2-offset,66px) + env(safe-area-inset-bottom,0px));width:100%;max-width:inherit;z-index:89;display:flex;justify-content:space-around;align-items:stretch;gap:var(--sp-hairline);background:var(--popover);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-header);padding:6px 6px;}
-.b2-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--sp-hairline);background:none;border:none;font-family:var(--font);cursor:pointer;color:var(--muted);padding:6px 4px;border-radius:var(--r1);transition:background .15s,color .15s;}
-.b2-tab svg{width:var(--ic-md);height:var(--ic-md);}
-.b2-tab span{font-size:var(--fs-eyebrow);font-weight:var(--w-label);}
-.b2-tab.on{color:var(--ink);background:var(--accent);}
+/* book2-subnav reuses .book-tabbar/.tab-item VERBATIM (2026-08-16, per direction "ส่วน tab-display
+   อยากให้ใช้เวอร์เดียวกับเวอร์ คู่มือ") — rendered with class="book-tabbar book2-subnav" / "tab-item"
+   on its buttons, so it's pixel-identical to the real app tabbar (icon-over-label, same sizing,
+   same active-violet color) rather than a bespoke second bottom-bar style; only the position
+   (floats above the real tabbar, offset JS-computed — see positionBook2Nav) and z-index are
+   overridden here. The DATA it shows stays Book v2's own 4 categories, only the tab CHROME matches. */
+.book2-subnav{bottom:calc(var(--b2-offset,66px) + env(safe-area-inset-bottom,0px));z-index:89;padding-bottom:var(--sp-list);}
 .toc{display:flex;gap:var(--sp-glue);padding:var(--sp-inline) var(--sp-stack) 4px;flex-shrink:0;}
 /* TOC jump-nav is .bt-tabs.bt-tabs--secondary (pill) — per direction, swapped with the in-card
    pickers below: the page-level section switcher (TOC) now reads as pills, while the small
@@ -2599,22 +2601,27 @@ function bookVerToggle(active){
   return '<div class="bookver"><button class="bookver-b'+(active===1?' on':'')+'" data-bv="1">คู่มือ</button><button class="bookver-b'+(active===2?' on':'')+'" data-bv="2">คู่มือ 2</button></div>';
 }
 function bindBookVer(){root.querySelectorAll('.bookver-b').forEach(function(b){b.onclick=function(){var v=+b.dataset.bv;if(v===BOOK_VER)return;BOOK_VER=v;render();};});}
+/* Markup reuses .book-tabbar/.tab-item verbatim (see the CSS comment above .book2-subnav) — same
+   classes as the real app tabbar rendered right after it, just with book2-subnav ADDED so the
+   position-override rule can target it specifically. */
 function book2Subnav(active){
-  return '<nav class="book2-subnav" role="tablist" aria-label="หมวดคู่มือ 2">'+BOOK2_TABS.map(function(t){
-    return '<button class="b2-tab'+(t.k===active?' on':'')+'" type="button" role="tab" aria-selected="'+(t.k===active?'true':'false')+'" data-b2="'+t.k+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>';
+  return '<nav class="book-tabbar book2-subnav" role="tablist" aria-label="หมวดคู่มือ 2">'+BOOK2_TABS.map(function(t){
+    return '<button class="tab-item'+(t.k===active?' active':'')+'" type="button" role="tab" aria-selected="'+(t.k===active?'true':'false')+'" data-b2="'+t.k+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>';
   }).join('')+'</nav>';
 }
-/* Sets --b2-offset from the app tabbar's OWN rendered height (not a guessed px) so the two fixed
-   bars always sit flush regardless of any spacing-token change to either one. */
+/* Sets --b2-offset from the REAL app tabbar's own rendered height (not a guessed px) so the two
+   fixed bars always sit flush regardless of any spacing-token change to either one. :not(.book2-
+   subnav) is required now that both bars share the .book-tabbar class — without it this would
+   measure itself. */
 function positionBook2Nav(){
-  var tb=root.querySelector('.book-tabbar');
+  var tb=root.querySelector('.book-tabbar:not(.book2-subnav)');
   if(tb)document.documentElement.style.setProperty('--b2-offset',Math.ceil(tb.getBoundingClientRect().height)+'px');
 }
 function bindBook2Nav(){
-  root.querySelectorAll('.book2-subnav .b2-tab').forEach(function(b){b.onclick=function(){
+  root.querySelectorAll('.book2-subnav .tab-item').forEach(function(b){b.onclick=function(){
     var k=b.dataset.b2;BOOK2_TAB=k;
     root.querySelectorAll('.b2-panel').forEach(function(p){p.classList.toggle('show',p.dataset.panel===k);});
-    root.querySelectorAll('.book2-subnav .b2-tab').forEach(function(x){var on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-selected',on?'true':'false');});
+    root.querySelectorAll('.book2-subnav .tab-item').forEach(function(x){var on=x===b;x.classList.toggle('active',on);x.setAttribute('aria-selected',on?'true':'false');});
     window.scrollTo(0,0);
   };});
 }
@@ -2634,24 +2641,38 @@ function insightHTML(r,h,matchOk){
 }
 /* Compare-reveal (adapted from compare-reveal.html, skinned to DNA) — pointer drag + keyboard slider +
    double-click reset + a one-time intro sweep. Idempotent per element (cr.__cr2 guard). */
-function initCompareReveal(){
+/* opts.onMove(pos), if given, fires only on USER-driven position changes (drag/keyboard/double-
+   click) — deliberately NOT from the intro sweep, so the linked detail-swap below (see renderBook2)
+   doesn't flicker through both personas during the automatic reveal animation. */
+function initCompareReveal(opts){
+  opts=opts||{};
   root.querySelectorAll('[data-cr2]').forEach(function(cr){
     if(cr.__cr2)return;cr.__cr2=true;
     var before=cr.querySelector('.cr2-before'),divider=cr.querySelector('.cr2-divider'),handle=cr.querySelector('.cr2-handle');
     var bChip=cr.querySelector('.cr2-chip-b'),aChip=cr.querySelector('.cr2-chip-a');
     var pos=parseFloat(cr.dataset.start||'50'),dragging=false;
     function paint(){var x=Math.max(0,Math.min(100,pos));before.style.clipPath='inset(0 '+(100-x).toFixed(2)+'% 0 0)';divider.style.left=x.toFixed(2)+'%';handle.setAttribute('aria-valuenow',Math.round(x));if(bChip)bChip.style.opacity=x>12?'1':'0';if(aChip)aChip.style.opacity=x<88?'1':'0';}
-    function fromX(clientX){var rc=cr.getBoundingClientRect();pos=((clientX-rc.left)/Math.max(1,rc.width))*100;paint();}
-    cr.addEventListener('pointerdown',function(e){dragging=true;if(cr.setPointerCapture)cr.setPointerCapture(e.pointerId);fromX(e.clientX);});
+    function fromX(clientX){var rc=cr.getBoundingClientRect();pos=((clientX-rc.left)/Math.max(1,rc.width))*100;paint();if(opts.onMove)opts.onMove(pos);}
+    cr.addEventListener('pointerdown',function(e){dragging=true;try{if(cr.setPointerCapture)cr.setPointerCapture(e.pointerId);}catch(err){}fromX(e.clientX);});
     cr.addEventListener('pointermove',function(e){if(dragging)fromX(e.clientX);});
     cr.addEventListener('pointerup',function(){dragging=false;});
     cr.addEventListener('pointercancel',function(){dragging=false;});
-    cr.addEventListener('dblclick',function(){pos=50;paint();});
+    cr.addEventListener('dblclick',function(){pos=50;paint();if(opts.onMove)opts.onMove(pos);});
     handle.setAttribute('role','slider');handle.setAttribute('aria-valuemin','0');handle.setAttribute('aria-valuemax','100');
-    handle.addEventListener('keydown',function(e){var s=e.shiftKey?10:4;if(e.key==='ArrowLeft'||e.key==='ArrowDown')pos-=s;else if(e.key==='ArrowRight'||e.key==='ArrowUp')pos+=s;else if(e.key==='Home')pos=0;else if(e.key==='End')pos=100;else return;e.preventDefault();paint();});
+    handle.addEventListener('keydown',function(e){var s=e.shiftKey?10:4;if(e.key==='ArrowLeft'||e.key==='ArrowDown')pos-=s;else if(e.key==='ArrowRight'||e.key==='ArrowUp')pos+=s;else if(e.key==='Home')pos=0;else if(e.key==='End')pos=100;else return;e.preventDefault();paint();if(opts.onMove)opts.onMove(pos);});
     paint();
     if(!RM){var t0=null;var sweep=function(ts){if(t0===null)t0=ts;var u=(ts-t0)/1500;if(u>=1){pos=52;paint();return;}var e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;pos=52+Math.sin(e*Math.PI*2)*32;paint();requestAnimationFrame(sweep);};requestAnimationFrame(sweep);}
   });
+}
+/* fam-badge + signature/assets/strengths-watchouts + legend — everything the compare-reveal slider's
+   "which persona is currently showing" should drive (2026-08-16, per direction "ถ้าได้ character card
+   คนละตัวกัน ต้องการให้ข้อมูลทั้งหมด ใน section preview นี้เปลี่ยนตาม card ที่ active อยู่"). Kept as
+   its own swappable block (id="b2ident-detail") separate from the compare-reveal markup itself, so
+   swapping personas only replaces this innerHTML — the slider's own drag state/DOM is untouched. */
+function book2IdentityDetail(hero){
+  return '<div class="fam-badge" style="'+famBadgeStyle(hero)+'"><span>'+hero.famTh+'</span></div>'+
+    heroDetailBody(hero)+
+    '<div class="hero-leg"><div><div class="hero-leg-lbl">แรงบันดาลใจจาก</div><div class="hero-leg-txt"><span class="ln">'+hero.legend+'</span> — '+hero.legendWhy+'</div></div></div>';
 }
 function renderBook2(){
   if(!RESULT){st.phase='splash';render();return;}
@@ -2666,7 +2687,7 @@ function renderBook2(){
       '<div class="cr2-side cr2-before">'+pcStatic(r.heroKey)+'</div>'+
       '<span class="cr2-chip cr2-chip-b">ก่อนงาน</span><span class="cr2-chip cr2-chip-a">หลังงาน</span>'+
       '<div class="cr2-divider"><button class="cr2-handle" type="button" aria-label="เลื่อนเทียบการ์ดก่อนงานและหลังงาน">'+arrows+'</button></div></div>'+
-      '<p class="cr2-cap">ลากเส้นแบ่งเพื่อเทียบการ์ดตัวตน <b>ก่อนงาน</b> ↔ <b>หลังงาน</b></p>';
+      '<p class="cr2-cap">ลากเส้นแบ่งเพื่อเทียบการ์ดตัวตน <b>ก่อนงาน</b> ↔ <b>หลังงาน</b> — ข้อมูลด้านล่างจะเปลี่ยนตามฝั่งที่เห็นเต็ม</p>';
   }
   root.innerHTML=
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
@@ -2675,10 +2696,8 @@ function renderBook2(){
   '<main class="scroll book2-scroll">'+
     '<div class="b2-panel'+(tab==='identity'?' show':'')+'" data-panel="identity">'+
       '<section class="hero-sec"><div class="hero-gw"><div class="hero-in">'+
-        '<div class="fam-badge" style="'+famBadgeStyle(h)+'"><span>'+h.famTh+'</span></div>'+
         compareBlock+
-        heroDetailBody(h)+
-        '<div class="hero-leg"><div><div class="hero-leg-lbl">แรงบันดาลใจจาก</div><div class="hero-leg-txt"><span class="ln">'+h.legend+'</span> — '+h.legendWhy+'</div></div></div>'+
+        '<div id="b2ident-detail">'+book2IdentityDetail(h)+'</div>'+
         '<div class="hero-acts"><button class="btn btn-primary hero-share-btn" id="shareCardBtn">'+ic('lc-upload')+'แชร์ภาพการ์ด</button></div>'+
       '</div></div></section>'+
     '</div>'+
@@ -2703,8 +2722,23 @@ function renderBook2(){
   appTabbar('book');
   bindTabbar();bindBookVer();bindBook2Nav();positionBook2Nav();
   root.querySelector('#devReset').onclick=resetQuiz;
-  if(ev.state==='building')bindViewer('');
-  initCompareReveal();
+  if(ev.state==='building'){
+    bindViewer('');
+    initCompareReveal();
+  }else{
+    // Linked preview: crossing the slider's 50% midpoint swaps #b2ident-detail to whichever
+    // persona is now showing MORE of its card (pos>=50 -> pre-event's .cr2-before layer covers
+    // more of the frame; see initCompareReveal's clip-path math) — threshold-gated so this only
+    // fires on an actual crossing, not every pixel of drag.
+    var activeIsPre=true;
+    initCompareReveal({onMove:function(pos){
+      var wantPre=pos>=50;
+      if(wantPre===activeIsPre)return;
+      activeIsPre=wantPre;
+      var det=root.querySelector('#b2ident-detail');
+      if(det)det.innerHTML=book2IdentityDetail(wantPre?h:ev.behHero);
+    }});
+  }
   initBtTabs(root.querySelector('#ddTabs'),function(value){root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===value)?'':'none';});});
   root.querySelectorAll('.side-row').forEach(function(rw){rw.onclick=function(){togSide(rw);};});
   var kr=root.querySelector('#klibRow');if(kr)kr.onclick=function(){LIB_OPEN=null;st.phase='library';render();};
@@ -2723,7 +2757,10 @@ var APP_TABS=[
   {k:'profile',icon:'lc-user',label:'โปรไฟล์'}
 ];
 function appTabbar(active){return '<nav class="book-tabbar">'+APP_TABS.map(function(t){return '<button class="tab-item'+(t.k===active?' active':'')+'" data-tab="'+t.k+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>';}).join('')+'</nav>';}
-function bindTabbar(){root.querySelectorAll('.book-tabbar .tab-item').forEach(function(b){b.onclick=function(){var k=b.dataset.tab;if(k===st.phase)return;st.phase=k;render();};});}
+/* :not(.book2-subnav) — Book v2's content-subnav reuses this exact .book-tabbar/.tab-item markup
+   (see book2Subnav's comment) so its buttons would otherwise also match this selector; they carry
+   data-b2, not data-tab, and are bound separately by bindBook2Nav(). */
+function bindTabbar(){root.querySelectorAll('.book-tabbar:not(.book2-subnav) .tab-item').forEach(function(b){b.onclick=function(){var k=b.dataset.tab;if(k===st.phase)return;st.phase=k;render();};});}
 /* ── deferred Book sections — all populated with EXAMPLE data (booth games + analysis engine
    don't exist yet); each carries an .ex-tag in the UI so nothing here reads as a real measurement. ── */
 function traitBars(){
