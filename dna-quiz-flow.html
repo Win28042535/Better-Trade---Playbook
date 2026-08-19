@@ -463,10 +463,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .tab-item svg{width:var(--ic-lg);height:var(--ic-lg);}
 .tab-item span{font-size:var(--fs-label);font-weight:var(--w-label);}
 .tab-item.active{color:var(--violet);}
-/* ══ คู่มือ 2 (Book v2) ══ version toggle · compare-reveal slider · top content-nav (reuses .toc) */
-.bookver{display:flex;gap:var(--sp-stack-tight);justify-content:center;padding:10px var(--sp-edge) 0;flex-shrink:0;}
-.bookver-b{flex:0 0 auto;min-height:34px;padding:0 var(--sp-stack);border-radius:var(--rpill);border:1px solid var(--line-soft);background:var(--white);color:var(--muted);font-family:var(--font);font-weight:var(--w-label);font-size:var(--fs-label);cursor:pointer;transition:background .15s,color .15s,border-color .15s;}
-.bookver-b.on{background:var(--ink);color:var(--cloud);border-color:var(--ink);}
+/* ══ คู่มือ 2 (Book v2) ══ compare-reveal slider · top content-nav (reuses .toc) — version switch
+   moved OFF this in-page pill entirely (2026-08-19, per direction "เอา tab ดูตัวเลือกแบบ...ออก เพื่อ
+   จะให้เลือกดูตัวเลือกผ่าน panel แทน") and into the demo panel's own "เวอร์ชันคู่มือ" control (see
+   buildDemo) — a real end-user was never meant to see 2 competing Book layouts side by side; this
+   was always a demo/review convenience, so it now lives with the panel's other demo-only switches. */
 /* compare-reveal (persona การ์ด ก่อน↔หลังงาน) — adapted from compare-reveal.html, DNA-skinned */
 .cr2{position:relative;width:100%;max-width:300px;margin:6px auto 0;aspect-ratio:5/7;border-radius:14px;overflow:hidden;background:var(--cloud);cursor:ew-resize;touch-action:pan-y;user-select:none;isolation:isolate;box-shadow:0 10px 30px rgba(17,19,24,0.15),0 2px 6px rgba(17,19,24,0.09);}
 .cr2-side{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
@@ -481,6 +482,15 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .cr2-handle:hover{transform:translate(-50%,-50%) scale(1.05);}
 .cr2-cap{text-align:center;font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;margin:10px auto 0;max-width:280px;}
 .cr2-cap b{color:var(--ink);font-weight:var(--w-label);}
+/* "หลังงาน" locked/empty state (2026-08-19, per direction "ให้เป็นภาพ preview mockup และมี overlay
+   สีเข้มๆ รองพื้นไว้...สื่อสารไปในทางว่า ยังไม่มีข้อมูล") — a plain sibling inside .cr2-after, so it
+   reveals/hides in exact sync with the persona art beneath it as .cr2-before's clip-path is dragged
+   (only .cr2-before ever gets clipped; .cr2-after is always full-frame underneath it — see
+   initCompareReveal's paint()). Shown only when evoCompute() reports 'building' (zero real booth/game
+   activity yet), so a genuinely divergent or illustrative post-event persona still renders uncovered. */
+.cr2-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(17,19,24,.7);color:var(--cloud);text-align:center;padding:16px;}
+.cr2-lock svg{width:28px;height:28px;}
+.cr2-lock span{font-size:var(--fs-bodysm);font-weight:var(--w-label);max-width:20ch;line-height:1.4;}
 .b2-panel{display:none;}
 .b2-panel.show{display:flex;flex-direction:column;gap:var(--sp-section);}
 .toc{display:flex;gap:var(--sp-glue);padding:var(--sp-inline) var(--sp-stack) 4px;flex-shrink:0;}
@@ -2496,7 +2506,6 @@ function renderBook(){
   root.innerHTML=
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
   '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="Better Trade — กลับหน้าหลัก" style="margin-right:auto"><div id="qr-cta-slot"></div></header>'+
-  bookVerToggle(1)+
   '<nav class="toc bt-tabs bt-tabs--secondary">'+
     '<button class="bt-tab" type="button" data-jump="hero-sec" aria-selected="true"><span class="bt-tab-icon">'+ic('lc-user')+'</span><span class="bt-tab-label">ตัวตน</span></button>'+
     '<button class="bt-tab" type="button" data-jump="conf-box" aria-selected="false"><span class="bt-tab-icon">'+ic('lc-sparkles')+'</span><span class="bt-tab-label">Confidence</span></button>'+
@@ -2579,7 +2588,6 @@ function renderBook(){
   root.querySelectorAll('.side-row').forEach(function(rw){rw.onclick=function(){togSide(rw);};});
   var tocs=root.querySelectorAll('.toc .bt-tab');tocs.forEach(function(p){p.onclick=function(){tocs.forEach(function(x){x.setAttribute('aria-selected','false');});p.setAttribute('aria-selected','true');var target=root.querySelector('#'+p.dataset.jump);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});};});
   root.querySelectorAll('#shareCardBtn,#shareTomorrowBtn').forEach(function(b){b.onclick=openShare;});
-  bindBookVer();
   bindViewer();       // pre-event card (always present)
   bindViewer('Post'); // post-event card — no-ops itself if the 'building' state skipped rendering one
   initBtTabs(root.querySelector('#heroEvTabs'),function(value){
@@ -2600,23 +2608,20 @@ function renderBook(){
    interestsHTML) but reorganizes them into 4 swap-panels driven by a BOTTOM content-nav — the tab menu
    moved off the top .toc onto a bottom bar, styled after the tab-display component — and replaces the
    pre/post persona tabs with a compare-reveal before/after slider (ก่อนงาน ↔ หลังงาน). Fully additive:
-   v1 renderBook is untouched; BOOK_VER toggles which one st.phase==='book' renders. */
-var BOOK_VER=1, BOOK2_TAB='identity';
+   v1 renderBook is untouched; BOOK_VER toggles which one st.phase==='book' renders. Default flipped
+   1->2 (2026-08-19, per direction "section preview card อยากให้แสดง default ที่แบบ คู่มือ 2") now that
+   the in-page version pill is gone and the demo panel is the only way to switch back to v1. */
+var BOOK_VER=2, BOOK2_TAB='identity';
 var BOOK2_TABS=[
   {k:'identity',icon:'lc-user',label:'ตัวตน'},
   {k:'analysis',icon:'lc-sparkles',label:'วิเคราะห์'},
   {k:'portfolio',icon:'lc-pie-chart',label:'พอร์ต'},
   {k:'journey',icon:'lc-route',label:'เส้นทาง'}
 ];
-function bookVerToggle(active){
-  return '<div class="bookver"><button class="bookver-b'+(active===1?' on':'')+'" data-bv="1">คู่มือ</button><button class="bookver-b'+(active===2?' on':'')+'" data-bv="2">คู่มือ 2</button></div>';
-}
-function bindBookVer(){root.querySelectorAll('.bookver-b').forEach(function(b){b.onclick=function(){var v=+b.dataset.bv;if(v===BOOK_VER)return;BOOK_VER=v;render();};});}
-/* Moved to the TOP, right under the คู่มือ/คู่มือ 2 version pill (2026-08-16, per direction "อยากให้
-   อยู่ด้านบน...เหมือนคู่มือเวอร์ 1") — was a fixed-bottom bar stacked above the app tabbar; now reuses
-   v1's OWN .toc position + exact style (.bt-tabs.bt-tabs--secondary pill tabs) instead of a bottom
-   bar, matching Book v1's own top jump-nav slot precisely. The panel-SWITCH behavior (not v1's
-   anchor-scroll) stays custom — see bindBook2Nav — only the position+chrome match v1. */
+/* Content-nav position note (2026-08-16 decision, still applies): moved to the TOP, right under the
+   (since-removed) คู่มือ/คู่มือ 2 version pill, reusing v1's OWN .toc position + exact style (.bt-tabs
+   .bt-tabs--secondary pill tabs) instead of a bottom bar — matches Book v1's own top jump-nav slot
+   precisely. The panel-SWITCH behavior (not v1's anchor-scroll) stays custom — see bindBook2Nav. */
 function book2Subnav(active){
   return '<nav class="toc bt-tabs bt-tabs--secondary" role="tablist" aria-label="หมวดคู่มือ 2">'+BOOK2_TABS.map(function(t){
     return '<button class="bt-tab" type="button" role="tab" aria-selected="'+(t.k===active?'true':'false')+'" data-b2="'+t.k+'"><span class="bt-tab-icon">'+ic(t.icon)+'</span><span class="bt-tab-label">'+t.label+'</span></button>';
@@ -2697,15 +2702,32 @@ function renderBook2(){
   var realPost=ev.state!=='building'&&ev.behKey!==r.heroKey;
   var postKey=realPost?ev.behKey:EVO_REP[h.fam==='V'?'G':'V'];
   var postHero=HEROES[postKey];
-  var compareBlock='<div class="cr2" data-cr2 data-start="52"><div class="cr2-side cr2-after">'+pcStatic(postKey)+'</div>'+
-      '<div class="cr2-side cr2-before">'+pcStatic(r.heroKey)+'</div>'+
-      '<span class="cr2-chip cr2-chip-b">ก่อนงาน</span><span class="cr2-chip cr2-chip-a">หลังงาน'+(realPost?'':' · ตัวอย่าง')+'</span>'+
-      '<div class="cr2-divider"><button class="cr2-handle" type="button" aria-label="เลื่อนเทียบการ์ดก่อนงานและหลังงาน">'+arrows+'</button></div></div>'+
-      '<p class="cr2-cap">ลากเส้นแบ่งเพื่อเทียบการ์ดตัวตน <b>ก่อนงาน</b> ↔ <b>หลังงาน</b> — ข้อมูลด้านล่างจะเปลี่ยนตามฝั่งที่เห็นเต็ม'+(realPost?'':' (ฝั่งหลังงานเป็นตัวอย่าง จนกว่าจะมีข้อมูลกิจกรรมจริงในงาน)')+'</p>';
+  /* "หลังงาน" locked/empty state (2026-08-19, per direction "กรณีที่ยังไม่ร่วมกิจกรรม หรือเล่นเกมส์
+     ในงาน (ทำเฉพาะแบบทดสอบทั้ง 3 ชุดเข้ามา) อยากให้ default ที่ฝั่ง preview ก่อนงาน...หลังงาน...เป็นภาพ
+     preview mockup และมี overlay สีเข้มๆ"). Deliberately its OWN check, not ev.state==='building' —
+     evoCompute()'s state is gated on gamesPlayedCount()===0, but GAME_PLAYED starts pre-seeded to 2
+     (see the GAMES TAB comment: "2/6 played to stay consistent with the Book/Home '2/6 ด้าน' example
+     state"), so a genuine first-time visitor who's only done the DNA Quiz already reads as 'ready' by
+     that measure — reusing it here would make this empty state practically unreachable. Booth
+     check-in/activity start truly empty regardless, so gating on THOSE (plus tolerating the app's own
+     2-game baseline) reaches exactly the "hasn't really been to the event yet" case being asked for,
+     without touching evoCompute()'s own semantics (Book v1's evoPanelHTML still depends on it). */
+  var noActivity=boothCheckinCount()===0&&boothActivityCount()===0&&gamesPlayedCount()<=2;
+  var compareBlock=noActivity
+    ? '<div class="cr2" data-cr2 data-start="90"><div class="cr2-side cr2-after">'+pcStatic(postKey)+
+        '<div class="cr2-lock">'+ic('lc-lock')+'<span>ยังไม่มีข้อมูล</span></div></div>'+
+        '<div class="cr2-side cr2-before">'+pcStatic(r.heroKey)+'</div>'+
+        '<span class="cr2-chip cr2-chip-b">ก่อนงาน</span><span class="cr2-chip cr2-chip-a">หลังงาน · รอข้อมูล</span>'+
+        '<div class="cr2-divider"><button class="cr2-handle" type="button" aria-label="เลื่อนเทียบการ์ดก่อนงานและหลังงาน">'+arrows+'</button></div></div>'+
+        '<p class="cr2-cap">ตอนนี้เห็นได้แค่การ์ด <b>ก่อนงาน</b> — ฝั่ง <b>หลังงาน</b> จะปลดล็อกหลังเล่นกิจกรรม/เกมในงาน</p>'
+    : '<div class="cr2" data-cr2 data-start="52"><div class="cr2-side cr2-after">'+pcStatic(postKey)+'</div>'+
+        '<div class="cr2-side cr2-before">'+pcStatic(r.heroKey)+'</div>'+
+        '<span class="cr2-chip cr2-chip-b">ก่อนงาน</span><span class="cr2-chip cr2-chip-a">หลังงาน'+(realPost?'':' · ตัวอย่าง')+'</span>'+
+        '<div class="cr2-divider"><button class="cr2-handle" type="button" aria-label="เลื่อนเทียบการ์ดก่อนงานและหลังงาน">'+arrows+'</button></div></div>'+
+        '<p class="cr2-cap">ลากเส้นแบ่งเพื่อเทียบการ์ดตัวตน <b>ก่อนงาน</b> ↔ <b>หลังงาน</b> — ข้อมูลด้านล่างจะเปลี่ยนตามฝั่งที่เห็นเต็ม'+(realPost?'':' (ฝั่งหลังงานเป็นตัวอย่าง จนกว่าจะมีข้อมูลกิจกรรมจริงในงาน)')+'</p>';
   root.innerHTML=
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
   '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="Better Trade — กลับหน้าหลัก" style="margin-right:auto"><div id="qr-cta-slot"></div></header>'+
-  bookVerToggle(2)+
   book2Subnav(tab)+
   '<main class="scroll">'+
     '<div class="b2-panel'+(tab==='identity'?' show':'')+'" data-panel="identity">'+
@@ -2733,21 +2755,29 @@ function renderBook2(){
     '</div>'+
   '</main>'+
   appTabbar('book');
-  bindTabbar();bindBookVer();bindBook2Nav();
+  bindTabbar();bindBook2Nav();
   root.querySelector('#devReset').onclick=resetQuiz;
   // Linked preview: crossing the slider's 50% midpoint swaps #b2ident-detail to whichever persona
   // is now showing MORE of its card (pos>=50 -> pre-event's .cr2-before layer covers more of the
   // frame; see initCompareReveal's clip-path math) — threshold-gated so this only fires on an
   // actual crossing, not every pixel of drag. postHero/postKey are always a genuinely different
   // persona from r.hero now (see the compareBlock comment above), so this always has something
-  // real to demonstrate regardless of whether ev's own real divergence produced one.
+  // real to demonstrate regardless of whether ev's own real divergence produced one — UNLESS
+  // noActivity, where the detail below the "หลังงาน" side is deliberately empty (reusing v1's own
+  // .ev-empty pattern) rather than describing a persona that isn't real data yet.
+  var emptyDetailHTML='<div class="ev-empty"><div class="ev-empty-ic">'+ic('lc-hourglass')+'</div>'+
+    '<div class="ev-empty-t">ยังไม่มีข้อมูลจากในงาน</div>'+
+    '<div class="ev-empty-s">เล่นเกมและเดินบูธในงานก่อน แล้วค่อยกลับมาดูว่าตัวตนที่ "ทำจริง" ตรงกับที่ DNA Quiz บอกไหม</div>'+
+    '<button class="btn btn-primary" id="evGoGames2">'+ic('lc-play-circle')+'ไปเล่นกิจกรรม</button></div>';
   var activeIsPre=true;
   initCompareReveal({onMove:function(pos){
     var wantPre=pos>=50;
     if(wantPre===activeIsPre)return;
     activeIsPre=wantPre;
     var det=root.querySelector('#b2ident-detail');
-    if(det)det.innerHTML=book2IdentityDetail(wantPre?h:postHero);
+    if(!det)return;
+    det.innerHTML=wantPre?book2IdentityDetail(h):(noActivity?emptyDetailHTML:book2IdentityDetail(postHero));
+    if(!wantPre&&noActivity){var eg=det.querySelector('#evGoGames2');if(eg)eg.onclick=function(){st.phase='games';render();};}
   }});
   initBtTabs(root.querySelector('#ddTabs'),function(value){root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===value)?'':'none';});});
   root.querySelectorAll('.side-row').forEach(function(rw){rw.onclick=function(){togSide(rw);};});
@@ -2935,7 +2965,7 @@ function sidesHTML(r){
   return '<section class="card mb-lg" id="sides-sec"><div class="sides-hd"><div class="s-ey">ข้อมูลจากกิจกรรมบูธจริง</div><h2 class="s-h">6 ด้านที่วัดได้จากคุณ</h2><p class="s-sub" style="margin-bottom:2px">แต่ละด้านมาจากพฤติกรรมในงาน — ไม่ใช่คำตอบจากแบบสอบถาม</p></div>'+items+'</section>';
 }
 function togSide(row){var item=row.parentElement,body=item.querySelector('.side-body'),cv=row.querySelector('.s-cv'),isOpen=body.classList.contains('show');root.querySelectorAll('.side-body.show').forEach(function(b){b.classList.remove('show');});root.querySelectorAll('.s-cv.open').forEach(function(c){c.classList.remove('open');});if(!isOpen){body.classList.add('show');cv.classList.add('open');}}
-function resetQuiz(){st={phase:'splash',spidx:0,idx:0,s1:[null,null,null],s2:[null,null,null,null,null,null,null],s3:[]};RESULT=null;BOOK_VER=1;BOOK2_TAB='identity';render();}
+function resetQuiz(){st={phase:'splash',spidx:0,idx:0,s1:[null,null,null],s2:[null,null,null,null,null,null,null],s3:[]};RESULT=null;BOOK_VER=2;BOOK2_TAB='identity';render();}
 
 /* ══ HOME TAB ══ content ported verbatim from Playbook Final's Home screen (see PLAYBOOK-2026-DATA-
    BASELINE.md §5). Progress values are mock and kept consistent with the Book page's own "2/6 ด้าน"
@@ -3545,6 +3575,11 @@ function buildDemo(){
   '<div class="demo-panel" id="demoPanel">'+
     '<div class="demo-hd"><div class="demo-ti">'+ic('lc-sliders')+'จำลองเคส (สำหรับเดโม)</div><span class="demo-x" id="demoClose">'+ic('lc-x')+'</span></div>'+
     '<div class="demo-lbl">มุมมอง</div>'+seg('segView',[{v:'auto',t:'อัตโนมัติ'},{v:'pc',t:'PC'},{v:'tablet',t:'แท็บเล็ต'},{v:'mobile',t:'มือถือ'}],DEMO.view)+
+    /* Book version switch moved here from an in-page pill on the Book screen itself (2026-08-19, per
+       direction "เอา tab ดูตัวเลือกแบบ...ออก เพื่อจะให้เลือกดูตัวเลือกผ่าน panel แทน") — a real
+       attendee only ever sees one Book layout; switching between คู่มือ/คู่มือ 2 is a review-only
+       concern, same category as มุมมอง/สิทธิ์ above it. */
+    '<div class="demo-lbl">พรีวิวคู่มือ</div>'+seg('segBookVer',[{v:1,t:'คู่มือ 1'},{v:2,t:'คู่มือ 2'}],BOOK_VER)+
     '<div class="demo-lbl">สิทธิ์ของคุณ</div><select class="demo-sel" id="demoTier"><option>Master Class</option><option>Explorer</option><option>Ultimate</option></select>'+
     '<div class="demo-stub">* ยังไม่เชื่อมสิทธิ์บัตรกับเนื้อหา (เดโม)</div>'+
     '<div class="demo-lbl">การ์ดตัวตน</div><select class="demo-sel" id="demoPersona"><option value="">— เลือกเพื่อดูการ์ด —</option>'+personaOpts+'</select>'+
@@ -3559,9 +3594,10 @@ function buildDemo(){
   document.getElementById('demoFab').onclick=function(){panel.classList.toggle('open');};
   document.getElementById('demoClose').onclick=function(){panel.classList.remove('open');};
   document.getElementById('segView').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.view=b.dataset.v;document.querySelectorAll('#segView button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');applyView();};});
+  document.getElementById('segBookVer').querySelectorAll('button').forEach(function(b){b.onclick=function(){var v=+b.dataset.v;if(v===BOOK_VER)return;BOOK_VER=v;document.querySelectorAll('#segBookVer button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('demoPersona').onchange=function(){if(this.value){DEMO.quizDone=true;document.getElementById('demoQuiz').classList.add('on');forcePersona(this.value);}};
   document.getElementById('demoQuiz').onclick=function(){DEMO.quizDone=!DEMO.quizDone;this.classList.toggle('on',DEMO.quizDone);};
-  document.getElementById('demoReset').onclick=function(){DEMO.quizDone=false;document.getElementById('demoQuiz').classList.remove('on');document.getElementById('demoPersona').value='';panel.classList.remove('open');resetQuiz();};
+  document.getElementById('demoReset').onclick=function(){DEMO.quizDone=false;document.getElementById('demoQuiz').classList.remove('on');document.getElementById('demoPersona').value='';document.getElementById('segBookVer').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',+x.dataset.v===2);});panel.classList.remove('open');resetQuiz();};
 }
 
 /* Go-to-top FAB (system-wide, all view modes incl. desktop/tablet). The page itself is what
