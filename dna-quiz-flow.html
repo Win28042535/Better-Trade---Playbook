@@ -181,6 +181,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    non-title elements (labels, buttons, badges) that weren't part of this request. */
 .tb-title{flex:1;font-size:var(--fs-h2);font-weight:var(--w-label);letter-spacing:0;color:var(--ink);}
 .tb-sub{display:flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);font-family:var(--font);}
+/* Quiz header's section status (dot + "1/1") — moved out from under .tb-title into its own flex
+   sibling (2026-08-19, per direction) so it sits at the header's right edge instead of stacked
+   left-aligned under the title; see renderQuiz's header markup. .tb-sub itself (shared with the
+   library header's "41 บทความ..." caption) is untouched — this modifier only bumps weight for the
+   quiz's own status, not every .tb-sub consumer. */
+.tb-sub--strong{font-weight:var(--w-label);flex-shrink:0;}
 .tb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 /* Header-pill CTA size — the app's only other explicit CTA size spec is the Liquid Metal hero
    button's (56px/20px desktop, 49px/18px mobile — see README's kit config); this is the small,
@@ -261,6 +267,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .int-count{font-family:var(--font);font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);margin:0 auto var(--sp-inline);text-align:center;max-width:460px;}
 .int-count b{color:var(--ink);}
 .int-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-list);}
+/* Mobile-only single column (2026-08-19, per direction) — 2-up read as cramped on a phone-width
+   frame once option labels wrap to 2 lines (e.g. "อสังหาฯ และกองทุนอสังหาฯ (REIT)"); tablet/pc keep
+   the 2-up grid since they have the width to spare. */
+:root[data-view="mobile"] .int-grid{grid-template-columns:1fr;}
 /* align-items:start (2026-08-15, per direction "ตัวเลือกคำตอบยังไม่ Align top") — same fix as .q-opt,
    missed here since this is a separate multi-select tile component, not the same class. */
 .int-opt{display:flex;align-items:start;gap:var(--sp-inline);padding:var(--sp-stack) 14px;border-radius:var(--r2);border:1.5px solid var(--line-soft);background:var(--white);cursor:pointer;transition:border-color .18s var(--ease),opacity .18s,transform .18s var(--ease);text-align:left;font-family:var(--font);width:100%;}
@@ -1036,6 +1046,22 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bt-tabs--secondary .bt-tab[aria-selected="true"]{background:var(--ink);color:var(--cloud);border-color:var(--ink);}
 .bt-tabs--secondary .bt-tab-label{overflow:hidden;text-overflow:ellipsis;}
 @media(max-width:420px){.bt-tabs--secondary{justify-content:flex-start;overflow-x:auto;scrollbar-width:none;}.bt-tabs--secondary::-webkit-scrollbar{display:none;}.bt-tabs--secondary .bt-tab{flex:0 0 auto;}}
+/* Same narrow-frame fix as the @media rule above, keyed off data-view instead of raw viewport
+   width (2026-08-19, per direction) — the app's own .shell caps at ~400px on data-view="mobile",
+   but a real browser viewport can stay well over 420px while showing that narrow frame (desktop
+   testing, the demo panel's forced "มือถือ" mode), so the @media query alone never fired there:
+   justify-content:space-between kept spacing pill items apart while flex:0 1 auto let them
+   shrink-squeeze their own 9px 6px padding to fit — exactly the "gap between items wide, padding
+   inside each item squeezed" complaint. flex-start + no-shrink here fixes it regardless of which
+   breakpoint actually triggered "mobile". */
+/* Follow-up (2026-08-19, per direction) — the flex-start/no-shrink fix above stopped the padding
+   squeeze, but left the 4 items packed to the left with dead space at the row's end on a mobile-
+   width card. Equal flex-grow (flex-basis 0) instead makes all 4 stretch to fill the card's full
+   width evenly, like a real segmented control, while each item's own padding stays untouched since
+   nothing is shrinking anymore — only growing. overflow-x/scrollbar no longer needed once items
+   fill exactly 100% of the row (nothing left to scroll). */
+:root[data-view="mobile"] .bt-tabs--secondary{justify-content:flex-start;}
+:root[data-view="mobile"] .bt-tabs--secondary .bt-tab{flex:1 1 0;}
 /* data-tooltip — CSS-only, no JS beyond what initBtTabs already wires for focus */
 .bt-tab[data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--ink);color:var(--cloud);font-size:var(--fs-label);font-weight:var(--w-body);padding:var(--sp-stack-tight) 9px;border-radius:var(--r0);white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .15s,transform .15s;pointer-events:none;z-index:20;}
 .bt-tab[data-tooltip]:hover::after,.bt-tab[data-tooltip]:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
@@ -2315,7 +2341,8 @@ function renderQuiz(){
   }).join('')+'</div>';
   root.innerHTML=
   '<header class="topbar"><div class="tb-ic" id="qBack">'+ic('lc-arrow-left')+'</div>'+
-    '<div style="flex:1"><div class="tb-title">'+secTitle+'</div><div class="tb-sub"><span class="tb-dot" style="background:'+dotColor+'"></span>'+secNo+'/'+secTot+'</div></div>'+
+    '<div class="tb-title">'+secTitle+'</div>'+
+    '<div class="tb-sub tb-sub--strong"><span class="tb-dot" style="background:'+dotColor+'"></span>'+secNo+'/'+secTot+'</div>'+
     '</header>'+
   progline+
   '<div class="q-scroll fade">'+
