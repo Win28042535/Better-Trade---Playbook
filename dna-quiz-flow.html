@@ -2254,7 +2254,13 @@ var S1=[
 
 /* p: = which of the 12 personas this answer most directly evidences (grounded in each
    persona's official definition text). Family is derived from HEROES[p].fam — never
-   stored redundantly here, so there is exactly one source of truth per persona. */
+   stored redundantly here, so there is exactly one source of truth per persona.
+   SUPERSEDED as compute()'s actual scoring input (2026-08-19) by SCORE_MATRIX below, sourced
+   from the user's own official spreadsheet `Investor_DNA_Score_Matrix.xlsx` — kept in place only
+   as a human-readable "primary persona" annotation per option (matches SCORE_MATRIX's top
+   scorer for most options, but NOT all — e.g. Q3 opt A/B and Q5 opt C disagree, see SCORE_MATRIX's
+   own note) and is otherwise dead/unread data now, same precedent as this file's other harmless
+   unused per-question metadata (q.tag, per update #9). */
 var S2=[
  {icon:'lc-target',img:'s2q1',tag:'คุณค่า / เป้าหมาย',cat:'',q:'เป้าหมายเรื่องเงินในฝันของคุณ คือแบบไหน?',
   opts:[{k:'A',t:'อยากมีเงินเข้ามาเรื่อยๆ เหมือนเก็บผลไม้จากต้นที่ปลูกไว้',p:'harvester'},{k:'B',t:'อยากถือของดีไว้นานๆ ให้ค่อยๆ โตขึ้นอย่างมั่นคง',p:'diamondhand'},{k:'C',t:'อยากลงกับสิ่งที่เชื่อว่าจะโตแรง แม้ต้องลุ้นก็ยอม',p:'maverick'},{k:'D',t:'อยากให้เงินอยู่ครบ ปลอดภัย นอนหลับสบายทุกคืน',p:'guardian'}]},
@@ -2270,6 +2276,37 @@ var S2=[
   opts:[{k:'A',t:'ขอปูพื้นให้แน่นก่อน เข้าใจหุ้นกับกองทุนแล้วเริ่มอย่างมั่นใจ',p:'steadyhand'},{k:'B',t:'ชอบเจาะลึกทีละบริษัทจนเข้าใจธุรกิจก่อนลงเงิน',p:'analyst'},{k:'C',t:'อยากรู้เรื่องลงทุนต่างประเทศ โอกาสที่ในไทยไม่มี',p:'explorer'},{k:'D',t:'ของสะสมและของที่ตัวเองรัก เช่น การ์ด พระ ของแบรนด์เนม',p:'collector'},{k:'E',t:'วิธีสร้างรายได้ประจำที่จับต้องได้ เช่น หุ้นปันผล บ้านให้เช่า',p:'harvester'}]},
  {icon:'lc-message-circle',img:'s2q7',tag:'ปรัชญาการลงทุน',cat:'',q:'ประโยคไหนโดนใจแนวคิด เรื่องเงินของคุณที่สุด?',
   opts:[{k:'A',t:'"ของดีมักถูกมองข้าม ราคาในตลาดตีผิดได้เสมอ"',p:'contrarian'},{k:'B',t:'"ไปกับจังหวะที่ตลาดกำลังไป ขี่คลื่นที่กำลังมา"',p:'waverider'},{k:'C',t:'"ทำสม่ำเสมอ ชนะการเดาจังหวะ ลงเรื่อยๆ แล้วอยู่ให้นาน"',p:'steadyhand'},{k:'D',t:'"ยอมให้เงินโตช้าลงหน่อย เพื่อดูแลสุขภาพ ความรู้ และเวลาไปพร้อมกัน"',p:'sage'}]}
+];
+
+/* ── SCORE_MATRIX (2026-08-19) — the real, official points formula for all 12 personas, transcribed
+   verbatim from the user's `Investor_DNA_Score_Matrix.xlsx` ("Score Matrix" sheet), which is now
+   compute()'s actual scoring engine for the 7-question S2/DNA section, replacing the old single
+   `p:`-tag "one vote per question" system. One entry per S2 question (index 0-6, matching S2's own
+   order — every question/option TEXT in that sheet was verified word-for-word identical to S2's own
+   `q`/`opts[].t` before transcribing) keyed by option letter (`opts[].k`); each option maps to the
+   points it awards to one OR MORE of the 12 personas (unlike the old system, several options
+   deliberately double-score — e.g. Q1·A gives harvester 3 AND sage 1 — capturing that a single
+   answer can evidence more than one identity at different strengths). Every row here was checked
+   against the sheet's own "รวม" (SUM-of-12-columns) checksum column, which exists in the source file
+   for exactly this integrity purpose. Persona keys match HEROES/PORDER 1:1 (the sheet's own Legend
+   tab independently confirms this file's G/N/V family grouping: Guardian·ผู้พิทักษ์ =
+   guardian/harvester/steadyhand/diamondhand, Navigator·นักเดินเรือ = analyst/planner/explorer/sage,
+   Visionary·ผู้มองการณ์ไกล = maverick/waverider/contrarian/collector — previously this file's own
+   invented grouping, now independently corroborated by the user's real data).
+   NOTE — 3 options where the sheet's real primary scorer disagrees with the old dead `p:` tag on the
+   SAME option (kept for transparency, not silently overwritten): S2[2] opt A (old tag diamondhand;
+   sheet says contrarian=3 is primary, diamondhand only 1), S2[2] opt B (old tag steadyhand; sheet
+   gives diamondhand=3 only, zero steadyhand), S2[4] opt C (old tag planner; sheet gives
+   steadyhand=3 only, zero planner). SCORE_MATRIX (this table) is the one actually used by compute()
+   — the old `p:` tags are inert. */
+var SCORE_MATRIX=[
+ {A:{harvester:3,sage:1},B:{diamondhand:3},C:{maverick:3},D:{guardian:3}},                          // Q1 คุณค่า/เป้าหมาย
+ {A:{analyst:3},B:{steadyhand:1,planner:3},C:{waverider:3},D:{diamondhand:1,collector:3}},          // Q2 สไตล์การตัดสินใจ
+ {A:{diamondhand:1,contrarian:3},B:{diamondhand:3},C:{explorer:3},D:{guardian:3},E:{guardian:1,analyst:2}}, // Q3 ปฏิกิริยาต่อความผันผวน
+ {A:{guardian:3},B:{steadyhand:3},C:{planner:3,explorer:2},D:{maverick:3},E:{diamondhand:1,collector:3}},   // Q4 การจัดสรรเงิน
+ {A:{waverider:3},B:{analyst:1,contrarian:3},C:{steadyhand:3},D:{diamondhand:1,sage:3},E:{guardian:1,analyst:1}}, // Q5 FOMO
+ {A:{steadyhand:1,analyst:1},B:{diamondhand:1,analyst:3},C:{explorer:3},D:{collector:3},E:{harvester:3}},  // Q6 ความสนใจ
+ {A:{analyst:1,contrarian:3},B:{waverider:3},C:{steadyhand:3,diamondhand:1},D:{sage:3}}             // Q7 ปรัชญาการลงทุน
 ];
 
 /* หน้าจอ 3 · ยืนยันตัวตน และแผนที่เดินบูธเฉพาะคุณ — Q3.1 เลือกได้ไม่เกิน 3 อย่าง.
@@ -2577,23 +2614,31 @@ function renderReveal(){
 
 function compute(){
   var personaKeys=Object.keys(HEROES);
-  var votes={};personaKeys.forEach(function(k){votes[k]=0;});
-  var chosen=[]; // the actual persona each answered S2 question pointed to, in order
-  st.s2.forEach(function(oi,qi){if(oi==null)return;var p=S2[qi].opts[oi].p;votes[p]++;chosen.push(p);});
+  /* Scoring engine rebuilt on SCORE_MATRIX (2026-08-19, per direction "ผลลัพธ์...จะอ้างอิงกับ
+     สูตรสรุปนี้") — `scores` is now real weighted points per persona (summed straight off the
+     official spreadsheet), not a 1-vote-per-question tally. Each answered S2 question can add
+     points to more than one persona at once (see SCORE_MATRIX's own header comment). */
+  var scores={};personaKeys.forEach(function(k){scores[k]=0;});
+  st.s2.forEach(function(oi,qi){
+    if(oi==null)return;
+    var optKey=S2[qi].opts[oi].k,pts=SCORE_MATRIX[qi][optKey]||{};
+    Object.keys(pts).forEach(function(p){scores[p]+=pts[p];});
+  });
   var declared=S1[0].opts[st.s1[0]].risk,horizon=S1[1].opts[st.s1[1]].hz,knowledge=S1[2].opts[st.s1[2]].kn;
-  var tot=chosen.length||1;
+  var tot=personaKeys.reduce(function(s,k){return s+scores[k];},0)||1;
 
-  /* 1) primary signal — the persona actually evidenced most often by real answers */
-  var max=-1;personaKeys.forEach(function(k){if(votes[k]>max)max=votes[k];});
-  var topPersonas=personaKeys.filter(function(k){return votes[k]===max;});
+  /* 1) primary signal — the persona with the highest real point total */
+  var max=-1;personaKeys.forEach(function(k){if(scores[k]>max)max=scores[k];});
+  var topPersonas=personaKeys.filter(function(k){return scores[k]===max;});
   var winner=topPersonas[0];
   if(topPersonas.length>1){
-    /* 2) tie-break — majority family among the tied personas (still real answer data) */
-    var famVotes={G:0,N:0,V:0};
-    chosen.forEach(function(p){famVotes[HEROES[p].fam]++;});
-    var famRank=topPersonas.slice().sort(function(a,b){return famVotes[HEROES[b].fam]-famVotes[HEROES[a].fam];});
-    var famMax=famVotes[HEROES[famRank[0]].fam];
-    var famTied=famRank.filter(function(p){return famVotes[HEROES[p].fam]===famMax;});
+    /* 2) tie-break — majority family by point total among the tied personas (still real answer
+       data, just weighted instead of counted) */
+    var famScore={G:0,N:0,V:0};
+    personaKeys.forEach(function(p){famScore[HEROES[p].fam]+=scores[p];});
+    var famRank=topPersonas.slice().sort(function(a,b){return famScore[HEROES[b].fam]-famScore[HEROES[a].fam];});
+    var famMax=famScore[HEROES[famRank[0]].fam];
+    var famTied=famRank.filter(function(p){return famScore[HEROES[p].fam]===famMax;});
     if(famTied.length===1){winner=famTied[0];}
     else{
       /* 3) still tied — closest persona riskLevel to the risk the user actually declared in S1 */
@@ -2603,43 +2648,26 @@ function compute(){
   }
   var hero=HEROES[winner];
 
-  /* Real-card constraint (2026-08-19, per direction) — only 3 of the 12 personas have real
-     photographed card art (harvester + diamondhand, family G; waverider, family V — see
-     Card Character/); the other 9 still only have a CSS-mockup card. Until more art exists, the
-     quiz's ACTUAL result must always resolve to one of these 3, never a mockup — even though the
-     vote/tie-break logic above still runs against all 12 real answers first, so family detection
-     stays true to what was actually answered. REAL_CARDS_BY_FAM lists each family's own real
-     card(s); family N has none of its own, so a mockup N winner compares against all 3 real cards
-     instead of just its family. This only touches compute()'s own DNA-quiz result —
-     evoCompute()'s post-event EVO_REP mapping (which still sends family N to the 'planner' mockup)
-     is deliberately left alone, per direction.
-     harvester/diamondhand tie-break (2026-08-19 follow-up, per direction "อยากให้ diamondhand
-     โผล่บ่อยขึ้นบ้าง") — the two share the same riskLevel (3), so a plain closest-risk comparison
-     let harvester win every tie by list order alone and diamondhand almost never appeared. Broken
-     instead by the SAME horizon answer S1 already collected (`horizon`, above): long-horizon
-     ("ถือยาว") reads as diamondhand's own identity ("นักลงทุนสายถือยาว"), short/mid reads as
-     harvester's ("สายเก็บเกี่ยว", regular income) — a real user signal instead of an arbitrary
-     default, and one that naturally splits results between the two instead of favoring one. */
-  var REAL_CARDS=['harvester','diamondhand','waverider'];
-  if(REAL_CARDS.indexOf(winner)===-1){
-    var realCandidates={G:['harvester','diamondhand'],V:['waverider'],N:REAL_CARDS}[hero.fam];
-    var winnerRisk=hero.riskLevel,best=realCandidates[0];
-    realCandidates.forEach(function(c){
-      var d=Math.abs(HEROES[c].riskLevel-winnerRisk),bd=Math.abs(HEROES[best].riskLevel-winnerRisk);
-      if(d<bd)best=c;
-      else if(d===bd&&c==='diamondhand'&&horizon==='long')best=c;
-    });
-    winner=best;hero=HEROES[winner];
-  }
+  /* Real-card constraint REMOVED (2026-08-19, per direction reversing the same-day-earlier
+     restriction above) — the quiz's actual result now resolves to whichever of the full 12
+     personas the vote/tie-break logic above actually lands on, with zero redirect toward the
+     3 personas that happen to have real photographed card art (harvester/diamondhand/waverider).
+     A CSS-mockup card (`pcFrontInner()` falls through to the editorial build whenever
+     `REAL_CARD_IMG[key]` is unset — see line ~2057) is now a fully legitimate real result, not
+     just a splash/carousel preview — exactly the "preview mockup การ์ดสามารถถูกนำมาแสดงเป็น
+     ผลลัพธ์จริงได้" direction. evoCompute()'s separate post-event EVO_REP mapping (G/V→real art,
+     N→'planner' mockup) is a different feature (declared-vs-behavioral risk shift after real
+     event activity) and was left untouched — it was never asked to change here. */
 
-  /* revealed risk = average riskLevel of every persona actually evidenced (not just the winner) —
-     a richer "behavioral" risk reading than the single declared-risk answer in S1. */
-  var revealed=Math.round((chosen.reduce(function(s,p){return s+HEROES[p].riskLevel;},0)/tot)*10)/10;
+  /* revealed risk = points-weighted average riskLevel across every persona actually scored (not
+     just the winner) — same idea as before, now weighted by real point mass instead of a plain
+     answer-count average. */
+  var revealed=Math.round((personaKeys.reduce(function(s,p){return s+scores[p]*HEROES[p].riskLevel;},0)/tot)*10)/10;
   if(revealed<1)revealed=1;if(revealed>10)revealed=10;
   var gap=Math.round((revealed-declared)*10)/10;
 
-  var dominance=max/tot; // how concentrated the answers were on the winning persona
-  var famPurity=(function(){var f={G:0,N:0,V:0};chosen.forEach(function(p){f[HEROES[p].fam]++;});return Math.max(f.G,f.N,f.V)/tot;})();
+  var dominance=max/tot; // how concentrated the POINTS were on the winning persona
+  var famPurity=(function(){var f={G:0,N:0,V:0};personaKeys.forEach(function(p){f[HEROES[p].fam]+=scores[p];});return Math.max(f.G,f.N,f.V)/tot;})();
 
   var identity=Math.max(10,Math.min(20,Math.round(dominance*20)));
   var behavior=knowledge==='advanced'?18:(knowledge==='intermediate'?16:14);
@@ -2647,7 +2675,7 @@ function compute(){
   var discipline=Math.max(10,Math.min(20,Math.round(famPurity*16)+(horizon==='long'?4:(horizon==='mid'?2:0))));
   var conf=Math.round((identity+behavior+riskAlign+discipline)/80*100);
   var confLevel=conf>=85?'สูงมาก — ข้อมูลสอดคล้องกัน':(conf>=70?'สูง — สอดคล้องดี':(conf>=55?'ปานกลาง — พอเห็นทิศทาง':'กำลังก่อตัว'));
-  RESULT={hero:hero,heroKey:winner,declared:declared,revealed:revealed,gap:gap,conf:conf,confLevel:confLevel,subs:{identity:identity,behavior:behavior,riskAlign:riskAlign,discipline:discipline},knowledge:knowledge,horizon:horizon,votes:votes,interests:st.s3.slice()};
+  RESULT={hero:hero,heroKey:winner,declared:declared,revealed:revealed,gap:gap,conf:conf,confLevel:confLevel,subs:{identity:identity,behavior:behavior,riskAlign:riskAlign,discipline:discipline},knowledge:knowledge,horizon:horizon,votes:scores,interests:st.s3.slice()};
 }
 
 function radarSVG(vals,hue){
