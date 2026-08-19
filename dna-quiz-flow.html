@@ -1830,7 +1830,20 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* ══ CONTAINER SCROLL ANIMATION DNA ══ .scroll-reveal sections tip back in 3D perspective while
    still below the fold and settle flat as scroll brings them into place — scroll paces the reveal,
    it doesn't gate it (see revealTick() near the bottom of the script). Reduced-motion collapses
-   straight to flat, content is never hidden, only its entrance timing changes. */
+   straight to flat, content is never hidden, only its entrance timing changes.
+   2026-08-19 system-wide motion audit — extended from the original 5 tabbar screens to every
+   remaining screen, closing the exact gap flagged ("หน้าคู่มือ (Playbook) ยังไม่ครบ"): Book v2's
+   3 non-identity tabs (analysis/portfolio/journey — efin-banner, AI Insight, radar/trait/alloc
+   card, dd-tabs card, 6-ด้าน sides card, route-steps card, library-teaser card) had ZERO scroll
+   motion and its <main> was even missing the base .fade page-enter every other tabbar screen gets
+   — both fixed. Also added to Home's postEventHTML() card (missed in the original pass) and to
+   Library's single card. Quiz/Consent/Reveal (previously deliberately skipped as "scoped to the 5
+   tabbar screens only") now carry .scroll-reveal too (.q-head, .consent-body, the reveal-scene
+   wrapper) so the same engine governs every screen — on these short single-viewport screens it
+   mostly renders pre-settled (nothing to tip from), but it keeps the system honest if their content
+   ever grows past one viewport, and it's zero-risk since it's purely additive to an existing,
+   already-proven mechanism. Splash intentionally untouched — its ambient asset-scatter + auto-fan
+   carousel is its own deliberate attract-motion, not a gap. */
 .scroll-reveal{will-change:transform;transform-origin:50% 100%;}
 @media(prefers-reduced-motion:reduce){.scroll-reveal{transform:none!important;}}
 </style>
@@ -2475,7 +2488,7 @@ function renderConsent(){
        (per direction "content ทั้งหมด (ยกเว้น button) อยู่ กึ่งกลางจอ") while the CTA stays pinned to
        the bottom — on mobile the body is flex:1 + justify-content:center; on pc/tablet it's a plain
        block so the whole group still centers together as before. */
-    '<div class="consent-body">'+
+    '<div class="consent-body scroll-reveal">'+
       '<div class="consent-h"><span class="ch-1">รู้จัก</span> <span class="ch-2">ตัวคุณ?</span></div>'+
       '<div class="consent-p">ตอบคำถามสั้นๆ ตามใจจริง ไม่มีคำตอบผิด แล้วเราจะสรุปเป็น <b>"คู่มือลงทุนของคุณ"</b> เฉพาะตัว</div>'+
       '<div class="round-cards">'+
@@ -2539,7 +2552,7 @@ function renderQuiz(){
     '</header>'+
   progline+
   '<div class="q-scroll fade">'+
-    '<div class="q-head" style="--qc:'+dotColor+'"><div class="q-icon-bare">'+(q.img?'<img src="'+ICON_IMG[q.img]+'" alt="">':ic(q.icon))+'</div>'+
+    '<div class="q-head scroll-reveal" style="--qc:'+dotColor+'"><div class="q-icon-bare">'+(q.img?'<img src="'+ICON_IMG[q.img]+'" alt="">':ic(q.icon))+'</div>'+
       '<div class="q-title">'+emphasizeQ(q.q)+'</div>'+(q.cat?('<div class="q-sub">'+q.cat.replace(/·/g,'✦')+'</div>'):'')+'</div>'+
     opts+
     '<div class="q-nav"><button class="btn btn-tertiary" id="backBtn">'+ic('lc-arrow-left','ic-back')+'ย้อนกลับ</button>'+
@@ -2599,7 +2612,7 @@ function renderReveal(){
      available space (2026-08-16, per direction "กลุ่มเนื้อหา...อยู่กึ่งกลาง...ตอนนี้เหมือนจะลงมาทาง
      ล่างกว่า"). --sp-edge (20px) — already this screen's own horizontal edge padding via .consent's
      base rule — closes most of that gap (measured offset 40px -> 4-10px across mobile/tablet/pc). */
-  '<div class="consent reveal-scene fade" style="padding-top:var(--sp-edge)">'+
+  '<div class="consent reveal-scene fade scroll-reveal" style="padding-top:var(--sp-edge)">'+
     '<div class="reveal-icon analyzing"><img src="'+ICON_IMG.hourglass+'" alt=""><span class="reveal-spin"></span></div>'+
     '<div class="consent-kicker">กำลังวิเคราะห์คำตอบของคุณ</div>'+
     /* Per direction, this screen wants the OPPOSITE weight/color order from renderConsent's
@@ -2744,7 +2757,14 @@ function evoCompute(r){
   var diverged=Math.abs(r.gap)>=2; // a real, already-computed behavioral risk gap of ≥2/10
   var behFam=(enough&&diverged)?(r.gap>=2?'V':'G'):hero.fam;
   var behKey=(behFam===hero.fam)?heroKey:EVO_REP[behFam];
-  return {state:played===0?'building':'ready',behKey:behKey,behHero:HEROES[behKey]};
+  /* Bug fix (found in a system-wide bug audit, 2026-08-19): state used to gate on played===0, but
+     GAME_PLAYED starts pre-seeded with 2 games already marked played for every session (see the
+     GAMES TAB comment), so gamesPlayedCount() is never really 0 — 'building' was dead/unreachable
+     for every real first-time visitor, even one who's checked into zero booths and played zero real
+     games, making evoPanelHTML's "ยังไม่มีข้อมูลจากในงาน" empty state (Book v1) unreachable. renderBook2
+     already worked around this with its own local noActivity check (chk===0&&act===0&&played<=2) —
+     reusing that exact formula here instead of touching it a 2nd time in a 2nd place. */
+  return {state:(chk===0&&act===0&&played<=2)?'building':'ready',behKey:behKey,behHero:HEROES[behKey]};
 }
 /* #famBadge's tint+text color track whichever persona is currently active (pre vs post can be a
    different family entirely) — shared by the initial render and the tab-switch handler below so
@@ -2801,7 +2821,7 @@ function evoPanelHTML(ev){
    markup instead of only ever existing in Book v1 — call bindEfinBanner(h) after inserting this
    wherever it's used. */
 function efinBannerHTML(h){
-  return '<div class="efin-banner"><div class="efin-hd"><img class="efin-logo" src="'+LOGO_IMG.efin+'" alt="efin.finance"><div class="efin-t">ให้ AI ช่วยแนะนำแบบคุณ</div></div>'+
+  return '<div class="efin-banner scroll-reveal"><div class="efin-hd"><img class="efin-logo" src="'+LOGO_IMG.efin+'" alt="efin.finance"><div class="efin-t">ให้ AI ช่วยแนะนำแบบคุณ</div></div>'+
     '<div class="efin-d">คัดลอกคำถามที่ปรับตามตัวตน '+h.th+' ของคุณไปคุยกับ efin AI ต่อได้ทันที</div>'+
     '<div class="efin-acts"><button class="btn btn-primary" id="efinCopyBtn">'+ic('lc-message-circle')+'<span>คัดลอกคำถามไปถาม efin AI</span></button><button class="btn btn-secondary" id="efinOpenBtn">'+ic('lc-globe')+'<span>เปิดหน้า efin AI</span></button></div></div>';
 }
@@ -3025,7 +3045,7 @@ function insightHTML(r,h,matchOk){
      bottom padding left .conf-box sitting flush against the card's own bottom edge. The near-
      identical inline copy in renderBook() (Book v1) keeps its own padding-bottom:0 since THAT one
      has more sections following inside the same card — this copy has nothing after it. */
-  return '<section class="card"><div class="s-pad">'+
+  return '<section class="card scroll-reveal"><div class="s-pad">'+
     '<div class="s-ey" style="font-weight:var(--w-label)">AI Insight</div><h2 class="s-h" style="margin-bottom:18px">คุณเป็นนักลงทุนแบบไหน</h2>'+
     '<div class="risk-box"><div class="risk-hd"><span class="risk-tag">ความเสี่ยง "บอก" vs "จริง"</span><span class="risk-match">'+(matchOk?('<span class="ld" style="background:var(--cyan)"></span>ตรงกัน'):('ต่างกัน '+(r.gap>0?'+':'')+r.gap))+'</span></div>'+
       '<p class="risk-desc">'+(matchOk?'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน':'ความเสี่ยงที่คุณ "บอก" กับพฤติกรรมจริงต่างกันอยู่บ้าง — รู้ gap นี้ช่วยให้วางแผนได้แม่นขึ้น')+'</p>'+
@@ -3048,7 +3068,7 @@ function initCompareReveal(opts){
     if(cr.__cr2)return;cr.__cr2=true;
     var before=cr.querySelector('.cr2-before'),divider=cr.querySelector('.cr2-divider'),handle=cr.querySelector('.cr2-handle');
     var bChip=cr.querySelector('.cr2-chip-b'),aChip=cr.querySelector('.cr2-chip-a');
-    var pos=parseFloat(cr.dataset.start||'50'),dragging=false;
+    var startPos=parseFloat(cr.dataset.start||'50'),pos=startPos,dragging=false;
     function paint(){var x=Math.max(0,Math.min(100,pos));before.style.clipPath='inset(0 '+(100-x).toFixed(2)+'% 0 0)';divider.style.left=x.toFixed(2)+'%';handle.setAttribute('aria-valuenow',Math.round(x));if(bChip)bChip.style.opacity=x>12?'1':'0';if(aChip)aChip.style.opacity=x<88?'1':'0';}
     function fromX(clientX){var rc=cr.getBoundingClientRect();pos=((clientX-rc.left)/Math.max(1,rc.width))*100;paint();if(opts.onMove)opts.onMove(pos);}
     cr.addEventListener('pointerdown',function(e){dragging=true;try{if(cr.setPointerCapture)cr.setPointerCapture(e.pointerId);}catch(err){}fromX(e.clientX);});
@@ -3059,7 +3079,15 @@ function initCompareReveal(opts){
     handle.setAttribute('role','slider');handle.setAttribute('aria-valuemin','0');handle.setAttribute('aria-valuemax','100');
     handle.addEventListener('keydown',function(e){var s=e.shiftKey?10:4;if(e.key==='ArrowLeft'||e.key==='ArrowDown')pos-=s;else if(e.key==='ArrowRight'||e.key==='ArrowUp')pos+=s;else if(e.key==='Home')pos=0;else if(e.key==='End')pos=100;else return;e.preventDefault();paint();if(opts.onMove)opts.onMove(pos);});
     paint();
-    if(!RM){var t0=null;var sweep=function(ts){if(t0===null)t0=ts;var u=(ts-t0)/1500;if(u>=1){pos=52;paint();return;}var e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;pos=52+Math.sin(e*Math.PI*2)*32;paint();requestAnimationFrame(sweep);};requestAnimationFrame(sweep);}
+    /* Bug fix (found in a system-wide bug audit, 2026-08-19): this sweep used to hardcode its
+       oscillation center AND final rest position to the literal 52 regardless of cr.dataset.start
+       — harmless for the common case (data-start="52", the "has activity" compareBlock branch),
+       but for the noActivity/"locked" branch (data-start="90", meant to keep the locked หลังงาน
+       side almost entirely hidden) it dragged the divider down to a ~50/50 split and left it there,
+       defeating the whole point of that locked-preview state. Now sweeps around and settles back on
+       the real intended startPos, so the little "tease" wiggle still plays but rests where the
+       caller actually asked it to. */
+    if(!RM){var t0=null;var sweep=function(ts){if(t0===null)t0=ts;var u=(ts-t0)/1500;if(u>=1){pos=startPos;paint();return;}var e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;pos=startPos+Math.sin(e*Math.PI*2)*32;paint();requestAnimationFrame(sweep);};requestAnimationFrame(sweep);}
   });
 }
 /* fam-badge + signature/assets/strengths-watchouts + legend — everything the compare-reveal slider's
@@ -3118,7 +3146,7 @@ function renderBook2(){
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
   '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="Better Trade — กลับหน้าหลัก" style="margin-right:auto">'+REG_CTA_HTML+'<div id="qr-cta-slot"></div></header>'+
   book2Subnav(tab)+
-  '<main class="scroll">'+
+  '<main class="scroll fade">'+
     '<div class="b2-panel'+(tab==='identity'?' show':'')+'" data-panel="identity">'+
       '<section class="hero-sec"><div class="hero-gw"><div class="hero-in scroll-reveal">'+
         compareBlock+
@@ -3137,16 +3165,16 @@ function renderBook2(){
     /* radar (was here as its own "พอร์ตลงทุนที่ถนัด" card) moved into the merged radarInterestHTML()
        below, 2026-08-19 per direction — the "วิเคราะห์" tab now ends with just AI Insight. */
     '<div class="b2-panel'+(tab==='portfolio'?' show':'')+'" data-panel="portfolio">'+
-      '<section class="card">'+radarInterestHTML(h,r)+
+      '<section class="card scroll-reveal">'+radarInterestHTML(h,r)+
         '<div class="trait-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">คะแนนพฤติกรรม</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">วัดจากกิจกรรมในงาน</p>'+traitBars()+'</div>'+
         '<div class="alloc-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">แผนจัดพอร์ตที่แนะนำ</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนเริ่มต้นที่เหมาะกับ '+h.th+'</p>'+allocBars()+'</div></section>'+
-      '<section class="card"><div class="s-pad"><div class="s-ey" style="display:flex;justify-content:space-between;align-items:center"><span style="display:inline-flex;align-items:center;gap:var(--sp-glue)">สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">เจาะรายสินทรัพย์</h2>'+ddTabs(h)+'</div></section>'+
+      '<section class="card scroll-reveal"><div class="s-pad"><div class="s-ey" style="display:flex;justify-content:space-between;align-items:center"><span style="display:inline-flex;align-items:center;gap:var(--sp-glue)">สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">เจาะรายสินทรัพย์</h2>'+ddTabs(h)+'</div></section>'+
     '</div>'+
     '<div class="b2-panel'+(tab==='journey'?' show':'')+'" data-panel="journey">'+
       sidesHTML(r)+
-      '<section class="card"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2></div>'+
+      '<section class="card scroll-reveal"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2></div>'+
         '<div class="route-steps">'+routeStep('done','','ทำ DNA Quiz','ตอบครบ 10 ข้อ เสร็จแล้ว — ได้ตัวตน '+h.th)+routeStep('act','2','ทำครบ 6 ด้าน','เสร็จแล้ว 2 จาก 6 — เหลืออีก 4 ด้านในบูธ')+routeStep('fut','3','รับ Playbook ส่วนตัวสมบูรณ์','เมื่อครบ 6 ด้าน รับกลยุทธ์เฉพาะตัวตน')+routeStep('fut','4','ติดตามบน efin.finance','Playbook sync ขึ้นแอปหลังงาน')+'</div></section>'+
-      '<section class="card"><div class="s-pad"><div class="list-row klib-row" id="klibRow"><div class="klib-ic">'+ic('lc-library')+'</div><div class="klib-tx"><div class="klib-t">คลังความรู้</div><div class="klib-s">41 บทความที่คัดมาสำหรับ '+h.th+'</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
+      '<section class="card scroll-reveal"><div class="s-pad"><div class="list-row klib-row" id="klibRow"><div class="klib-ic">'+ic('lc-library')+'</div><div class="klib-tx"><div class="klib-t">คลังความรู้</div><div class="klib-s">41 บทความที่คัดมาสำหรับ '+h.th+'</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
     '</div>'+
   '</main>'+
   appTabbar('book');
@@ -3265,7 +3293,7 @@ function renderLibrary(){
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
   '<header class="topbar"><div class="tb-ic" id="libBack">'+ic('lc-arrow-left')+'</div><div style="flex:1"><div class="tb-title">คลังความรู้</div><div class="tb-sub">41 บทความ ✦ จัดเป็น 8 หมวด</div></div></header>'+
   '<main class="scroll fade">'+
-    '<section class="card"><div class="s-pad">'+
+    '<section class="card scroll-reveal"><div class="s-pad">'+
       '<div class="s-ey">'+ic('lc-library')+'สำหรับ '+h.th+'</div>'+
       '<h2 class="s-h"><span class="lib-num">'+total+'</span> เรื่องที่คุณเก็บได้ตลอดงาน</h2>'+
       '<p class="s-sub">แตะหมวดเพื่อดูรายการ ✦ เนื้อหาเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน</p>'+
@@ -3392,7 +3420,7 @@ function sidesHTML(r){
   ];
   var items='';
   sides.forEach(function(sd,i){items+='<article class="side-item"'+(i===5?' style="border-bottom:none"':'')+'><div class="list-row side-row"><div class="side-num '+sd.cc+'">'+sd.num+'</div><div class="side-cx"><div class="side-t">'+sd.t+'</div><div class="side-s">'+sd.s+'</div></div><div class="side-r"><span class="sc '+sd.cc+'">'+sd.chip+'</span>'+ic('lc-chevron-down','s-cv'+(sd.show?' open':''))+'</div></div><div class="side-body'+(sd.show?' show':'')+'"><div class="side-bi"><div class="side-dl">'+sd.body+'</div></div></div></article>';});
-  return '<section class="card mb-lg" id="sides-sec"><div class="sides-hd"><div class="s-ey">ข้อมูลจากกิจกรรมบูธจริง</div><h2 class="s-h">6 ด้านที่วัดได้จากคุณ</h2><p class="s-sub" style="margin-bottom:2px">แต่ละด้านมาจากพฤติกรรมในงาน — ไม่ใช่คำตอบจากแบบสอบถาม</p></div>'+items+'</section>';
+  return '<section class="card mb-lg scroll-reveal" id="sides-sec"><div class="sides-hd"><div class="s-ey">ข้อมูลจากกิจกรรมบูธจริง</div><h2 class="s-h">6 ด้านที่วัดได้จากคุณ</h2><p class="s-sub" style="margin-bottom:2px">แต่ละด้านมาจากพฤติกรรมในงาน — ไม่ใช่คำตอบจากแบบสอบถาม</p></div>'+items+'</section>';
 }
 function togSide(row){var item=row.parentElement,body=item.querySelector('.side-body'),cv=row.querySelector('.s-cv'),isOpen=body.classList.contains('show');root.querySelectorAll('.side-body.show').forEach(function(b){b.classList.remove('show');});root.querySelectorAll('.s-cv.open').forEach(function(c){c.classList.remove('open');});if(!isOpen){body.classList.add('show');cv.classList.add('open');}}
 function resetQuiz(){st={phase:'splash',spidx:0,idx:0,s1:[null,null,null],s2:[null,null,null,null,null,null,null],s3:[]};RESULT=null;BOOK_VER=2;BOOK2_TAB='identity';render();}
@@ -3482,7 +3510,7 @@ function postEventHTML(){
           }).join('')+'</div>')+
       '</div>';
   };
-  return '<section class="home-card pe-sec"><div class="hcard-hd"><div class="s-h">หลังจบงาน · ดูย้อนหลัง</div></div><div class="hcard-s" style="margin-top:-6px">'+s.ebookNote+'</div>'+
+  return '<section class="home-card pe-sec scroll-reveal"><div class="hcard-hd"><div class="s-h">หลังจบงาน · ดูย้อนหลัง</div></div><div class="hcard-s" style="margin-top:-6px">'+s.ebookNote+'</div>'+
     '<div class="pe-report'+(s.progressUnlocked?' on':'')+'">'+ic(s.progressUnlocked?'lc-trending-up':'lc-lock')+'<div><div class="pe-report-t">รายงานพัฒนาการหลังงาน</div><div class="pe-report-s">'+s.progressNote+'</div></div></div>'+
     (s.vdos.length?('<div class="pe-vlbl">วิดีโอย้อนหลัง</div><div class="pe-vlist">'+s.vdos.map(function(v){return '<div class="pe-vitem"><div class="pe-vic">'+ic(v.icon)+'</div><div class="pe-vtx"><div class="pe-vt">'+v.title+'</div><div class="pe-vs">'+v.note+'</div></div>'+ic('lc-play-circle','pe-vplay')+'</div>';}).join('')+'</div>'):'')+
     s.tracks.map(trackHTML).join('')+
