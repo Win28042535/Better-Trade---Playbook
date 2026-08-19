@@ -2,7 +2,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "routes": [
-    { "src": "/", "dest": "/index.html" },
+    { "src": "/", "status": 302, "headers": { "Location": "/dna-quiz-flow.html" } },
     { "src": "/quiz", "dest": "/dna-quiz-flow.html" },
     { "src": "/playbook", "dest": "/Digital Playbook v8 standalone.html" }
   ]
