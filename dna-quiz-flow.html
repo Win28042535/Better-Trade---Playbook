@@ -980,17 +980,29 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bt-tabs--primary .bt-tab{padding:10px 1px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border-bottom:2px solid transparent;margin-bottom:-1px;}
 .bt-tabs--primary .bt-tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:var(--w-label);}
 @media(max-width:420px){.bt-tabs--primary{overflow-x:auto;scrollbar-width:none;}.bt-tabs--primary::-webkit-scrollbar{display:none;}}
-/* --secondary: compact/pill active state. flex-wrap:nowrap (was wrap) + flex:1 min-width:0 keeps
-   every item on ONE row at equal width regardless of label length — wrap let items size to their
-   own content instead, which visually read as "uneven, and the one that didn't fit fell to a
-   second row" (TOC's 4 buttons, the only current --secondary consumer). min-width:0 overrides the
-   flex-item default (content-based) so flex-shrink can actually shrink a tab below its label's
-   natural width; .bt-tab-label gets the matching ellipsis truncation so a squeezed label clips
-   cleanly instead of overflowing the pill. */
-.bt-tabs--secondary{flex-wrap:nowrap;}
-.bt-tabs--secondary .bt-tab{flex:1;min-width:0;padding:9px 10px;min-height:40px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border:1px solid var(--line-soft);border-radius:var(--rpill);background:var(--white);transition:color .15s,border-color .15s,background .15s;}
+/* --secondary: compact/pill active state. flex-wrap:nowrap (was wrap) keeps every item on ONE row
+   — wrap let items size to their own content, which visually read as "uneven, and the one that
+   didn't fit fell to a second row" (TOC's original 4 buttons). The original fix forced flex:1 (equal
+   width regardless of label length) with ellipsis as a safety net for whatever got squeezed — but
+   Book v2's own content-nav (ตัวตน/วิเคราะห์/พอร์ต/เส้นทาง, a real --secondary consumer added later)
+   showed this wasn't just a rare-squeeze fallback: "วิเคราะห์"/"เส้นทาง" clip to "วิเคร..."/"เส้นท..."
+   on an ordinary 375px phone every time, since forcing 4 labels of different lengths into identical
+   widths guarantees the longer ones overflow (2026-08-19 typography review, confirmed via
+   scrollWidth>clientWidth on both). Fixed with 3 changes: (1) flex:0 1 auto — each pill sized to its
+   OWN label instead of a forced equal share, only shrinking if the row's total content truly exceeds
+   the container; (2) padding tightened 10px->6px horizontal, freeing enough width that NEITHER label
+   set (this one, or v1's TOC — "Confidence" is the widest single word across both and was checked
+   too) needs to shrink at all from ~375px up; (3) below 420px (this component's own icon+padding
+   overhead no longer fits either set even un-shrunk) it switches to horizontal scroll instead of
+   clipping, same overflow-x:auto pattern --primary already uses right above for the identical
+   problem — confirmed zero clipping 375-420px, and a real usable scroll (not a clip) below that,
+   down to 320px, for both label sets. Ellipsis rule kept below as a last-resort safety net for any
+   future label wider than this can size for even while scrolling. */
+.bt-tabs--secondary{flex-wrap:nowrap;justify-content:space-between;}
+.bt-tabs--secondary .bt-tab{flex:0 1 auto;min-width:0;padding:9px 6px;min-height:40px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border:1px solid var(--line-soft);border-radius:var(--rpill);background:var(--white);transition:color .15s,border-color .15s,background .15s;}
 .bt-tabs--secondary .bt-tab[aria-selected="true"]{background:var(--ink);color:var(--cloud);border-color:var(--ink);}
 .bt-tabs--secondary .bt-tab-label{overflow:hidden;text-overflow:ellipsis;}
+@media(max-width:420px){.bt-tabs--secondary{justify-content:flex-start;overflow-x:auto;scrollbar-width:none;}.bt-tabs--secondary::-webkit-scrollbar{display:none;}.bt-tabs--secondary .bt-tab{flex:0 0 auto;}}
 /* data-tooltip — CSS-only, no JS beyond what initBtTabs already wires for focus */
 .bt-tab[data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--ink);color:var(--cloud);font-size:var(--fs-label);font-weight:var(--w-body);padding:var(--sp-stack-tight) 9px;border-radius:var(--r0);white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .15s,transform .15s;pointer-events:none;z-index:20;}
 .bt-tab[data-tooltip]:hover::after,.bt-tab[data-tooltip]:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
