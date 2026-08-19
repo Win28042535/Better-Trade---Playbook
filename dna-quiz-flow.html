@@ -755,10 +755,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .conf-su{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--muted);font-family:var(--font);}
 .conf-bars{display:flex;flex-direction:column;gap:var(--sp-list);}
 .conf-row{display:flex;align-items:center;gap:var(--sp-inline);}
-.conf-rl{width:62px;flex-shrink:0;font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);}
+.conf-rl{width:86px;flex-shrink:0;font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);}
 .conf-tr{flex:1;height:1px;background:var(--line-soft);position:relative;}
 .conf-fi{height:1px;background:var(--ink);position:absolute;left:0;top:0;}
-.conf-vl{width:36px;text-align:right;font-size:var(--fs-meta);font-weight:var(--w-head);color:var(--ink);font-family:var(--serif);}
+.conf-vl{width:50px;text-align:right;font-size:var(--fs-meta);font-weight:var(--w-head);color:var(--ink);font-family:var(--serif);}
 .conf-note{font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);line-height:1.55;margin-top:var(--sp-stack);}
 .radar-sec{padding:var(--sp-block) var(--sp-card-pad);}
 .radar-ww{display:flex;justify-content:center;margin-top:var(--sp-stack);}
@@ -855,6 +855,62 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .alloc-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
 .alloc-l{flex:1;color:var(--ink);}
 .alloc-p{font-family:var(--serif);color:var(--ink);}
+
+/* ══ CHART MOTION + INTERACTION (Dashboard Design & Interaction DNA reference) ══
+   Every chart on this page (confidence bars, risk bars, trait bars, allocation bars, radar) used to
+   be static — correct final values, zero motion, zero hover response. This adds the reveal-on-scroll
+   + chart-appropriate draw animation + hover highlight/dim the reference calls for, without touching
+   the numbers themselves (still the same real inline values, just animated into place). One-time
+   reveal per card (driven by initCharts(), JS section near radarSVG) — never repeats on re-scroll,
+   this is a data-reveal moment, not a decorative loop. `.viz-bar` is the shared "grows from 0 to its
+   real value" primitive (confidence/risk/trait rows + allocation segments all use it); the radar gets
+   its own center→axis→shape→dots sequence since a width-grow doesn't apply to a polygon. Every rule
+   below is a plain `transition`, so the file's existing global `prefers-reduced-motion:reduce`
+   kill-switch (`*,*::before,*::after{transition:none!important}`, top of stylesheet) already
+   collapses all of this to an instant snap-to-final-value — no separate RM branch needed here. */
+.viz-bar{width:0;transition:width .7s var(--ease);}
+.viz-in .viz-bar{width:var(--tw,0);}
+.risk-row:nth-child(2) .viz-bar{transition-delay:.08s;}
+.conf-row:nth-child(2) .viz-bar{transition-delay:.06s;}
+.conf-row:nth-child(3) .viz-bar{transition-delay:.12s;}
+.conf-row:nth-child(4) .viz-bar{transition-delay:.18s;}
+.trait-row:nth-child(2) .viz-bar{transition-delay:.06s;}
+.trait-row:nth-child(3) .viz-bar{transition-delay:.12s;}
+.trait-row:nth-child(4) .viz-bar{transition-delay:.18s;}
+.alloc-seg:nth-child(2){transition-delay:.06s;}
+.alloc-seg:nth-child(3){transition-delay:.12s;}
+.alloc-seg:nth-child(4){transition-delay:.18s;}
+
+/* radar — "Center → Axis → Shape Expand → Data Points" per the chart-animation reference */
+.rk-grid,.rk-axis{opacity:0;transition:opacity .3s var(--ease);}
+.rk-axis{transition-delay:.08s;}
+.rk-poly{transform-box:view-box;transform-origin:0 0;transform:scale(0);transition:transform .5s var(--ease) .3s;}
+.rk-dot{opacity:0;transform:scale(0);transition:opacity .25s var(--ease),transform .25s var(--ease);cursor:pointer;}
+.rk-lab{opacity:0;transition:opacity .3s var(--ease) .7s;}
+.viz-in .rk-grid,.viz-in .rk-axis,.viz-in .rk-lab{opacity:1;}
+.viz-in .rk-poly{transform:scale(1);}
+.viz-in .rk-dot{opacity:1;transform:scale(1);}
+.rk-dot:nth-of-type(1){transition-delay:.62s;}.rk-dot:nth-of-type(2){transition-delay:.68s;}
+.rk-dot:nth-of-type(3){transition-delay:.74s;}.rk-dot:nth-of-type(4){transition-delay:.80s;}
+.rk-dot:nth-of-type(5){transition-delay:.86s;}.rk-dot:nth-of-type(6){transition-delay:.92s;}
+/* hover a data point → it (and its matching axis label) pop/bold; the other 5 dim to ~45%, the same
+   "active 100% / inactive ~40-60%" focus rule the reference specifies for hover behavior */
+.radar-ww svg:hover .rk-dot{opacity:.45;}
+.radar-ww svg:hover .rk-dot:hover{opacity:1;transform:scale(1.5);}
+.rk-dot:nth-of-type(1):hover~.rk-lab:nth-of-type(1),.rk-dot:nth-of-type(2):hover~.rk-lab:nth-of-type(2),
+.rk-dot:nth-of-type(3):hover~.rk-lab:nth-of-type(3),.rk-dot:nth-of-type(4):hover~.rk-lab:nth-of-type(4),
+.rk-dot:nth-of-type(5):hover~.rk-lab:nth-of-type(5),.rk-dot:nth-of-type(6):hover~.rk-lab:nth-of-type(6){font-weight:700;fill:var(--ink);}
+
+/* row hover — active row stays full opacity, its siblings dim to ~55% (desktop/mouse only; a touch
+   kiosk has no hover, so every row just stays fully visible there, the safer default anyway) */
+@media(hover:hover) and (pointer:fine){
+  .conf-bars .conf-row,.risk-bars .risk-row,.trait-row{transition:opacity .15s var(--ease);}
+  .conf-bars:hover .conf-row,.risk-bars:hover .risk-row,.trait-list:hover .trait-row{opacity:.55;}
+  .conf-bars .conf-row:hover,.risk-bars .risk-row:hover,.trait-list .trait-row:hover{opacity:1;}
+  .alloc-seg,.alloc-row{transition:opacity .15s var(--ease),filter .15s var(--ease);}
+  .alloc-seg.dim,.alloc-row.dim{opacity:.45;}
+  .alloc-seg.hi{filter:brightness(1.18) saturate(1.1);}
+}
 
 /* deep-dive summary — asset tabs (now .bt-tabs.bt-tabs--primary, swapped per direction — see the
    BT-TABS block above) + tailored bullet list for the advisor conversation. .dd-tablist is just
@@ -1191,7 +1247,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    this row and the draw-status callout right after it had no gap between them at all. --sp-list is
    the token for "next row in the same stack", the same relationship these two blocks have. */
 .booth-prog{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-inline);margin-bottom:var(--sp-list);}
-.bp-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad-sm);}
+/* display:flex/column + .bp-bar's margin-top:auto (2026-08-19, per direction "อยากให้ตำแหน่งของ bar
+   อยู่ใน alignment ที่เท่ากัน") — .bp-lbl can wrap to 2 lines ("กิจกรรมประจำบูธ" vs the shorter
+   "เช็คอินบูธ"), which used to leave the bar sitting at a different height in each card even though
+   the grid (`.booth-prog`) already stretches both cards to the same total height. Pinning the bar to
+   the card's own bottom edge means it always lands on the same plane across both cards regardless of
+   how many lines the label above it wraps to. */
+.bp-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad-sm);display:flex;flex-direction:column;}
 /* align-items:flex-start (2026-08-15, per direction "ตอนนี้ดู align กลาง card เป็นหลัก ต้อง align
    top") — .bp-lbl can wrap to 2 lines ("กิจกรรมประจำบูธ" at narrow widths), which was centering the
    icon and .bp-frac number against the full wrapped height instead of the label's first line. */
@@ -1199,7 +1261,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bp-hd svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
 .bp-lbl{flex:1;font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
 .bp-frac{font-size:var(--fs-bodysm);font-weight:var(--w-label);white-space:nowrap;}
-.bp-bar{height:6px;border-radius:var(--rpill);background:var(--accent);overflow:hidden;}
+.bp-bar{margin-top:auto;height:6px;border-radius:var(--rpill);background:var(--accent);overflow:hidden;}
 .bp-fill{height:100%;border-radius:var(--rpill);transition:width .25s var(--ease);}
 .draw-status{display:flex;gap:var(--sp-inline);align-items:flex-start;padding:var(--sp-card-pad-sm);border-radius:var(--r2);background:var(--paper);border:1px solid var(--line-soft);}
 .draw-status.ok{background:var(--done-wash);border-color:var(--done-border);}
@@ -1765,6 +1827,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    no side frame (task 5). */
 @media(min-width:480px){:root[data-view="mobile"] body{background:var(--cloud);}:root[data-view="mobile"] .shell{border-left:1px solid var(--line-soft);border-right:1px solid var(--line-soft);}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;}}
+/* ══ CONTAINER SCROLL ANIMATION DNA ══ .scroll-reveal sections tip back in 3D perspective while
+   still below the fold and settle flat as scroll brings them into place — scroll paces the reveal,
+   it doesn't gate it (see revealTick() near the bottom of the script). Reduced-motion collapses
+   straight to flat, content is never hidden, only its entrance timing changes. */
+.scroll-reveal{will-change:transform;transform-origin:50% 100%;}
+@media(prefers-reduced-motion:reduce){.scroll-reveal{transform:none!important;}}
 </style>
 
 <!-- Lucide icons — inline symbol defs (MIT, lucide.dev), per Design DNA §07. -->
@@ -2292,7 +2360,34 @@ function render(){
   else if(st.phase==='games')renderGames();
   else if(st.phase==='profile')renderProfile();
   window.scrollTo(0,0);
+  revealTick(); // sync .scroll-reveal transforms to the fresh DOM immediately, don't wait for a scroll event
 }
+
+/* ══ CONTAINER SCROLL ANIMATION DNA (motion) ══ shared scroll-linked controller for every
+   .scroll-reveal element (see the CSS block above) — re-queries the DOM each tick so it stays
+   correct across renders() without being rebound per screen, same "bind once, query live" pattern
+   as buildGoTop()'s onScroll below. Bound to BOTH window and #root's own scroll (root scrolls
+   internally in the desktop mobile-frame preview per :root[data-view=mobile] .shell{overflow-y:
+   auto}), matching buildGoTop's dual-binding. rAF-throttled since scroll fires far faster than a
+   frame budget needs. */
+function revealTick(){
+  SR_RAF=null;
+  var els=document.querySelectorAll('.scroll-reveal');
+  if(RM){els.forEach(function(el){el.style.transform='';});return;}
+  var vh=window.innerHeight;
+  els.forEach(function(el){
+    var rect=el.getBoundingClientRect();
+    if(rect.width===0&&rect.height===0)return; // display:none (e.g. an inactive book2 tab panel)
+    var start=vh*0.92,end=vh*0.42; // enters the reveal ~92% down the viewport, settles flat by ~42%
+    var p=Math.max(0,Math.min(1,(start-rect.top)/(start-end)));
+    el.style.transform='perspective(1000px) rotateX('+((1-p)*12).toFixed(2)+'deg) translateY('+((1-p)*26).toFixed(1)+'px) scale('+(0.95+p*0.05).toFixed(3)+')';
+  });
+}
+var SR_RAF=null;
+function requestRevealTick(){if(!SR_RAF)SR_RAF=requestAnimationFrame(revealTick);}
+window.addEventListener('scroll',requestRevealTick,{passive:true});
+window.addEventListener('resize',requestRevealTick,{passive:true});
+root.addEventListener('scroll',requestRevealTick,{passive:true});
 
 /* Rebuilt 2026-08-15 per direction ("หน้าที่ 2" review, full list): dropped the "DNA · 11" header
    pill, the "แบบทดสอบสำหรับนักลงทุน" kicker, the em dash in the intro line, the item-count "· ~N
@@ -2561,13 +2656,30 @@ function radarSVG(vals,hue){
   function ring(s){var o='';for(var k=0;k<6;k++){var a=(-90+60*k)*Math.PI/180;o+=(k?' ':'')+(Math.cos(a)*R*s).toFixed(1)+','+(Math.sin(a)*R*s).toFixed(1);}return o;}
   function axis(k){var a=(-90+60*k)*Math.PI/180;return '<line class="rk-axis" x1="0" y1="0" x2="'+(Math.cos(a)*R).toFixed(1)+'" y2="'+(Math.sin(a)*R).toFixed(1)+'"/>';}
   var poly=pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');
-  var dots='';pts.forEach(function(p){dots+='<circle class="rk-dot" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3"/>';});
+  var dots='';pts.forEach(function(p,k){dots+='<circle class="rk-dot" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3"><title>'+RADAR_AXES[k]+' '+vals[k]+'</title></circle>';});
   var lab=[[0,-104,'middle'],[104,-52,'start'],[104,60,'start'],[0,116,'middle'],[-104,60,'end'],[-104,-52,'end']];
   var labels='';for(var k=0;k<6;k++){labels+='<text class="rk-lab" x="'+lab[k][0]+'" y="'+lab[k][1]+'" text-anchor="'+lab[k][2]+'" font-family="'+SVGFONT+'" font-size="10.5" font-weight="500">'+RADAR_AXES[k]+' '+vals[k]+'</text>';}
   return '<svg width="340" height="244" viewBox="0 0 340 244" style="max-width:100%" role="img" aria-label="พอร์ตลงทุน '+RESULT.hero.th+'"><title>พอร์ตลงทุน '+RESULT.hero.th+'</title><g transform="translate('+cx+','+cy+')">'+
     '<polygon class="rk-grid" points="'+ring(1)+'"/><polygon class="rk-grid" points="'+ring(.75)+'"/><polygon class="rk-grid" points="'+ring(.5)+'"/><polygon class="rk-grid" points="'+ring(.25)+'"/>'+
     axis(0)+axis(1)+axis(2)+axis(3)+axis(4)+axis(5)+
     '<polygon class="rk-poly" points="'+poly+'" fill="rgba('+hue+',0.14)" stroke-linejoin="round"/>'+dots+labels+'</g></svg>';
+}
+/* ── Dashboard chart-reveal (Motion DNA: Section → Card Reveal → Data Reveal → Chart Animation →
+   Final State) — observes each chart's containing card and adds .viz-in the first time it enters the
+   viewport; the CSS above ("CHART MOTION + INTERACTION") does the actual animating per chart type.
+   Called once per render from renderBook()/renderBook2() right after their HTML lands in the DOM, and
+   naturally re-fires for Book v2's tab-hidden (display:none) chart panels once the user switches to
+   them, since the observer keeps watching regardless of the .b2-panel/.show toggle. One-time per
+   element (unobserve after firing) — re-scrolling past an already-revealed chart never re-plays it,
+   matching the reference's "not a decorative loop" rule. */
+function initCharts(scope){
+  var boxes=(scope||root).querySelectorAll('.conf-box,.risk-box,.trait-sec,.alloc-sec,.radar-sec');
+  if(!boxes.length)return;
+  if(!window.IntersectionObserver){boxes.forEach(function(b){b.classList.add('viz-in');});return;}
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('viz-in');io.unobserve(e.target);}});
+  },{threshold:.3});
+  boxes.forEach(function(b){io.observe(b);});
 }
 
 /* ── PRE/POST-EVENT IDENTITY — merges the old standalone "hero card" (pure DNA Quiz result) with
@@ -2754,7 +2866,7 @@ function renderBook(){
     '<button class="bt-tab" type="button" data-jump="route-sec" aria-selected="false"><span class="bt-tab-icon">'+ic('lc-route')+'</span><span class="bt-tab-label">เส้นทาง</span></button>'+
   '</nav>'+
   '<main class="scroll">'+
-    '<section class="fade hero-sec" id="hero-sec"><div class="hero-gw"><div class="hero-in">'+
+    '<section class="fade hero-sec" id="hero-sec"><div class="hero-gw"><div class="hero-in scroll-reveal">'+
       '<div class="fam-badge" id="famBadge" style="'+famBadgeStyle(activeHero)+'"><span>'+activeHero.famTh+'</span></div>'+
       '<div class="bt-tabs bt-tabs--primary hero-ev-tabs" id="heroEvTabs" role="tablist" aria-label="เลือกช่วงเวลาของโปรไฟล์">'+
         '<button class="bt-tab" type="button" role="tab" aria-selected="'+(defaultTab==='pre'?'true':'false')+'" tabindex="'+(defaultTab==='pre'?'0':'-1')+'" data-value="pre"><span class="bt-tab-icon">'+ic('lc-file-text')+'</span><span class="bt-tab-label">โปรไฟล์ก่อนงาน</span></button>'+
@@ -2780,8 +2892,8 @@ function renderBook(){
       '<div class="risk-box"><div class="risk-hd"><span class="risk-tag">ความเสี่ยง "บอก" vs "จริง"</span><span class="risk-match">'+(matchOk?('<span class="ld" style="background:var(--cyan)"></span>ตรงกัน'):('ต่างกัน '+(r.gap>0?'+':'')+r.gap))+'</span></div>'+
         '<p class="risk-desc">'+(matchOk?'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน — นักลงทุนที่ self-aware มักตัดสินใจได้ดีกว่าในภาวะตลาดผันผวน':'ความเสี่ยงที่คุณ "บอก" กับที่พฤติกรรมจริงสะท้อนออกมาต่างกันอยู่บ้าง — รู้ gap นี้ช่วยให้วางแผนได้แม่นขึ้น')+'</p>'+
         '<div class="risk-slbl">ระดับความเสี่ยง 1–10</div>'+
-        '<div class="risk-bars"><div class="risk-row"><span class="risk-rl">ความเสี่ยงที่บอก</span><div class="risk-tr"><div class="risk-fi" style="width:'+(r.declared*10)+'%;background:var(--muted)"></div></div><span class="risk-vl">'+r.declared+'</span></div>'+
-        '<div class="risk-row"><span class="risk-rl" style="color:var(--ink)">ความเสี่ยงจริง</span><div class="risk-tr"><div class="risk-fi" style="width:'+(r.revealed*10)+'%"></div></div><span class="risk-vl">'+r.revealed+'</span></div></div></div>'+
+        '<div class="risk-bars"><div class="risk-row"><span class="risk-rl">ความเสี่ยงที่บอก</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.declared*10)+'%;background:var(--muted)"></div></div><span class="risk-vl">'+r.declared+'</span></div>'+
+        '<div class="risk-row"><span class="risk-rl" style="color:var(--ink)">ความเสี่ยงจริง</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.revealed*10)+'%"></div></div><span class="risk-vl">'+r.revealed+'</span></div></div></div>'+
       '<div class="conf-box" id="conf-box"><div class="conf-glow"></div><div class="conf-hd"><div class="conf-ic">'+ic('lc-sparkles')+'</div><div><div class="conf-ml">Confidence Score</div><div class="conf-mv">'+r.confLevel+'</div></div><div class="conf-sc">'+r.conf+'<span class="conf-su">/100</span></div></div>'+
         '<div class="conf-bars">'+confRow('ตัวตน',r.subs.identity)+confRow('พฤติกรรม',r.subs.behavior)+confRow('ความเสี่ยง',r.subs.riskAlign)+confRow('วินัย',r.subs.discipline)+'</div>'+
         '<p class="conf-note">คะแนนจะสมบูรณ์เมื่อทำครบ 6 ด้านในงาน — ยิ่งสูง ทำนายผลตอบแทนได้แม่นขึ้น</p></div>'+
@@ -2842,6 +2954,8 @@ function renderBook(){
   root.querySelector('#klibRow').onclick=function(){LIB_OPEN=null;st.phase='library';render();};
   mountHeaderQR();
   bindHeaderLogo();
+  initCharts(root);
+  bindAllocHover(root);
 }
 /* ══ คู่มือ 2 (Book v2) ══ alternate Book view (2026-08-16, per direction "เพิ่มมาอีกเวอร์ชันนึง โดยนำ
    compare-reveal/tab-display มาใช้ แยก tab menu ด้านล่างไว้ (bottom nav)"). Reuses every v1 data helper
@@ -2888,8 +3002,8 @@ function insightHTML(r,h,matchOk){
     '<div class="risk-box"><div class="risk-hd"><span class="risk-tag">ความเสี่ยง "บอก" vs "จริง"</span><span class="risk-match">'+(matchOk?('<span class="ld" style="background:var(--cyan)"></span>ตรงกัน'):('ต่างกัน '+(r.gap>0?'+':'')+r.gap))+'</span></div>'+
       '<p class="risk-desc">'+(matchOk?'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน':'ความเสี่ยงที่คุณ "บอก" กับพฤติกรรมจริงต่างกันอยู่บ้าง — รู้ gap นี้ช่วยให้วางแผนได้แม่นขึ้น')+'</p>'+
       '<div class="risk-slbl">ระดับความเสี่ยง 1–10</div>'+
-      '<div class="risk-bars"><div class="risk-row"><span class="risk-rl">ความเสี่ยงที่บอก</span><div class="risk-tr"><div class="risk-fi" style="width:'+(r.declared*10)+'%;background:var(--muted)"></div></div><span class="risk-vl">'+r.declared+'</span></div>'+
-      '<div class="risk-row"><span class="risk-rl" style="color:var(--ink)">ความเสี่ยงจริง</span><div class="risk-tr"><div class="risk-fi" style="width:'+(r.revealed*10)+'%"></div></div><span class="risk-vl">'+r.revealed+'</span></div></div></div>'+
+      '<div class="risk-bars"><div class="risk-row"><span class="risk-rl">ความเสี่ยงที่บอก</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.declared*10)+'%;background:var(--muted)"></div></div><span class="risk-vl">'+r.declared+'</span></div>'+
+      '<div class="risk-row"><span class="risk-rl" style="color:var(--ink)">ความเสี่ยงจริง</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.revealed*10)+'%"></div></div><span class="risk-vl">'+r.revealed+'</span></div></div></div>'+
     '<div class="conf-box"><div class="conf-glow"></div><div class="conf-hd"><div class="conf-ic">'+ic('lc-sparkles')+'</div><div><div class="conf-ml">Confidence Score</div><div class="conf-mv">'+r.confLevel+'</div></div><div class="conf-sc">'+r.conf+'<span class="conf-su">/100</span></div></div>'+
       '<div class="conf-bars">'+confRow('ตัวตน',r.subs.identity)+confRow('พฤติกรรม',r.subs.behavior)+confRow('ความเสี่ยง',r.subs.riskAlign)+confRow('วินัย',r.subs.discipline)+'</div>'+
       '<p class="conf-note">คะแนนจะสมบูรณ์เมื่อทำครบ 6 ด้านในงาน</p></div>'+
@@ -2978,7 +3092,7 @@ function renderBook2(){
   book2Subnav(tab)+
   '<main class="scroll">'+
     '<div class="b2-panel'+(tab==='identity'?' show':'')+'" data-panel="identity">'+
-      '<section class="hero-sec"><div class="hero-gw"><div class="hero-in">'+
+      '<section class="hero-sec"><div class="hero-gw"><div class="hero-in scroll-reveal">'+
         compareBlock+
         '<div id="b2ident-detail">'+book2IdentityDetail(h)+'</div>'+
         redeemCardHTML(isUltimate)+
@@ -3042,6 +3156,8 @@ function renderBook2(){
   var sc=root.querySelector('#shareCardBtn');if(sc)sc.onclick=openShare;
   mountHeaderQR();
   bindHeaderLogo();
+  initCharts(root);
+  bindAllocHover(root);
 }
 /* ── App shell: shared bottom tab bar across the 5 companion-app screens (home/book/passport/games/
    profile), ported 1:1 from Playbook Final's `tabs` array (labels/icons/order). Each screen renders
@@ -3065,7 +3181,7 @@ function bindTabbar(){root.querySelectorAll('.book-tabbar .tab-item[data-tab]').
    don't exist yet); each carries an .ex-tag in the UI so nothing here reads as a real measurement. ── */
 function traitBars(){
   var rows=[{l:'เก็บข้อมูลก่อนตัดสินใจ',v:31,m:35},{l:'ความมีวินัยการลงทุน',v:25,m:25},{l:'การกระจายความเสี่ยง',v:10,m:25},{l:'รับความผันผวนได้',v:11,m:15}];
-  return '<div class="trait-list">'+rows.map(function(t){return '<div class="trait-row"><span class="trait-l">'+t.l+'</span><span class="trait-v"><b>'+t.v+'</b>/'+t.m+'</span><div class="trait-tr"><div class="trait-fi" style="width:'+Math.round(t.v/t.m*100)+'%"></div></div></div>';}).join('')+'</div>';
+  return '<div class="trait-list">'+rows.map(function(t){return '<div class="trait-row"><span class="trait-l">'+t.l+'</span><span class="trait-v"><b>'+t.v+'</b>/'+t.m+'</span><div class="trait-tr"><div class="trait-fi viz-bar" style="--tw:'+Math.round(t.v/t.m*100)+'%"></div></div></div>';}).join('')+'</div>';
 }
 /* Bar segments now render in a softened tone of each color (2026-08-15, per Component System
    review "สีเป็น solid เลยค่อนข้างหนัก และสีดูจัดไป") — the thick 14px bar made a full-saturation
@@ -3074,9 +3190,25 @@ function traitBars(){
    toward white. */
 function allocBars(){
   var segs=[{l:'สินทรัพย์แกนหลัก (กองทุน/หุ้นใหญ่)',p:40,c:'var(--violet)'},{l:'สินทรัพย์เติบโต',p:30,c:'var(--cyan)'},{l:'สินทรัพย์ทางเลือก / กระจาย',p:20,c:'var(--pink)'},{l:'เงินสด / สภาพคล่อง',p:10,c:'var(--yellow)'}];
-  var bar=segs.map(function(s){return '<div class="alloc-seg" style="width:'+s.p+'%;background:color-mix(in srgb,'+s.c+' 55%,var(--white))"></div>';}).join('');
-  var legend=segs.map(function(s){return '<div class="alloc-row"><span class="alloc-dot" style="background:'+s.c+'"></span><span class="alloc-l">'+s.l+'</span><span class="alloc-p">'+s.p+'%</span></div>';}).join('');
+  var bar=segs.map(function(s,i){return '<div class="alloc-seg viz-bar" data-i="'+i+'" style="--tw:'+s.p+'%;background:color-mix(in srgb,'+s.c+' 55%,var(--white))"></div>';}).join('');
+  var legend=segs.map(function(s,i){return '<div class="alloc-row" data-i="'+i+'"><span class="alloc-dot" style="background:'+s.c+'"></span><span class="alloc-l">'+s.l+'</span><span class="alloc-p">'+s.p+'%</span></div>';}).join('');
   return '<div class="alloc-bar">'+bar+'</div><div class="alloc-legend">'+legend+'</div>';
+}
+/* Allocation legend ↔ bar-segment hover pairing (Interaction DNA §10: hover one → highlight it, dim
+   the rest to ~45%). The two lists are separate DOM siblings (stacked bar vs legend rows below it),
+   so they're paired by a shared data-i index rather than a pure-CSS :has() selector. Idempotent per
+   .alloc-bar's parent (guards against double-binding if this were ever called twice on one render). */
+function bindAllocHover(scope){
+  (scope||root).querySelectorAll('.alloc-bar').forEach(function(bar){
+    var wrap=bar.parentElement;if(!wrap||wrap.__allocHover)return;wrap.__allocHover=true;
+    var segs=wrap.querySelectorAll('.alloc-seg'),rows=wrap.querySelectorAll('.alloc-row');
+    function set(i){
+      segs.forEach(function(s){var m=s.dataset.i===i;s.classList.toggle('hi',i!==null&&m);s.classList.toggle('dim',i!==null&&!m);});
+      rows.forEach(function(r){r.classList.toggle('dim',i!==null&&r.dataset.i!==i);});
+    }
+    segs.forEach(function(s){s.addEventListener('mouseenter',function(){set(s.dataset.i);});s.addEventListener('mouseleave',function(){set(null);});});
+    rows.forEach(function(r){r.addEventListener('mouseenter',function(){set(r.dataset.i);});r.addEventListener('mouseleave',function(){set(null);});});
+  });
 }
 /* ══ LIBRARY (คลังความรู้) ══ real category names + item counts extracted verbatim from the source
    (playbook-final-extracted.html — see PLAYBOOK-2026-DATA-BASELINE.md §7): 8 categories, 41 items
@@ -3141,7 +3273,14 @@ function ddTabs(h){
   }).join('');
   return '<div class="bt-tabs bt-tabs--primary dd-tablist" id="ddTabs" role="tablist" aria-label="เลือกสินทรัพย์ที่จะดูรายละเอียด">'+tablist+'</div>'+panels;
 }
-function confRow(l,v){return '<div class="conf-row"><span class="conf-rl">'+l+'</span><div class="conf-tr"><div class="conf-fi" style="width:'+(v/20*100)+'%"></div></div><span class="conf-vl">'+v+'</span></div>';}
+/* Each sub-score gets its own spectrum hue (2026-08-19, per direction "อยากให้มีการใช้สีที่ต่างๆกัน" —
+   all 4 bars were solid --ink and read as flat/monotone next to the risk bars above them) — mapped
+   by label text rather than an extra call-site argument, since confRow('ตัวตน',...) etc. is called
+   identically from 2 places in this file (renderBook + insightHTML) and editing both call sites in
+   sync has already bitten this file once (see the risk-fi indentation mismatch in update #19). Same
+   4-hue set allocBars() already uses, so both charts read as one consistent palette. */
+var CONF_ROW_COLOR={'ตัวตน':'var(--violet)','พฤติกรรม':'var(--cyan)','ความเสี่ยง':'var(--pink)','วินัย':'var(--yellow)'};
+function confRow(l,v){var c=CONF_ROW_COLOR[l]||'var(--ink)';return '<div class="conf-row"><span class="conf-rl">'+l+'</span><div class="conf-tr"><div class="conf-fi viz-bar" style="--tw:'+(v/20*100)+'%;background:'+c+'"></div></div><span class="conf-vl">'+v+'</span></div>';}
 /* ══ SHARE MODAL (logic) ══ "แชร์ภาพการ์ด"/"แชร์พรุ่งนี้ของคุณ" both open this bottom-sheet share
    modal — a copy-link field plus social targets (LINE first, it's the dominant channel in TH),
    modeled on the reference share sheet but skinned to this app's design DNA. Each social chip opens
@@ -3420,24 +3559,24 @@ function renderHome(){
   var bookTeaser=RESULT?'เติมแล้ว 2/6 ด้าน · เล่นเพิ่มเพื่อให้ครบ':'ทำแบบทดสอบตัวตน 7 ข้อ เพื่อเปิดคู่มือ';
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
-    '<section class="home-hero"><div class="hh-badge">'+ic('lc-book-open')+'<span class="hh-badge-tx">คู่มือลงทุนของคุณ</span></div>'+
+    '<section class="home-hero scroll-reveal"><div class="hh-badge">'+ic('lc-book-open')+'<span class="hh-badge-tx">คู่มือลงทุนของคุณ</span></div>'+
       '<img class="hh-logo" src="'+LOGO_IMG.nwnp+'" alt="New World New Playbook">'+
       '<p class="hh-sub"><b>คู่มือการลงทุนส่วนตัวของคุณ ประกอบจากการ์ดตัวตนและสิ่งที่คุณทำจริงในงาน</b> ดูย้อนหลังได้บน efin.finance</p>'+
       '<div class="hh-meta"><span>'+ic('lc-calendar')+'31 ต.ค. – 1 พ.ย. 2569</span><span>'+ic('lc-map-pin')+'Samyan Mitrtown ชั้น 5</span></div></section>'+
     (function(){var tp=(t.meta.sub||'').split(' · ');var benefit=tp[0]||'',price=tp[1]||'';
-      return '<button class="pass-card" id="homeTier"><div class="pass-top"><span class="pass-ic'+(t.meta.icon==='lc-crown'?' gold':'')+'">'+ic(t.meta.icon)+'</span><div class="pass-hd"><div class="pass-ey">บัตรของคุณ</div><div class="pass-name">'+t.name+'</div></div>'+ic('lc-chevron-right','pass-cv')+'</div>'+
+      return '<button class="pass-card scroll-reveal" id="homeTier"><div class="pass-top"><span class="pass-ic'+(t.meta.icon==='lc-crown'?' gold':'')+'">'+ic(t.meta.icon)+'</span><div class="pass-hd"><div class="pass-ey">บัตรของคุณ</div><div class="pass-name">'+t.name+'</div></div>'+ic('lc-chevron-right','pass-cv')+'</div>'+
         '<div class="pass-benefit">'+benefit+'</div>'+
         (price?'<div class="pass-foot"><span class="pass-foot-lbl">ราคาบัตร</span><span class="pass-price">'+price+'</span></div>':'')+
       '</button>';})()+
-    '<section class="next-step"><div class="ns-ic">'+ic(ns.icon)+'</div><div class="ns-tx"><div class="ns-ey">'+ns.ey+'</div><div class="ns-t">'+ns.t+'</div><div class="ns-b">'+ns.b+'</div></div><div class="ns-cta-slot" id="ns-cta-slot"></div></section>'+
-    '<div class="home-counters">'+HOME_COUNTERS.map(function(c){return '<button class="hc-card" data-go="'+c.go+'"><svg viewBox="0 0 24 24" class="lucide" style="color:'+c.color+'"><use href="#'+c.icon+'"/></svg><div class="hc-val">'+c.val+'</div><div class="hc-label">'+c.label+'</div></button>';}).join('')+'</div>'+
+    '<section class="next-step scroll-reveal"><div class="ns-ic">'+ic(ns.icon)+'</div><div class="ns-tx"><div class="ns-ey">'+ns.ey+'</div><div class="ns-t">'+ns.t+'</div><div class="ns-b">'+ns.b+'</div></div><div class="ns-cta-slot" id="ns-cta-slot"></div></section>'+
+    '<div class="home-counters scroll-reveal">'+HOME_COUNTERS.map(function(c){return '<button class="hc-card" data-go="'+c.go+'"><svg viewBox="0 0 24 24" class="lucide" style="color:'+c.color+'"><use href="#'+c.icon+'"/></svg><div class="hc-val">'+c.val+'</div><div class="hc-label">'+c.label+'</div></button>';}).join('')+'</div>'+
     '<div class="list-row book-teaser" id="homeBook"><div class="bt-ic">'+ic('lc-book-open')+'</div><div class="klib-tx"><div class="bt-t">คู่มือลงทุนของคุณ</div><div class="bt-s">'+bookTeaser+'</div></div>'+ic('lc-chevron-right','bt-cv')+'</div>'+
-    '<section class="home-card"><div class="hcard-hd"><div class="s-h">เวทีห้องใหญ่</div><div class="hcard-s">09.00–18.30 น. · Samyan Mitrtown ชั้น 5 · เวทีเดียว 2 วัน กำหนดการคนละชุด</div></div>'+
+    '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">เวทีห้องใหญ่</div><div class="hcard-s">09.00–18.30 น. · Samyan Mitrtown ชั้น 5 · เวทีเดียว 2 วัน กำหนดการคนละชุด</div></div>'+
       '<div class="bt-tabs bt-tabs--primary" id="agTabs" role="tablist" aria-label="เลือกวันที่กำหนดการ"><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===1?'true':'false')+'" data-value="1"><span class="bt-tab-label">วันที่ 1 ✦ 31 ต.ค.</span></button><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===2?'true':'false')+'" data-value="2"><span class="bt-tab-label">วันที่ 2 ✦ 1 พ.ย.</span></button></div>'+
       '<div class="ag-list">'+shown.map(function(a){return '<div class="ag-row"><div class="ag-time">'+a.time+'</div><div><div class="ag-t">'+a.t+'</div>'+(a.by?'<div class="ag-by">'+a.by+'</div>':'')+'</div></div>';}).join('')+'</div>'+
       (days.length>3?('<button class="ag-more" id="agMore">'+ic(HOME_MST.agendaAll?'lc-chevron-down':'lc-chevron-down')+(HOME_MST.agendaAll?'ย่อกำหนดการ':('ดูกำหนดการทั้งวัน '+days.length+' รายการ'))+'</button>'):'')+
     '</section>'+
-    '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;gap:var(--sp-list);margin-bottom:var(--sp-inline)">'+ic('lc-megaphone')+'<div class="s-h" style="font-size:var(--fs-h2);margin-bottom:0">ประกาศจากงาน</div></div>'+
+    '<section class="home-card scroll-reveal"><div class="hcard-hd" style="display:flex;align-items:center;gap:var(--sp-list);margin-bottom:var(--sp-inline)">'+ic('lc-megaphone')+'<div class="s-h" style="font-size:var(--fs-h2);margin-bottom:0">ประกาศจากงาน</div></div>'+
       HOME_ANN.map(function(a){return '<div class="ann-row"><svg viewBox="0 0 24 24" class="lucide" style="color:'+a.color+'"><use href="#'+a.icon+'"/></svg><div><div class="ann-t">'+a.t+'</div><div class="ann-s">'+a.s+'</div></div></div>';}).join('')+
     '</section>'+
     postEventHTML()+
@@ -3626,7 +3765,7 @@ function renderBooth(){
        แผนที่เดินบูธ") — the previous turn's merge into one card didn't read right in practice, so
        "เดินบูธ ✦ ลุ้นรางวัล" (title/progress/draw-status) is its own .home-card again, same as the
        map/route section right after it. */
-    '<section class="home-card"><div class="hcard-hd"><div class="s-h">เดินบูธ <span class="hd-star">✦</span> ลุ้นรางวัล</div><div class="hcard-s">เช็คอินบูธ · กิจกรรมประจำบูธ · ลุ้นรางวัลใหญ่</div></div>'+
+    '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">เดินบูธ <span class="hd-star">✦</span> ลุ้นรางวัล</div><div class="hcard-s">เช็คอินบูธ · กิจกรรมประจำบูธ · ลุ้นรางวัลใหญ่</div></div>'+
       '<div class="booth-prog">'+
         '<div class="bp-card"><div class="bp-hd">'+ic('lc-qr-code')+'<span class="bp-lbl">เช็คอินบูธ</span><span class="bp-frac" style="color:'+(chkOK?'var(--cyan)':'var(--violet)')+'">'+(chkOK?('ครบแล้ว · '+chk+' บูธ'):(chk+'/'+CHECKIN_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,chk/CHECKIN_NEED*100)+'%;background:'+(chkOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
         '<div class="bp-card"><div class="bp-hd">'+ic('lc-gamepad-2')+'<span class="bp-lbl">กิจกรรมประจำบูธ</span><span class="bp-frac" style="color:'+(actOK?'var(--cyan)':'var(--violet)')+'">'+(actOK?('ครบแล้ว · '+act+' บูธ'):(act+'/'+ACTIVITY_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,act/ACTIVITY_NEED*100)+'%;background:'+(actOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
@@ -3635,14 +3774,14 @@ function renderBooth(){
         ? '<div class="draw-status ok">'+ic('lc-gift')+'<div><div class="ds-h">ครบเงื่อนไขแล้ว · กดร่วมลุ้นรางวัลใหญ่ได้เลย</div><div class="ds-s">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">✓ กดร่วมลุ้นก่อน 16:00 น. ของวันที่ 2</div></div></div>'
         : '<div class="draw-status need">'+ic('lc-gift')+'<div><div class="ds-h">ยังขาด<span class="ds-chips">'+need.map(function(n){return '<span class="ds-chip">'+n+'</span>';}).join('')+'</span></div><div class="ds-s">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">ครบเมื่อไหร่ ปุ่มร่วมลุ้นรางวัลใหญ่จะขึ้นตรงนี้ให้กด</div></div></div>')+
     '</section>'+
-    '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline)"><div class="s-h" style="margin-bottom:0">'+(RESULT?'แผนที่เดินบูธเฉพาะคุณ':'แผนที่เดินบูธ (เส้นทางแนะนำ)')+'</div><span class="route-badge">'+visited+'/'+route.length+' จุด</span></div>'+
+    '<section class="home-card scroll-reveal"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline)"><div class="s-h" style="margin-bottom:0">'+(RESULT?'แผนที่เดินบูธเฉพาะคุณ':'แผนที่เดินบูธ (เส้นทางแนะนำ)')+'</div><span class="route-badge">'+visited+'/'+route.length+' จุด</span></div>'+
       '<div class="map-ph has-img"><img class="mp-img" src="'+MAP_IMG+'" alt="ผังงาน Better Trade 2026 · Samyan Mitrtown ชั้น 5"><span class="mp-cap">ผังงาน · Samyan Mitrtown ชั้น 5</span><button class="mp-zoom" id="mapZoomBtn">'+ic('lc-maximize-2')+'<span>ดูแบบเต็มจอ</span></button></div>'+
       '<div class="route-list">'+route.map(function(p,i){
         var badge=(p.topPick?'<span class="rt-badge pick">อันดับ 1 สำหรับคุณ</span>':'')+(p.featured?'<span class="rt-badge feat">ผู้สนับสนุน</span>':'')+(p.newAngle?'<span class="rt-badge new">มุมใหม่</span>':'');
         return '<div class="rt-row'+(p.topPick?' top':'')+'"><div class="rt-rail"><div class="rt-dot" style="background:'+p.dotColor+'">'+ic(p.icon)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+'</div><div class="rt-meta">'+p.zone+' · '+p.status+'</div></div></div>';
       }).join('')+'</div>'+
     '</section>'+
-    '<section class="home-card"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline);flex-wrap:wrap"><div class="s-h" style="margin-bottom:0">กิจกรรมประจำโซน</div><button class="howto-btn" id="howtoBtn">'+ic('lc-info')+'วิธีเล่น</button></div>'+
+    '<section class="home-card scroll-reveal"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline);flex-wrap:wrap"><div class="s-h" style="margin-bottom:0">กิจกรรมประจำโซน</div><button class="howto-btn" id="howtoBtn">'+ic('lc-info')+'วิธีเล่น</button></div>'+
       '<div class="hcard-s" style="margin-top:-6px">แตะชื่อบูธเพื่อเช็คอิน — เช็คอินก่อน แล้วเกมของโซนนั้นจะปลดให้เล่น</div>'+
       '<div class="booth-legend"><span><span class="lg-sw" style="background:var(--white);border:1px solid var(--line-strong)"></span>ยังไม่เช็คอิน</span><span><span class="lg-sw" style="background:var(--amber-bg);border:1px solid var(--amber-border)"></span>เช็คอินแล้ว</span><span><span class="lg-sw" style="background:var(--done-fill);border:1px solid var(--done-border)"></span>ร่วมกิจกรรมแล้ว</span></div>'+
       '<div class="booth-grid">'+BOOTHS.map(function(b,bi){
@@ -3755,7 +3894,7 @@ function renderGames(){
   var listIdx=nextIdx>=0?restIdx:[0,1,2,3,4,5];
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
-    '<section class="home-card">'+
+    '<section class="home-card scroll-reveal">'+
       '<div class="s-h">คู่มือ 6 ด้านของคุณ</div><div class="gh-sub">เล่นเกมแล้วเติมทีละด้าน</div>'+
       /* Same .pass-card as Home's "บัตรของคุณ" — plain icon+eyebrow+value text, no chart. Replaces
          the old dark donut ring, which crammed "X/6" into a 66px circle hard to read at a glance
@@ -3789,15 +3928,15 @@ function renderProfile(){
   var t=curTier();
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
-    '<section class="prof-card">'+
+    '<section class="prof-card scroll-reveal">'+
       '<div class="prof-av"><img src="'+PROFILE_PHOTO+'" alt="รูปโปรไฟล์ของตรีนุช รัตนมณี"></div>'+
       '<div class="prof-name">ตรีนุช รัตนมณี</div>'+
       '<div class="prof-org">บริษัทตัวอย่าง จำกัด (ข้อมูลจำลอง)</div>'+
       '<div class="prof-chips"><span class="prof-vf">'+ic('lc-check-circle')+'ยืนยันแล้ว</span><span class="prof-tier">'+ic(t.meta.icon)+t.name+'</span></div>'+
       '<div class="prof-qr"><div class="pq-lbl">QR ประจำตัว</div><div class="pq-box">'+ic('lc-qr-code')+'</div><div class="pq-note">เปิดหน้านี้ให้เจ้าหน้าที่สแกน เพื่อเช็คอินบูธ แลกการ์ดตัวจริง หรือส่งสรุปให้ผู้แนะนำการลงทุน · จะสแกน QR ที่จุดนั้นเองก็ได้ผลเหมือนกัน</div></div>'+
     '</section>'+
-    '<section class="prof-rows">'+PROFILE_ROWS.map(function(r){var v=r.k==='สิทธิ'?t.name:r.v;return '<div class="pr-row"><span class="pr-k">'+r.k+'</span><span class="pr-v">'+v+'</span></div>';}).join('')+'</section>'+
-    '<div class="prof-foot"><div class="pf-brand">efin × BetterTrade · New World, New Playbook</div>'+
+    '<section class="prof-rows scroll-reveal">'+PROFILE_ROWS.map(function(r){var v=r.k==='สิทธิ'?t.name:r.v;return '<div class="pr-row"><span class="pr-k">'+r.k+'</span><span class="pr-v">'+v+'</span></div>';}).join('')+'</section>'+
+    '<div class="prof-foot scroll-reveal"><div class="pf-brand">efin × BetterTrade · New World, New Playbook</div>'+
       '<div class="pf-note">'+ic('lc-info')+'เราแค่ "จด" ไม่ "ชี้" · แต้ม ≠ ตัวตน · เพื่อการวางแผนและการศึกษา ไม่ใช่คำชี้ชวนลงทุน</div>'+
       '<div class="pf-note">'+ic('lc-lock')+'เปิดคู่มือด้วย OTP/QR ตาม PDPA · ตัวเลข/สิทธิเป็นข้อมูลเบื้องต้น (MOCK) ต้องเคาะกับทีมจัดงานก่อนใช้จริง</div>'+
     '</div>'+
