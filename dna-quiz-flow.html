@@ -1043,7 +1043,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    future label wider than this can size for even while scrolling. */
 .bt-tabs--secondary{flex-wrap:nowrap;justify-content:space-between;}
 .bt-tabs--secondary .bt-tab{flex:0 1 auto;min-width:0;padding:9px 6px;min-height:40px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border:1px solid var(--line-soft);border-radius:var(--rpill);background:var(--white);transition:color .15s,border-color .15s,background .15s;}
-.bt-tabs--secondary .bt-tab[aria-selected="true"]{background:var(--ink);color:var(--cloud);border-color:var(--ink);}
+/* Softened from solid --ink/--cloud (2026-08-19, per direction) — sitting right under the header's
+   own black "ลงทะเบียน" CTA, a solid-black selected pill read as a second primary button stacked
+   underneath it. Switched to the app's existing violet "active" wash (--active-fill/--violet/
+   --active-border — same tokens already used for other in-progress/active states, e.g. .rt-badge.new,
+   .ds-chip) so the selected tab reads as navigation, not another CTA. */
+.bt-tabs--secondary .bt-tab[aria-selected="true"]{background:var(--active-fill);color:var(--violet);border-color:var(--active-border);}
 .bt-tabs--secondary .bt-tab-label{overflow:hidden;text-overflow:ellipsis;}
 @media(max-width:420px){.bt-tabs--secondary{justify-content:flex-start;overflow-x:auto;scrollbar-width:none;}.bt-tabs--secondary::-webkit-scrollbar{display:none;}.bt-tabs--secondary .bt-tab{flex:0 0 auto;}}
 /* Same narrow-frame fix as the @media rule above, keyed off data-view instead of raw viewport
@@ -2447,6 +2452,35 @@ function compute(){
   }
   var hero=HEROES[winner];
 
+  /* Real-card constraint (2026-08-19, per direction) — only 3 of the 12 personas have real
+     photographed card art (harvester + diamondhand, family G; waverider, family V — see
+     Card Character/); the other 9 still only have a CSS-mockup card. Until more art exists, the
+     quiz's ACTUAL result must always resolve to one of these 3, never a mockup — even though the
+     vote/tie-break logic above still runs against all 12 real answers first, so family detection
+     stays true to what was actually answered. REAL_CARDS_BY_FAM lists each family's own real
+     card(s); family N has none of its own, so a mockup N winner compares against all 3 real cards
+     instead of just its family. This only touches compute()'s own DNA-quiz result —
+     evoCompute()'s post-event EVO_REP mapping (which still sends family N to the 'planner' mockup)
+     is deliberately left alone, per direction.
+     harvester/diamondhand tie-break (2026-08-19 follow-up, per direction "อยากให้ diamondhand
+     โผล่บ่อยขึ้นบ้าง") — the two share the same riskLevel (3), so a plain closest-risk comparison
+     let harvester win every tie by list order alone and diamondhand almost never appeared. Broken
+     instead by the SAME horizon answer S1 already collected (`horizon`, above): long-horizon
+     ("ถือยาว") reads as diamondhand's own identity ("นักลงทุนสายถือยาว"), short/mid reads as
+     harvester's ("สายเก็บเกี่ยว", regular income) — a real user signal instead of an arbitrary
+     default, and one that naturally splits results between the two instead of favoring one. */
+  var REAL_CARDS=['harvester','diamondhand','waverider'];
+  if(REAL_CARDS.indexOf(winner)===-1){
+    var realCandidates={G:['harvester','diamondhand'],V:['waverider'],N:REAL_CARDS}[hero.fam];
+    var winnerRisk=hero.riskLevel,best=realCandidates[0];
+    realCandidates.forEach(function(c){
+      var d=Math.abs(HEROES[c].riskLevel-winnerRisk),bd=Math.abs(HEROES[best].riskLevel-winnerRisk);
+      if(d<bd)best=c;
+      else if(d===bd&&c==='diamondhand'&&horizon==='long')best=c;
+    });
+    winner=best;hero=HEROES[winner];
+  }
+
   /* revealed risk = average riskLevel of every persona actually evidenced (not just the winner) —
      a richer "behavioral" risk reading than the single declared-risk answer in S1. */
   var revealed=Math.round((chosen.reduce(function(s,p){return s+HEROES[p].riskLevel;},0)/tot)*10)/10;
@@ -2562,6 +2596,19 @@ function evoPanelHTML(ev){
    ranked list), not two separate topics. Shared by Book v1 (renderBook, where they were already
    adjacent) and Book v2 (renderBook2's "พอร์ต" tab — the radar moves here from its former home in
    the "วิเคราะห์" tab so both halves live in the same place). */
+/* efin-ic (round lucide-sparkles badge) swapped for the real efin.finance wordmark, 2026-08-19 per
+   direction — the wordmark is a 5:1 logo, not a square glyph, so it replaces the circle badge
+   outright rather than being cropped into one. Title copy dropped its own leading "efin" since the
+   logo now does that naming job. Both CTAs wired up via bindEfinBanner() below — were previously
+   plain <button>s with no onclick at all. Extracted into its own function (2026-08-19 follow-up,
+   per direction "ยังไม่มีใน พรีวิว คู่มือ 2") so Book v2's "วิเคราะห์" tab can reuse the exact same
+   markup instead of only ever existing in Book v1 — call bindEfinBanner(h) after inserting this
+   wherever it's used. */
+function efinBannerHTML(h){
+  return '<div class="efin-banner"><div class="efin-hd"><img class="efin-logo" src="'+LOGO_IMG.efin+'" alt="efin.finance"><div class="efin-t">ให้ AI ช่วยแนะนำแบบคุณ</div></div>'+
+    '<div class="efin-d">คัดลอกคำถามที่ปรับตามตัวตน '+h.th+' ของคุณไปคุยกับ efin AI ต่อได้ทันที</div>'+
+    '<div class="efin-acts"><button class="btn btn-primary" id="efinCopyBtn">'+ic('lc-message-circle')+'<span>คัดลอกคำถามไปถาม efin AI</span></button><button class="btn btn-secondary" id="efinOpenBtn">'+ic('lc-globe')+'<span>เปิดหน้า efin AI</span></button></div></div>';
+}
 function radarInterestHTML(h,r){
   return '<div class="radar-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">เรดาร์ความสนใจ</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">ความถนัดต่อสินทรัพย์แต่ละประเภท และ 3 อันดับที่คุณสนใจ จากคำตอบ DNA Quiz ✦ ยิ่งเล่นกิจกรรมในงานครบ ยิ่งแม่นขึ้น</p><div class="radar-ww">'+radarSVG(h.radar,h.rgb)+'</div>'+interestsHTML(r)+'</div>';
 }
@@ -2661,14 +2708,7 @@ function renderBook(){
       '<div class="hero-acts"><button class="btn btn-primary hero-share-btn" id="shareCardBtn">'+ic('lc-upload')+'แชร์ภาพการ์ด</button></div>'+
       '<div class="hero-note">'+ic('lc-info')+'ตัวตนนี้สรุปจากคำตอบ DNA Quiz ของคุณ — ยิ่งทำกิจกรรมในงานครบ ยิ่งแม่นขึ้น</div>'+
     '</div></div></section>'+
-    /* efin-ic (round lucide-sparkles badge) swapped for the real efin.finance wordmark, 2026-08-19
-       per direction — the wordmark is a 5:1 logo, not a square glyph, so it replaces the circle
-       badge outright rather than being cropped into one. Title copy dropped its own leading "efin"
-       since the logo now does that naming job. Both CTAs wired up below (bindEfinBanner) — were
-       previously plain <button>s with no onclick at all. */
-    '<div class="efin-banner"><div class="efin-hd"><img class="efin-logo" src="'+LOGO_IMG.efin+'" alt="efin.finance"><div class="efin-t">ให้ AI ช่วยแนะนำแบบคุณ</div></div>'+
-      '<div class="efin-d">คัดลอกคำถามที่ปรับตามตัวตน '+h.th+' ของคุณไปคุยกับ efin AI ต่อได้ทันที</div>'+
-      '<div class="efin-acts"><button class="btn btn-primary" id="efinCopyBtn">'+ic('lc-message-circle')+'<span>คัดลอกคำถามไปถาม efin AI</span></button><button class="btn btn-secondary" id="efinOpenBtn">'+ic('lc-globe')+'<span>เปิดหน้า efin AI</span></button></div></div>'+
+    efinBannerHTML(h)+
     '<section class="card mb"><div class="s-pad" style="padding-bottom:0">'+
       /* 2 fixes to this header (2026-08-15, per direction): .s-ey bumped to weight 700 · .s-h
          given real margin-bottom before .risk-box, since this section (unlike its siblings) has no
@@ -2880,6 +2920,10 @@ function renderBook2(){
       '</div></div></section>'+
     '</div>'+
     '<div class="b2-panel'+(tab==='analysis'?' show':'')+'" data-panel="analysis">'+
+      /* efin AI banner added here 2026-08-19, per direction ("ยังไม่มีใน พรีวิว คู่มือ 2") — Book v1
+         puts this directly above its own "AI Insight" card; same relative order kept here since
+         insightHTML() below IS that AI Insight card for v2. */
+      efinBannerHTML(h)+
       insightHTML(r,h,matchOk)+
     '</div>'+
     /* radar (was here as its own "พอร์ตลงทุนที่ถนัด" card) moved into the merged radarInterestHTML()
@@ -2899,6 +2943,7 @@ function renderBook2(){
   '</main>'+
   appTabbar('book');
   bindTabbar();bindBook2Nav();
+  bindEfinBanner(h);
   root.querySelector('#devReset').onclick=resetQuiz;
   // Linked preview: crossing the slider's 50% midpoint swaps #b2ident-detail to whichever persona
   // is now showing MORE of its card (pos>=50 -> pre-event's .cr2-before layer covers more of the
