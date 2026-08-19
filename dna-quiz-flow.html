@@ -459,13 +459,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .scroll{flex:1;padding:var(--sp-inline) var(--sp-edge) 96px;display:flex;flex-direction:column;gap:var(--sp-section);}
 /* fixed bottom tab bar — pinned within the app frame (max-width:inherit copies .shell's own responsive max-width so it never spans wider than the app on tablet/pc); stub navigation only, no destinations exist yet besides this page */
 .book-tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:inherit;z-index:90;display:flex;justify-content:space-around;align-items:center;background:var(--popover);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line-header);padding:var(--sp-list) 4px calc(var(--sp-list) + env(safe-area-inset-bottom,0px));}
-/* padding tightened --sp-inline(10px)->--sp-glue(6px) (2026-08-19, when a 6th item — the registration
-   link — joined this row): with 6 items, the row's natural content width slightly exceeded the
-   375px mobile shell, forcing flex-shrink on every item and wrapping most labels to 2 lines even
-   though the row never overflows/scrolls; confirmed the original 5-item row never wrapped down to
-   320px, so this was purely the 6th item's added width. Re-verified label-wrap-free at 320/360/375px
-   with all 6 items after this change — still a real DNA spacing token, just a tighter one. */
-.tab-item{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;font-family:var(--font);cursor:pointer;color:var(--muted);padding:4px var(--sp-glue);}
+.tab-item{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;font-family:var(--font);cursor:pointer;color:var(--muted);padding:4px var(--sp-inline);}
 .tab-item svg{width:var(--ic-lg);height:var(--ic-lg);}
 .tab-item span{font-size:var(--fs-label);font-weight:var(--w-label);}
 .tab-item.active{color:var(--violet);}
@@ -2511,7 +2505,7 @@ function renderBook(){
      next (redeem card) → inspiration/legend → actions → disclaimer. */
   root.innerHTML=
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
-  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="Better Trade — กลับหน้าหลัก" style="margin-right:auto"><div id="qr-cta-slot"></div></header>'+
+  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="Better Trade — กลับหน้าหลัก" style="margin-right:auto"><div id="qr-cta-slot"></div><div id="reg-cta-slot"></div></header>'+
   '<nav class="toc bt-tabs bt-tabs--secondary">'+
     '<button class="bt-tab" type="button" data-jump="hero-sec" aria-selected="true"><span class="bt-tab-icon">'+ic('lc-user')+'</span><span class="bt-tab-label">ตัวตน</span></button>'+
     '<button class="bt-tab" type="button" data-jump="conf-box" aria-selected="false"><span class="bt-tab-icon">'+ic('lc-sparkles')+'</span><span class="bt-tab-label">Confidence</span></button>'+
@@ -2605,7 +2599,7 @@ function renderBook(){
   var evGoGames=root.querySelector('#evGoGames');if(evGoGames)evGoGames.onclick=function(){st.phase='games';render();};
   initBtTabs(root.querySelector('#ddTabs'),function(value){root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===value)?'':'none';});});
   root.querySelector('#klibRow').onclick=function(){LIB_OPEN=null;st.phase='library';render();};
-  mountHeaderQR();
+  mountHeaderQR();mountHeaderReg();
   bindHeaderLogo();
 }
 /* ══ คู่มือ 2 (Book v2) ══ alternate Book view (2026-08-16, per direction "เพิ่มมาอีกเวอร์ชันนึง โดยนำ
@@ -2733,7 +2727,7 @@ function renderBook2(){
         '<p class="cr2-cap">ลากเส้นแบ่งเพื่อเทียบการ์ดตัวตน <b>ก่อนงาน</b> ↔ <b>หลังงาน</b> — ข้อมูลด้านล่างจะเปลี่ยนตามฝั่งที่เห็นเต็ม'+(realPost?'':' (ฝั่งหลังงานเป็นตัวอย่าง จนกว่าจะมีข้อมูลกิจกรรมจริงในงาน)')+'</p>';
   root.innerHTML=
   '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
-  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="Better Trade — กลับหน้าหลัก" style="margin-right:auto"><div id="qr-cta-slot"></div></header>'+
+  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="Better Trade — กลับหน้าหลัก" style="margin-right:auto"><div id="qr-cta-slot"></div><div id="reg-cta-slot"></div></header>'+
   book2Subnav(tab)+
   '<main class="scroll">'+
     '<div class="b2-panel'+(tab==='identity'?' show':'')+'" data-panel="identity">'+
@@ -2789,7 +2783,7 @@ function renderBook2(){
   root.querySelectorAll('.side-row').forEach(function(rw){rw.onclick=function(){togSide(rw);};});
   var kr=root.querySelector('#klibRow');if(kr)kr.onclick=function(){LIB_OPEN=null;st.phase='library';render();};
   var sc=root.querySelector('#shareCardBtn');if(sc)sc.onclick=openShare;
-  mountHeaderQR();
+  mountHeaderQR();mountHeaderReg();
   bindHeaderLogo();
 }
 /* ── App shell: shared bottom tab bar across the 5 companion-app screens (home/book/passport/games/
@@ -2802,14 +2796,14 @@ var APP_TABS=[
   {k:'games',icon:'lc-gamepad-2',label:'เกมหลัก'},
   {k:'profile',icon:'lc-user',label:'โปรไฟล์'}
 ];
-/* Registration site link (2026-08-19, per direction "ถ้าไม่มีปุ่มนี้เพิ่มไว้...จะไม่สามารถกลับมาที่เว็บ
-   ลงทะเบียนได้อีก") — this app has no other way back to it once a visitor lands here from that site's
-   own link. Rendered as a real <a target="_blank"> (opens in a new tab, not a st.phase switch) so
-   leaving never wipes this SPA's in-memory quiz/profile state, which lives only in JS vars with no
-   persistence. lc-globe (nearest available icon to "external site") signals it's not another screen
-   of this app before the tap, same intent an external-link glyph would carry. */
+/* Registration site link (2026-08-19) — this app has no other way back to it once a visitor lands
+   here from that site's own link, and that site carries event details this app doesn't duplicate.
+   Started as a 6th item on THIS bar, then moved (same day, per direction "ต้องการให้ย้ายตำแหน่งจาก
+   nav.bar ไปไว้ header ด้านบน...ให้เป็น primary button") into its own header slot next to the QR pill
+   — see mountHeaderReg(). REG_URL stays a top-level const since that mount function is the only
+   consumer now. */
 var REG_URL='https://dc1hw.efin.finance/events/better-trade/better-trade2026';
-function appTabbar(active){return '<nav class="book-tabbar">'+APP_TABS.map(function(t){return '<button class="tab-item'+(t.k===active?' active':'')+'" data-tab="'+t.k+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>';}).join('')+'<a class="tab-item" href="'+REG_URL+'" target="_blank" rel="noopener">'+ic('lc-globe')+'<span>ลงทะเบียน</span></a></nav>';}
+function appTabbar(active){return '<nav class="book-tabbar">'+APP_TABS.map(function(t){return '<button class="tab-item'+(t.k===active?' active':'')+'" data-tab="'+t.k+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>';}).join('')+'</nav>';}
 function bindTabbar(){root.querySelectorAll('.book-tabbar .tab-item[data-tab]').forEach(function(b){b.onclick=function(){var k=b.dataset.tab;if(k===st.phase)return;st.phase=k;render();};});}
 /* ── deferred Book sections — all populated with EXAMPLE data (booth games + analysis engine
    don't exist yet); each carries an .ex-tag in the UI so nothing here reads as a real measurement. ── */
@@ -3126,7 +3120,7 @@ var AGENDA_D2=[
   {time:'18:30',t:'ปิดงาน',by:''}
 ];
 function appHeader(){return '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
-  '<header class="topbar app-topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.efinBT+'" alt="efin × Better Trade — กลับหน้าหลัก" style="margin-right:auto"><div id="qr-cta-slot"></div></header>';}
+  '<header class="topbar app-topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.efinBT+'" alt="efin × Better Trade — กลับหน้าหลัก" style="margin-right:auto"><div id="qr-cta-slot"></div><div id="reg-cta-slot"></div></header>';}
 /* Header logo (left) is clickable system-wide → always routes to Home, same "brand mark = home"
    convention as most apps/sites. Bound once per render call right after appHeader()/renderBook's
    own header is injected — see mountHeaderQR's sibling calls and renderBook's own binding. */
@@ -3137,6 +3131,18 @@ function bindHeaderLogo(){var el=root.querySelector('#hdLogo');if(el)el.onclick=
 function mountHeaderQR(){
   if(!window.mountLiquidMetalButtonInto)return;
   window.mountLiquidMetalButtonInto('#qr-cta-slot','compact',{label:'สแกน QR',icon:ic('lc-qr-code'),onClick:function(){openScan(null,null);}});
+}
+/* Registration-site link (2026-08-19, per direction "ต้องการให้ย้ายตำแหน่งจาก nav.bar ไปไว้ header
+   ด้านบน...ให้เป็น primary button") — moved here from a 6th bottom-nav item (see git history) into
+   its own header slot beside the QR pill. "primary button" reuses this app's OWN Liquid Metal button
+   system rather than the plain .btn-primary class: the 'hero' preset's own upstream default label is
+   literally 'ลงทะเบียน' (this component was originally built FOR a registration CTA), so the 'compact'
+   preset here is that same primary-CTA family, just sized to match the header's QR pill next to it.
+   Opens in a new tab (not a st.phase switch) for the same reason the old nav-bar link did — this SPA's
+   quiz/profile state lives only in memory, with no persistence to survive navigating away. */
+function mountHeaderReg(){
+  if(!window.mountLiquidMetalButtonInto)return;
+  window.mountLiquidMetalButtonInto('#reg-cta-slot','compact',{label:'ลงทะเบียน',icon:ic('lc-globe'),onClick:function(){window.open(REG_URL,'_blank','noopener');}});
 }
 /* Home's "ขั้นต่อไป" card CTA — the ONE next action on the whole home screen, so it gets the 'cta'
    preset (bigger than the header pill's 'compact') rather than blending in as a minor button. */
@@ -3200,7 +3206,7 @@ function renderHome(){
     var fresh=root.querySelector('#agTabs [aria-selected="true"]');if(fresh)fresh.focus({preventScroll:true});
   });
   var agMore=root.querySelector('#agMore');if(agMore)agMore.onclick=function(){HOME_MST.agendaAll=!HOME_MST.agendaAll;renderHome();};
-  mountHeaderQR();
+  mountHeaderQR();mountHeaderReg();
   bindHeaderLogo();
   mountHomeNsCta(ns);
   bindPostEvent(t);
@@ -3420,7 +3426,7 @@ function renderBooth(){
   root.querySelector('#mapZoomBtn').onclick=openMap;
   root.querySelector('#mlScrim').onclick=closeMap;
   root.querySelector('#mlClose').onclick=closeMap;
-  mountHeaderQR();
+  mountHeaderQR();mountHeaderReg();
   bindHeaderLogo();
 }
 
@@ -3510,7 +3516,7 @@ function renderGames(){
   root.querySelector('#devReset').onclick=resetQuiz;
   root.querySelectorAll('[data-play]').forEach(function(b){b.onclick=function(e){e.stopPropagation();var i=+b.dataset.play;GAME_PLAYED[i]=true;GAME_OPEN=i;renderGames();};});
   root.querySelectorAll('[data-open]').forEach(function(t){t.onclick=function(){var i=+t.dataset.open;if(!GAME_PLAYED[i])return;togGame(i);};});
-  mountHeaderQR();
+  mountHeaderQR();mountHeaderReg();
   bindHeaderLogo();
   mountNgCta(nextIdx);
 }
@@ -3545,7 +3551,7 @@ function renderProfile(){
   appTabbar('profile');
   bindTabbar();
   root.querySelector('#devReset').onclick=resetQuiz;
-  mountHeaderQR();
+  mountHeaderQR();mountHeaderReg();
   bindHeaderLogo();
 }
 
