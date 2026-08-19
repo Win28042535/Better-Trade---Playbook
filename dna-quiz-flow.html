@@ -459,7 +459,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .scroll{flex:1;padding:var(--sp-inline) var(--sp-edge) 96px;display:flex;flex-direction:column;gap:var(--sp-section);}
 /* fixed bottom tab bar — pinned within the app frame (max-width:inherit copies .shell's own responsive max-width so it never spans wider than the app on tablet/pc); stub navigation only, no destinations exist yet besides this page */
 .book-tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:inherit;z-index:90;display:flex;justify-content:space-around;align-items:center;background:var(--popover);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line-header);padding:var(--sp-list) 4px calc(var(--sp-list) + env(safe-area-inset-bottom,0px));}
-.tab-item{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;font-family:var(--font);cursor:pointer;color:var(--muted);padding:4px var(--sp-inline);}
+/* padding tightened --sp-inline(10px)->--sp-glue(6px) (2026-08-19, when a 6th item — the registration
+   link — joined this row): with 6 items, the row's natural content width slightly exceeded the
+   375px mobile shell, forcing flex-shrink on every item and wrapping most labels to 2 lines even
+   though the row never overflows/scrolls; confirmed the original 5-item row never wrapped down to
+   320px, so this was purely the 6th item's added width. Re-verified label-wrap-free at 320/360/375px
+   with all 6 items after this change — still a real DNA spacing token, just a tighter one. */
+.tab-item{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;font-family:var(--font);cursor:pointer;color:var(--muted);padding:4px var(--sp-glue);}
 .tab-item svg{width:var(--ic-lg);height:var(--ic-lg);}
 .tab-item span{font-size:var(--fs-label);font-weight:var(--w-label);}
 .tab-item.active{color:var(--violet);}
@@ -2796,8 +2802,15 @@ var APP_TABS=[
   {k:'games',icon:'lc-gamepad-2',label:'เกมหลัก'},
   {k:'profile',icon:'lc-user',label:'โปรไฟล์'}
 ];
-function appTabbar(active){return '<nav class="book-tabbar">'+APP_TABS.map(function(t){return '<button class="tab-item'+(t.k===active?' active':'')+'" data-tab="'+t.k+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>';}).join('')+'</nav>';}
-function bindTabbar(){root.querySelectorAll('.book-tabbar .tab-item').forEach(function(b){b.onclick=function(){var k=b.dataset.tab;if(k===st.phase)return;st.phase=k;render();};});}
+/* Registration site link (2026-08-19, per direction "ถ้าไม่มีปุ่มนี้เพิ่มไว้...จะไม่สามารถกลับมาที่เว็บ
+   ลงทะเบียนได้อีก") — this app has no other way back to it once a visitor lands here from that site's
+   own link. Rendered as a real <a target="_blank"> (opens in a new tab, not a st.phase switch) so
+   leaving never wipes this SPA's in-memory quiz/profile state, which lives only in JS vars with no
+   persistence. lc-globe (nearest available icon to "external site") signals it's not another screen
+   of this app before the tap, same intent an external-link glyph would carry. */
+var REG_URL='https://dc1hw.efin.finance/events/better-trade/better-trade2026';
+function appTabbar(active){return '<nav class="book-tabbar">'+APP_TABS.map(function(t){return '<button class="tab-item'+(t.k===active?' active':'')+'" data-tab="'+t.k+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>';}).join('')+'<a class="tab-item" href="'+REG_URL+'" target="_blank" rel="noopener">'+ic('lc-globe')+'<span>ลงทะเบียน</span></a></nav>';}
+function bindTabbar(){root.querySelectorAll('.book-tabbar .tab-item[data-tab]').forEach(function(b){b.onclick=function(){var k=b.dataset.tab;if(k===st.phase)return;st.phase=k;render();};});}
 /* ── deferred Book sections — all populated with EXAMPLE data (booth games + analysis engine
    don't exist yet); each carries an .ex-tag in the UI so nothing here reads as a real measurement. ── */
 function traitBars(){
