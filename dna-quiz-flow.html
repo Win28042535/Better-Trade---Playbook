@@ -2528,7 +2528,7 @@ function renderBook(){
          lines up with "AI Insight" itself instead of the icon above it · .s-h given real
          margin-bottom before .risk-box, since this section (unlike its siblings) has no .s-sub to
          supply that gap on its own and was reading as glued directly to the content below it. */
-      '<div class="s-ey" style="font-weight:var(--w-label)">'+ic('lc-sparkles')+'AI Insight</div><h2 class="s-h" style="margin-left:22px;margin-bottom:18px">คุณเป็นนักลงทุนแบบไหน</h2>'+
+      '<div class="s-ey" style="font-weight:var(--w-label)">AI Insight</div><h2 class="s-h" style="margin-left:22px;margin-bottom:18px">คุณเป็นนักลงทุนแบบไหน</h2>'+
       '<div class="risk-box"><div class="risk-hd"><span class="risk-tag">ความเสี่ยง "บอก" vs "จริง"</span><span class="risk-match">'+(matchOk?('<span class="ld" style="background:var(--cyan)"></span>ตรงกัน'):('ต่างกัน '+(r.gap>0?'+':'')+r.gap))+'</span></div>'+
         '<p class="risk-desc">'+(matchOk?'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน — นักลงทุนที่ self-aware มักตัดสินใจได้ดีกว่าในภาวะตลาดผันผวน':'ความเสี่ยงที่คุณ "บอก" กับที่พฤติกรรมจริงสะท้อนออกมาต่างกันอยู่บ้าง — รู้ gap นี้ช่วยให้วางแผนได้แม่นขึ้น')+'</p>'+
         '<div class="risk-slbl">ระดับความเสี่ยง 1–10</div>'+
@@ -2541,10 +2541,10 @@ function renderBook(){
     /* Every sibling section here (int-sec/trait-sec/alloc-sec) has an .s-sub explaining what the
        chart is + an .ex-tag marking it as example data — radar-sec had neither, so next to them
        it read as an unfinished chart rather than a deliberately-scoped demo section. */
-    '<div class="radar-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">'+ic('lc-pie-chart')+'พอร์ตลงทุนที่ถนัด</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนความถนัดต่อสินทรัพย์แต่ละประเภท จากคำตอบ DNA Quiz ✦ ยิ่งเล่นกิจกรรมในงานครบ ยิ่งแม่นขึ้น</p><div class="radar-ww">'+radarSVG(h.radar,h.rgb)+'</div></div>'+
-    '<div class="int-sec"><div class="s-ey" style="margin-bottom:0">'+ic('lc-target')+'เรื่องที่คุณสนใจ</div><p class="s-sub" style="margin:4px 0 0">3 อันดับที่คุณเลือกไว้ในแบบทดสอบ ✦ ยังไม่ใช่สัดส่วนพอร์ตจริง</p>'+interestsHTML(r)+'</div>'+
-    '<div class="trait-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">'+ic('lc-zap')+'คะแนนพฤติกรรม</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">วัดจากกิจกรรมในงาน ✦ ยิ่งเล่นครบ ยิ่งแม่น</p>'+traitBars()+'</div>'+
-    '<div class="alloc-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">'+ic('lc-pie-chart')+'แผนจัดพอร์ตที่แนะนำ</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนเริ่มต้นที่เหมาะกับ '+h.th+'</p>'+allocBars()+'</div>'+
+    '<div class="radar-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">พอร์ตลงทุนที่ถนัด</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนความถนัดต่อสินทรัพย์แต่ละประเภท จากคำตอบ DNA Quiz ✦ ยิ่งเล่นกิจกรรมในงานครบ ยิ่งแม่นขึ้น</p><div class="radar-ww">'+radarSVG(h.radar,h.rgb)+'</div></div>'+
+    '<div class="int-sec"><div class="s-ey" style="margin-bottom:0">เรื่องที่คุณสนใจ</div><p class="s-sub" style="margin:4px 0 0">3 อันดับที่คุณเลือกไว้ในแบบทดสอบ ✦ ยังไม่ใช่สัดส่วนพอร์ตจริง</p>'+interestsHTML(r)+'</div>'+
+    '<div class="trait-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">คะแนนพฤติกรรม</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">วัดจากกิจกรรมในงาน ✦ ยิ่งเล่นครบ ยิ่งแม่น</p>'+traitBars()+'</div>'+
+    '<div class="alloc-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">แผนจัดพอร์ตที่แนะนำ</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนเริ่มต้นที่เหมาะกับ '+h.th+'</p>'+allocBars()+'</div>'+
     '</section>'+
     sidesHTML(r)+
     /* .quote-card removed entirely (2026-08-15, per direction "เอา section นี้ออกเลย เพราะ ถือว่า
@@ -2556,15 +2556,15 @@ function renderBook(){
     /* Merged — "ทำอะไรต่อดี" (broad next steps) and "สรุปไว้คุยกับผู้แนะนำการลงทุน" (per-asset
        advisor prep) were two separate cards answering the same underlying question ("what next"),
        just at two different zoom levels; now one card, broad→specific top to bottom. */
-    '<section class="card mb-lg"><div class="s-pad"><div class="s-ey">'+ic('lc-compass')+'ทำอะไรต่อดี</div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">ขั้นต่อไปที่แนะนำ</h2>'+
+    '<section class="card mb-lg"><div class="s-pad"><div class="s-ey">ทำอะไรต่อดี</div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">ขั้นต่อไปที่แนะนำ</h2>'+
       '<div class="next-grid">'+
         '<div class="next-card"><div class="next-ic">'+ic('lc-book-open')+'</div><div class="next-t">เรียนรู้</div><div class="next-d">พื้นฐานสำหรับ '+h.th+'</div></div>'+
         '<div class="next-card"><div class="next-ic">'+ic(h.assets[0].icon)+'</div><div class="next-t">สำรวจ</div><div class="next-d">'+h.assets.slice(0,2).map(function(a){return a.t;}).join(' ✦ ')+'</div></div>'+
         '<div class="next-card"><div class="next-ic">'+ic('lc-map-pin')+'</div><div class="next-t">เดินบูธต่อ</div><div class="next-d">เหลืออีก 4 จาก 6 ด้าน</div></div>'+
       '</div>'+
-      '<div class="sub-divider"><div class="s-ey" style="display:flex;justify-content:space-between;align-items:center"><span style="display:inline-flex;align-items:center;gap:var(--sp-glue)">'+ic('lc-message-circle')+'สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">เจาะรายสินทรัพย์</h2>'+ddTabs(h)+'</div>'+
+      '<div class="sub-divider"><div class="s-ey" style="display:flex;justify-content:space-between;align-items:center"><span style="display:inline-flex;align-items:center;gap:var(--sp-glue)">สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">เจาะรายสินทรัพย์</h2>'+ddTabs(h)+'</div>'+
     '</div></section>'+
-    '<section class="card" id="route-sec"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">'+ic('lc-route')+'เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2><p class="s-sub">Master Class ขึ้นไป — เส้นทางจากตัวตนที่วัดได้จริง</p></div>'+
+    '<section class="card" id="route-sec"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2><p class="s-sub">Master Class ขึ้นไป — เส้นทางจากตัวตนที่วัดได้จริง</p></div>'+
       '<div class="route-steps">'+routeStep('done','','ทำ DNA Quiz','ตอบครบ 10 ข้อ เสร็จแล้ว — ได้ตัวตน '+h.th)+routeStep('act','2','ทำครบ 6 ด้าน','เสร็จแล้ว 2 จาก 6 — เหลืออีก 4 ด้านในบูธ')+routeStep('fut','3','รับ Playbook ส่วนตัวสมบูรณ์','เมื่อครบ 6 ด้าน รับกลยุทธ์เฉพาะตัวตน + Confidence เต็ม')+routeStep('fut','4','ติดตามบน efin.finance','Playbook sync ขึ้นแอปหลังงาน พร้อม AI ติดตามพอร์ต')+'</div>'+
       '<div class="route-cta-w"><button class="btn btn-primary">'+ic('lc-play-circle')+'ไปเล่นกิจกรรมต่อ'+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
     '</section>'+
@@ -2635,7 +2635,7 @@ function bindBook2Nav(){
 /* AI Insight card (risk gap + confidence) — shared markup so v1 and v2 can't drift apart. */
 function insightHTML(r,h,matchOk){
   return '<section class="card"><div class="s-pad" style="padding-bottom:0">'+
-    '<div class="s-ey" style="font-weight:var(--w-label)">'+ic('lc-sparkles')+'AI Insight</div><h2 class="s-h" style="margin-left:22px;margin-bottom:18px">คุณเป็นนักลงทุนแบบไหน</h2>'+
+    '<div class="s-ey" style="font-weight:var(--w-label)">AI Insight</div><h2 class="s-h" style="margin-left:22px;margin-bottom:18px">คุณเป็นนักลงทุนแบบไหน</h2>'+
     '<div class="risk-box"><div class="risk-hd"><span class="risk-tag">ความเสี่ยง "บอก" vs "จริง"</span><span class="risk-match">'+(matchOk?('<span class="ld" style="background:var(--cyan)"></span>ตรงกัน'):('ต่างกัน '+(r.gap>0?'+':'')+r.gap))+'</span></div>'+
       '<p class="risk-desc">'+(matchOk?'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน':'ความเสี่ยงที่คุณ "บอก" กับพฤติกรรมจริงต่างกันอยู่บ้าง — รู้ gap นี้ช่วยให้วางแผนได้แม่นขึ้น')+'</p>'+
       '<div class="risk-slbl">ระดับความเสี่ยง 1–10</div>'+
@@ -2719,17 +2719,17 @@ function renderBook2(){
     '</div>'+
     '<div class="b2-panel'+(tab==='analysis'?' show':'')+'" data-panel="analysis">'+
       insightHTML(r,h,matchOk)+
-      '<section class="card"><div class="radar-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">'+ic('lc-pie-chart')+'พอร์ตลงทุนที่ถนัด</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนความถนัดต่อสินทรัพย์แต่ละประเภท จากคำตอบ DNA Quiz</p><div class="radar-ww">'+radarSVG(h.radar,h.rgb)+'</div></div></section>'+
+      '<section class="card"><div class="radar-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">พอร์ตลงทุนที่ถนัด</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนความถนัดต่อสินทรัพย์แต่ละประเภท จากคำตอบ DNA Quiz</p><div class="radar-ww">'+radarSVG(h.radar,h.rgb)+'</div></div></section>'+
     '</div>'+
     '<div class="b2-panel'+(tab==='portfolio'?' show':'')+'" data-panel="portfolio">'+
-      '<section class="card"><div class="int-sec" style="border-top:none"><div class="s-ey" style="margin-bottom:0">'+ic('lc-target')+'เรื่องที่คุณสนใจ</div><p class="s-sub" style="margin:4px 0 0">3 อันดับที่คุณเลือกไว้ในแบบทดสอบ</p>'+interestsHTML(r)+'</div>'+
-        '<div class="trait-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">'+ic('lc-zap')+'คะแนนพฤติกรรม</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">วัดจากกิจกรรมในงาน</p>'+traitBars()+'</div>'+
-        '<div class="alloc-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">'+ic('lc-pie-chart')+'แผนจัดพอร์ตที่แนะนำ</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนเริ่มต้นที่เหมาะกับ '+h.th+'</p>'+allocBars()+'</div></section>'+
-      '<section class="card"><div class="s-pad"><div class="s-ey" style="display:flex;justify-content:space-between;align-items:center"><span style="display:inline-flex;align-items:center;gap:var(--sp-glue)">'+ic('lc-message-circle')+'สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">เจาะรายสินทรัพย์</h2>'+ddTabs(h)+'</div></section>'+
+      '<section class="card"><div class="int-sec" style="border-top:none"><div class="s-ey" style="margin-bottom:0">เรื่องที่คุณสนใจ</div><p class="s-sub" style="margin:4px 0 0">3 อันดับที่คุณเลือกไว้ในแบบทดสอบ</p>'+interestsHTML(r)+'</div>'+
+        '<div class="trait-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">คะแนนพฤติกรรม</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">วัดจากกิจกรรมในงาน</p>'+traitBars()+'</div>'+
+        '<div class="alloc-sec"><div class="trait-hd"><div class="s-ey" style="margin-bottom:0">แผนจัดพอร์ตที่แนะนำ</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนเริ่มต้นที่เหมาะกับ '+h.th+'</p>'+allocBars()+'</div></section>'+
+      '<section class="card"><div class="s-pad"><div class="s-ey" style="display:flex;justify-content:space-between;align-items:center"><span style="display:inline-flex;align-items:center;gap:var(--sp-glue)">สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">เจาะรายสินทรัพย์</h2>'+ddTabs(h)+'</div></section>'+
     '</div>'+
     '<div class="b2-panel'+(tab==='journey'?' show':'')+'" data-panel="journey">'+
       sidesHTML(r)+
-      '<section class="card"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">'+ic('lc-route')+'เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2></div>'+
+      '<section class="card"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2></div>'+
         '<div class="route-steps">'+routeStep('done','','ทำ DNA Quiz','ตอบครบ 10 ข้อ เสร็จแล้ว — ได้ตัวตน '+h.th)+routeStep('act','2','ทำครบ 6 ด้าน','เสร็จแล้ว 2 จาก 6 — เหลืออีก 4 ด้านในบูธ')+routeStep('fut','3','รับ Playbook ส่วนตัวสมบูรณ์','เมื่อครบ 6 ด้าน รับกลยุทธ์เฉพาะตัวตน')+routeStep('fut','4','ติดตามบน efin.finance','Playbook sync ขึ้นแอปหลังงาน')+'</div></section>'+
       '<section class="card"><div class="s-pad"><div class="list-row klib-row" id="klibRow"><div class="klib-ic">'+ic('lc-library')+'</div><div class="klib-tx"><div class="klib-t">คลังความรู้</div><div class="klib-s">41 บทความที่คัดมาสำหรับ '+h.th+'</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
     '</div>'+
@@ -2934,7 +2934,7 @@ function sidesHTML(r){
   ];
   var items='';
   sides.forEach(function(sd,i){items+='<article class="side-item"'+(i===5?' style="border-bottom:none"':'')+'><div class="list-row side-row"><div class="side-num '+sd.cc+'">'+sd.num+'</div><div class="side-cx"><div class="side-t">'+sd.t+'</div><div class="side-s">'+sd.s+'</div></div><div class="side-r"><span class="sc '+sd.cc+'">'+sd.chip+'</span>'+ic('lc-chevron-down','s-cv'+(sd.show?' open':''))+'</div></div><div class="side-body'+(sd.show?' show':'')+'"><div class="side-bi"><div class="side-dl">'+sd.body+'</div></div></div></article>';});
-  return '<section class="card mb-lg" id="sides-sec"><div class="sides-hd"><div class="s-ey">'+ic('lc-pie-chart')+'ข้อมูลจากกิจกรรมบูธจริง</div><h2 class="s-h">6 ด้านที่วัดได้จากคุณ</h2><p class="s-sub" style="margin-bottom:2px">แต่ละด้านมาจากพฤติกรรมในงาน — ไม่ใช่คำตอบจากแบบสอบถาม</p></div>'+items+'</section>';
+  return '<section class="card mb-lg" id="sides-sec"><div class="sides-hd"><div class="s-ey">ข้อมูลจากกิจกรรมบูธจริง</div><h2 class="s-h">6 ด้านที่วัดได้จากคุณ</h2><p class="s-sub" style="margin-bottom:2px">แต่ละด้านมาจากพฤติกรรมในงาน — ไม่ใช่คำตอบจากแบบสอบถาม</p></div>'+items+'</section>';
 }
 function togSide(row){var item=row.parentElement,body=item.querySelector('.side-body'),cv=row.querySelector('.s-cv'),isOpen=body.classList.contains('show');root.querySelectorAll('.side-body.show').forEach(function(b){b.classList.remove('show');});root.querySelectorAll('.s-cv.open').forEach(function(c){c.classList.remove('open');});if(!isOpen){body.classList.add('show');cv.classList.add('open');}}
 function resetQuiz(){st={phase:'splash',spidx:0,idx:0,s1:[null,null,null],s2:[null,null,null,null,null,null,null],s3:[]};RESULT=null;BOOK_VER=1;BOOK2_TAB='identity';render();}
