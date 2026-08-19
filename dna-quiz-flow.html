@@ -205,10 +205,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* Real custom illustrated icons have landed for most questions (q.img → ICON_IMG, see renderQuiz)
    — the --accent circle was only ever a placeholder backdrop for a future icon, and per direction
    it's dropped now that real art is here ("ไม่ต้องมีสีพื้นหลัง (วงกลม)"). Questions still on a
-   plain Lucide icon (q.icon, no q.img yet) render at the same 60px slot size so nothing reflows
-   between "has custom art" and "still placeholder" questions. */
-.q-icon-bare{display:flex;align-items:center;justify-content:center;margin:0 auto var(--sp-stack);width:60px;height:60px;color:var(--qc,var(--violet));}
-.q-icon-bare svg{width:32px;height:32px;}
+   plain Lucide icon (q.icon, no q.img yet) render at the same 80px slot size (bumped up from 60px,
+   2026-08-19 per direction) so nothing reflows between "has custom art" and "still placeholder"
+   questions. */
+.q-icon-bare{display:flex;align-items:center;justify-content:center;margin:0 auto var(--sp-stack);width:80px;height:80px;color:var(--qc,var(--violet));}
+.q-icon-bare svg{width:42px;height:42px;}
 /* Gentle idle motion per direction ("motion แบบเดียวกับ asset element หน้าแรก") — reuses the
    SAME spDrift keyframe the splash scatter runs on (defined further down, order-independent for
    @keyframes) at its own default drift/rotate values, just a touch slower/smaller since this is a
@@ -289,21 +290,18 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    which correctly expands it to the full bleed edge on both sides. justify-content:space-between
    (not center) puts "ถัดไป" flush against the right edge — easiest one-handed reach on a phone —
    while pc/tablet above keep the roomy centered pair from the Animated Hero redesign. */
-/* Equal fixed-CTA position across every quiz question, anchored to the splash CTA (2026-08-16, per
-   direction "ตำแหน่ง ฟิ๊ก button ยังไม่เท่ากัน... ยึดเท่ากับ splash"). The old setup parked the nav
-   via margin-top:auto against .q-scroll's own 34px bottom padding — but a question whose answers ran
-   tall enough to fill the column CONSUMED that padding (the nav slid to the border-box edge), while a
-   short question kept it, so the button sat 9px from the bottom on some screens and 43px on others.
-   Fix: on mobile, drop q-scroll's min-height (flex:1 alone already makes every quiz screen fill the
-   shell equally) and its bottom padding to 0, so the nav ALWAYS parks at the same border-box edge
-   regardless of content height; the whole bottom gap now lives in the nav's own padding-bottom (36px),
-   tuned so the button's bottom sits the SAME distance from the screen edge as the splash CTA
-   (splash = its container's 18px pad + the CTA bar's 14px pad; the 36 here compensates for the topbar/
-   progress chrome above q-scroll pushing its border-box a few px past the viewport). Measured: all 11
-   questions + consent + splash land within 1px of each other (all 20px above the screen edge before
-   safe-area, measured against the running attract screen's own CTA). */
-:root[data-view="mobile"] .q-scroll{min-height:0;padding-bottom:0;}
-:root[data-view="mobile"] .q-nav{position:sticky;bottom:0;z-index:6;width:auto;max-width:none;margin-left:calc(-1*var(--sp-edge));margin-right:calc(-1*var(--sp-edge));padding:14px var(--sp-edge) calc(25px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper) 45%,color-mix(in srgb,var(--paper) 50%,transparent) 75%,transparent);justify-content:flex-end;}
+/* Quiz CTA reverted OFF sticky-bottom on mobile (2026-08-19, per direction "แก้ไขให้ไม่ฟิ้ก bottom
+   (เมื่อ scroll ให้เห็นตัวเลือกคำตอบทั้งหมดก่อน ถึงเจอ button)"). The previous sticky treatment
+   (2026-08-16, matched to the splash CTA's fixed position) pinned .q-nav to the viewport bottom while
+   options scrolled underneath it — on any question whose answers ran to option E, that option sat
+   directly behind the pinned bar, visually indistinguishable from "no more content below" and easy to
+   miss entirely. Reverted to the same in-flow behavior pc/tablet already use (base .q-nav's
+   margin-top:auto — parks at the bottom of the column only when there's leftover space; when content
+   overflows, it simply follows the last option and requires a real scroll to reach), so every option
+   is guaranteed to scroll fully into view before the button ever appears. justify-content:flex-end
+   kept (one-handed reach on phone); safe-area padding kept since the button can still land at the
+   true screen edge on short questions. */
+:root[data-view="mobile"] .q-nav{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px));justify-content:flex-end;}
 /* ============================================================================
    BUTTON SYSTEM (2026-08-11) — 3 tiers by fill weight, each usable with or
    without an icon (an icon is just optional inline content — no separate CSS
@@ -2193,7 +2191,7 @@ function renderConsent(){
        block so the whole group still centers together as before. */
     '<div class="consent-body">'+
       '<div class="consent-h"><span class="ch-1">รู้จัก</span> <span class="ch-2">ตัวคุณ?</span></div>'+
-      '<div class="consent-p">ตอบคำถามสั้นๆ ตามใจจริง ไม่มีคำตอบผิด แล้วระบบจะสรุปเป็น <b>"คู่มือลงทุนของคุณ"</b> เฉพาะตัว</div>'+
+      '<div class="consent-p">ตอบคำถามสั้นๆ ตามใจจริง ไม่มีคำตอบผิด แล้วเราจะสรุปเป็น <b>"คู่มือลงทุนของคุณ"</b> เฉพาะตัว</div>'+
       '<div class="round-cards">'+
         '<div class="round-card"><div class="rc-top"><span class="rc-dot" style="background:var(--yellow)"></span><span class="rc-kicker">ส่วนที่ 1</span></div><div class="rc-title">ความเสี่ยง</div><div class="rc-meta">3 ข้อ</div></div>'+
         '<div class="round-card"><div class="rc-top"><span class="rc-dot" style="background:var(--violet)"></span><span class="rc-kicker">ส่วนที่ 2</span></div><div class="rc-title">ตัวตน DNA</div><div class="rc-meta">7 ข้อ</div></div>'+
@@ -2523,12 +2521,12 @@ function renderBook(){
       '<div class="efin-d">คัดลอกคำถามที่ปรับตามตัวตน '+h.th+' ของคุณไปคุยกับ efin AI ต่อได้ทันที</div>'+
       '<div class="efin-acts"><button class="btn btn-primary">'+ic('lc-message-circle')+'คัดลอกคำถามไปถาม efin AI</button><button class="btn btn-secondary">เปิดหน้า efin AI</button></div></div>'+
     '<section class="card mb"><div class="s-pad" style="padding-bottom:0">'+
-      /* 3 fixes to this header (2026-08-15, per direction): .s-ey bumped to weight 700 · .s-h
-         indented 22px (--ic-sm 16px + --sp-glue 6px, the eyebrow's own icon+gap width) so its text
-         lines up with "AI Insight" itself instead of the icon above it · .s-h given real
-         margin-bottom before .risk-box, since this section (unlike its siblings) has no .s-sub to
-         supply that gap on its own and was reading as glued directly to the content below it. */
-      '<div class="s-ey" style="font-weight:var(--w-label)">AI Insight</div><h2 class="s-h" style="margin-left:22px;margin-bottom:18px">คุณเป็นนักลงทุนแบบไหน</h2>'+
+      /* 2 fixes to this header (2026-08-15, per direction): .s-ey bumped to weight 700 · .s-h
+         given real margin-bottom before .risk-box, since this section (unlike its siblings) has no
+         .s-sub to supply that gap on its own and was reading as glued directly to the content below
+         it. (.s-h's 22px indent, added to line up with "AI Insight" past its former icon, was
+         removed 2026-08-19 when that icon was dropped from every .s-ey on this page.) */
+      '<div class="s-ey" style="font-weight:var(--w-label)">AI Insight</div><h2 class="s-h" style="margin-bottom:18px">คุณเป็นนักลงทุนแบบไหน</h2>'+
       '<div class="risk-box"><div class="risk-hd"><span class="risk-tag">ความเสี่ยง "บอก" vs "จริง"</span><span class="risk-match">'+(matchOk?('<span class="ld" style="background:var(--cyan)"></span>ตรงกัน'):('ต่างกัน '+(r.gap>0?'+':'')+r.gap))+'</span></div>'+
         '<p class="risk-desc">'+(matchOk?'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน — นักลงทุนที่ self-aware มักตัดสินใจได้ดีกว่าในภาวะตลาดผันผวน':'ความเสี่ยงที่คุณ "บอก" กับที่พฤติกรรมจริงสะท้อนออกมาต่างกันอยู่บ้าง — รู้ gap นี้ช่วยให้วางแผนได้แม่นขึ้น')+'</p>'+
         '<div class="risk-slbl">ระดับความเสี่ยง 1–10</div>'+
@@ -2635,7 +2633,7 @@ function bindBook2Nav(){
 /* AI Insight card (risk gap + confidence) — shared markup so v1 and v2 can't drift apart. */
 function insightHTML(r,h,matchOk){
   return '<section class="card"><div class="s-pad" style="padding-bottom:0">'+
-    '<div class="s-ey" style="font-weight:var(--w-label)">AI Insight</div><h2 class="s-h" style="margin-left:22px;margin-bottom:18px">คุณเป็นนักลงทุนแบบไหน</h2>'+
+    '<div class="s-ey" style="font-weight:var(--w-label)">AI Insight</div><h2 class="s-h" style="margin-bottom:18px">คุณเป็นนักลงทุนแบบไหน</h2>'+
     '<div class="risk-box"><div class="risk-hd"><span class="risk-tag">ความเสี่ยง "บอก" vs "จริง"</span><span class="risk-match">'+(matchOk?('<span class="ld" style="background:var(--cyan)"></span>ตรงกัน'):('ต่างกัน '+(r.gap>0?'+':'')+r.gap))+'</span></div>'+
       '<p class="risk-desc">'+(matchOk?'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน':'ความเสี่ยงที่คุณ "บอก" กับพฤติกรรมจริงต่างกันอยู่บ้าง — รู้ gap นี้ช่วยให้วางแผนได้แม่นขึ้น')+'</p>'+
       '<div class="risk-slbl">ระดับความเสี่ยง 1–10</div>'+
