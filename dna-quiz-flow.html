@@ -2642,7 +2642,12 @@ function redeemCardHTML(isUltimate){
     : '<div class="redeem-card locked">'+ic('lc-gift')+'<div><div class="redeem-t">แลกรับการ์ดตัวจริง</div><div class="redeem-s">รับการ์ดกระดาษใบที่ตรงกับตัวตนคุณ ที่จุดแลกรับการ์ดตัวจริง (สิทธิบัตร Ultimate) · 1 คน = 1 ใบ</div></div></div>';
   return msg+
     '<div class="redeem-quota"><span>ผลิตจำกัด '+REDEEM_TOTAL+' ใบ · เหลือ '+REDEEM_LEFT+' ใบ</span>'+(isUltimate?'':'<span class="redeem-tier">'+ic('lc-lock')+'Ultimate</span>')+'</div>'+
-    '<div class="redeem-note">'+ic('lc-qr-code')+'บัตร Explorer และ Master Class สะสมการ์ดดิจิทัลได้ · การแลกการ์ดกระดาษจริงที่จุดแลกรับการ์ดตัวจริง สงวนสำหรับผู้ถือบัตร Ultimate</div>'+
+    /* 2 fixes (2026-08-19, per direction): the digital-card line bumped to --w-label (700) — it's
+       the actual headline claim of this banner, the physical-redemption line underneath is the
+       supporting detail; and that second line now starts on its own line (<br>) instead of running
+       on after the "·" separator, so the two ideas (digital vs physical redemption) read as two
+       distinct lines, not one long sentence. */
+    '<div class="redeem-note">'+ic('lc-qr-code')+'<span><b style="font-weight:var(--w-label)">บัตร Explorer และ Master Class สะสมการ์ดดิจิทัลได้</b><br>การแลกการ์ดกระดาษจริงที่จุดแลกรับการ์ดตัวจริง สงวนสำหรับผู้ถือบัตร Ultimate</span></div>'+
     '<div class="hero-note">'+ic('lc-info')+'ค่า SKILL บนการ์ดคือชั้นสนุกของการ์ดสะสม — ทีมออกแบบกำหนดและผู้เชี่ยวชาญสอบทาน ไม่ใช่ค่าที่วัดจากการเล่นของคุณ · ตัวตนจริงของคุณดูได้จากคู่มือทั้งหมด · มิใช่คำแนะนำการลงทุน</div>';
 }
 /* PLAY BOOK PDF download (2026-08-19, per direction — also present in the mockup, absent from the
@@ -2817,7 +2822,12 @@ function bindBook2Nav(){
 }
 /* AI Insight card (risk gap + confidence) — shared markup so v1 and v2 can't drift apart. */
 function insightHTML(r,h,matchOk){
-  return '<section class="card"><div class="s-pad" style="padding-bottom:0">'+
+  /* padding-bottom:0 dropped (2026-08-19, per direction) — this .s-pad is the section's ONLY
+     content when insightHTML() is used standalone (Book v2's "วิเคราะห์" tab), so removing the
+     bottom padding left .conf-box sitting flush against the card's own bottom edge. The near-
+     identical inline copy in renderBook() (Book v1) keeps its own padding-bottom:0 since THAT one
+     has more sections following inside the same card — this copy has nothing after it. */
+  return '<section class="card"><div class="s-pad">'+
     '<div class="s-ey" style="font-weight:var(--w-label)">AI Insight</div><h2 class="s-h" style="margin-bottom:18px">คุณเป็นนักลงทุนแบบไหน</h2>'+
     '<div class="risk-box"><div class="risk-hd"><span class="risk-tag">ความเสี่ยง "บอก" vs "จริง"</span><span class="risk-match">'+(matchOk?('<span class="ld" style="background:var(--cyan)"></span>ตรงกัน'):('ต่างกัน '+(r.gap>0?'+':'')+r.gap))+'</span></div>'+
       '<p class="risk-desc">'+(matchOk?'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน':'ความเสี่ยงที่คุณ "บอก" กับพฤติกรรมจริงต่างกันอยู่บ้าง — รู้ gap นี้ช่วยให้วางแผนได้แม่นขึ้น')+'</p>'+
