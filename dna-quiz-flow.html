@@ -181,13 +181,6 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    non-title elements (labels, buttons, badges) that weren't part of this request. */
 .tb-title{flex:1;font-size:var(--fs-h2);font-weight:var(--w-label);letter-spacing:0;color:var(--ink);}
 .tb-sub{display:flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);font-family:var(--font);}
-/* Quiz header's section status (dot + "1/1") — moved out from under .tb-title into its own flex
-   sibling (2026-08-19, per direction) so it sits at the header's right edge instead of stacked
-   left-aligned under the title; see renderQuiz's header markup. .tb-sub itself (shared with the
-   library header's "41 บทความ..." caption) is untouched — this modifier only bumps weight for the
-   quiz's own status, not every .tb-sub consumer. */
-.tb-sub--strong{font-weight:var(--w-label);flex-shrink:0;}
-.tb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 /* Header-pill CTA size — the app's only other explicit CTA size spec is the Liquid Metal hero
    button's (56px/20px desktop, 49px/18px mobile — see README's kit config); this is the small,
    secondary counterpart used inline in a header rather than as a screen's main action. Recorded in
@@ -201,16 +194,6 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .devbar svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--muted);}
 .devbar span{font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);font-family:var(--font);}
 
-/* PROGRESS — a single hairline, not a chunky segmented bar */
-/* 3-segment progress — one segment per section, sized by question count (3/7/1), each filling in its own section color. Reads as "3 different legs of a trip", not one flat bar. */
-/* padding matched to .topbar's own base inset (var(--sp-stack)) — was a hardcoded 18px that didn't
-   line up with the header's 14px, so the bar's ends sat visibly inset from the title/counter above
-   it instead of spanning the same width as the header (2026-08-20, per direction "อยากให้เต็มความยาว
-   เท่ากับ header"). */
-.progline{padding:0 var(--sp-stack);flex-shrink:0;display:flex;gap:4px;height:3px;}
-.progline-seg{height:3px;border-radius:2px;background:var(--line-soft);position:relative;overflow:hidden;}
-.progline-seg i{position:absolute;top:0;left:0;bottom:0;border-radius:2px;transition:width .3s var(--ease);display:block;}
-
 /* ── QUIZ ── every quiz screen is one equal-height canvas: content flows from the top, the nav is pinned to the bottom (margin-top:auto), and a min-height keeps all screens the same size regardless of how much they contain */
 .q-scroll{flex:1;min-height:620px;padding:var(--sp-list) var(--sp-edge) 34px;display:flex;flex-direction:column;}
 /* Quiz layout — re-centered against 21st.dev "Animated Hero" (badge → 2-weight headline → centered
@@ -221,9 +204,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* --qc (2026-08-15, per Icon System audit review "ปรับให้เข้ากับ token ที่มี") — this was declared
    with a fallback on both .q-icon-bare and .q-title b but never actually set anywhere, so every
    question rendered on the same violet/ink default regardless of section. Now wired to the SAME
-   per-section color already driving this screen's own progress segments/topbar dot (dotColor in
-   renderQuiz — yellow §1 risk, violet §2 DNA, pink §3 interests), set once here on the shared
-   .q-head wrapper and inherited by both children — reuses an existing token, doesn't invent one. */
+   per-section color (dotColor in renderQuiz — yellow §1 risk, violet §2 DNA, pink §3 interests),
+   set once here on the shared .q-head wrapper and inherited by both children — reuses an existing
+   token, doesn't invent one. */
 .q-head{margin:22px 0 24px;text-align:center;}
 /* Real custom illustrated icons have now landed for EVERY question (q.img → ICON_IMG, see
    renderQuiz) — the last 3 (s1q2 "ระยะเวลาการลงทุน", s2q6 "ความสนใจ/สิ่งที่อยากเรียน", s2q7
@@ -1894,7 +1877,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* pc .shell used to cap at min(94vw,1120px) — that's exactly the "wide shell holding a narrower
    inner column" pattern the comment above says was removed (task-5): on a real 1440px+ monitor it
    left ~160px+ of dead paper-colored space on each side because nothing downstream needed the shell
-   itself to be narrow — .q-scroll/.progline/.toc/main.scroll/.topbar/.book-tabbar below already hold
+   itself to be narrow — .q-scroll/.toc/main.scroll/.topbar/.book-tabbar below already hold
    their own 760px reading measure centered independently of shell width. Uncapped (2026-08-20, per
    direction "ให้ full-bleed เต็มจอจริงๆ") so pc is a genuinely seamless full-width page, matching the
    "SEAMLESS FULL PAGE" comment just below rather than contradicting it. */
@@ -1915,16 +1898,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    side-borders below (line ~588) are scoped to the mobile-frame preview only — on real desktop they
    read as a narrow fixed frame with dead side-gutters, which is what task-5 asked us to remove. */
 :root[data-view="pc"] .q-scroll,:root[data-view="tablet"] .q-scroll,
-:root[data-view="pc"] .progline,:root[data-view="tablet"] .progline,
 :root[data-view="pc"] .toc,:root[data-view="tablet"] .toc,
 :root[data-view="pc"] main.scroll,:root[data-view="tablet"] main.scroll{max-width:760px;margin-left:auto;margin-right:auto;width:100%;}
 /* full-width sticky topbar bar, but its inner icons/title align to the same 760 reading column */
 :root[data-view="pc"] .topbar,:root[data-view="tablet"] .topbar{padding-left:max(var(--sp-stack),calc((100% - 760px)/2));padding-right:max(var(--sp-stack),calc((100% - 760px)/2));}
-/* .progline is already inset to the 760 column by its own max-width+margin:auto above, so its
-   base var(--sp-stack) padding here would double-inset it past where .topbar's title/counter
-   land (.topbar has no such extra padding once the (100%-760)/2 calc takes over from the
-   var(--sp-stack) floor) — zero it out so the bar's ends line up exactly under the header's. */
-:root[data-view="pc"] .progline,:root[data-view="tablet"] .progline{padding:0;}
 :root[data-view="pc"] .book-tabbar,:root[data-view="tablet"] .book-tabbar{max-width:760px;}
 /* splash on larger canvases: SMALLER hero logo, and a MORE prominent subtitle (it's the line that
    states what you're here to do — find your 1-of-12 type), roomier side padding */
@@ -2678,7 +2655,6 @@ function emphasizeQ(s){var i=s.lastIndexOf(' ');return i<0?s:s.slice(0,i+1)+'<b>
 function renderQuiz(){
   var idx=st.idx,q=getQ(idx),isInterests=(idx===10);
   var sec=idx<3?1:(idx<10?2:3);
-  var secNo=idx<3?idx+1:(idx<10?idx-2:1),secTot=idx<3?3:(idx<10?7:1);
   var sel=isInterests?null:getAns(idx);
   var opts;
   if(isInterests){
@@ -2693,23 +2669,20 @@ function renderQuiz(){
   }
   var nextLabel=isInterests?('วิเคราะห์ตัวตน '+ic('lc-arrow-right','ic-fwd')):('ถัดไป '+ic('lc-arrow-right','ic-fwd'));
   var dotColor=sec===1?'var(--yellow)':(sec===2?'var(--violet)':'var(--pink)');
-  /* section title/count moved entirely into the topbar (was a whole eyebrow+title+purpose block
+  /* section title moved entirely into the topbar (was a whole eyebrow+title+purpose block
      inside the body) — the body now goes straight to icon → question → answers → CTA, all more
      prominent for it having nothing above them competing for the eye. */
   var secTitle=sec===1?'ความเสี่ยงในการลงทุน':(sec===2?'ตัวตนนักลงทุน (DNA)':'ยืนยันตัวตน และแผนที่เดินบูธ');
   var nextDisabled=isInterests?(st.s3.length===0):(sel===null);
-  /* 3-segment progress: one track per section (widths proportional to question count 3/7/1), each filling only as far as this section's own answered count */
-  var segTot=[3,7,1],segColor=['var(--yellow)','var(--violet)','var(--pink)'];
-  var segDone=[Math.min(idx,3),Math.min(Math.max(idx-3,0),7),Math.min(Math.max(idx-10,0),1)];
-  var progline='<div class="progline">'+segTot.map(function(t,i){
-    return '<div class="progline-seg" style="flex-grow:'+t+'"><i style="width:'+Math.round(segDone[i]/t*100)+'%;background:'+segColor[i]+'"></i></div>';
-  }).join('')+'</div>';
+  /* Progress indicator (dot+"n/n" counter and the segmented progline below the header) removed
+     entirely from every quiz screen (2026-08-20, per direction "เอา progress indicator ของหน้า
+     แบบทดสอบทั้งหมด ออก") — the header now shows just the back arrow + section title, and the body
+     starts straight at .q-scroll with nothing between it and the topbar. dotColor is kept: it still
+     drives --qc, the per-section accent color on the question icon below. */
   root.innerHTML=
   '<header class="topbar"><div class="tb-ic" id="qBack">'+ic('lc-arrow-left')+'</div>'+
     '<div class="tb-title">'+secTitle+'</div>'+
-    '<div class="tb-sub tb-sub--strong"><span class="tb-dot" style="background:'+dotColor+'"></span>'+secNo+'/'+secTot+'</div>'+
     '</header>'+
-  progline+
   '<div class="q-scroll fade">'+
     '<div class="q-head scroll-reveal" style="--qc:'+dotColor+'"><div class="q-icon-bare">'+(q.img?'<img src="'+ICON_IMG[q.img]+'" alt="">':ic(q.icon))+'</div>'+
       '<div class="q-title">'+emphasizeQ(q.q)+'</div>'+(q.cat?('<div class="q-sub">'+q.cat.replace(/·/g,'✦')+'</div>'):'')+'</div>'+
