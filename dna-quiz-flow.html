@@ -3769,8 +3769,14 @@ var AGENDA_D2=[
   {time:'17:30',t:'ประกาศผลรางวัลใหญ่',by:'เวทีห้องใหญ่'},
   {time:'18:30',t:'ปิดงาน',by:''}
 ];
+/* Logo dropped efin (2026-08-20, per direction "หน้าหลัก เดินบูธ เกมส์หลัก โปรไฟล์ ให้โลโก้เหลือแค่
+   better trade...อ้างอิงตาม header ของหน้าคู่มือ") — swaps the combined efin×Better Trade lockup
+   (LOGO_IMG.efinBT) for the standalone Better Trade mark (LOGO_IMG.bt), matching renderBook/
+   renderBook2's own hd-logo exactly (both already used LOGO_IMG.bt). Covers every appHeader()
+   consumer: Home, Booth (เดินบูธ), Games (เกมส์หลัก), Profile — Library keeps its own back-arrow
+   header untouched, it never went through appHeader(). */
 function appHeader(){return '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
-  '<header class="topbar app-topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.efinBT+'" alt="efin × Better Trade — กลับหน้าหลัก" style="margin-right:auto">'+REG_CTA_HTML+'<div id="qr-cta-slot"></div></header>';}
+  '<header class="topbar app-topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="Better Trade — กลับหน้าหลัก" style="margin-right:auto">'+REG_CTA_HTML+'<div id="qr-cta-slot"></div></header>';}
 /* Header logo (left) is clickable system-wide → always routes to Home, same "brand mark = home"
    convention as most apps/sites. Bound once per render call right after appHeader()/renderBook's
    own header is injected — see mountHeaderQR's sibling calls and renderBook's own binding. */
