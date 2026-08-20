@@ -1117,7 +1117,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    teaser → agenda → announcements), re-skinned into this app's editorial DNA (spectrum/ink, not the
    source's navy/#007dfe). Each block is a direct child of .scroll so it inherits the same 28px
    section rhythm as the Book page. */
-.app-topbar .tb-logo{height:20px;}
+/* Was 20px, 2px smaller than every other header's logo (.tb-logo's own base height below) — Home/
+   Booth/Games/Profile's appHeader() is the only header this override ever touched, so it read as a
+   size mismatch against the คู่มือ (Book) header right next to it in the tab bar. Matched to the
+   base 22px per direction (2026-08-20, "ขนาดโลโก้...ไม่เท่ากับหน้าคู่มือ...ให้ใช้ขนาดเท่ากับหน้าคู่มือ"). */
+.app-topbar .tb-logo{height:22px;}
 .home-hero{position:relative;overflow:hidden;text-align:center;border:1px solid var(--line-soft);border-radius:var(--r2);background:radial-gradient(120% 80% at 50% 0%,color-mix(in srgb,var(--violet) 14%,transparent),color-mix(in srgb,var(--cyan) 8%,transparent) 46%,var(--white) 78%);padding:22px var(--sp-card-pad) 24px;}
 /* "คู่มือลงทุนของคุณ" poster eyebrow — locked to weight 500 (var(--w-head)) in muted gray, matching
    every other eyebrow in the app (.s-ey etc. — see design.md's eyebrow convention). Was flipped to
