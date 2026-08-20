@@ -1117,11 +1117,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    teaser → agenda → announcements), re-skinned into this app's editorial DNA (spectrum/ink, not the
    source's navy/#007dfe). Each block is a direct child of .scroll so it inherits the same 28px
    section rhythm as the Book page. */
-/* Was 20px, 2px smaller than every other header's logo (.tb-logo's own base height below) — Home/
-   Booth/Games/Profile's appHeader() is the only header this override ever touched, so it read as a
-   size mismatch against the คู่มือ (Book) header right next to it in the tab bar. Matched to the
-   base 22px per direction (2026-08-20, "ขนาดโลโก้...ไม่เท่ากับหน้าคู่มือ...ให้ใช้ขนาดเท่ากับหน้าคู่มือ"). */
-.app-topbar .tb-logo{height:22px;}
+/* .app-topbar (and its own .tb-logo height override) is GONE (2026-08-20, per direction "เปลี่ยน
+   header ของหน้าหลัก เดินบูธ เกมส์หลัก โปรไฟล์ ให้ใช้ header ของหน้าคู่มือแทน") — the previous fix
+   just hand-matched the override's number (20px→22px) to the Book header's, which still left two
+   separate CSS rules that could drift apart again. appHeader() now emits the exact same
+   `class="topbar"` (no modifier) as renderBook/renderBook2's own header, so all four screens share
+   one single .tb-logo rule (base height below) with the Book page — there is no second number to
+   keep in sync. */
 .home-hero{position:relative;overflow:hidden;text-align:center;border:1px solid var(--line-soft);border-radius:var(--r2);background:radial-gradient(120% 80% at 50% 0%,color-mix(in srgb,var(--violet) 14%,transparent),color-mix(in srgb,var(--cyan) 8%,transparent) 46%,var(--white) 78%);padding:22px var(--sp-card-pad) 24px;}
 /* "คู่มือลงทุนของคุณ" poster eyebrow — locked to weight 500 (var(--w-head)) in muted gray, matching
    every other eyebrow in the app (.s-ey etc. — see design.md's eyebrow convention). Was flipped to
@@ -3778,9 +3780,14 @@ var AGENDA_D2=[
    (LOGO_IMG.efinBT) for the standalone Better Trade mark (LOGO_IMG.bt), matching renderBook/
    renderBook2's own hd-logo exactly (both already used LOGO_IMG.bt). Covers every appHeader()
    consumer: Home, Booth (เดินบูธ), Games (เกมส์หลัก), Profile — Library keeps its own back-arrow
-   header untouched, it never went through appHeader(). */
+   header untouched, it never went through appHeader().
+   Header markup now IS the Book header's, not just matched to it (2026-08-20, per direction
+   "เปลี่ยน header...ให้ใช้ header ของหน้าคู่มือแทน") — dropped the app-topbar modifier class (and
+   its own .tb-logo height override, removed above) that used to give this header a second,
+   independently-tunable CSS path; plain class="topbar" is byte-identical to renderBook/
+   renderBook2's <header>, img, and inner CTA slots. */
 function appHeader(){return '<div class="devbar" id="devReset">'+ic('lc-refresh-cw')+'<span>โหมดทดสอบ ✦ แตะเพื่อกลับไปเริ่ม Quiz ใหม่</span></div>'+
-  '<header class="topbar app-topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="Better Trade — กลับหน้าหลัก" style="margin-right:auto">'+REG_CTA_HTML+'<div id="qr-cta-slot"></div></header>';}
+  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="Better Trade — กลับหน้าหลัก" style="margin-right:auto">'+REG_CTA_HTML+'<div id="qr-cta-slot"></div></header>';}
 /* Header logo (left) is clickable system-wide → always routes to Home, same "brand mark = home"
    convention as most apps/sites. Bound once per render call right after appHeader()/renderBook's
    own header is injected — see mountHeaderQR's sibling calls and renderBook's own binding. */
