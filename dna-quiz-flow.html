@@ -984,18 +984,27 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .alloc-seg:nth-child(3){transition-delay:.12s;}
 .alloc-seg:nth-child(4){transition-delay:.18s;}
 
-/* radar — "Center → Axis → Shape Expand → Data Points" per the chart-animation reference */
-.rk-grid,.rk-axis{opacity:0;transition:opacity .3s var(--ease);}
-.rk-axis{transition-delay:.08s;}
+/* radar — "Center → Axis → Shape Expand → Data Points" per the chart-animation reference. Each axis
+   ray now "draws" outward from center (stroke-dashoffset via pathLength=1, angle-agnostic) at the
+   SAME index-matched delay its data point travels out to sit on it (was: axis just faded in static
+   early, then every dot popped in ~0.6s+ later as one late separate burst — direction: "จุด...
+   movement พร้อมแกนต่างๆ", the point should move together with its axis, not after it). */
+.rk-grid{opacity:0;transition:opacity .3s var(--ease);}
+.viz-in .rk-grid{opacity:1;}
+.rk-axis{opacity:0;stroke-dasharray:1;stroke-dashoffset:1;transition:opacity .15s var(--ease),stroke-dashoffset .45s var(--ease);}
+.viz-in .rk-axis{opacity:1;stroke-dashoffset:0;}
 .rk-poly{transform-box:view-box;transform-origin:0 0;transform:scale(0);transition:transform .5s var(--ease) .3s;}
-.rk-dot{opacity:0;transform:scale(0);transition:opacity .25s var(--ease),transform .25s var(--ease);cursor:pointer;}
-.rk-lab{opacity:0;transition:opacity .3s var(--ease) .7s;}
-.viz-in .rk-grid,.viz-in .rk-axis,.viz-in .rk-lab{opacity:1;}
+.rk-dot{opacity:0;transform:scale(0);transition:opacity .3s var(--ease),transform .45s var(--ease);cursor:pointer;}
+.rk-lab{opacity:0;transition:opacity .3s var(--ease) .85s;}
+.viz-in .rk-lab{opacity:1;}
 .viz-in .rk-poly{transform:scale(1);}
 .viz-in .rk-dot{opacity:1;transform:scale(1);}
-.rk-dot:nth-of-type(1){transition-delay:.62s;}.rk-dot:nth-of-type(2){transition-delay:.68s;}
-.rk-dot:nth-of-type(3){transition-delay:.74s;}.rk-dot:nth-of-type(4){transition-delay:.80s;}
-.rk-dot:nth-of-type(5){transition-delay:.86s;}.rk-dot:nth-of-type(6){transition-delay:.92s;}
+.rk-axis:nth-of-type(1),.rk-dot:nth-of-type(1){transition-delay:.08s;}
+.rk-axis:nth-of-type(2),.rk-dot:nth-of-type(2){transition-delay:.13s;}
+.rk-axis:nth-of-type(3),.rk-dot:nth-of-type(3){transition-delay:.18s;}
+.rk-axis:nth-of-type(4),.rk-dot:nth-of-type(4){transition-delay:.23s;}
+.rk-axis:nth-of-type(5),.rk-dot:nth-of-type(5){transition-delay:.28s;}
+.rk-axis:nth-of-type(6),.rk-dot:nth-of-type(6){transition-delay:.33s;}
 /* hover a data point → it (and its matching axis label) pop/bold; the other 5 dim to ~45%, the same
    "active 100% / inactive ~40-60%" focus rule the reference specifies for hover behavior */
 .radar-ww svg:hover .rk-dot{opacity:.45;}
@@ -2879,7 +2888,7 @@ function radarSVG(vals,hue){
   var R=90,cx=170,cy=122,pts=[];
   for(var k=0;k<6;k++){var a=(-90+60*k)*Math.PI/180;var r=R*vals[k]/100;pts.push([Math.cos(a)*r,Math.sin(a)*r]);}
   function ring(s){var o='';for(var k=0;k<6;k++){var a=(-90+60*k)*Math.PI/180;o+=(k?' ':'')+(Math.cos(a)*R*s).toFixed(1)+','+(Math.sin(a)*R*s).toFixed(1);}return o;}
-  function axis(k){var a=(-90+60*k)*Math.PI/180;return '<line class="rk-axis" x1="0" y1="0" x2="'+(Math.cos(a)*R).toFixed(1)+'" y2="'+(Math.sin(a)*R).toFixed(1)+'"/>';}
+  function axis(k){var a=(-90+60*k)*Math.PI/180;return '<line class="rk-axis" pathLength="1" x1="0" y1="0" x2="'+(Math.cos(a)*R).toFixed(1)+'" y2="'+(Math.sin(a)*R).toFixed(1)+'"/>';}
   var poly=pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');
   var dots='';pts.forEach(function(p,k){dots+='<circle class="rk-dot" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3"><title>'+RADAR_AXES[k]+' '+vals[k]+'</title></circle>';});
   var lab=[[0,-104,'middle'],[104,-52,'start'],[104,60,'start'],[0,116,'middle'],[-104,60,'end'],[-104,-52,'end']];
@@ -3137,7 +3146,7 @@ function renderBook(){
         '<div class="risk-slbl">ระดับความเสี่ยง 1–10</div>'+
         '<div class="risk-bars"><div class="risk-row"><span class="risk-rl">ความเสี่ยงที่บอก</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.declared*10)+'%;background:var(--muted)"></div></div><span class="risk-vl">'+r.declared+'</span></div>'+
         '<div class="risk-row"><span class="risk-rl" style="color:var(--ink)">ความเสี่ยงจริง</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.revealed*10)+'%"></div></div><span class="risk-vl">'+r.revealed+'</span></div></div></div>'+
-      '<div class="conf-box" id="conf-box"><div class="conf-glow"></div><div class="conf-hd"><div class="conf-ic">'+ic('lc-sparkles')+'</div><div><div class="conf-ml">Confidence Score</div><div class="conf-mv">'+r.confLevel+'</div></div><div class="conf-sc">'+r.conf+'<span class="conf-su">/100</span></div></div>'+
+      '<div class="conf-box" id="conf-box"><div class="conf-glow"></div><div class="conf-hd"><div><div class="conf-ml">Confidence Score</div><div class="conf-mv">'+r.confLevel+'</div></div><div class="conf-sc">'+r.conf+'<span class="conf-su">/100</span></div></div>'+
         '<div class="conf-bars">'+confRow('ตัวตน',r.subs.identity)+confRow('พฤติกรรม',r.subs.behavior)+confRow('ความเสี่ยง',r.subs.riskAlign)+confRow('วินัย',r.subs.discipline)+'</div>'+
         '<p class="conf-note">คะแนนจะสมบูรณ์เมื่อทำครบ 6 ด้านในงาน — ยิ่งสูง ทำนายผลตอบแทนได้แม่นขึ้น</p></div>'+
     '</div>'+
@@ -3257,7 +3266,7 @@ function insightHTML(r,h,matchOk){
       '<div class="risk-slbl">ระดับความเสี่ยง 1–10</div>'+
       '<div class="risk-bars"><div class="risk-row"><span class="risk-rl">ความเสี่ยงที่บอก</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.declared*10)+'%;background:var(--muted)"></div></div><span class="risk-vl">'+r.declared+'</span></div>'+
       '<div class="risk-row"><span class="risk-rl" style="color:var(--ink)">ความเสี่ยงจริง</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.revealed*10)+'%"></div></div><span class="risk-vl">'+r.revealed+'</span></div></div></div>'+
-    '<div class="conf-box"><div class="conf-glow"></div><div class="conf-hd"><div class="conf-ic">'+ic('lc-sparkles')+'</div><div><div class="conf-ml">Confidence Score</div><div class="conf-mv">'+r.confLevel+'</div></div><div class="conf-sc">'+r.conf+'<span class="conf-su">/100</span></div></div>'+
+    '<div class="conf-box"><div class="conf-glow"></div><div class="conf-hd"><div><div class="conf-ml">Confidence Score</div><div class="conf-mv">'+r.confLevel+'</div></div><div class="conf-sc">'+r.conf+'<span class="conf-su">/100</span></div></div>'+
       '<div class="conf-bars">'+confRow('ตัวตน',r.subs.identity)+confRow('พฤติกรรม',r.subs.behavior)+confRow('ความเสี่ยง',r.subs.riskAlign)+confRow('วินัย',r.subs.discipline)+'</div>'+
       '<p class="conf-note">คะแนนจะสมบูรณ์เมื่อทำครบ 6 ด้านในงาน</p></div>'+
     '</div></section>';
@@ -3848,7 +3857,7 @@ function renderHome(){
       '<div class="ag-list">'+shown.map(function(a){return '<div class="ag-row"><div class="ag-time">'+a.time+'</div><div><div class="ag-t">'+a.t+'</div>'+(a.by?'<div class="ag-by">'+a.by+'</div>':'')+'</div></div>';}).join('')+'</div>'+
       (days.length>3?('<button class="ag-more" id="agMore">'+ic(HOME_MST.agendaAll?'lc-chevron-down':'lc-chevron-down')+(HOME_MST.agendaAll?'ย่อกำหนดการ':('ดูกำหนดการทั้งวัน '+days.length+' รายการ'))+'</button>'):'')+
     '</section>'+
-    '<section class="home-card scroll-reveal"><div class="hcard-hd" style="display:flex;align-items:center;gap:var(--sp-list);margin-bottom:var(--sp-inline)">'+ic('lc-megaphone')+'<div class="s-h" style="font-size:var(--fs-h2);margin-bottom:0">ประกาศจากงาน</div></div>'+
+    '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">ประกาศจากงาน</div></div>'+
       HOME_ANN.map(function(a){return '<div class="ann-row"><svg viewBox="0 0 24 24" class="lucide" style="color:'+a.color+'"><use href="#'+a.icon+'"/></svg><div><div class="ann-t">'+a.t+'</div><div class="ann-s">'+a.s+'</div></div></div>';}).join('')+
     '</section>'+
     postEventHTML()+
