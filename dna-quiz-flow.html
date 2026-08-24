@@ -727,14 +727,19 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .ev-empty-s{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.55;max-width:34ch;margin:0 auto var(--sp-stack);}
 /* แลกรับการ์ดตัวจริง — tier-gated like the post-event tracks (.pe-report/.pe-locked share this
    same on/locked pattern): Ultimate can redeem now, everything else sees what unlocks it. */
-.redeem-card{margin-top:var(--sp-stack);display:flex;gap:var(--sp-inline);align-items:flex-start;padding:var(--sp-stack) 14px;border-radius:var(--r1);}
+.redeem-card{margin-top:var(--sp-stack);padding:var(--sp-stack) 14px;border-radius:var(--r1);}
 .redeem-card.on{border:1px solid var(--amber-border);}
 .redeem-card.locked{border:1px dashed var(--line-strong);}
-.redeem-card svg{width:var(--ic-lg);height:var(--ic-lg);flex:0 0 auto;}
-.redeem-card.on svg{color:var(--amber-text);}
-.redeem-card.locked svg{color:var(--muted);}
-.redeem-t{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
-.redeem-s{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;line-height:1.5;}
+/* Icon moved inline into .redeem-t (2026-08-24, matching .bt-t/.pass-ey's "alignment แนวนอนกลางกับ
+   หัวข้อ" fix) — was its own flex item centered against the whole title+subtitle block via
+   align-items:flex-start, not the heading line. Size/gap unified off .bt-t-ic (24px) and this
+   card's own gap token (var(--sp-inline)), the two reference points per direction. */
+.redeem-t{display:flex;align-items:center;gap:var(--sp-inline);font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);}
+.redeem-t-ic{width:var(--ic-lg);height:auto;flex:0 0 auto;}
+/* Body copy indented to sit under the title text, not the icon (2026-08-24, per direction "title
+   และเนื้อหามี alignment ให้ตรงกัน") — same icon-width+gap offset applied to .bt-s/.pass-name/.ds-s
+   /.ds-dl below, so every one of these title-row cards reads as one aligned text column. */
+.redeem-s{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;margin-left:calc(var(--ic-lg) + var(--sp-inline));line-height:1.5;}
 /* Expanded redeem-card content (2026-08-19, per direction — was in the design mockup but never
    built): a quota line + tier-gate pill, a QR/digital-card explainer banner, and a SKILL-value
    disclaimer. Added below the existing on/locked message, not replacing it. */
@@ -1209,9 +1214,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    .pass-ey-ic instead of its own flex item centered against the whole pass-hd block, so flex's
    align-items:center centers it against just that one eyebrow line. "บัตรของคุณ"'s tier badge above
    still uses its own separate .pass-ic column, untouched. */
-.pass-ey{display:flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.08em;color:var(--muted);text-transform:uppercase;}
-.pass-ey-ic{width:16px;height:auto;flex:0 0 auto;}
-.pass-name{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);line-height:1.15;margin-top:1px;}
+.pass-ey{display:flex;align-items:center;gap:var(--sp-inline);font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.08em;color:var(--muted);text-transform:uppercase;}
+.pass-ey-ic{width:var(--ic-lg);height:auto;flex:0 0 auto;}
+.pass-name{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);line-height:1.15;margin-top:1px;margin-left:calc(var(--ic-lg) + var(--sp-inline));}
 .pass-cv{width:20px;height:20px;color:var(--muted);flex:0 0 auto;}
 .pass-benefit{font-size:var(--fs-bodysm);color:var(--muted);margin-top:var(--sp-inline);line-height:1.4;}
 .pass-foot{margin-top:var(--sp-inline);padding-top:var(--sp-inline);border-top:1px solid var(--line-soft);display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-list);}
@@ -1253,9 +1258,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    next to it. The icon now sits inline inside .bt-t itself (.bt-t-ic), so flex's align-items:center
    centers it against just that one line, matching the heading exactly. .book-teaser's grid dropped
    the now-unused 44px column to match (see below). */
-.bt-t{display:flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);line-height:1.25;}
+.bt-t{display:flex;align-items:center;gap:var(--sp-inline);font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);line-height:1.25;}
 .bt-t-ic{width:24px;height:auto;flex:0 0 auto;}
-.bt-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:2px;}
+.bt-s{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:2px;margin-left:calc(var(--ic-lg) + var(--sp-inline));}
 .bt-cv{width:20px;height:20px;color:var(--muted);flex-shrink:0;}
 .home-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:18px var(--sp-card-pad);}
 .hcard-hd{margin-bottom:var(--sp-inline);}
@@ -1445,7 +1450,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bp-frac{font-size:var(--fs-bodysm);font-weight:var(--w-label);white-space:nowrap;}
 .bp-bar{margin-top:auto;height:6px;border-radius:var(--rpill);background:var(--accent);overflow:hidden;}
 .bp-fill{height:100%;border-radius:var(--rpill);transition:width .25s var(--ease);}
-.draw-status{display:flex;gap:var(--sp-inline);align-items:flex-start;padding:var(--sp-card-pad-sm);border-radius:var(--r2);background:var(--paper);border:1px solid var(--line-soft);}
+.draw-status{padding:var(--sp-card-pad-sm);border-radius:var(--r2);background:var(--paper);border:1px solid var(--line-soft);}
 .draw-status.ok{border-color:var(--done-border);}
 /* .need — the "not eligible yet" state used to read as flatly as the page's own quiet default
    (same gray-on-paper as everything else), so the one card that should make you want to go
@@ -1455,12 +1460,17 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    progress/neutral" info (.bp-fill, .rt-badge.new, tab active state); amber is the file's one
    consistent "pay attention, do this" tone already used for .redeem-card.on/.prof-tier/.rt-badge.feat. */
 .draw-status.need{background:var(--amber-bg);border-color:var(--amber-border);}
-.draw-status svg{width:var(--ic-lg);height:var(--ic-lg);flex:0 0 auto;color:var(--muted);}
-.draw-status.need svg{color:var(--amber-text);}
-.ds-h{font-size:var(--fs-body);font-weight:var(--w-label);color:var(--ink);line-height:1.45;}
-.ds-s{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;}
-.ds-dl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--ink);margin-top:var(--sp-glue);}
-.ds-chips{display:inline-flex;flex-wrap:wrap;gap:var(--sp-glue);margin-left:var(--sp-glue);vertical-align:middle;}
+/* Icon moved inline into .ds-h (2026-08-24, same "alignment แนวนอนกลางกับหัวข้อ" fix as .bt-t/
+   .pass-ey/.redeem-t) — was its own flex item centered against the whole title+subtitle+deadline
+   block. */
+.ds-h{display:flex;align-items:center;flex-wrap:wrap;gap:var(--sp-inline);font-size:var(--fs-body);font-weight:var(--w-label);color:var(--ink);line-height:1.45;}
+.ds-h-ic{width:var(--ic-lg);height:auto;flex:0 0 auto;}
+.ds-s{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;margin-left:calc(var(--ic-lg) + var(--sp-inline));}
+.ds-dl{font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--ink);margin-top:var(--sp-glue);margin-left:calc(var(--ic-lg) + var(--sp-inline));}
+/* .ds-chips pulled out of .ds-h into its own row (2026-08-24, same "title/เนื้อหา alignment ตรงกัน"
+   direction) — inline inside .ds-h it wrapped flush with the icon's left edge, not the heading
+   text, same misalignment .ds-s/.ds-dl had. Now it's just another indented content line. */
+.ds-chips{display:flex;flex-wrap:wrap;gap:var(--sp-glue);margin-top:var(--sp-glue);margin-left:calc(var(--ic-lg) + var(--sp-inline));}
 .ds-chip{display:inline-block;background:var(--active-fill);color:var(--violet);font-weight:var(--w-head);font-size:var(--fs-eyebrow);padding:4px var(--sp-inline);border-radius:var(--rpill);white-space:nowrap;}
 .draw-status.need .ds-chip{background:var(--amber-bg);color:var(--amber-text);border:1px solid var(--amber-border);}
 /* hero route */
@@ -3076,8 +3086,8 @@ var REDEEM_TOTAL=800,REDEEM_LEFT=250; // demo quota numbers for the "แลก�
    v2 (renderBook2's identity panel, which had no redeem-card at all before this). */
 function redeemCardHTML(isUltimate){
   var msg=isUltimate
-    ? '<div class="redeem-card on"><img src="'+ICON_CARD_PNG+'" alt="" style="width:28px;height:auto;flex:0 0 auto"><div><div class="redeem-t">พร้อมแลกรับการ์ดตัวจริงแล้ว</div><div class="redeem-s">แลกได้ที่จุดแลกรับการ์ดตัวจริง ✦ Samyan Mitrtown ชั้น 5</div></div></div>'
-    : '<div class="redeem-card locked"><img src="'+ICON_GIFT_PNG+'" alt="" style="width:28px;height:auto;flex:0 0 auto"><div><div class="redeem-t">แลกรับการ์ดตัวจริง</div><div class="redeem-s">รับการ์ดกระดาษใบที่ตรงกับตัวตนคุณ ที่จุดแลกรับการ์ดตัวจริง (สิทธิบัตร Ultimate) · 1 คน = 1 ใบ</div></div></div>';
+    ? '<div class="redeem-card on"><div class="redeem-t"><img class="redeem-t-ic" src="'+ICON_CARD_PNG+'" alt="">พร้อมแลกรับการ์ดตัวจริงแล้ว</div><div class="redeem-s">แลกได้ที่จุดแลกรับการ์ดตัวจริง ✦ Samyan Mitrtown ชั้น 5</div></div>'
+    : '<div class="redeem-card locked"><div class="redeem-t"><img class="redeem-t-ic" src="'+ICON_GIFT_PNG+'" alt="">แลกรับการ์ดตัวจริง</div><div class="redeem-s">รับการ์ดกระดาษใบที่ตรงกับตัวตนคุณ ที่จุดแลกรับการ์ดตัวจริง (สิทธิบัตร Ultimate) · 1 คน = 1 ใบ</div></div>';
   return msg+
     '<div class="redeem-quota"><span>ผลิตจำกัด '+REDEEM_TOTAL+' ใบ · เหลือ '+REDEEM_LEFT+' ใบ</span>'+(isUltimate?'':'<span class="redeem-tier">'+ic('lc-lock')+'Ultimate</span>')+'</div>'+
     /* 2 fixes (2026-08-19, per direction): the digital-card line bumped to --w-label (700) — it's
@@ -4070,8 +4080,8 @@ function renderBooth(){
         '<div class="bp-card"><div class="bp-hd">'+ic('lc-gamepad-2')+'<span class="bp-lbl">กิจกรรมประจำบูธ</span><span class="bp-frac" style="color:'+(actOK?'var(--cyan)':'var(--violet)')+'">'+(actOK?('ครบแล้ว · '+act+' บูธ'):(act+'/'+ACTIVITY_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,act/ACTIVITY_NEED*100)+'%;background:'+(actOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
       '</div>'+
       (eligible
-        ? '<div class="draw-status ok"><img src="'+ICON_GIFT_PNG+'" alt="" style="width:28px;height:auto;flex:0 0 auto"><div><div class="ds-h">ครบเงื่อนไขแล้ว · กดร่วมลุ้นรางวัลใหญ่ได้เลย</div><div class="ds-s">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">✓ กดร่วมลุ้นก่อน 16:00 น. ของวันที่ 2</div></div></div>'
-        : '<div class="draw-status need"><img src="'+ICON_GIFT_PNG+'" alt="" style="width:28px;height:auto;flex:0 0 auto"><div><div class="ds-h">ยังขาด<span class="ds-chips">'+need.map(function(n){return '<span class="ds-chip">'+n+'</span>';}).join('')+'</span></div><div class="ds-s">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">ครบเมื่อไหร่ ปุ่มร่วมลุ้นรางวัลใหญ่จะขึ้นตรงนี้ให้กด</div></div></div>')+
+        ? '<div class="draw-status ok"><div class="ds-h"><img class="ds-h-ic" src="'+ICON_GIFT_PNG+'" alt="">ครบเงื่อนไขแล้ว · กดร่วมลุ้นรางวัลใหญ่ได้เลย</div><div class="ds-s">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">✓ กดร่วมลุ้นก่อน 16:00 น. ของวันที่ 2</div></div>'
+        : '<div class="draw-status need"><div class="ds-h"><img class="ds-h-ic" src="'+ICON_GIFT_PNG+'" alt="">ยังขาด</div><div class="ds-chips">'+need.map(function(n){return '<span class="ds-chip">'+n+'</span>';}).join('')+'</div><div class="ds-s">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">ครบเมื่อไหร่ ปุ่มร่วมลุ้นรางวัลใหญ่จะขึ้นตรงนี้ให้กด</div></div>')+
     '</section>'+
     '<section class="home-card scroll-reveal"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline)"><div class="s-h" style="margin-bottom:0">'+(RESULT?'แผนที่เดินบูธเฉพาะคุณ':'แผนที่เดินบูธ (เส้นทางแนะนำ)')+'</div><span class="route-badge">'+visited+'/'+route.length+' จุด</span></div>'+
       '<div class="map-ph has-img"><img class="mp-img" src="'+MAP_IMG+'" alt="ผังงาน Better Trade 2026 · Samyan Mitrtown ชั้น 5"><span class="mp-cap">ผังงาน · Samyan Mitrtown ชั้น 5</span><button class="mp-zoom" id="mapZoomBtn">'+ic('lc-maximize-2')+'<span>ดูแบบเต็มจอ</span></button></div>'+
