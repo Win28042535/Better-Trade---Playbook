@@ -37,14 +37,18 @@ Fixed tokens — **identical across mobile / tablet / pc**. Only spacing (`--sp-
 | `--fs-title` | 36px | quiz question headline (`.q-title`), consent headline (`.consent-h`) |
 | `--fs-heading` | 28px | section/hero headline (`.hero-th`, `.s-h`) |
 | `--fs-h2` | 24px | topbar title, stat/rank numerals, progress value, pass name (`.tb-title`, `.prog-val`, `.pass-name`, `.int-sec-rank`) |
-| `--fs-sub` | 20px | component titles, answer option text, button label (`.opt-text`, `.btn`, `.side-t`, `.scan-t`) |
-| `--fs-body` | 20px | paragraph copy (`.consent-p`) — same size as `--fs-sub`, distinct semantic role |
+| `--fs-sub` | 22px | component titles, answer option text, button label (`.opt-text`, `.btn`, `.side-t`, `.scan-t`) |
+| `--fs-body` | 22px | paragraph copy (`.consent-p`) — same size as `--fs-sub`, distinct semantic role |
 | `--fs-bodysm` | 18px | the app's default supporting-text size — most captions/descriptions/secondary copy |
 | `--fs-label` | 16px | option-key numerals, list item titles, inline note text |
 | `--fs-eyebrow` | 14px | uppercase kicker/section labels |
 | `--fs-meta` | 14px | meta/count text — same size as eyebrow, kept as a separate token for semantic clarity (per 2026-08-15 audit, this is now the only deliberate two-way size overlap in the scale) |
 
 *(v3, 2026-08-19: every rung stepped up uniformly from the v2 numbers — title 32→36, heading 24→28, h2 22→24, sub/body 18→20, bodysm 16→18, label 14→16, eyebrow/meta 12→14 — same relative hierarchy, larger absolute scale.)*
+
+*(v4, 2026-08-26, per direct spec: only sub/body moved this round, 20→22 — every other rung held. This
+narrows the h2(24)↔sub/body(22) gap to 2px and widens sub/body(22)↔bodysm(18) to 4px, breaking the
+"ratios preserved" pattern v2/v3 kept — a deliberate, isolated bump, not a full re-scale.)*
 
 **Card-art scale** (`--pc-fs-1`…`--pc-fs-5`: 24/13/11/10/8.5px) is a **separate, smaller scale** used only by the persona collectible card front/back — deliberately not folded into `--fs-*` because the card is signature illustration art, not app chrome.
 
