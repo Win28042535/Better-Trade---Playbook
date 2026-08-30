@@ -10,6 +10,8 @@ design review; expect it to drift the same way its siblings have (see §11).
 - [PRODUCT.md](PRODUCT.md) — brand personality, users, product purpose, anti-references
 - [TYPOGRAPHY-DNA.md](TYPOGRAPHY-DNA.md) — full type-scale read-out
 - [EFINAI-ORB-DNA.md](EFINAI-ORB-DNA.md) — the efin AI orb icon's own DNA
+- [GLOW-BORDER-DNA.md](GLOW-BORDER-DNA.md) — the ตัวตน card preview's living rotating comet border
+- [AURORA-BACKGROUND-DNA.md](AURORA-BACKGROUND-DNA.md) — the analyzing screen's drifting light-blob background
 - [PLAYBOOK-2026-DATA-BASELINE.md](PLAYBOOK-2026-DATA-BASELINE.md) — content/persona data source
 
 ---
@@ -265,11 +267,15 @@ without manually driving the real counters to the threshold. **When a new screen
 if/else state, add a demo-panel override for it** — this has become the established way to make a state
 reviewable.
 
-### 9.2 Version-preview toggles (`BOOK_VER`, `POSTER_VER`)
-Global vars (not real user-facing settings) letting the demo panel A/B two implementations of the same
+### 9.2 Version-preview toggles (retired pattern — `BOOK_VER`, `POSTER_VER`)
+Global vars (not real user-facing settings) that let the demo panel A/B two implementations of the same
 screen side-by-side during a redesign (Book v1 vs v2, Poster v1/v2/v3) before one is retired. Once a
-version "wins," the loser is usually kept reachable via the panel for a while rather than deleted
-immediately, in case review reopens it.
+version "won," the loser was usually kept reachable via the panel for a while rather than deleted
+immediately, in case review reopened it — but both examples here have since had their loser actually
+deleted once no one reopened it: `POSTER_VER` (2026-08-29, only V3 ever reachable) and `BOOK_VER`
+(2026-08-30, "ลบ คู่มือ 1 ออก" — คู่มือ 1's `renderBook()` removed, `renderBook2()` renamed to
+`renderBook`). Neither var exists in the code anymore; this section stays as a record of the pattern
+for the next time a version A/B is needed, not as a pointer to live code.
 
 ---
 
