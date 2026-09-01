@@ -4,7 +4,7 @@ Source of truth: [dna-quiz-flow.html](dna-quiz-flow.html) — the `:root` block 
 below it (components), and the `<script>` at the bottom (motion + render logic). **This document is a
 read-out of that live file, not a new spec.** If this doc and the CSS ever disagree, the CSS wins — grep
 the file (`--fs-`, `--ink`, `.next-step`, etc.) before trusting a number here. Written 2026-08-26 for
-design review; expect it to drift the same way its siblings have (see §11).
+design review, last synced 2026-09-01 (see §10); expect it to drift the same way its siblings have (see §11).
 
 **Sibling docs** (this file indexes/condenses them — don't duplicate their detail here):
 - [PRODUCT.md](PRODUCT.md) — brand personality, users, product purpose, anti-references
@@ -110,7 +110,10 @@ positive tracking.
 
 ## 4. Spacing, radius, shadow
 
-Named-by-use-case spacing scale (10 values) — pick the *case* that matches, not a raw px:
+Named-by-use-case spacing scale (10 values) — pick the *case* that matches, not a raw px. The
+2026-08-31 border/spacing audit rounded ~58 off-grid literals (9/10/14/18/26/28px, etc., that had
+drifted in ad hoc) onto the nearest existing rung below — no new tokens were added, this was
+compliance cleanup, not a re-tune:
 
 | Token | px | Use case |
 |---|---|---|
@@ -127,11 +130,19 @@ Named-by-use-case spacing scale (10 values) — pick the *case* that matches, no
 | `--sp-section` | 20 (24 tablet/pc) | gap between top-level sections on a long scroll |
 
 Radius: `--r0:6px` (micro-chrome — tooltip/focus ring/route badge), `--r1:8px` (small cards), `--r2:16px`
-(cards), `--rpill:48px` (pills/buttons). 12px and 24px are reserved, unused.
+(cards), `--rpill:48px` (pills/buttons). 12px and 24px are reserved, unused — **enforced by the
+2026-08-31 border/spacing audit**, which caught 3 consumers (`.ns-ic`, `.scan-mine-qr`, `.scan-note`)
+that had drifted onto a stray literal `12px` and repointed them at `var(--r2)`; the "reserved" claim is
+now actually true again, not just documented.
 
 Shadows: `--shadow-action`/`--shadow-primary` (buttons — genuine floating controls keep a shadow),
-`--shadow-md`/`--shadow-lg` (overlays: demo panel, lightbox). **Cards/sections themselves carry no
-shadow** — hairline border only (`--line-soft`), per the "scenes, not components" principle in §1.
+`--shadow-md`/`--shadow-lg` (overlays: demo panel, map lightbox, scan/share/howto sheets). **Cards/
+sections themselves carry no shadow** — hairline border only (`--line-soft`), per the "scenes, not
+components" principle in §1. `--shadow-lg` was also re-tuned in the 2026-08-31 audit: it now matches
+the value already hand-duplicated across the map lightbox + `.scan-card`/`.share-sheet`/`.howto-card`
+(instead of an old 24px/64px/.26 definition none of them actually used), and those 4 consumers now
+reference the token instead of repeating the literal. `.demo-panel` is the only other `--shadow-lg`
+consumer and got marginally stronger as a side effect (dev-only tool, not user-facing).
 
 ---
 
@@ -206,7 +217,12 @@ since this SPA replaces `root.innerHTML` wholesale on every render (see §9.2).
   §2.2 instead of ink. **This is the pattern to reuse next time a new "one action, in a card" moment
   needs a home** — don't invent a fourth bespoke card shape for it.
 - `.conf-box` — the Confidence Score card (sub-score bars + a `.conf-foot` note+CTA row, itself using the
-  full-width `.btn.btn-primary` shape, not Liquid Metal, for its "เล่นเกม 6 ด้าน" button).
+  full-width `.btn.btn-primary` shape, not Liquid Metal, for its "เล่นเกม 6 ด้าน" button). **Also reused
+  as-is by `skillCardHTML()`** for the SKILL ประจำการ์ด card (title + `.skc-chiprow` + `.conf-bars` rows,
+  same shell) — a second consumer of the same class, not a fork. Its "ยังขาด" badge (amber `.sc.act`
+  chip beside the title, laid out via a `.trait-hd` flex wrapper shared with `.skc-t`) was removed
+  2026-09-01 per direction; `.trait-hd` was deleted with it since nothing else used that wrapper, and
+  `.skc-t` went back to its own default margin instead of the inline zero it used to need.
 
 ### 7.3 Bars & charts — three idioms, one reveal mechanism
 All three share the `.viz-bar` reveal (§6.2) and a `grid-template-columns:1fr auto` row shape
@@ -279,22 +295,30 @@ for the next time a version A/B is needed, not as a pointer to live code.
 
 ---
 
-## 10. What changed most recently (this session, 2026-08-26)
+## 10. What changed most recently
 
-For quick orientation on what's newest and least battle-tested — worth a closer look in review:
-- **Token re-tune (same day as this doc, per direct spec)**: `--fs-sub`/`--fs-body` 20→22px;
-  `--sp-list` 9→8, `--sp-inline` 10→12, `--sp-stack`/`--sp-card-pad-sm` 14→16, `--sp-card-pad` 20→22.
-  Applied directly to `:root` — every consumer is token-based so nothing else needed touching. Verified
-  no horizontal overflow and no fixed-height text clipping at the new sizes; not yet checked against a
-  visual screenshot in this session (Browser pane wasn't compositing frames) — worth a manual look.
-- Booth-zone icon-set completed (ทองคำ/สุขภาพ art added, all 10 zones now have bespoke PNG icons).
-- New **green** status tone added to the ladder (§2.2) — the newest tone, only one hand-mixed token deep.
-- `.next-step` extended with tone modifiers (`ds-ok`/`ds-need`) — first reuse of that card shape outside
-  its original ink-dark context; worth checking it still reads correctly if a third tone is ever needed.
-- `.int-bar-row` interest-bar chart is new (real-data-only bars, no fabricated stated-marker — an earlier
-  dashed-marker version was tried and explicitly reverted).
-- `เล่นเกม 6 ด้าน` CTA button restyled twice in one session (small inline pill → full-width `.btn-primary`
-  matching the share-card button) — a live example of the "layout ตามรูปที่ N" review workflow.
+For quick orientation on what's newest and least battle-tested — worth a closer look in review.
+Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
+
+**2026-09-01** (`894dc5e`) — two unrelated fixes in one commit:
+- Glow border (`.hero-glow-spin`'s conic-gradient) reworked for a longer spectrum + softer graduated
+  tail — stop positions/angles only, motion/mask technique untouched. Detailed in full in
+  [GLOW-BORDER-DNA.md](GLOW-BORDER-DNA.md) §7–§8 (kept in sync there, not duplicated here).
+- `skillCardHTML()`'s "ยังขาด" badge removed per direction — see the `.conf-box` bullet in §7.2.
+
+**2026-08-31** (`32aad80`, "Border & spacing audit") — compliance cleanup, no new tokens or visual
+redesign: 3 stray `border-radius:12px` consumers repointed at `var(--r2)`, `--shadow-lg` aligned to
+the value already duplicated across 4 overlay cards, ~58 off-grid spacing literals rounded onto the
+existing scale. Full detail folded into §4 above. Verified in-browser (no console errors, no
+clipping/overlap) across Book, Home, and demo-panel screens.
+
+**2026-08-26** (token re-tune + content additions, folded into their sections above rather than kept
+here as a separate list): `--fs-sub`/`--fs-body` 20→22px; `--sp-list` 9→8, `--sp-inline` 10→12,
+`--sp-stack`/`--sp-card-pad-sm` 14→16, `--sp-card-pad` 20→22 (see §3/§4). Booth-zone icon-set
+completed (all 10 zones now have bespoke PNG icons, §5). New **green** status tone added (§2.2) —
+still the newest tone, only one hand-mixed token deep, unchanged since. `.next-step` extended with
+tone modifiers `ds-ok`/`ds-need` (§7.2) and `.int-bar-row` interest-bar chart added (§7.3) — both
+still current, no further changes since.
 
 ---
 
@@ -306,6 +330,9 @@ For quick orientation on what's newest and least battle-tested — worth a close
 - **`.next-step` now serves two visual jobs** (ink-dark hero card *and* light tone-colored status card) —
   confirm this dual-purpose is intentional going forward, not a shortcut that should fork into two
   components once one of them grows more custom needs.
+- **`.conf-box` now serves two jobs too** (Confidence Score card *and* the SKILL card via
+  `skillCardHTML()`, §7.2) — same watch-out as `.next-step` above: fine while both stay simple rows +
+  a foot/chip row, worth a second look if either grows bespoke needs the other shouldn't inherit.
 - **This doc itself will go stale** — the same way `design-dna-bt2026` (memory) and the sibling `.md`
   files already have, per their own admitted history. Re-grep `:root` and the component classes named
   here before trusting a specific value in a future review.
