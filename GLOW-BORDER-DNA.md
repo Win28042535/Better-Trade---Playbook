@@ -162,14 +162,29 @@ padding-box-reveal trick this file already uses elsewhere (`.q-opt.sel`, `.pcv-b
 - `.hero-glow-spin` is the **Rotating Gradient Layer**: an absolutely-positioned square, centered
   on `.hero-gw` via `top:50%;left:50%;transform:translate(-50%,-50%) rotate(...)`, with
   `background:conic-gradient(...)` painting the whole "Bright Head → Soft Tail → Fading Trail →
-  Resting Border" anatomy in ONE gradient (stops: `var(--line-soft)` 0–8deg [resting] → `#61e8ed`
-  9deg → `#9c91ff` 34deg → `#f178d8` 59deg → `#f2ea83` 84deg [head sweeps the full spectrum] →
-  fades back to `var(--line-soft)` by 130deg [soft tail + fading trail] → flat `var(--line-soft)`
-  130–360deg [resting border, the majority of the loop] — 0deg and 360deg both resolve to the same
-  color so the gradient's own definition seam is invisible, landing deep in the flat resting arc
-  rather than at the visible head). `@keyframes heroGlowSpin{to{transform:...rotate(360deg)}}`
-  drives the spin, `4s linear infinite` — **same speed idle and on hover**, per §3 (no
-  `@media(hover:hover)` rule needed any more, unlike the SVG-era version this replaced).
+  Resting Border" anatomy in ONE gradient. **Stops revised 2026-09-01** ("Long Spectrum & Soft
+  Tail" direction — the original 8/9/34/59/84/130deg shape read as short against this frame's long
+  ~1:4 perimeter, and its tail/head were both hard 1–2-stop linear cuts instead of a gradual fade).
+  Angles now live on custom properties (`--g-lead` etc., set on `.hero-glow-spin` itself) so they
+  can be read/tuned without re-deriving the whole gradient string:
+  `--g-lead:6deg` → `--g-head-mid:13deg` (soft onset midpoint, `rgba(57,126,131,.54)`, replacing the
+  old 1deg knife-edge jump) → `--g-head:20deg` (`#61e8ed`, head reaches full brightness — still the
+  *shortest*, crispest ramp on the ring per §3's "head stays a bit more defined than the tail") →
+  `--g-hue1:50deg` (`#9c91ff`) → `--g-hue2:80deg` (`#f178d8`) → `--g-core-end:110deg` (`#f2ea83`,
+  core spectrum widened 75deg→90deg) → four graduated tail stops, each lerped toward
+  `var(--line-soft)` in BOTH hue and alpha (100/82/63/45/26% intensity, matching a Head→Core→Tail→
+  Background step-down instead of one flat blend): `--g-tail1:132deg` (`rgba(197,191,111,.82)`) →
+  `--g-tail2:154deg` (`rgba(152,148,88,.63)`) → `--g-tail3:176deg` (`rgba(107,105,67,.45)`) →
+  `--g-tail4:198deg` (`rgba(62,62,45,.26)`) → `--g-rest:220deg` (`var(--line-soft)`, fully resting —
+  tail widened 46deg→110deg) → flat `var(--line-soft)` 220–360deg (resting arc, now 146deg instead
+  of 230deg — spectrum+tail nearly doubled, 121deg→220deg, intentionally, per "frame should feel a
+  light presence covering it"). 0deg/360deg still resolve to the same color so the gradient's own
+  definition seam stays invisible in the flat resting arc. Responsive: `@media(max-width:1024px)`
+  and `(max-width:640px)` trim `.hero-glow-spin`'s own `opacity` (.92/.85) rather than re-deriving
+  the angle set — per spec, smaller viewports should stay "same long spectrum, just a touch
+  quieter," not shorter. `@keyframes heroGlowSpin{to{transform:...rotate(360deg)}}` still drives the
+  spin, `4s linear infinite` — **same speed idle and on hover**, per §3 (no `@media(hover:hover)`
+  rule needed any more, unlike the SVG-era version this replaced) — untouched by this revision.
 - `sizeHeroGlow()` (JS, dna-quiz-flow.html) is what makes this square "oversized" correctly for
   *any* aspect ratio: it measures `.hero-gw`'s real `clientWidth`/`clientHeight`, sets
   `.hero-glow-spin`'s `width`/`height` to `sqrt(w²+h²)+48` (diagonal + 24px margin each side, Origin
