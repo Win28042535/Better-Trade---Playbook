@@ -91,7 +91,8 @@ amber's shape) is worth a review — see §11.
 
 Two typefaces: **FC Minimal** (`--font`, UI voice — everything, incl. all Thai text) and **Baskervville**
 (`--serif`, editorial display voice — **English display text + numerals only, never Thai**). Both
-self-hosted base64 `@font-face`, no CDN dependency.
+self-hosted `@font-face`, no CDN dependency — as of the 2026-09-02 asset-extraction pass, the `.ttf`
+files live under `assets/` and are referenced by relative `url()`, not inlined as base64 (see §10).
 
 Fixed scale (identical mobile/tablet/pc — only spacing grows on wider viewports, never type size):
 
@@ -152,8 +153,9 @@ consumer and got marginally stronger as a side effect (dev-only tool, not user-f
 inline `<symbol>` defs, rendered via `ic('lc-name')` → an inline `<svg><use></use></svg>`. Stroke width
 steps with size: 16px→1.75px, 20/24px→2px. Never filled/duotone/emoji.
 
-**Override: custom PNG icon-set art**, embedded as base64 `data:` URIs, for specific domains where
-bespoke illustrated icons were supplied (17 images: `ICON_STOCK_TH_PNG`, `ICON_GOLD_PNG`,
+**Override: custom PNG icon-set art**, loaded from `assets/*.png` (base64-inlined `data:` URIs until
+the 2026-09-02 extraction pass, see §10 — same PNGs, just external files now), for specific domains
+where bespoke illustrated icons were supplied (17 images: `ICON_STOCK_TH_PNG`, `ICON_GOLD_PNG`,
 `ICON_JOYSTICK_PNG`, `ICON_CROWN_PNG`, etc.). Every consumer follows the same **fallback pattern** —
 PNG art if this specific key has it, else fall back to the Lucide symbol — so a future entry without
 commissioned art never renders broken:
@@ -299,6 +301,21 @@ for the next time a version A/B is needed, not as a pointer to live code.
 
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
+
+**2026-09-02 — asset extraction (repo-size fix, no visual change).** `dna-quiz-flow.html` had grown to
+~54MB because every image/video/font was inlined as a base64 `data:` URI directly in JS variables
+(`ICON_*_PNG`, `LOGO_IMG`, `BG_IMG`, `ASSET_IMG`, `REAL_CARD_IMG`, `BG_VIDEO`, the 3 `@font-face` rules)
+— GitHub started warning on push once it crossed the 50MB recommended-max. Pulled all 53 embedded
+assets out to real files under `assets/` (biggest wins: the 22.7MB home hero video and the 13.8MB
+booth-map PNG) and replaced each data URI with a relative path string — since JS just interpolates
+these vars into `src="..."`/`url(...)` either way, **no consuming code needed to change**, only the
+RHS of each `var NAME=`/`key:` assignment. `dna-quiz-flow.html` dropped to ~540KB; `assets/` holds the
+~38MB of actual binary content (base64 itself was inflating the text by ~33% on top of that). Verified
+line-by-line that only the 29 known asset-declaration lines changed (nothing else in the file moved),
+and confirmed live that video/map/card art/icons/fonts all still load with no console errors after the
+swap. Git history before this commit still has the old ~54MB blob in it — this only stops it from
+growing further, it doesn't shrink already-pushed history (that needs a separate, more invasive
+history-rewrite pass if ever wanted).
 
 **2026-09-01** (`894dc5e`) — two unrelated fixes in one commit:
 - Glow border (`.hero-glow-spin`'s conic-gradient) reworked for a longer spectrum + softer graduated
