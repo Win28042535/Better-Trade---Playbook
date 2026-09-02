@@ -317,6 +317,17 @@ swap. Git history before this commit still has the old ~54MB blob in it — this
 growing further, it doesn't shrink already-pushed history (that needs a separate, more invasive
 history-rewrite pass if ever wanted).
 
+**2026-09-02 — video compression (same-day follow-up).** `assets/sky.mp4` (the home hero background,
+§7 doesn't cover it since it's markup not a component, but it's the `.hh-video` behind "คู่มือลงทุนของ
+คุณ") was the single biggest asset — probed with ffprobe and found it was a raw **3364×2464 @ ~17Mbps**
+export, way past what `.hh-video{object-fit:cover}` ever needs (the card it fills tops out at 760px
+wide on tablet/pc, less on mobile). Re-encoded with ffmpeg — installed one-time as a scratch npm
+package (`ffmpeg-static`/`ffprobe-static`), not a system install — to 1280px-wide H.264, CRF 28,
+`+faststart`, no audio track (there wasn't one to begin with): **17MB → 1.1MB**, a further ~15×
+reduction on top of the extraction above. Compared a same-timestamp frame from both versions side by
+side before committing to the swap — visually indistinguishable at the video's real display size.
+Verified live: same 8.04s duration, still autoplays/loops/plays muted, no console errors.
+
 **2026-09-01** (`894dc5e`) — two unrelated fixes in one commit:
 - Glow border (`.hero-glow-spin`'s conic-gradient) reworked for a longer spectrum + softer graduated
   tail — stop positions/angles only, motion/mask technique untouched. Detailed in full in
