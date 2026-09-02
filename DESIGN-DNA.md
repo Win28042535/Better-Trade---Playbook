@@ -341,6 +341,17 @@ ZONE"/"Health ZONE" labels) between the original and two quality candidates (90 
 between them). Verified live: preview thumbnail and the fullscreen lightbox zoom both render sharp, no
 console errors, transparency intact.
 
+**2026-09-02 — icon-set outlier cleanup (same-day follow-up).** 4 of the 17 custom PNG icons
+(`ICON_GOLD_PNG`, `ICON_HEALTH_PNG`, `ICON_JOYSTICK_PNG`, `ICON_HOURGLASS_PNG` — 1.5–2.6MB each, ~8.7MB
+combined) turned out to be raw **1920×1920** exports that never got downsized like their 13 siblings,
+which all sit at a consistent 240×240 (~90–130KB each). Every consumer displays these at 24–48px
+(`.bc-asset-ic`/`.ns-ic`/`.ev-empty-ic`) — even 3× retina only ever needs ~144px. Downscaled all 4 to
+the same 240×240 the rest of the set already uses (lanczos filter, kept PNG for consistency with the
+siblings rather than introducing a third format): **~8.7MB → ~0.35MB**, ~25× smaller. Verified each
+visually at 240×240 before swapping (still sharp, illustrated-glass style holds up fine at this size)
+and live in its real context — booth-zone rows (gold bars, health heart), the games next-step card
+(joystick), and the Games "Coming soon" empty state (hourglass) — no console errors.
+
 **2026-09-01** (`894dc5e`) — two unrelated fixes in one commit:
 - Glow border (`.hero-glow-spin`'s conic-gradient) reworked for a longer spectrum + softer graduated
   tail — stop positions/angles only, motion/mask technique untouched. Detailed in full in
