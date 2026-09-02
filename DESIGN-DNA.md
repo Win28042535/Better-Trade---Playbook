@@ -328,6 +328,19 @@ reduction on top of the extraction above. Compared a same-timestamp frame from b
 side before committing to the swap — visually indistinguishable at the video's real display size.
 Verified live: same 8.04s duration, still autoplays/loops/plays muted, no console errors.
 
+**2026-09-02 — map image compression (same-day follow-up).** `assets/MAP_IMG.png` (the booth floorplan,
+`.mp-img` inline preview + `.ml-img` fullscreen lightbox) was next biggest at 10.37MB — a raw
+3657×2772 RGBA export, again far past what either consumer displays at (`.ml-card{max-width:720px}`
+caps even the "zoomed in" lightbox). Converted to **WebP** instead of just downscaling the PNG, since
+it has real alpha transparency (the floorplan's diagonal silhouette sits on `.map-ph`'s own gradient
+background, not a bounding box) that a plain JPEG swap would have lost. Scaled to 2200px wide (~3× the
+720px display cap, generous headroom for the small zone-label text) at WebP quality 90: **10.37MB →
+0.32MB**, ~32× smaller. Compared crops of the same real-world region (the "Alternative Investment
+ZONE"/"Health ZONE" labels) between the original and two quality candidates (90 and 85) before picking
+— text stayed crisp at both, went with 90 for the larger safety margin at negligible extra size (~100KB
+between them). Verified live: preview thumbnail and the fullscreen lightbox zoom both render sharp, no
+console errors, transparency intact.
+
 **2026-09-01** (`894dc5e`) — two unrelated fixes in one commit:
 - Glow border (`.hero-glow-spin`'s conic-gradient) reworked for a longer spectrum + softer graduated
   tail — stop positions/angles only, motion/mask technique untouched. Detailed in full in
