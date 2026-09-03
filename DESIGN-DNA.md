@@ -225,6 +225,22 @@ since this SPA replaces `root.innerHTML` wholesale on every render (see §9.2).
   chip beside the title, laid out via a `.trait-hd` flex wrapper shared with `.skc-t`) was removed
   2026-09-01 per direction; `.trait-hd` was deleted with it since nothing else used that wrapper, and
   `.skc-t` went back to its own default margin instead of the inline zero it used to need.
+- **`.pass-card`'s multi-ticket variant** (2026-09-02, `DEMO.multiTicket` demo-panel preview only — see
+  §9.1) — **zero new classes.** `passCardMultiHTML()` just repeats the exact single-ticket block above
+  (`.pass-ey`+icon, `.pass-name.pn-indent`, `.pass-benefit`, `.pass-foot` price row) once per held
+  ticket inside the one card, pulling each ticket's ประเภทบัตร/สิทธิ/ราคา from the same `TIER_META`
+  lookup `curTier()` reads. Only ticket #1 keeps the chevron and the "บัตรของคุณ" eyebrow text; ticket
+  2+ gets "บัตรใบที่ N" and a hairline `border-top` divider (same technique `.pass-foot` already uses)
+  ahead of it. A same-day first pass here tried a bespoke combined-summary layout (icon badge + tier
+  pill row + one "unlocked X of Y" line) — scrapped once directed to reuse the single-ticket DNA
+  verbatim instead of inventing a new card shape.
+- **Profile's `ticketHistoryHTML()`** (2026-09-02, `DEMO.multiTicket` only) — also zero new classes: it
+  reuses `sidesHTML()`'s "6 ด้านที่วัดได้จากคุณ" list DNA verbatim (`.card`/`.sides-hd`/`.s-ey`/`.s-h`/
+  `.s-sub` for the header, `.side-item`/`.side-row`/`.side-num`/`.side-cx`/`.side-t`/`.side-s`/`.side-r`/
+  `.sc` per row) rather than the bespoke `.tkt-hist`/`.tkt-row` set a same-day first pass built — see
+  §9.1. `.side-num.done`/`.sc.done` (ink circle, the ladder's own green "complete" chip) both already
+  mean "settled/valid," reused as-is for "ใช้งานได้"; no expand/collapse, since a ticket has nothing
+  further to reveal the way a 6-ด้าน row's body does.
 
 ### 7.3 Bars & charts — three idioms, one reveal mechanism
 All three share the `.viz-bar` reveal (§6.2) and a `grid-template-columns:1fr auto` row shape
@@ -283,7 +299,10 @@ as of this session — **explicit force-toggles for edge-case states** (e.g. `DE
 ครบเงื่อนไขแล้ว/ยังขาด for the prize-draw card) so both branches of a conditional UI can be previewed
 without manually driving the real counters to the threshold. **When a new screen has a meaningful
 if/else state, add a demo-panel override for it** — this has become the established way to make a state
-reviewable.
+reviewable. **`DEMO.multiTicket`** (2026-09-02) is the newest example: a "จำนวนบัตร" toggle previewing a
+customer holding 2 tickets at once (see §7.2's `.pass-card` multi-ticket bullet) — default OFF,
+single-ticket stays the real/active state, and it's scoped to just Home + Profile, not a reinterpretation of the
+`สิทธิ์ของคุณ` `curTier()` select every other gate in the file still reads.
 
 ### 9.2 Version-preview toggles (retired pattern — `BOOK_VER`, `POSTER_VER`)
 Global vars (not real user-facing settings) that let the demo panel A/B two implementations of the same
@@ -301,6 +320,56 @@ for the next time a version A/B is needed, not as a pointer to live code.
 
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
+
+**2026-09-02 — responsive audit: `.topbar` overflow at 320px, on-event.** Per direction "responsive
+audit" — scripted a `scrollWidth`/`clientWidth` sweep (not visual spot-checks) across every screen ×
+`data-view` × real width (320/375/768/1280px), 17 screen-states × 3 views × 4 widths. Found exactly one
+genuine overflow: on-event, `.topbar` holds 3 items at once (`.tb-logo` + `.reg-cta` "ลงทะเบียน"
+[`flex-shrink:0`, never compresses] + `#qr-cta-slot`'s mounted "สแกน QR" button) — reproduces on every
+screen showing this header combo (Home/Games/Booth via `appHeader()`, Book via its own pre-`appHeader()`
+duplicate header at line ~3988 — see the open item below), but **only at 320–329px**, a genuinely
+narrow window (confirmed clean at 330/340/375px via the same script). Fixed by tightening just the gap
+between the 3 items from `--sp-inline` (12px) to `--sp-glue` (6px) at `max-width:340px` — closes the 6px
+shortfall with margin, verified via the same sweep script (0 overflow found, re-run at all 4 widths)
+before and after, not just a visual re-check. Re-ran the full sweep clean afterward at 320/375/768/1280.
+
+**Methodology note for next time:** the sweep script's first draft leaked `DEMO` state between
+screen-setups (not resetting `eventPhase`/`RESULT`/etc. per iteration), which combined with render()'s
+own on-event redirect gate (§ "On-Event gate" near `function render()`) silently substituted `home`/
+`book` for several screens the script THOUGHT it was testing as `splash`/`consent`/etc. — inflated the
+first pass's finding count with mislabeled duplicates of the same real bug. Second draft resets all
+demo/session state at the top of every screen-setup call; trust that version's results, not the first.
+
+**2026-09-02 — multi-ticket demo preview (new feature, default OFF), revised same day.** Per direction
+"จำลองเคส...ลูกค้าบัตร 1 แบบ / บัตร 2 แบบ...แต่ยังให้ active ที่กรณีลูกค้าบัตร 1 แบบ" — added
+`DEMO.multiTicket` (demo-panel "จำนวนบัตร" toggle, §9.1) previewing a customer holding 2 tickets at
+once (a fixed Explorer + Master Class combo, `MULTI_TICKET_DEMO`), scoped to exactly the 2 screens
+asked for. **First pass** invented a bespoke combined-summary look for both screens (an icon-badge +
+tier-pill-row pass-card with a "7 จาก 9 สิทธิ" line; a different demo persona name/photo on Profile; a
+new `.tkt-hist` card). **Follow-up direction the same day** asked for the opposite instinct — reuse
+existing DNA, don't invent — so it was rebuilt:
+- **Home's pass-card** (`passCardMultiHTML()`) — no combined summary; repeats the single-ticket
+  ประเภทบัตร/สิทธิ/ราคา block (§7.2) once per ticket, reading the same `TIER_META` `curTier()` uses.
+- **Profile** — chips row unchanged from the first pass (one `.prof-tier` pill per ticket); photo/name/
+  org now stay identical to the single-ticket demo ("ออนไลน์ แอสเซ็ท") rather than a different persona;
+  the "ประวัติการซื้อบัตร" section (`ticketHistoryHTML()`) now reuses `sidesHTML()`'s "6 ด้านที่วัดได้
+  จากคุณ" list DNA verbatim instead of a bespoke card (§7.2).
+
+**Deliberately NOT touched:** every other `curTier()` read in the file (booth map personalization,
+prize-draw eligibility, the post-event upgrade CTA, etc.) — the direction only asked for these 2
+screens, and "what tier level should 2 combined tickets resolve to for gating elsewhere" was never
+specified, so it stays out of scope rather than guessed at. Verified (both passes): default
+(`multiTicket:false`) renders byte-identical to before on both screens; toggling on/off round-trips
+cleanly with no console errors, on mobile and tablet.
+
+**Second follow-up, same day** — 3 small fixes: `ticketHistoryHTML()`'s "ทุกบัตรที่คุณถือ" eyebrow lost
+the icon it had gained in the first rebuild (`sidesHTML()`'s own eyebrow never had one either — this
+was drift, not a deliberate difference). `.pass-ey{align-items:center}` → `flex-start` — the tier icon
+(24px) is visibly taller than the eyebrow's own small text, so centering let it overhang above and
+below the label; this also affects the single-ticket card (harmless — same fix applies either way).
+`passCardMultiHTML()`'s first ticket no longer keeps the "บัตรของคุณ" eyebrow — once there's more than
+one ticket, ALL of them read "บัตรใบที่ N" (1, 2, ...); "บัตรของคุณ" is reserved for the true
+single-ticket card alone, not mixed with "บัตรใบที่ 2" on ticket 1.
 
 **2026-09-02 — asset extraction (repo-size fix, no visual change).** `dna-quiz-flow.html` had grown to
 ~54MB because every image/video/font was inlined as a base64 `data:` URI directly in JS variables
@@ -388,3 +457,9 @@ still current, no further changes since.
 - **This doc itself will go stale** — the same way `design-dna-bt2026` (memory) and the sibling `.md`
   files already have, per their own admitted history. Re-grep `:root` and the component classes named
   here before trusting a specific value in a future review.
+- **Book's header is a hand-duplicated `appHeader()`** (line ~3988, predates `appHeader()` existing as a
+  shared helper — see the 2026-09-02 responsive-audit entry in §10) — unlike `appHeader()`, it renders
+  `#qr-cta-slot` unconditionally instead of omitting it in Pre-Event. Harmless today (an unmounted empty
+  slot is 0-width, `mountHeaderQR()` already no-ops in Pre-Event), but it's still a second copy of the
+  same markup that can silently drift from `appHeader()` again — worth switching Book to call
+  `appHeader()` directly next time this file is touched.

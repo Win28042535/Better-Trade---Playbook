@@ -186,6 +186,18 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 
 /* TOP BAR — quiet, no boxed icon chrome */
 .topbar{position:sticky;top:0;z-index:80;background:var(--popover);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line-header);height:54px;display:flex;align-items:center;padding:0 var(--sp-stack);gap:var(--sp-inline);flex-shrink:0;}
+/* Bug fix (2026-09-02, responsive audit — found via a scripted scrollWidth/clientWidth sweep across
+   every screen × data-view × real width, not just visual spot-checks) — on-event, .topbar holds 3
+   items at once (.tb-logo + .reg-cta "ลงทะเบียน" [flex-shrink:0, never compresses] + #qr-cta-slot's
+   mounted "สแกน QR" button), and at a genuine 320px viewport (checked 320-375px; only 320-329px
+   actually fails) they don't quite fit even after the logo shrinks as far as it can — a real,
+   precisely reproducible 6px horizontal overflow, on every screen that shows this header combo
+   (Home/Games/Booth via appHeader(), Book via its own pre-appHeader() duplicate header). Tightening
+   just the gap between the 3 items (12px->6px) closes the 6px shortfall with margin to spare —
+   confirmed via the same script before committing to this fix, not just visually. Scoped narrow
+   (≤340px, a few px of headroom above the exact 330px cutoff measured) so the roomier gap everywhere
+   else is untouched. */
+@media(max-width:340px){.topbar{gap:var(--sp-glue);}}
 /* Header's registration CTA (2026-08-19) — same .btn.btn-primary as renderConsent's #startBtn
    ("style เดียวกับปุ่ม เริ่มทำแบบทดสอบ"), same fill/color/weight/pill-shape, just resized down from
    that button's full 48px-tall/24px-padding dimensions (same technique as .q-nav's own .btn-primary
@@ -1575,7 +1587,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    align-items:center centers it against just that one eyebrow line. */
 /* letter-spacing dropped (2026-08-29, per direction) — same fix as .s-ey above; "บัตรของคุณ" and
    "ความคืบหน้าของคู่มือ" are this class's only two call sites, both Thai. */
-.pass-ey{display:flex;align-items:center;gap:var(--sp-inline);font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);text-transform:uppercase;}
+/* align-items:flex-start (2026-09-02, per direction "ให้ไอคอน alignment top กับคำว่า บัตรของคุณ") —
+   was center: the tier icon (--ic-lg, 24px) is visibly taller than this eyebrow's own small text, so
+   centering the two against each other let the icon overhang above AND below the label; top-aligning
+   lines the icon's own top edge up with the text's cap-height instead, reading as deliberate rather
+   than just "vertically centered because that's the flex default." */
+.pass-ey{display:flex;align-items:flex-start;gap:var(--sp-inline);font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);text-transform:uppercase;}
 .pass-ey-ic{width:var(--ic-lg);height:auto;flex:0 0 auto;}
 .pass-name{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);line-height:1.15;margin-top:1px;}
 /* "บัตรของคุณ"'s tier icon moved from its own .pass-ic badge column, to inline with .pass-name
@@ -1591,6 +1608,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pass-benefit{font-size:var(--fs-bodysm);color:var(--muted);margin-top:var(--sp-inline);line-height:1.4;}
 .pass-foot{margin-top:var(--sp-inline);padding-top:var(--sp-inline);border-top:1px solid var(--line-soft);display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-list);}
 .pass-foot-lbl{font-size:var(--fs-eyebrow);color:var(--muted);}
+/* Multi-ticket pass-card (2026-09-02, per direction "จำลองเคส...ลูกค้าบัตร 2 แบบ", revised same day
+   per follow-up direction "ใช้ข้อมูล/DNA เดียวกับบัตร 1 ใบ แต่เพิ่มข้อมูลบัตรใบที่ 2 เข้าไป") — no new
+   classes needed at all: passCardMultiHTML() just repeats the exact .pass-ey/.pass-name.pn-indent/
+   .pass-benefit/.pass-foot block above once per held ticket, inside the same one .pass-card. An
+   earlier pass here invented a combined-privileges summary line + a badge/pill layout instead; scrapped
+   same day once the direction clarified it should read as "your normal ticket card, just twice," not a
+   new card shape. See §7.2's `.pass-card` bullet below for the exact markup this repeats. */
 .pass-price{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);}
 /* next-step — the ONE prominent home action, an ink card echoing the source's dark navy card */
 /* align-items:flex-start (2026-08-15, per direction "align top... ตอนนี้ align center อยู่") — shared
@@ -2267,6 +2291,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    repeated value elsewhere to consolidate into a token. */
 .pq-box svg{width:96px;height:96px;}
 .pq-note{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;margin:var(--sp-inline) auto 0;max-width:300px;}
+/* "ประวัติการซื้อบัตร" (2026-09-02, multi-ticket demo only) reuses sidesHTML()'s "6 ด้านที่วัดได้จาก
+   คุณ" list DNA verbatim (per direction "ใช้ design dna เดียวกับ section 6 ด้าน...") — .card/.sides-hd/
+   .s-ey/.s-h/.s-sub for the header, .side-item/.side-row/.side-num/.side-cx/.side-t/.side-s/.side-r/.sc
+   for each row. No new classes at all; see ticketHistoryHTML(). An earlier pass here built a bespoke
+   .tkt-hist/.tkt-row/.tkt-ok set instead — deleted same day once the direction asked for the existing
+   pattern, not a new one. */
 .prof-rows{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-stack) var(--sp-card-pad);display:flex;flex-direction:column;gap:var(--sp-inline);}
 .pr-row{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--sp-inline);font-size:var(--fs-bodysm);}
 .pr-k{color:var(--muted);flex:0 0 auto;}
@@ -4357,6 +4387,25 @@ var TIER_META={
    never by .prof-tier's plain ic() badge. */
 var TIER_ICON_PNG={'lc-crown':ICON_CROWN_PNG,'lc-gem':ICON_DIAMOND_PNG,'lc-compass':ICON_COMPASS_PNG};
 function curTier(){var s=document.getElementById('demoTier');var n=(s&&s.value)||'Master Class';return {name:n,meta:TIER_META[n]||TIER_META['Master Class']};}
+/* Multi-ticket demo preview (2026-09-02, per direction "จำลองเคส...ลูกค้าบัตร 2 แบบ [เช่น] ซื้อบัตร
+   Ultimate แล้ว ซื้อ Master class เพิ่ม", revised same day per follow-up direction — Profile's
+   photo/name/org should stay the SAME as the single-ticket demo, not a different persona, and Home's
+   pass-card should reuse the single-ticket ประเภทบัตร/สิทธิ/ราคา DNA verbatim per ticket rather than a
+   combined summary) — a SEPARATE preview toggle (DEMO.multiTicket, see buildDemo) from curTier()
+   above, scoped only to the 2 screens the direction actually asked for (Home's pass-card, Profile's
+   chips row + a new ticket-purchase-history section) — every other curTier() gate in the file (booth
+   map personalization, prize-draw eligibility, post-event upgrade CTA, etc.) is untouched and keeps
+   reading the single-tier demoTier select regardless of this flag, since the direction didn't ask
+   those to change and "what tier level does 2 combined tickets resolve to for gating" was never
+   specified. Hardcoded to one illustrative combo (Explorer + Master Class, matching the direction's
+   own example almost exactly) rather than deriving every possible pairing — this is a fixed preview
+   case, not a general multi-ticket cart system. */
+var MULTI_TICKET_DEMO={
+  tickets:[
+    {name:'Explorer',icon:'lc-compass',validity:'2 วัน',buyDate:'5 ก.ย. 2569',no:'BT-100482'},
+    {name:'Master Class',icon:'lc-gem',validity:'1 วัน (วันที่ 2)',buyDate:'22 ก.ย. 2569',no:'BT-118207'}
+  ]
+};
 /* ══ POST-EVENT / "หลังจบงาน · ดูย้อนหลัง" ══ real session data + gating rules extracted verbatim
    from Playbook Final. Workshop and Master Class tracks removed from this section (2026-08-26, per
    direction) — Conference is the only track left; the upgrade CTA below is untouched (still keyed
@@ -4539,6 +4588,30 @@ function mountNgCta(nextIdx){
   if(nextIdx<0||!window.mountLiquidMetalButtonInto)return;
   window.mountLiquidMetalButtonInto('#ng-cta-slot','cta',{label:'เล่นเกม',icon:ic('lc-play-circle'),onClick:function(){GAME_PLAYED[nextIdx]=true;GAME_OPEN=nextIdx;renderGames();}});
 }
+/* Home's multi-ticket pass-card (DEMO.multiTicket only — see MULTI_TICKET_DEMO/buildDemo). Per
+   direction "ใช้ข้อมูล หรือ dna เดียวกับบัตร 1 ใบ แต่เพิ่มข้อมูลบัตรใบที่ 2 เข้าไป mapping เพิ่มด้วย" —
+   this is NOT a bespoke "combined" summary card (an earlier pass here tried that and was reverted
+   same day); it's the exact single-ticket markup below — .pass-ey icon+eyebrow, .pass-name.pn-indent,
+   .pass-benefit, .pass-foot price row — repeated once per held ticket inside the one .pass-card,
+   pulling each ticket's ประเภทบัตร/สิทธิ/ราคา from the SAME TIER_META lookup curTier() already reads.
+   Only the first ticket gets the chevron (one "go see details" affordance for the whole card, not
+   per-row); every ticket's eyebrow reads "บัตรใบที่ N" (2026-09-02 follow-up direction — the single-
+   ticket card keeps "บัตรของคุณ" for itself; once there's more than one, ALL of them are "บัตรใบที่ N",
+   ticket 1 included, not a mix of "บัตรของคุณ" + "บัตรใบที่ 2"). Ticket 2+ also gets a hairline divider
+   (the same border-top .pass-foot already uses elsewhere) to separate it from the ticket above. */
+function passCardMultiHTML(){
+  var blocks=MULTI_TICKET_DEMO.tickets.map(function(ticket,i){
+    var meta=TIER_META[ticket.name]||{};
+    var tp=(meta.sub||'').split(' · ');var benefit=tp[0]||'',price=tp[1]||'';
+    var tierIcHTML=TIER_ICON_PNG[meta.icon]?'<img class="pass-ey-ic" src="'+TIER_ICON_PNG[meta.icon]+'" alt="">':ic(meta.icon,'pass-ey-ic');
+    var eyebrow='บัตรใบที่ '+(i+1);
+    var head=i===0
+      ?'<div class="pass-top"><div class="pass-hd"><div class="pass-ey">'+tierIcHTML+eyebrow+'</div><div class="pass-name pn-indent">'+ticket.name+'</div></div>'+ic('lc-chevron-right','pass-cv')+'</div>'
+      :'<div class="pass-hd" style="margin-top:var(--sp-inline);padding-top:var(--sp-inline);border-top:1px solid var(--line-soft)"><div class="pass-ey">'+tierIcHTML+eyebrow+'</div><div class="pass-name pn-indent">'+ticket.name+'</div></div>';
+    return head+'<div class="pass-benefit">'+benefit+'</div>'+(price?'<div class="pass-foot"><span class="pass-foot-lbl">ราคาบัตร</span><span class="pass-price">'+price+'</span></div>':'');
+  }).join('');
+  return '<button class="pass-card scroll-reveal" id="homeTier">'+blocks+'</button>';
+}
 function renderHome(){
   // Pre-Event (2026-08-28, per direction "หน้าหลัก...Pre-Event: poster, ประกาศจากงาน, บัตรของคุณ,
   // เวทีห้องใหญ่") — "ขั้นต่อไป"/home-counters/book-teaser all reason about real in-event progress
@@ -4563,7 +4636,7 @@ function renderHome(){
       '<img class="hh-logo" src="'+LOGO_IMG.nwnp+'" alt="New World New Playbook">'+
       '<p class="hh-sub"><b>คู่มือการลงทุนส่วนตัวของคุณ ประกอบจากการ์ดตัวตนและสิ่งที่คุณทำจริงในงาน</b> ดูย้อนหลังได้บน efin.finance</p>'+
       '<div class="hh-meta"><span>'+ic('lc-calendar')+'31 ต.ค. – 1 พ.ย. 2569</span><span>'+ic('lc-map-pin')+'Samyan Mitrtown ชั้น 5</span></div></section>'+
-    (function(){var tp=(t.meta.sub||'').split(' · ');var benefit=tp[0]||'',price=tp[1]||'';
+    (DEMO.multiTicket?passCardMultiHTML():(function(){var tp=(t.meta.sub||'').split(' · ');var benefit=tp[0]||'',price=tp[1]||'';
       /* Tier icon inline with .pass-ey (the "บัตรของคุณ" eyebrow), not .pass-name (2026-08-24, per
          direction "อยากให้ icon มงกุฎ alignment กับคำว่า บัตรของคุณ") — same .pass-ey-ic treatment
          "ความคืบหน้าของคู่มือ" already uses. Crown tiers use the hand-drawn มงกุฎ1.png
@@ -4573,7 +4646,7 @@ function renderHome(){
       return '<button class="pass-card scroll-reveal" id="homeTier"><div class="pass-top"><div class="pass-hd"><div class="pass-ey">'+tierIcHTML+'บัตรของคุณ</div><div class="pass-name pn-indent">'+t.name+'</div></div>'+ic('lc-chevron-right','pass-cv')+'</div>'+
         '<div class="pass-benefit">'+benefit+'</div>'+
         (price?'<div class="pass-foot"><span class="pass-foot-lbl">ราคาบัตร</span><span class="pass-price">'+price+'</span></div>':'')+
-      '</button>';})()+
+      '</button>';})())+
     (pre?'':(
     '<section class="next-step scroll-reveal"><div class="ns-ic">'+(ns.iconPng?'<img src="'+ns.iconPng+'" alt="">':ic(ns.icon))+'</div><div class="ns-tx"><div class="ns-ey">'+ns.ey+'</div><div class="ns-t">'+ns.t+'</div></div><div class="ns-cta-slot" id="ns-cta-slot"></div><div class="ns-body"><div class="ns-b">'+ns.b+'</div></div></section>'+
     '<div class="home-counters scroll-reveal">'+HOME_COUNTERS.map(function(c){return '<button class="hc-card" data-go="'+c.go+'"><svg viewBox="0 0 24 24" class="lucide" style="color:'+c.color+'"><use href="#'+c.icon+'"/></svg><div class="hc-val">'+c.val()+'</div><div class="hc-label">'+c.label+'</div></button>';}).join('')+'</div>'+
@@ -5062,18 +5135,50 @@ var PROFILE_ROWS=[
   {k:'สถานที่',v:'Samyan Mitrtown ชั้น 5 ถ.พระรามที่ 4 ปทุมวัน กรุงเทพฯ 10330'},
   {k:'อีเมล',v:'••••••••••'}
 ];
+/* Profile's "ประวัติการซื้อบัตร" (DEMO.multiTicket only) — each ticket is its own purchase/product
+   (per direction "บัตรแต่ละใบเป็นสินค้าแยกกัน ซื้อเพิ่มได้โดยไม่ต้องยกเลิกบัตรเดิม"). Reuses sidesHTML()'s
+   "6 ด้านที่วัดได้จากคุณ" list DNA verbatim (per follow-up direction "ใช้ design dna เดียวกับ section 6
+   ด้าน...") instead of a bespoke card — same .card/.sides-hd/.s-ey/.s-h/.s-sub header, same
+   .side-item/.side-row/.side-num/.side-cx/.side-t/.side-s/.side-r/.sc row shape. `.side-num.done`
+   (ink-filled circle) and `.sc.done` (the ladder's own green "complete" chip) both already mean
+   exactly "this is settled/valid," so "ใช้งานได้" reuses them as-is rather than inventing a 4th tone.
+   No expand/collapse here (unlike sidesHTML's own accordion rows) — a ticket has nothing further to
+   reveal, so the chevron-down + .side-body machinery is simply omitted, not disabled. */
+function ticketHistoryHTML(){
+  var rows=MULTI_TICKET_DEMO.tickets.map(function(x,i){
+    return '<article class="side-item"'+(i===MULTI_TICKET_DEMO.tickets.length-1?' style="border-bottom:none"':'')+'>'+
+      '<div class="list-row side-row"><div class="side-num done">'+ic(x.icon)+'</div>'+
+      '<div class="side-cx"><div class="side-t">'+x.name+'</div><div class="side-s">'+x.validity+' · ซื้อ '+x.buyDate+' · เลขที่ '+x.no+'</div></div>'+
+      '<div class="side-r"><span class="sc done">'+ic('lc-check')+'ใช้งานได้</span></div></div></article>';
+  }).join('');
+  return '<section class="card scroll-reveal"><div class="sides-hd"><div class="s-ey">ทุกบัตรที่คุณถือ</div><h2 class="s-h">ประวัติการซื้อบัตร</h2>'+
+    '<p class="s-sub" style="margin-bottom:2px">บัตรแต่ละใบเป็นสินค้าแยกกัน ซื้อเพิ่มได้โดยไม่ต้องยกเลิกบัตรเดิม</p></div>'+rows+'</section>';
+}
 function renderProfile(){
-  var t=curTier();
+  var t=curTier(),m=DEMO.multiTicket;
+  // Multi-ticket: one .prof-tier pill per held ticket instead of curTier()'s single tier pill. Photo/
+  // name/org stay the SAME single-ticket identity regardless (2026-09-02 follow-up direction "รูป,
+  // ชื่อ, description...ใช้ข้อมูลหรือ dna เดียวกับบัตร 1 ใบ") — an earlier pass swapped in a different
+  // demo persona/avatar here, reverted same day since only the ticket-related sections should differ.
+  var tierChips=m?MULTI_TICKET_DEMO.tickets.map(function(x){return '<span class="prof-tier">'+ic(x.icon)+x.name+'</span>';}).join('')
+    :'<span class="prof-tier">'+ic(t.meta.icon)+t.name+'</span>';
+  // "สิทธิ" row becomes "บัตรที่ถือ" : "Explorer + Master Class" when multiTicket — same PROFILE_ROWS
+  // shape/order otherwise, just this one row's label+value swapped.
+  var rows=PROFILE_ROWS.map(function(r){
+    if(r.k==='สิทธิ')return m?{k:'บัตรที่ถือ',v:MULTI_TICKET_DEMO.tickets.map(function(x){return x.name;}).join(' + ')}:{k:r.k,v:t.name};
+    return r;
+  });
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
     '<section class="prof-card scroll-reveal">'+
       '<div class="prof-av"><img src="'+PROFILE_PHOTO+'" alt="รูปโปรไฟล์ของออนไลน์ แอสเซ็ท"></div>'+
       '<div class="prof-name">ออนไลน์ แอสเซ็ท</div>'+
       '<div class="prof-org">บริษัทตัวอย่าง จำกัด (ข้อมูลจำลอง)</div>'+
-      '<div class="prof-chips"><span class="prof-vf">'+ic('lc-check-circle')+'ยืนยันแล้ว</span><span class="prof-tier">'+ic(t.meta.icon)+t.name+'</span></div>'+
+      '<div class="prof-chips"><span class="prof-vf">'+ic('lc-check-circle')+'ยืนยันแล้ว</span>'+tierChips+'</div>'+
       '<div class="prof-qr"><div class="pq-lbl">QR ประจำตัว</div><div class="pq-box">'+ic('lc-qr-code')+'</div><div class="pq-note">เปิดหน้านี้ให้เจ้าหน้าที่สแกน เพื่อเช็คอินบูธ แลกการ์ดตัวจริง หรือส่งสรุปให้ผู้แนะนำการลงทุน · จะสแกน QR ที่จุดนั้นเองก็ได้ผลเหมือนกัน</div></div>'+
     '</section>'+
-    '<section class="prof-rows scroll-reveal">'+PROFILE_ROWS.map(function(r){var v=r.k==='สิทธิ'?t.name:r.v;return '<div class="pr-row"><span class="pr-k">'+r.k+'</span><span class="pr-v">'+v+'</span></div>';}).join('')+'</section>'+
+    (m?ticketHistoryHTML():'')+
+    '<section class="prof-rows scroll-reveal">'+rows.map(function(r){return '<div class="pr-row"><span class="pr-k">'+r.k+'</span><span class="pr-v">'+r.v+'</span></div>';}).join('')+'</section>'+
     '<div class="prof-foot scroll-reveal"><div class="pf-brand">efin × BetterTrade · New World, New Playbook</div>'+
       '<div class="pf-note">'+ic('lc-info')+'เราแค่ "จด" ไม่ "ชี้" · แต้ม ≠ ตัวตน · เพื่อการวางแผนและการศึกษา ไม่ใช่คำชี้ชวนลงทุน</div>'+
       '<div class="pf-note">'+ic('lc-lock')+'เปิดคู่มือด้วย OTP/QR ตาม PDPA · ตัวเลข/สิทธิเป็นข้อมูลเบื้องต้น (MOCK) ต้องเคาะกับทีมจัดงานก่อนใช้จริง</div>'+
@@ -5100,7 +5205,7 @@ function renderProfile(){
    "already done" mock defaults. Switching to 'pre' does NOT touch RESULT/quizDone — a pre-event
    visitor may already have taken the quiz online, so identity content stays independently gated on
    RESULT alone (see renderBook's empty state, buildRoute's personalized flag). */
-var DEMO={view:'auto',quizDone:false,draw:'auto',eventPhase:'pre'}; // draw: 'auto' (default, resolves to eligible) | 'ok' | 'need' — see renderBooth. eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above.
+var DEMO={view:'auto',quizDone:false,draw:'auto',eventPhase:'pre',multiTicket:false}; // draw: 'auto' (default, resolves to eligible) | 'ok' | 'need' — see renderBooth. eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
 /* 'auto' now always resolves to mobile (2026-08-26, per direction "อัตโนมัติ default ไว้ที่ mobile
    size") — was real window.innerWidth-based detection (w<768→mobile/w<1440→tablet/else pc); PC/
    แท็บเล็ต/มือถือ stay available as explicit manual overrides, 'อัตโนมัติ' just no longer reacts to
@@ -5154,6 +5259,12 @@ function buildDemo(){
        switcher had nothing left to switch. */
     '<div class="demo-lbl">สิทธิ์ของคุณ</div><select class="demo-sel" id="demoTier"><option>Master Class</option><option>Explorer</option><option>Ultimate</option></select>'+
     '<div class="demo-stub">* ยังไม่เชื่อมสิทธิ์บัตรกับเนื้อหา (เดโม)</div>'+
+    /* จำนวนบัตร (2026-09-02) — separate preview toggle, not a 3rd demoTier option: "2 ใบ" previews a
+       FIXED illustrative combo (MULTI_TICKET_DEMO) on just the Home pass-card + Profile page, it
+       doesn't reinterpret สิทธิ์ของคุณ above or any other curTier() gate elsewhere in the file.
+       Default stays "1 ใบ" — the single-ticket case is the real/active one. */
+    '<div class="demo-lbl">จำนวนบัตร</div>'+seg('segTicketCount',[{v:'1',t:'บัตร 1 ใบ'},{v:'2',t:'บัตร 2 ใบ (ตัวอย่าง)'}],DEMO.multiTicket?'2':'1')+
+    '<div class="demo-stub">* พรีวิว Home + โปรไฟล์ เท่านั้น ไม่กระทบสิทธิ์ของคุณด้านบน</div>'+
     '<div class="demo-lbl">การ์ดตัวตน</div><select class="demo-sel" id="demoPersona"><option value="">— เลือกเพื่อดูการ์ด —</option>'+personaOpts+'</select>'+
     '<div class="demo-lbl">สถานะ</div><div class="demo-row"><span class="rl">'+ic('lc-book-open')+'ทำแบบทดสอบตัวตนแล้ว</span><span class="sw'+(DEMO.quizDone?' on':'')+'" id="demoQuiz"></span></div>'+
     /* Force the "เดินบูธ ✦ ลุ้นรางวัล" draw-status card's eligible/not-eligible state for preview
@@ -5178,9 +5289,10 @@ function buildDemo(){
   };});
   document.getElementById('segView').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.view=b.dataset.v;document.querySelectorAll('#segView button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');applyView();};});
   document.getElementById('segDraw').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.draw=b.dataset.v;document.querySelectorAll('#segDraw button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
+  document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.multiTicket=(b.dataset.v==='2');document.querySelectorAll('#segTicketCount button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('demoPersona').onchange=function(){if(this.value){DEMO.quizDone=true;document.getElementById('demoQuiz').classList.add('on');forcePersona(this.value);}};
   document.getElementById('demoQuiz').onclick=function(){DEMO.quizDone=!DEMO.quizDone;this.classList.toggle('on',DEMO.quizDone);};
-  document.getElementById('demoReset').onclick=function(){DEMO.quizDone=false;document.getElementById('demoQuiz').classList.remove('on');document.getElementById('demoPersona').value='';DEMO.draw='auto';document.getElementById('segDraw').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='auto');});panel.classList.remove('open');resetQuiz();};
+  document.getElementById('demoReset').onclick=function(){DEMO.quizDone=false;document.getElementById('demoQuiz').classList.remove('on');document.getElementById('demoPersona').value='';DEMO.draw='auto';document.getElementById('segDraw').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='auto');});DEMO.multiTicket=false;document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='1');});panel.classList.remove('open');resetQuiz();};
 }
 
 /* Go-to-top FAB (system-wide, all view modes incl. desktop/tablet). The page itself is what
