@@ -2232,10 +2232,23 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* font-size/weight now match Booth's "กิจกรรมประจำโซน" asset title (.bc-asset — fs-bodysm/w-label,
    2026-08-28, per direction "text size และ text weight อ้างอิงให้เท่ากับ...หุ้นไทย") — was fs-sub/
    w-head, a size step up and a lighter weight than that reference. */
-.gr-title{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.35;display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-glue);}
+.gr-title{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.35;}
 /* Solid fill, not a tint — a 16%-tint chip on a row that's ALSO 5%-cyan-tinted (.game-row.played)
    just blended into its own background instead of reading as a distinct status. */
-.gr-played{display:inline-flex;align-items:center;gap:var(--sp-stack-tight);font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--cyan);padding:4px var(--sp-inline);border-radius:var(--rpill);}
+/* Bug fix (2026-09-03, per direction "การวางข้อมูล...ดูแปลกๆ ไม่สมบูรณ์") — .gr-title used to be
+   display:flex;flex-wrap:wrap so the "✓ เล่นแล้ว" badge could sit inline right after a short title,
+   wrapping to its own line only when a longer title left no room. That made the layout depend on
+   each game's OWN title length: "ความเสี่ยงแท้จริง" (short) kept the badge inline, while "สิ่งที่คุณดู
+   ก่อนตัดสินใจ"/"ภูมิคุ้มกันความกลัวตกขบวน" (longer) wrapped it below — 3 played rows on the same
+   screen, 2 visibly different shapes, reading as unfinished/random rather than a deliberate design.
+   .gr-title is now plain block text (no flex), and .gr-played is a block-level flex box (display:flex
+   instead of inline-flex) so it ALWAYS starts on its own new line after the title, the same way any
+   block element follows preceding text — deterministic regardless of title length. width:fit-content
+   keeps it a compact chip hugging its own icon+label (a bare display:flex block would otherwise
+   stretch to the row's full width, which reads as a wide bar, not a pill — confirmed via screenshot
+   before adding this). Verified live: all played rows (including a 4th, "เป้าหมายตามวัย") now render
+   identically — title line, then the pill directly under it, every time. */
+.gr-played{display:flex;width:fit-content;align-items:center;gap:var(--sp-stack-tight);font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--cyan);padding:4px var(--sp-inline);border-radius:var(--rpill);margin-top:4px;}
 .gr-played svg{width:var(--ic-sm);height:var(--ic-sm);}
 .gr-status{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.4;margin-top:2px;}
 .gr-chev{width:20px;height:20px;color:var(--muted);flex-shrink:0;cursor:pointer;transition:transform .2s var(--ease);}
