@@ -676,6 +676,20 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .tab-item svg{width:var(--ic-lg);height:var(--ic-lg);}
 .tab-item span{font-size:var(--fs-label);font-weight:var(--w-label);}
 .tab-item.active{color:var(--violet);}
+/* Bug fix (2026-09-03, responsive audit — real 320px phone) — .tab-item has no explicit flex-basis,
+   so its default flex-shrink:1 let the 5 items compress once their combined content (icon-or-label
+   width + var(--sp-inline)=12px padding each side) overflowed the row: at 320px the 5 items' natural
+   widths summed to ~327px against ~312px of usable row width (320 - the bar's own 4px+4px padding),
+   forcing 4 of the 5 labels ("หน้าหลัก"/"คู่มือของคุณ"/"เดินบูธ"/"เกมหลัก") to wrap to 2 lines while
+   "โปรไฟล์" (shortest) happened to stay single-line — an uneven, unfinished-looking bar, confirmed via
+   getBoundingClientRect (labels wrapping to height 32px vs the one unwrapped label's 16px).
+   var(--sp-inline) (12px/side) is this app's "two distinct-but-related items in a row" spacing, sized
+   for things like an avatar+label — too generous for a 5-way icon+caption column this narrow. Halving
+   just THIS padding at the same ≤420px floor the rest of the file uses for real-narrow-phone fixes
+   frees 8px per item (40px across all 5) — comfortably more than the ~15px shortfall — so every label
+   renders single-line, confirmed live down to 320px. Icon size/gap untouched; still a real regression
+   risk if a longer future label is added, but today's 5 labels have real margin, not a knife-edge fit. */
+@media(max-width:420px){.tab-item{padding:4px 8px;}}
 /* ══ คู่มือ 2 (Book v2) ══ compare-reveal slider · top content-nav (reuses .toc) — version switch
    moved OFF this in-page pill entirely (2026-08-19, per direction "เอา tab ดูตัวเลือกแบบ...ออก เพื่อ
    จะให้เลือกดูตัวเลือกผ่าน panel แทน") and into the demo panel's own "เวอร์ชันคู่มือ" control (see
@@ -1782,6 +1796,26 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    to .bt-tabs--secondary so it doesn't touch the shared .bt-tab-icon svg rule's other consumers
    (v1 TOC, primary tabs, dd-tablist) which keep the full --ic-md icon. */
 :root[data-view="mobile"] .bt-tabs--secondary .bt-tab-icon svg{width:var(--ic-sm);height:var(--ic-sm);}
+/* Responsive audit regression fix (2026-09-03, real 320px phone) — the 2026-08-27 fix above assumed
+   a smaller --fs-bodysm than the app now ships (that token grew to 18px under a later "app-scaled
+   typography" pass, per DESIGN-DNA.md), so its "only 'เส้นทาง' wraps at the 320px floor" claim no
+   longer held: live measurement now showed BOTH "ตัวตน" (28.6px natural) and "เส้นทาง" (35.7px
+   natural) wrapping at 320px, each breaking at its own dictionary word-boundary (ตัว+ตน, เส้น+ทาง)
+   the way the 2026-08-27 comment already describes for เส้นทาง alone. "วิเคราะห์" (40.0px natural,
+   the actual WIDEST label) still never wraps — it has no such internal boundary — so it was already
+   the real ceiling to design for, not a safe assumption to skip.
+   Rather than re-derive a font-size-specific icon/padding trim that will just drift out of sync
+   again the next time --fs-bodysm changes, this shrinks every space-cost on the pill at once (icon
+   16px→14px, its own gap 6px→3px, the pill's internal h-padding 6px→3px, the row's own outer padding
+   16px→10px and inter-pill gap 6px→5px) so there's real margin, not a knife-edge fit: verified live
+   via getBoundingClientRect down to a real 320px viewport — "วิเคราะห์" (widest) renders at ~40px
+   inside ~44-49px of available label room per pill, all 4 single-line, none clipped. 420px matches
+   this same component's own existing narrow-phone breakpoint (the @media rules above/below). */
+@media(max-width:420px){
+  :root[data-view="mobile"] .toc.bt-tabs--secondary{padding-left:10px;padding-right:10px;gap:5px;}
+  :root[data-view="mobile"] .bt-tabs--secondary .bt-tab{padding:8px 3px;gap:3px;}
+  :root[data-view="mobile"] .bt-tabs--secondary .bt-tab-icon svg{width:14px;height:14px;}
+}
 /* Tablet/pc had no override at all here — they fell through to the base space-between +
    flex:0 1 auto above, which (unlike mobile's flex:1 1 0 fix) was only ever tuned to stop pills
    clipping on a NARROW frame, not to look deliberate on a much wider ~760px row (see .toc's own
