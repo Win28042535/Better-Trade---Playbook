@@ -321,6 +321,26 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-09-03 — responsive audit: tablet 800/820/834/884px + phone 393/402/420/430/440px, clean (no code change).** Per direction "responsive audit" for these two specific width bands — same
+`scrollWidth`/`clientWidth` sweep methodology as the 2026-09-02 entry below, run fresh against this
+session's own harness: `st.phase` forced through all 10 screens (splash/consent/quiz/reveal/book/
+library/home/passport/games/profile) × all 3 `data-view` states (mobile/tablet/pc, incl. every
+mismatched real-width/data-view combo the 2026-09-02 fixes were about) × both `DEMO.eventPhase`
+values (pre/on, since on-event is what mounts the 3-item `.topbar` — logo + reg-cta + QR pill —
+that was the last real bug found) × all 9 target widths = 540 checks, 0 overflows. Cross-checked
+with direct `getBoundingClientRect()` reads (not just screenshots — screenshots taken immediately
+after a `data-view` switch under-read `.shell`'s width because of its own `.shell{transition:
+max-width .3s}`, and can visually mis-render viewports wider than the preview pane's own physical
+size; neither is a real bug, just artifacts of testing too fast / too wide — verify geometry via
+JS rects when a screenshot taken right after a state change looks implausible) on the two specific
+prior fix points (`.str-grid{flex-direction:column}` and `.next-step`'s narrow-phone grid-template,
+both keyed off `max-width:420px` regardless of `data-view`) at the 420px boundary — both hold.
+**Conclusion: nothing in this file needed a fix for these 9 widths** — the 320–480px hardening from
+prior sessions already covers the phone band, and 800–884px falls inside the same "no breakpoint
+lives here" gap the file already had between 640px and 1024px (data-view carries the layout, not a
+raw `@media` at these widths), so tablet holds too. Documented here so a future session doesn't
+re-run the identical sweep from scratch assuming these ranges were never checked.
+
 **2026-09-02 — responsive audit: `.topbar` overflow at 320px, on-event.** Per direction "responsive
 audit" — scripted a `scrollWidth`/`clientWidth` sweep (not visual spot-checks) across every screen ×
 `data-view` × real width (320/375/768/1280px), 17 screen-states × 3 views × 4 widths. Found exactly one
