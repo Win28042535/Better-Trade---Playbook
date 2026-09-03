@@ -2507,7 +2507,18 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    direction "ให้ full-bleed เต็มจอจริงๆ") so pc is a genuinely seamless full-width page, matching the
    "SEAMLESS FULL PAGE" comment just below rather than contradicting it. */
 :root[data-view="pc"] .shell{max-width:none;}
-:root[data-view="mobile"] .shell{max-width:400px;}
+/* Bug fix (2026-09-03, responsive audit from 428px up, per direction "เนื้อหาบีบๆแคบๆ...ให้เต็ม
+   หน้าจอ") — this 400px cap used to apply unconditionally on data-view="mobile", but the matching
+   "phone frame" look (border/shadow/rounded corners, @media(min-width:480px) below) only turns on
+   at ≥480px. Below that, a REAL phone in the extremely common 400-479px CSS-px range (412/414/420/
+   428/430 — Pixel/Galaxy/iPhone Plus/Pro Max widths) got squeezed into a plain, unstyled 400px
+   column with 12-30px of dead space down one side for no visual reason (confirmed live: shell
+   clientWidth 400 at innerWidth 428). 320-399px phones were never affected (100% already loses to
+   400px there) — only this specific mid-width band was. Un-capped here so .shell is edge-to-edge on
+   any real width below 480px; the 400px card width is reinstated ONLY alongside the frame styling
+   at ≥480px (see that rule), where a real phone this wide doesn't exist and it's actually a desktop
+   previewing data-view=mobile. */
+:root[data-view="mobile"] .shell{max-width:none;}
 /* Section-to-section gap: mobile keeps the tighter 20px; tablet/pc get a touch more room (24px) —
    a wider canvas reads better with slightly more separation than the narrow phone frame needs. */
 :root[data-view="tablet"],:root[data-view="pc"]{--sp-section:24px;}
@@ -2516,7 +2527,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    real phone. Using overflow:hidden here clipped every screen taller than one viewport (the whole
    Book below the identity card, the quiz's ถัดไป button) into an unreachable void. overflow-y:auto
    makes the frame the scroll container; scrollbar hidden to preserve the device look. */
-@media(min-width:480px){:root[data-view="mobile"] .shell{border-radius:30px;border:1px solid var(--line);box-shadow:0 30px 70px rgba(17,19,24,0.18);overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
+@media(min-width:480px){:root[data-view="mobile"] .shell{max-width:400px;border-radius:30px;border:1px solid var(--line);box-shadow:0 30px 70px rgba(17,19,24,0.18);overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
 :root[data-view="mobile"] .shell::-webkit-scrollbar{display:none;}}
 /* Desktop (pc/tablet) is a SEAMLESS FULL PAGE, not a framed card: full-width topbar + backgrounds,
    with reading content held to a comfortable centered measure inside. The cloud backdrop + shell
