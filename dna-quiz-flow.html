@@ -741,96 +741,76 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .prog-track{height:3px;border-radius:var(--rpill);background:var(--accent);overflow:hidden;}
 .prog-fill{height:100%;border-radius:var(--rpill);background-image:var(--spectrum);}
 
-/* HERO CARD — GLOW BORDER (rebuilt 2026-08-30 on the reference the user pointed at,
-   https://www.originkit.dev/components/glow-border?preset=base) — per GLOW-BORDER-DNA.md ("a living
-   light that travels around the edge"): Bright Head → Soft Tail → Fading Trail → Resting Border,
-   continuously rotating, 4s/loop, same speed idle and on hover (no hover speed-up — see the note
-   near .hero-glow-spin's own CSS rule below). Wraps .hero-gw itself — the
-   ENTIRE identity section (badge+tabs+card+detail text+redeem card+CTA), confirmed as the intended
-   target (border section, not the character card) — even at real content height, a tall ~1:4 box.
-   HISTORY (2 earlier attempts, both superseded — kept so the same mistakes aren't repeated):
-   1) conic-gradient()+@property-angle applied DIRECTLY to .hero-gw (same technique
-      .efin-ai-orb::before uses, see EFINAI-ORB-DNA.md) — conic-gradient's angle-to-position mapping
-      is only even on a roughly square box; at ~1:4 the two long edges each swallowed ~43% of the
-      360° sweep, so the comet sat almost permanently on one edge instead of visibly traveling.
-   2) SVG <rect> traced by stroke-dasharray/stroke-dashoffset with pathLength="100" (sidesteps #1 by
-      advancing along actual arc length instead of angle) — correct direction, but shipped with its
-      own bugs: a single dash sized 16% of the real (long) perimeter rendered as a solid ~40%-of-one-
-      edge flat-colored bar with no head/tail fade, and the accompanying gradient only varied with x,
-      so it sat at one flat hue along the vertical edges. A 3-layer version fixed the anatomy/color
-      but was still built on the "warp a gradient to fit this specific box" idea.
-   CURRENT (Origin Kit's technique) sidesteps the aspect-ratio problem a 3rd, different way: instead
-   of warping anything to .hero-gw's own (tall) shape, a conic-gradient spins on an OVERSIZED SQUARE
-   (.hero-glow-spin, sized to .hero-gw's diagonal+margin by sizeHeroGlow() below, so its corners never
-   swing inside .hero-gw's real corners) centered behind the frame — since the gradient's own
-   rotation is always on a true square, ITS internal angle mapping is never distorted. A MASK
-   (.hero-glow-mask: two solid layers clipped to content-box/border-box, mask-composite:exclude — the
-   standard-syntax name for what Origin Kit's own docs call -webkit-mask-composite:xor) then cuts
-   that spinning square down to just the border ring; the ring's shape (which exactly follows
-   .hero-gw's REAL edges) is what makes it read correctly on any aspect ratio, not the gradient math.
-   Confirmed live in dna-quiz-flow.html on the real ~1:4 box — no more flat-colored bar, no more one-
-   edge distortion. */
+/* HERO CARD — FULL GLOW FRAME + MOVING LIGHT TEXTURE (rebuilt 2026-09-03 per DESIGN-DNA.md, which
+   supersedes the earlier Origin-Kit comet border and GLOW-BORDER-DNA.md). Direction's core principle:
+   "the frame itself IS the glow; the motion is light moving through its surface" — explicitly NOT a
+   bright head racing a resting rail (§08 Motion DNA, §14 Don't). So this is a full rewrite of the
+   VISUAL, on the SAME aspect-ratio-safe machinery the comet used (kept because it was the robust part):
+   an OVERSIZED SQUARE conic per layer (so the conic's angle→position map is never distorted on this
+   tall ~1:4 box — the 2 earlier direct-conic / SVG-dash attempts that failed on aspect ratio are
+   documented in git history), each MASKED (two solid layers clipped content-box/border-box,
+   mask-composite:exclude) down to the real 3px border ring, which is what makes the glow follow
+   .hero-gw's REAL edges + corners on any shape. Sizes computed in sizeHeroGlow() below.
+   TWO layers now instead of one comet:
+   - .hero-glow-base — the frame's ALWAYS-ON spectrum glow (default state, §05). The mirrored Better
+     Trade spectrum (cyan→blue→indigo→violet→magenta→orange→…mirror…→cyan) means 0deg===360deg so
+     there is NO seam at the wrap (§04/§07), and every neighbouring stop is an adjacent hue so there
+     is NO colour jump at any corner. 12s drift (sped up from an initial 24s per direction) = "light
+     living in the surface", never a racer.
+   - .hero-glow-energy — a soft, WIDE, two-lobed brightness field (░▒▓████▓▒░ symmetric head/tail,
+     §06) drifting the SAME direction but faster (5s, sped up from an initial 11s), screen-blended so it LIFTS the spectrum
+     beneath (a brighter moving core, §05 "Moving Energy") instead of painting a line over it. Two
+     lobes 180deg apart read as an energy field pulsing through the frame, not one dot. Loop-closed
+     at 0/360 (both transparent) so no reset is ever visible (§08).
+   Ambient bloom (§03 outer layer) = drop-shadow on the .hero-glow PARENT — it operates on the
+   already-masked ring's alpha, so it blooms the RING shape outward, cheaply, without a 3rd blurred
+   layer. Glow fades in on viewport entry via .glow-on (§10 Scroll Reveal, wired in sizeHeroGlow).
+   Hover nudges core brightness + bloom only (§09). prefers-reduced-motion freezes the flow but keeps
+   the frame glowing (§12). */
 .hero-gw{position:relative;padding:3px;border-radius:calc(var(--r2) + 3px);}
-.hero-in{position:relative;background:var(--white);border-radius:var(--r2);padding:var(--sp-block) var(--sp-card-pad);}
-.hero-glow-mask{position:absolute;inset:0;padding:3px;border-radius:inherit;overflow:hidden;pointer-events:none;box-sizing:border-box;}
-/* Bug fixed 2026-08-30 — declaring BOTH the standard mask-composite:exclude AND the legacy
-   -webkit-mask-composite:xor on the same rule (the usual cross-browser-safe pairing, and what this
-   file already does for every OTHER -webkit-prefixed property, e.g. backdrop-filter above) silently
-   broke the composite in this engine specifically for the 2-layer XOR case — nothing was revealed at
-   all, confirmed by screenshot (no ring, not even the faint resting one). Either set alone (standard-
-   only, or webkit-only) renders the ring correctly — the two just can't coexist on one element here.
-   @supports feature-queries pick exactly one set per engine instead of declaring both at once. */
+.hero-in{position:relative;z-index:1;background:var(--white);border-radius:var(--r2);padding:var(--sp-block) var(--sp-card-pad);}
+/* Outer wrapper carries the ambient bloom + the scroll-reveal fade. Its filter also establishes an
+   isolated stacking context, so the energy layer's screen blend resolves only against the base ring,
+   never bleeding onto page content behind the frame. */
+.hero-glow{position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  filter:drop-shadow(0 0 6px rgba(114,45,244,.30)) drop-shadow(0 0 14px rgba(0,212,254,.16));
+  opacity:0;transition:opacity 1.1s var(--ease);}
+.hero-gw.glow-on .hero-glow{opacity:1;}
+.hero-glow-mask{position:absolute;inset:0;padding:3px;border-radius:inherit;overflow:hidden;box-sizing:border-box;}
+/* Bug retained from 2026-08-30 — declaring BOTH standard mask-composite:exclude AND legacy
+   -webkit-mask-composite:xor on the same rule silently breaks the 2-layer XOR composite in this
+   engine (nothing revealed). @supports picks exactly one set per engine instead of both at once. */
 @supports (mask-composite:exclude){.hero-glow-mask{mask-image:linear-gradient(#fff 0 0),linear-gradient(#fff 0 0);mask-clip:content-box,border-box;mask-composite:exclude;}}
 @supports not (mask-composite:exclude){.hero-glow-mask{-webkit-mask-image:linear-gradient(#fff 0 0),linear-gradient(#fff 0 0);-webkit-mask-clip:content-box,border-box;-webkit-mask-composite:xor;}}
-/* Stops per Origin Kit's own "standard" mode shape (sharp head → fading tail → flat resting arc,
-   wrapping back to the SAME colour at 0deg/360deg so the gradient's own definition boundary — not
-   the visible head — is what coincides with the seam, per their "avoiding the hard diagonal seam"
-   key feature) — just re-colored onto our --spectrum's 4 stops instead of Origin Kit's single
-   glowColor, since GLOW-BORDER-DNA.md calls for reusing the existing spectrum token, not a new one.
-   var(--line-soft) is the "Resting Border" — same token the SVG version's static ring used.
-   REVISED 2026-09-01 (per "Long Spectrum & Soft Tail" direction) — two problems with the original
-   8/9/34/59/84/130deg stops on this tall ~1:4 frame: (1) the core spectrum (75deg) read as short
-   against the long perimeter this same-size square gets masked down to, and (2) the 46deg tail was
-   one flat linear blend straight to opaque var(--line-soft), and the head was a literal 1deg jump
-   (8→9) from resting into opaque cyan — both hard cuts instead of a light that gradually arrives
-   and dissolves. Fix, angles now on custom properties so the shape can be read/tuned without
-   re-deriving the whole conic-gradient string:
-   - head (--g-lead→--g-head, 6→20deg) gained a soft-onset midpoint (--g-head-mid, 13deg) instead of
-     jumping straight from line-soft to opaque cyan — still the shortest, crispest ramp on the ring
-     (14deg) so it still reads as a defined leading edge, just no longer a knife-edge.
-   - core spectrum (--g-head→--g-core-end) widened 75deg→90deg (20-50-80-110deg hue stops).
-   - tail (--g-core-end→--g-rest) widened 46deg→110deg AND split into 4 extra graduated stops
-     (--g-tail1..4) instead of one linear blend, each one lerped toward var(--line-soft) in BOTH hue
-     and alpha at 80/60/40/20% so intensity steps down the way the spec's Head→Core→Tail→Background
-     hierarchy asks for, and the ring's own opacity (not just its hue) fades toward whatever sits
-     behind .hero-gw — the tail dissolves into the page, it doesn't stop against it.
-   - resting arc shrank 230deg→146deg accordingly (spectrum+tail nearly doubled, 121deg→220deg) —
-     intentional per "frame should feel a light presence covering it", not a bug.
-   No change to rotation speed/direction/loop (heroGlowSpin below is untouched) or to the mask
-   technique above — only these stop positions/colors. */
-.hero-glow-spin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);animation:heroGlowSpin 4s linear infinite;
-  --g-lead:6deg;--g-head-mid:13deg;--g-head:20deg;--g-hue1:50deg;--g-hue2:80deg;--g-core-end:110deg;
-  --g-tail1:132deg;--g-tail2:154deg;--g-tail3:176deg;--g-tail4:198deg;--g-rest:220deg;
-  background:conic-gradient(var(--line-soft) 0deg,var(--line-soft) var(--g-lead),
-    rgba(57,126,131,.54) var(--g-head-mid),
-    #61e8ed var(--g-head),#9c91ff var(--g-hue1),#f178d8 var(--g-hue2),#f2ea83 var(--g-core-end),
-    rgba(197,191,111,.82) var(--g-tail1),
-    rgba(152,148,88,.63) var(--g-tail2),
-    rgba(107,105,67,.45) var(--g-tail3),
-    rgba(62,62,45,.26) var(--g-tail4),
-    var(--line-soft) var(--g-rest),var(--line-soft) 360deg);}
-/* Responsive intensity only (per spec: Tablet/Mobile keep the SAME long spectrum + soft tail shape,
-   just a touch quieter) — trims opacity of the whole spinning layer rather than re-deriving the
-   angle set per breakpoint, since the ask was "ลด Intensity", not "ลด Length", at smaller sizes. */
-@media(max-width:1024px){.hero-glow-spin{opacity:.92;}}
-@media(max-width:640px){.hero-glow-spin{opacity:.85;}}
-/* 4s/loop, same in both idle and hover states — no hover speed-up (2026-08-30, per direction: the
-   spec line "spectrum หมุนผ่านแอนิเมชั่นการแปลง CSS ธรรมดา (4 วินาที/รอบ, 4 วินาทีเมื่อวางเมาส์เหนือ)"
-   was confirmed to mean BOTH figures are literally 4s, i.e. hoverMultiplier removed entirely — not
-   a typo for some other hover duration. This replaces the earlier 10s-idle/2s-hover (hoverMultiplier
-   5x) numbers from GLOW-BORDER-DNA.md §3; that doc has been updated to match. No
-   @media(hover:hover) rule needed any more since hover no longer changes anything. */
-@keyframes heroGlowSpin{to{transform:translate(-50%,-50%) rotate(360deg);}}
+.hero-glow-base,.hero-glow-energy{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);will-change:transform;}
+/* BASE — always-on spectrum ring (§05 Default State: full glow on all 4 sides + corners). Mirrored
+   Better Trade spectrum (§04) so 0deg===360deg (seamless, §07) and every step is an adjacent hue. */
+.hero-glow-base{opacity:.85;animation:heroGlowDrift 12s linear infinite;
+  background:conic-gradient(from 0deg,
+    #00D4FE 0deg,#1F87E6 36deg,#113CF3 72deg,#722DF4 108deg,#E63BD8 144deg,
+    #F79319 180deg,#E63BD8 216deg,#722DF4 252deg,#113CF3 288deg,#1F87E6 324deg,#00D4FE 360deg);}
+/* ENERGY — two soft wide lobes (§06 soft head→core→tail falloff), screen-blended to brighten the
+   spectrum beneath. Faster drift (5s) than the base so light appears to flow THROUGH the frame. */
+.hero-glow-energy{mix-blend-mode:screen;opacity:.9;animation:heroGlowFlow 5s linear infinite;
+  background:conic-gradient(from 0deg,
+    rgba(255,255,255,0) 0deg,rgba(255,255,255,0) 40deg,
+    rgba(255,255,255,.12) 66deg,rgba(255,255,255,.42) 90deg,rgba(255,255,255,.12) 114deg,
+    rgba(255,255,255,0) 140deg,rgba(255,255,255,0) 220deg,
+    rgba(255,255,255,.12) 246deg,rgba(255,255,255,.42) 270deg,rgba(255,255,255,.12) 294deg,
+    rgba(255,255,255,0) 320deg,rgba(255,255,255,0) 360deg);}
+@keyframes heroGlowDrift{to{transform:translate(-50%,-50%) rotate(360deg);}}
+@keyframes heroGlowFlow{to{transform:translate(-50%,-50%) rotate(360deg);}}
+/* Hover (§09) — subtle: brighten the moving core + a touch more ambient bloom. Frame stays fully
+   glowing; nothing turns into a hard line. */
+.hero-gw:hover .hero-glow{filter:drop-shadow(0 0 8px rgba(114,45,244,.40)) drop-shadow(0 0 18px rgba(0,212,254,.22));}
+.hero-gw:hover .hero-glow-energy{opacity:1;}
+/* Responsive (§11) — keep the SAME full-spectrum ring + soft field everywhere (reduce INTENSITY,
+   not coverage), just quieter + lighter bloom on smaller screens. */
+@media(max-width:1024px){.hero-glow{filter:drop-shadow(0 0 5px rgba(114,45,244,.24)) drop-shadow(0 0 11px rgba(0,212,254,.13));}.hero-glow-energy{opacity:.8;}}
+@media(max-width:640px){.hero-glow-base{opacity:.78;}.hero-glow-energy{opacity:.7;}}
+/* Reduced motion (§12) — freeze the flow but KEEP the frame glowing (base spectrum + a static energy
+   position remain); no content depends on the motion. */
+@media(prefers-reduced-motion:reduce){.hero-glow-base,.hero-glow-energy{animation:none!important;}.hero-glow{transition:none;}}
 /* Centered + a real pill chip instead of quiet uppercase eyebrow text — this is the card's own
    identity line ("Visionary ✦ ผู้มองการณ์ไกล"), so it should read as a badge, not a caption. No
    leading dot (removed per direction — the ✦ inside famTh already marks it, a second dot in front
@@ -3019,30 +2999,40 @@ function pcBackInner(key){
     '<div class="pcb-sec"><div class="pcb-hd">'+ic('lc-pie-chart')+'สเกลบุคลิก (ประเมิน)</div>'+stats+'</div>'+
     '<div class="pcb-leg">แรงบันดาลใจจาก ✦ <b>'+h.legend+'</b></div></div>';
 }
-/* .hero-gw's own rotating comet border (see GLOW BORDER comment near .hero-gw's CSS — Origin Kit's
-   conic-gradient+mask technique, rebuilt 2026-08-30). heroGlowMarkup() is the shared markup
-   fragment, dropped inside .hero-gw right before .hero-in so .hero-in's own opaque background
-   covers everything but the 3px padding ring (same padding-box-reveal trick .hero-gw used before
-   this — only the masking mechanism changed, not this part). sizeHeroGlow() is the JS half: CSS
-   alone can't express "the diagonal of this specific element" without container-query units this
-   codebase doesn't otherwise use, so .hero-glow-spin's width/height (diagonal + 48px margin, so its
-   corners clear .hero-gw's real corners at every rotation angle) are computed here instead. */
+/* .hero-gw's Full Glow Frame + Moving Light Texture (see the big FULL GLOW FRAME comment near
+   .hero-gw's CSS). heroGlowMarkup() is the shared markup fragment, dropped inside .hero-gw right
+   before .hero-in so .hero-in's own opaque background covers everything but the 3px ring. Both light
+   layers (base spectrum + moving energy) are oversized squares that CSS alone can't size — "the
+   diagonal of this specific element" needs container-query units this codebase doesn't use — so
+   sizeHeroGlow() computes it (diagonal + 48px margin, so their corners clear .hero-gw's real corners
+   at every angle) and also wires the §10 scroll-reveal activation. */
 function heroGlowMarkup(){
-  return '<div class="hero-glow-mask" aria-hidden="true"><div class="hero-glow-spin"></div></div>';
+  return '<div class="hero-glow" aria-hidden="true"><div class="hero-glow-mask"><div class="hero-glow-base"></div><div class="hero-glow-energy"></div></div></div>';
 }
-var HERO_GLOW_RESIZE_BOUND=false;
+var HERO_GLOW_RESIZE_BOUND=false,HERO_GLOW_IO=null;
 function sizeHeroGlow(){
-  var gw=root.querySelector('.hero-gw'),spin=root.querySelector('.hero-glow-spin');
-  if(!gw||!spin)return;
+  var gw=root.querySelector('.hero-gw');
+  if(!gw)return;
+  var layers=gw.querySelectorAll('.hero-glow-base,.hero-glow-energy');
   var w=gw.clientWidth,h=gw.clientHeight;
-  if(!w||!h)return;
-  var d=Math.sqrt(w*w+h*h)+48;
-  spin.style.width=d+'px';spin.style.height=d+'px';
-  /* one-shot listener (guarded so repeated renderBook() calls never stack duplicates) — same
-     pattern buildGoTop()'s own window resize binding uses elsewhere in this file. Looks up the
-     current .hero-gw/.hero-glow-spin fresh each time it fires rather than closing over these, since
-     every render() rebuilds .hero-gw's DOM from scratch. */
+  if(w&&h&&layers.length){
+    var d=Math.sqrt(w*w+h*h)+48;
+    for(var i=0;i<layers.length;i++){layers[i].style.width=d+'px';layers[i].style.height=d+'px';}
+  }
+  /* one-shot resize listener (guarded so repeated renderBook() calls never stack duplicates) — looks
+     up the current .hero-gw/layers fresh each fire rather than closing over these, since every
+     render() rebuilds .hero-gw's DOM from scratch. */
   if(!HERO_GLOW_RESIZE_BOUND){HERO_GLOW_RESIZE_BOUND=true;window.addEventListener('resize',sizeHeroGlow,{passive:true});}
+  /* §10 Scroll Reveal — the glow fades in (base first, then the moving field) only once the frame
+     enters the viewport, not on page load. One-shot per element; disconnect the prior observer since
+     render() gives us a brand-new (detached-from-the-old-observer) .hero-gw each time. */
+  if(gw.classList.contains('glow-on'))return;
+  if(!window.IntersectionObserver){gw.classList.add('glow-on');return;}
+  if(HERO_GLOW_IO)HERO_GLOW_IO.disconnect();
+  HERO_GLOW_IO=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('glow-on');HERO_GLOW_IO.unobserve(e.target);}});
+  },{threshold:.2});
+  HERO_GLOW_IO.observe(gw);
 }
 /* static front-only card (carousel) */
 function pcStatic(key){return '<div class="pc3d"><div class="pc-tilt"><div class="pc-face front">'+pcFrontInner(key)+'</div></div></div>';}
