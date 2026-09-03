@@ -2134,6 +2134,62 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .rt-badge.feat{color:var(--amber-text);background:var(--amber-bg);}
 .rt-badge.new{color:var(--violet);background:var(--active-fill);}
 .rt-meta{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;}
+/* ══ Booth Journey v2 (DEMO.boothVer==='v2') ══ additive UX layer over the SAME map/route markup —
+   every selector here is scoped to a v2-only class (.map-ph.v2, .route-list.v2, .rt-row.v2, .bmk) so
+   the shipped v1 booth page is untouched. Numbered semantic markers on the map, synced 1:1 with the
+   numbered step dots, one shared state color across both, and a subtle focus highlight. */
+/* Map markers — a numbered pin overlaid on the floor plan at BOOTH_MAP_POS %. Default shows just the
+   number; the current pin and the tapped pin reveal their short label. Sized/positioned so labels
+   stay inside .map-ph's clipped bounds (short labels, centered, small type) — no horizontal overflow. */
+.map-ph.v2 .bmk{position:absolute;transform:translate(-50%,-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;padding:0;cursor:pointer;font-family:var(--font);-webkit-tap-highlight-color:transparent;}
+.map-ph.v2 .bmk-num{position:relative;z-index:1;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--white);font-weight:var(--w-label);font-size:var(--fs-eyebrow);line-height:1;border:2px solid var(--white);box-shadow:0 2px 6px rgba(17,19,24,.35);transition:transform .18s var(--ease);}
+.map-ph.v2 .bmk.done .bmk-num{background:var(--cyan);}
+.map-ph.v2 .bmk.cur .bmk-num,.map-ph.v2 .bmk.start .bmk-num{background:var(--violet);}
+.map-ph.v2 .bmk.next .bmk-num{background:var(--amber-text);}
+.map-ph.v2 .bmk.up .bmk-num{background:var(--muted);}
+/* pulse ring — current/start pin always pulses (soft "you are here" / "start here"); a tapped pin
+   gets a one-shot flash. */
+.map-ph.v2 .bmk-ring{position:absolute;top:0;left:50%;width:26px;height:26px;margin-left:-13px;border-radius:50%;pointer-events:none;opacity:0;}
+.map-ph.v2 .bmk.cur .bmk-ring,.map-ph.v2 .bmk.start .bmk-ring{opacity:1;box-shadow:0 0 0 3px color-mix(in srgb,var(--violet) 42%,transparent);animation:bmkPulse 2s var(--ease) infinite;}
+.map-ph.v2 .bmk.flash .bmk-ring{opacity:1;box-shadow:0 0 0 3px color-mix(in srgb,var(--violet) 55%,transparent);animation:bmkFlash .7s var(--ease) 1;}
+@keyframes bmkPulse{0%{box-shadow:0 0 0 2px color-mix(in srgb,var(--violet) 45%,transparent);}70%{box-shadow:0 0 0 10px color-mix(in srgb,var(--violet) 0%,transparent);}100%{box-shadow:0 0 0 2px color-mix(in srgb,var(--violet) 0%,transparent);}}
+@keyframes bmkFlash{0%{box-shadow:0 0 0 2px color-mix(in srgb,var(--violet) 60%,transparent);}100%{box-shadow:0 0 0 14px color-mix(in srgb,var(--violet) 0%,transparent);}}
+@media(prefers-reduced-motion:reduce){.map-ph.v2 .bmk.cur .bmk-ring,.map-ph.v2 .bmk.start .bmk-ring,.map-ph.v2 .bmk.flash .bmk-ring{animation:none;}}
+/* label — absolutely positioned so it NEVER shifts the number pill off its map coordinate (a
+   hidden in-flow label used to reserve space and push the pin, worsening spacing on narrow frames).
+   Hidden by default; shown for current/start + selected pins (spec: Default number only, Tap shows
+   label). Sits below the pin by default; top-cluster pins (.lbl-up) drop it above, onto open floor
+   rather than onto a neighbouring zone pin. */
+.map-ph.v2 .bmk-lbl{position:absolute;left:50%;top:calc(100% + 3px);max-width:96px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--white);border:1px solid var(--line-soft);border-radius:var(--rpill);padding:1px var(--sp-list);box-shadow:0 1px 4px rgba(17,19,24,.18);opacity:0;transform:translateX(-50%) translateY(-2px);pointer-events:none;transition:opacity .15s var(--ease),transform .15s var(--ease);}
+.map-ph.v2 .bmk.lbl-up .bmk-lbl{top:auto;bottom:calc(100% + 3px);}
+.map-ph.v2 .bmk.cur .bmk-lbl,.map-ph.v2 .bmk.start .bmk-lbl,.map-ph.v2 .bmk.sel .bmk-lbl{opacity:1;transform:translateX(-50%);}
+/* any pin that's showing a label rides above its neighbors so the label (white chip) is never drawn
+   under a later marker in the crowded top-right cluster; selected sits highest of all. */
+.map-ph.v2 .bmk.cur,.map-ph.v2 .bmk.start{z-index:4;}
+.map-ph.v2 .bmk.sel{z-index:5;}
+.map-ph.v2 .bmk.sel .bmk-num{transform:scale(1.18);box-shadow:0 0 0 3px var(--white),0 2px 8px rgba(17,19,24,.4);}
+@media(hover:hover) and (pointer:fine){.map-ph.v2 .bmk:hover .bmk-num{transform:scale(1.12);}.map-ph.v2 .bmk:hover .bmk-lbl{opacity:1;transform:none;}}
+/* The floor plan clusters its zones in the top-right quadrant, exactly where v1's "ดูแบบเต็มจอ"
+   button lives — so in v2 the fullscreen control moves to the free bottom-right corner (clear of
+   every marker: none sits below ~y53% or right of ~x63%) AND collapses to an icon-only chip so it
+   can't collide with the bottom-left caption on a narrow phone. v1's labeled top-right button is
+   untouched. */
+.map-ph.v2 .mp-zoom{top:auto;bottom:9px;padding:7px;}
+.map-ph.v2 .mp-zoom span{display:none;}
+.map-ph.v2 .mp-zoom svg{width:var(--ic-md);height:var(--ic-md);}
+/* v2 legend spacing — sits between the map and the route list. */
+.bmk-legend{margin-top:var(--sp-inline);}
+/* v2 route rows — numbered dots (state-colored), a tap-to-focus row, and current/next state chips. */
+.route-list.v2 .rt-row{cursor:pointer;border-radius:var(--r1);padding:6px var(--sp-list);margin:0 calc(var(--sp-list) * -1);transition:background .15s var(--ease);}
+.route-list.v2 .rt-row.sel{background:var(--active-wash);}
+@media(hover:hover) and (pointer:fine){.route-list.v2 .rt-row:hover{background:var(--cloud);}.route-list.v2 .rt-row.sel:hover{background:var(--active-wash);}}
+.route-list.v2 .rt-dot.rt-num{color:var(--white);font-weight:var(--w-label);font-size:var(--fs-bodysm);}
+.route-list.v2 .rt-row.up .rt-name{color:var(--ink);}
+.route-list.v2 .rt-state{display:inline-flex;align-items:center;gap:2px;font-size:var(--fs-label);font-weight:var(--w-head);padding:2px var(--sp-list);border-radius:var(--rpill);white-space:nowrap;}
+.route-list.v2 .rt-state svg{width:13px;height:13px;flex:0 0 auto;}
+.route-list.v2 .rt-state.cur,.route-list.v2 .rt-state.start{color:var(--white);background:var(--violet);}
+.route-list.v2 .rt-state.next{color:var(--amber-text);background:var(--amber-bg);}
+.route-list.v2 .rt-state.done{color:var(--cyan);background:color-mix(in srgb,var(--cyan) 12%,transparent);}
 /* zone activity */
 /* "วิธีเล่น" modal — same family as .scan-modal/.share-modal (see those for the shared pattern
    rationale). Replaced the old .zone-howto inline max-height expand (2026-08-16). */
@@ -4752,6 +4808,23 @@ function renderHome(){
    bars and grand-prize gate react; the floorplan (MAP_IMG) is the real event floor plan asset. */
 var CHECKIN_NEED=5,ACTIVITY_NEED=5;
 var BOOTH_CHK={},BOOTH_ACT={},BOOTH_HOWTO=false,DRAW_JOINED=false; // BOOTH_CHK[assetIdx]=Set(companyIdx); BOOTH_ACT[assetIdx]=bool; DRAW_JOINED=tapped "ร่วมลุ้นรางวัล"
+/* Booth v2 preview only (DEMO.boothVer==='v2', see renderBooth): the route step / map marker the
+   user has focused via the two-way Step↔Map sync. null = nothing focused. Persists across the
+   partial re-renders renderBooth() does (scan/activity toggles) so the focus survives a check-in. */
+var BOOTH_SEL=null;
+/* Map coordinates for each route stop, as % of the floor-plan image (Floorplan BTT (1).png), keyed
+   by the stop's own name so buildRoute() can attach mx/my without caring about order — the whole
+   point of the sync is that a stop's NUMBER changes with route order while its physical marker stays
+   put. `s` is the short marker label (per the spec's "Short Name / Label เมื่อจำเป็น"); the full
+   name still lives on the route row. Positions read off the floor plan's own printed zone labels. */
+var BOOTH_MAP_POS={
+  'จุดแลกรับการ์ดตัวจริง':{x:40,y:15,s:'แลกการ์ด'},
+  'Capital Zone':{x:58.3,y:53.4,s:'Capital'},
+  'Crypto Zone':{x:46.9,y:38.8,s:'Crypto'},
+  'Commodity Zone':{x:46.9,y:27.4,s:'Commodity'},
+  'Alternative Investment Zone':{x:61.3,y:13.2,s:'Alternative'},
+  'Health Zone':{x:62.5,y:27.4,s:'Health'}
+};
 /* 10 booths — asset / gamified game name / icon (Material→Lucide) — verbatim from BOOTHS. */
 var BOOTHS=[
   {asset:'หุ้นไทย',game:'สังเวียนเลือกหุ้น',icon:'lc-trending-up',zone:0},
@@ -4912,7 +4985,9 @@ function buildRoute(){
   var visited=Math.min(boothCheckinCount(),stops.length);
   return stops.map(function(z,i){
     var isV=i<visited;
+    var pos=BOOTH_MAP_POS[z.name]||{x:50,y:50,s:z.name}; // mx/my/short for the v2 map markers (see BOOTH_MAP_POS)
     return {name:z.name,zone:z.zone,icon:z.icon,topPick:z.topPick,newAngle:z.newAngle,featured:z.featured,color:z.color,
+      mx:pos.x,my:pos.y,short:pos.s,
       status:isV?'✓ แวะแล้ว':(z.topPick?'แนะนำอันดับ 1 สำหรับคุณ':(z.newAngle?'แนะนำให้ลอง (มุมใหม่)':'ยังไม่แวะ')),
       dotColor:isV?'var(--cyan)':(z.topPick?'var(--violet)':(z.featured?'var(--amber-text)':(z.newAngle?'var(--violet)':'var(--muted)')))};
   });
@@ -4942,6 +5017,29 @@ function renderBooth(){
   // Forced "ยังขาด" while the real counts already clear both thresholds would otherwise leave this
   // chips row empty (looks broken) — fall back to the full requirement as an illustrative example.
   if(DEMO.draw==='need'&&!need.length)need=['เช็คอินอีก '+CHECKIN_NEED+' บูธ','ร่วมกิจกรรมอีก '+ACTIVITY_NEED+' บูธ'];
+  /* ── Booth Journey v2 preview (DEMO.boothVer==='v2') ── everything below is a no-op when v2 is
+     false, so v1 renders exactly as before. v2 keeps the same section order/layout/content and only:
+       1. numbers the route steps 1..N and draws the SAME number as a marker on the map (Step↔Marker sync)
+       2. recolors both step dot AND its marker by one shared semantic state (done/current/next/upcoming)
+       3. surfaces "อยู่ตรงนี้" (current) + "ถัดไป" (next) on the map and the list
+       4. wires two-way focus: tap a step → its marker highlights; tap a marker → its step highlights
+     Semantic state is derived from `visited` (the real checked-in count): stops before it are done,
+     the one AT it is where you are now, the next is your next destination, the rest are upcoming.
+     When everything's visited there's no current/next — all read done. */
+  var v2=DEMO.boothVer==='v2';
+  if(BOOTH_SEL!=null&&BOOTH_SEL>=route.length)BOOTH_SEL=null; // route length can shrink (pre-event reorder); drop a now-invalid focus
+  var semColor={done:'var(--cyan)',cur:'var(--violet)',start:'var(--violet)',next:'var(--amber-text)',up:'var(--muted)'};
+  /* Semantic state per stop. On-Event (the venue is open, real check-ins exist) is the full model —
+     "where am I / what's next": stops before `visited` are done, the one at it is current ("อยู่ตรงนี้"),
+     the next is the next destination, the rest upcoming. Pre-Event has no real location, so per the
+     spec ("PRE = understand the journey", no navigation UI) it drops current/next and just marks the
+     first stop as the start ("เริ่มที่นี่") — the numbered sequence + shared colors carry the rest. */
+  var semState=pre
+    ? function(i){return i===0?'start':'up';}
+    : function(i){return visited>=route.length?'done':(i<visited?'done':(i===visited?'cur':(i===visited+1?'next':'up')));};
+  var semLegend=v2?(pre
+    ? '<div class="booth-legend bmk-legend"><span><span class="lg-sw" style="background:var(--violet)"></span>เริ่มที่นี่</span><span><span class="lg-sw" style="background:var(--muted)"></span>จุดต่อไปตามลำดับ</span></div>'
+    : '<div class="booth-legend bmk-legend"><span><span class="lg-sw" style="background:var(--cyan)"></span>เสร็จแล้ว</span><span><span class="lg-sw" style="background:var(--violet)"></span>อยู่ตรงนี้</span><span><span class="lg-sw" style="background:var(--amber-text)"></span>ถัดไป</span><span><span class="lg-sw" style="background:var(--muted)"></span>ยังไม่ถึง</span></div>'):'';
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
     (pre
@@ -4980,9 +5078,22 @@ function renderBooth(){
         : '<div class="next-step ds-need"><div class="ns-ic"><img src="'+ICON_GIFT_PNG+'" alt=""></div><div class="ns-tx"><div class="ns-ey">ลุ้นรางวัลใหญ่</div><div class="ns-t">ยังขาด</div></div><div class="ns-body"><div class="ds-chips">'+need.map(function(n){return '<span class="ds-chip">'+n+'</span>';}).join('')+'</div><div class="ns-b">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">ครบเมื่อไหร่ ปุ่มร่วมลุ้นรางวัลใหญ่จะขึ้นตรงนี้ให้กด</div></div></div>')+
     '</section>')+
     '<section class="home-card scroll-reveal"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline)"><div class="s-h" style="margin-bottom:0">'+(mapPersonalized?'แผนที่เดินบูธเฉพาะคุณ':'แผนที่เดินบูธ (เส้นทางแนะนำ)')+'</div><span class="route-badge">'+visited+'/'+route.length+' จุด</span></div>'+
-      '<div class="map-ph has-img"><img class="mp-img" src="'+MAP_IMG+'" alt="ผังงาน BetterTrade 2026 · Samyan Mitrtown ชั้น 5"><span class="mp-cap">ผังงาน · Samyan Mitrtown ชั้น 5</span><button class="mp-zoom" id="mapZoomBtn">'+ic('lc-maximize-2')+'<span>ดูแบบเต็มจอ</span></button></div>'+
-      '<div class="route-list">'+route.map(function(p,i){
+      '<div class="map-ph has-img'+(v2?' v2':'')+'"><img class="mp-img" src="'+MAP_IMG+'" alt="ผังงาน BetterTrade 2026 · Samyan Mitrtown ชั้น 5">'+
+        /* v2 markers — one per route stop, numbered to match its step, placed at BOOTH_MAP_POS % and
+           colored by the shared semantic state. Number shows by default; the short label reveals on
+           the current marker and on tap (per the spec's "Default → Number Only / Tap → Show Label"). */
+        (v2?route.map(function(p,i){var s=semState(i);var lup=p.my<22?' lbl-up':'';return '<button type="button" class="bmk '+s+lup+(BOOTH_SEL===i?' sel':'')+'" data-i="'+i+'" style="left:'+p.mx+'%;top:'+p.my+'%" aria-label="จุดที่ '+(i+1)+' · '+p.name+'"><span class="bmk-ring"></span><span class="bmk-num">'+(i+1)+'</span><span class="bmk-lbl">'+p.short+'</span></button>';}).join(''):'')+
+        '<span class="mp-cap">ผังงาน · Samyan Mitrtown ชั้น 5</span><button class="mp-zoom" id="mapZoomBtn" aria-label="ดูแผนที่แบบเต็มจอ">'+ic('lc-maximize-2')+'<span>ดูแบบเต็มจอ</span></button></div>'+
+      /* v2 semantic legend — the one key that makes both markers and step dots readable at a glance;
+         phase-specific (see semLegend above). Reuses the existing .booth-legend look. */
+      semLegend+
+      '<div class="route-list'+(v2?' v2':'')+'">'+route.map(function(p,i){
         var badge=(p.topPick?'<span class="rt-badge pick">อันดับ 1 สำหรับคุณ</span>':'')+(p.featured?'<span class="rt-badge feat">ผู้สนับสนุน</span>':'')+(p.newAngle?'<span class="rt-badge new">มุมใหม่</span>':'');
+        if(v2){
+          var s=semState(i);
+          var stChip=s==='cur'?'<span class="rt-state cur">'+ic('lc-map-pin')+'อยู่ตรงนี้</span>':(s==='start'?'<span class="rt-state start">'+ic('lc-map-pin')+'เริ่มที่นี่</span>':(s==='next'?'<span class="rt-state next">'+ic('lc-arrow-right')+'ถัดไป</span>':(s==='done'?'<span class="rt-state done">'+ic('lc-check')+'เสร็จแล้ว</span>':'')));
+          return '<div class="rt-row v2 '+s+(BOOTH_SEL===i?' sel':'')+'" data-i="'+i+'"><div class="rt-rail"><div class="rt-dot rt-num" style="background:'+semColor[s]+'">'+(i+1)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+stChip+'</div><div class="rt-meta">'+p.zone+' · '+p.status+'</div></div></div>';
+        }
         return '<div class="rt-row'+(p.topPick?' top':'')+'"><div class="rt-rail"><div class="rt-dot" style="background:'+p.dotColor+'">'+ic(p.icon)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+'</div><div class="rt-meta">'+p.zone+' · '+p.status+'</div></div></div>';
       }).join('')+'</div>'+
     '</section>'+
@@ -5045,6 +5156,27 @@ function renderBooth(){
      instead of a Liquid Metal mount. */
   var drawCtaBtn=root.querySelector('#drawCtaBtn');
   if(drawCtaBtn)drawCtaBtn.onclick=function(){DRAW_JOINED=true;renderBooth();};
+  /* ── v2 two-way Step↔Map focus ── tapping a step highlights its marker (and brings the map into
+     view + gives it a one-shot pulse); tapping a marker highlights its step (and brings the step
+     into view). Selection is applied via class toggles only — no full re-render — so it stays smooth
+     and doesn't disturb scroll (the DNA's "list rows toggle classes, don't re-render" idiom). It's
+     also re-applied on the next real render() from BOOTH_SEL, so a focus survives a check-in. Kept
+     deliberately subtle per the spec: highlight + a brief pulse, no violent pan/zoom that could push
+     a marker out of view, clip a label, or cause horizontal overflow (.map-ph clips its own bounds). */
+  if(v2){
+    var applySel=function(){
+      root.querySelectorAll('.rt-row.v2').forEach(function(r){r.classList.toggle('sel',BOOTH_SEL!=null&&+r.dataset.i===BOOTH_SEL);});
+      root.querySelectorAll('.map-ph .bmk').forEach(function(m){m.classList.toggle('sel',BOOTH_SEL!=null&&+m.dataset.i===BOOTH_SEL);});
+    };
+    var pulseMarker=function(i){var mk=root.querySelector('.map-ph .bmk[data-i="'+i+'"]');if(!mk)return;mk.classList.remove('flash');void mk.offsetWidth;mk.classList.add('flash');};
+    var selectStop=function(i,from){
+      BOOTH_SEL=i;applySel();
+      if(from==='step'){var mp=root.querySelector('.map-ph');if(mp&&mp.scrollIntoView)mp.scrollIntoView({behavior:'smooth',block:'center'});pulseMarker(i);}
+      else{var rr=root.querySelector('.rt-row.v2[data-i="'+i+'"]');if(rr&&rr.scrollIntoView)rr.scrollIntoView({behavior:'smooth',block:'center'});}
+    };
+    root.querySelectorAll('.rt-row.v2').forEach(function(r){r.onclick=function(){selectStop(+r.dataset.i,'step');};});
+    root.querySelectorAll('.map-ph .bmk').forEach(function(m){m.onclick=function(e){e.stopPropagation();selectStop(+m.dataset.i,'map');};});
+  }
   mountHeaderQR();
   bindHeaderLogo();
 }
@@ -5270,7 +5402,7 @@ function renderProfile(){
    "already done" mock defaults. Switching to 'pre' does NOT touch RESULT/quizDone — a pre-event
    visitor may already have taken the quiz online, so identity content stays independently gated on
    RESULT alone (see renderBook's empty state, buildRoute's personalized flag). */
-var DEMO={view:'auto',quizDone:false,draw:'auto',eventPhase:'pre',multiTicket:false}; // draw: 'auto' (default, resolves to eligible) | 'ok' | 'need' — see renderBooth. eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
+var DEMO={view:'auto',quizDone:false,draw:'auto',eventPhase:'pre',multiTicket:false,boothVer:'v1'}; // draw: 'auto' (default, resolves to eligible) | 'ok' | 'need' — see renderBooth. boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
 /* 'auto' now always resolves to mobile (2026-08-26, per direction "อัตโนมัติ default ไว้ที่ mobile
    size") — was real window.innerWidth-based detection (w<768→mobile/w<1440→tablet/else pc); PC/
    แท็บเล็ต/มือถือ stay available as explicit manual overrides, 'อัตโนมัติ' just no longer reacts to
@@ -5336,6 +5468,11 @@ function buildDemo(){
        (2026-08-26, per direction "อยากให้จำลองเคส...ไว้ด้วย กรณีครบเงื่อนไขแล้ว และกรณียังขาด") —
        'auto' keeps the real boothCheckinCount()/boothActivityCount() math; see renderBooth. */
     '<div class="demo-lbl">รางวัลใหญ่ (เดินบูธ)</div>'+seg('segDraw',[{v:'auto',t:'อัตโนมัติ'},{v:'ok',t:'ครบเงื่อนไขแล้ว'},{v:'need',t:'ยังขาด'}],DEMO.draw)+
+    /* หน้าเดินบูธ (2026-09-03) — separate preview toggle for the Booth Journey UX v2: v1 is the shipped
+       page, v2 layers numbered semantic markers + Step↔Map sync onto the SAME layout. Affects the
+       เดินบูธ tab only (renderBooth's `v2` flag); nothing else in the app reads DEMO.boothVer. */
+    '<div class="demo-lbl">หน้าเดินบูธ (พรีวิว)</div>'+seg('segBoothVer',[{v:'v1',t:'v1 เดิม'},{v:'v2',t:'v2 แผนที่ Sync'}],DEMO.boothVer)+
+    '<div class="demo-stub">* v2 = แผนที่มีหมุดเลขตรงกับ Step + แตะ Step/หมุดเพื่อโฟกัสกัน</div>'+
     '<div class="demo-lbl">ผลเกมย้อนเวลาพอร์ต → สิ่งที่ทำจริง</div><select class="demo-sel" id="demoCrisis"><option>ตอนวิกฤต "คงเส้น" (ถือ)</option><option>ตอนวิกฤต "ขายหนี" (ตัดขาย)</option><option>ตอนวิกฤต "ช้อนซื้อ" (เก็บเพิ่ม)</option></select>'+
     '<div class="demo-lbl">วิกฤตรอบที่ 2 (สวนขั้วกัน = ยังไม่นิ่ง)</div><select class="demo-sel" id="demoCrisis2"><option>เหมือนรอบแรก</option><option>สวนทางรอบแรก</option></select>'+
     '<div class="demo-stub">* เกมในงานยังไม่ออกแบบ — 2 ช่องนี้เป็น stub</div>'+
@@ -5354,6 +5491,7 @@ function buildDemo(){
   };});
   document.getElementById('segView').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.view=b.dataset.v;document.querySelectorAll('#segView button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');applyView();};});
   document.getElementById('segDraw').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.draw=b.dataset.v;document.querySelectorAll('#segDraw button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
+  document.getElementById('segBoothVer').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.boothVer=b.dataset.v;BOOTH_SEL=null;document.querySelectorAll('#segBoothVer button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.multiTicket=(b.dataset.v==='2');document.querySelectorAll('#segTicketCount button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('demoPersona').onchange=function(){if(this.value){DEMO.quizDone=true;document.getElementById('demoQuiz').classList.add('on');forcePersona(this.value);}};
   document.getElementById('demoQuiz').onclick=function(){DEMO.quizDone=!DEMO.quizDone;this.classList.toggle('on',DEMO.quizDone);};
