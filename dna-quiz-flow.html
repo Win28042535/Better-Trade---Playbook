@@ -3400,11 +3400,28 @@ function revealTick(){
   var rAtBottom=!rootScrolls||(root.scrollTop+root.clientHeight)>=(root.scrollHeight-1);
   var atBottom=wAtBottom&&rAtBottom;
   els.forEach(function(el){
+    // Bug fix (2026-09-03, "กิจกรรมประจำโซน" reveal arriving way too late on tall phones — iPhone 15
+    // Pro/Pro Max reported, but this was really a height bug, not a device bug). rect.top below used
+    // to be read WITHOUT clearing the transform first, so on every tick after the first it measured
+    // the box as the PREVIOUS tick's rotateX/perspective had already distorted it, not its true
+    // scrolled position — a feedback loop. perspective(1000px) foreshortens a rotated box more the
+    // taller it is (negligible on a ~480px card, severe on this section's ~1700px booth-grid card on
+    // mobile, where the whole grid stacks to one column), so the corrupted rect.top under-reported
+    // how far the section had actually scrolled, and p kept chasing a moving target instead of
+    // reaching 1 — the section stayed visibly shrunken/tilted for nearly a full extra screen of
+    // scrolling before catching up. Clearing the transform before reading gets the TRUE untransformed
+    // position every tick (costs one extra reflow per .scroll-reveal element, negligible at this
+    // count). Also scale the perspective distance with the element's own height (floor 1000px, same
+    // as before, for anything at/under that height) so a very tall card foreshortens by roughly the
+    // same visual amount as a short one under the same 12deg tilt, instead of collapsing harder the
+    // taller it is.
+    if(el.style.transform)el.style.transform='';
     var rect=el.getBoundingClientRect();
     if(rect.width===0&&rect.height===0)return; // display:none (e.g. an inactive book2 tab panel)
     var start=vh*0.92,end=vh*0.42; // enters the reveal ~92% down the viewport, settles flat by ~42%
     var p=atBottom?1:Math.max(0,Math.min(1,(start-rect.top)/(start-end)));
-    el.style.transform='perspective(1000px) rotateX('+((1-p)*12).toFixed(2)+'deg) translateY('+((1-p)*26).toFixed(1)+'px) scale('+(0.95+p*0.05).toFixed(3)+')';
+    var persp=Math.max(1000,rect.height*2.2);
+    el.style.transform='perspective('+Math.round(persp)+'px) rotateX('+((1-p)*12).toFixed(2)+'deg) translateY('+((1-p)*26).toFixed(1)+'px) scale('+(0.95+p*0.05).toFixed(3)+')';
   });
 }
 var SR_RAF=null;

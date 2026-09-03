@@ -321,6 +321,31 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-09-03 — scroll motion bug: `revealTick()`'s "กิจกรรมประจำโซน" card arriving nearly a full page
+late on tall phones (iPhone 15 Pro/Pro Max reported).** Root cause wasn't a device- or width-specific
+breakpoint — it was `revealTick()` (§ "CONTAINER SCROLL ANIMATION DNA") reading `el.getBoundingClientRect()`
+**without clearing the element's own transform from the previous tick first**. That's harmless for a
+normal-height `.scroll-reveal` card, but `perspective(1000px) rotateX(12deg)` foreshortens a rotated
+box more the taller it is relative to that 1000px perspective distance — negligible on a ~480px card,
+severe on this section's booth-grid card (~1700px tall on mobile, one column). The distorted
+mid-rotation box fed its own (wrong) `rect.top` into the NEXT tick's progress calc, so `p` chased a
+moving target and never converged until the user had scrolled nearly the section's own height past
+it — reading as "leaves a blank gap for almost the whole page before it shows up". Fixed two ways in
+`revealTick()`: (1) clear `el.style.transform` before reading `rect` each tick, so `p` is always
+computed from the TRUE scrolled position, not last frame's distorted paint (costs one extra reflow
+per `.scroll-reveal` element per tick — negligible at the handful this app has); (2) scale
+`perspective` with the element's own height (`Math.max(1000, rect.height*2.2)`, same 1000px floor as
+before for anything at/under that height) so a very tall card foreshortens by about the same visual
+amount as a short one under the same 12deg tilt, instead of collapsing harder the taller it is.
+Verified via direct `getBoundingClientRect()`/`offsetHeight` reads (not just eyeballing — this bug is
+invisible in a single screenshot, only shows up as a timing error across a scroll range) that the
+section now converges to its natural height within the same ~0.5×vh scroll window every other
+`.scroll-reveal` card gets, at both reported sizes (iPhone 15 Pro 393×852, Pro Max 430×932) plus the
+full 393/402/420/430/440 (phone) and 800/820/834/884 (tablet) width set from the audit below — and
+re-ran that audit's own 0-overflow sweep after the change since `revealTick()` is shared by every
+screen, not just this one card. No other `.scroll-reveal` section changed behavior (all comfortably
+under the old fixed 1000px perspective's safe height already).
+
 **2026-09-03 — responsive audit: tablet 800/820/834/884px + phone 393/402/420/430/440px, clean (no code change).** Per direction "responsive audit" for these two specific width bands — same
 `scrollWidth`/`clientWidth` sweep methodology as the 2026-09-02 entry below, run fresh against this
 session's own harness: `st.phase` forced through all 10 screens (splash/consent/quiz/reveal/book/
