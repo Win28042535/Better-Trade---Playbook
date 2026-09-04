@@ -2476,8 +2476,17 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
      original -16px upward drift (tuned for the old top:6% spot, which had a full screen of
      headroom above it) would have clipped back into the logo mid-animation even with the rest
      position fixed. Halved to -8px so the full oscillation stays clear. */
-  .sp-el-candle{top:29%!important;left:3%!important;bottom:auto!important;right:auto!important;--dy:-8px!important;}
-  .sp-el-bitcoin{top:28%!important;right:3%!important;left:auto!important;bottom:auto!important;}
+  /* dx ALSO capped, found in the 2026-09-04 audit — this rule fixed top/left/right/bottom and dy,
+     but left candle/bitcoin's own horizontal drift (--dx, inherited from the base JS scatter table:
+     candle +16px, bitcoin -12px) untouched, and BOTH happen to drift INWARD (candle right, bitcoin
+     left) — straight toward .sp-sub, the exact zone this rule anchors them beside. Verified live: at
+     390px width even candle/bitcoin's REST position (before any drift) already overlapped .sp-sub by
+     ~17px — pre-existing, not caused by this session's .sp-sub width change (confirmed by reverting
+     .sp-sub back to its old flat 28ch and re-checking — the overlap was already there), just never
+     caught before. Zeroing --dx removes the drift-widens-it half of the problem; left/right nudged
+     out 4px for the rest-position half. */
+  .sp-el-candle{top:29%!important;left:0%!important;bottom:auto!important;right:auto!important;--dy:-8px!important;--dx:0px!important;}
+  .sp-el-bitcoin{top:28%!important;right:0%!important;left:auto!important;bottom:auto!important;--dx:0px!important;}
 }
 @keyframes spDrift{from{transform:translate3d(0,0,0) rotate(var(--r0,0deg)) scale(var(--sc,1));}to{transform:translate3d(var(--dx,10px),var(--dy,-16px),0) rotate(var(--r1,6deg)) scale(var(--sc,1));}}
 .sp-top{position:relative;z-index:2;text-align:center;width:100%;}
@@ -2493,7 +2502,14 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .sp-h .l1{display:block;color:var(--ink);}
 .sp-h .l2{display:block;color:var(--muted);}
 /* subtitle carries the "what am I here to do" message — kept prominent (ink, slightly larger) so it out-reads the decorative hero logo; the key phrase is bolded via <b> in render */
-.sp-sub{font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--ink);line-height:1.55;max-width:28ch;margin:var(--sp-inline) auto 0;}
+/* max-width was a flat 28ch (≈280px) for every mobile width (2026-09-04 audit, same "390+...ยิ่ง
+   หน้าจอใหญ่ยิ่งโล่ง" direction as .fan-card's own comment above) — 71.9% of shell width at 390px,
+   down to 58.5% at 479px. min(76vw,340px): scales with the real viewport below 480px (76% ≈ the
+   original 280/390 ratio, so unchanged at the small end), caps at 340px right around the 480px frame
+   boundary (76%×447≈340, comfortably before 480 — no jump, and framed wide viewports beyond it stay
+   capped instead of growing with raw vw forever). 340px still reads as a normal paragraph measure,
+   not an over-wide line. */
+.sp-sub{font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--ink);line-height:1.55;max-width:min(76vw,340px);margin:var(--sp-inline) auto 0;}
 .sp-sub b{font-weight:var(--w-label);}
 .sp-stage{position:relative;z-index:2;flex:0 0 auto;width:100%;display:flex;align-items:center;justify-content:center;min-height:0;margin:clamp(22px,5vh,46px) 0 0;}
 /* fan carousel — adapted from a GSAP card-fan reference (rot/scale/x/y per slot, arc shape) into
@@ -2502,10 +2518,44 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    glide along the SAME arc into/out of the 7 visible slots. Auto-plays forever; the centered card
    (.center, see paintFan/bindFanFlip) is also tappable to flip and see the card-back art — every
    other slot stays pointer-events:none, purely decorative. */
-.fan-stage{position:relative;width:100%;height:clamp(250px,34vh,330px);}
-.fan-card{--fw:172px;position:absolute;top:50%;left:50%;width:var(--fw);aspect-ratio:5/7;transition:transform 1s cubic-bezier(.22,1,.36,1),opacity .6s var(--ease);will-change:transform,opacity;pointer-events:none;}
+/* floor bumped 250px→310px (2026-09-04 audit) — .fan-card's own --fw can now reach 210px at the wide
+   end of the mobile range (see its own comment above), 294px tall; the old 250px floor let v2's card
+   (same --fw) overflow its stage and poke into the caption text below at a wide-but-short viewport
+   (479×700 — confirmed live, not just by the math). 310px clears it with a small margin. */
+.fan-stage{position:relative;width:100%;height:clamp(310px,34vh,330px);}
+/* --fw was a flat 172px for EVERY mobile width (2026-09-04 audit, per direction "mobile size
+   [390+]...ยิ่งหน้าจอใหญ่ ยิ่งโล่ง...อยากให้ scale...เหมาะสมกับทุกหน้าจอ") — measured live: .shell is
+   UNCAPPED and tracks the real viewport 1:1 below the 480px phone-frame breakpoint (see .shell's own
+   @media(min-width:480px) rule far below), so a phone at 390px and one at 479px got the identical
+   172px card — 44.1% of shell width on the small phone, only 35.9% on the bigger one, same shrink-as-
+   canvas-grows problem as the tablet audit above. min(44vw,210px): scales 1:1 with the real viewport
+   below 480px (44% ≈ the original 172/390 ratio, so nothing changes at the small end), then the 210px
+   cap takes over right around the 480px frame boundary (44%×480=211.2, just past 210) — deliberately
+   chosen so there's no visible jump at that seam: the value is already flat at 210 for several px
+   before 480, and framed viewports beyond it (where .shell freezes at 400px but raw vw keeps growing)
+   stay capped at 210 instead of scaling with vw forever. */
+.fan-card{--fw:min(44vw,210px);position:absolute;top:50%;left:50%;width:var(--fw);aspect-ratio:5/7;transition:transform 1s cubic-bezier(.22,1,.36,1),opacity .6s var(--ease);will-change:transform,opacity;pointer-events:none;}
 .fan-card.center{pointer-events:auto;cursor:pointer;}
-:root[data-view="tablet"] .fan-card,:root[data-view="pc"] .fan-card{--fw:204px;}
+/* ── TABLET/PC SCALE-UP (2026-09-04 audit, per direction "ยิ่งหน้าจอใหญ่ ยิ่งโล่ง...อยากให้ scale
+   ของ preview card, logo, title, subtitle สมส่วนใหญ่-เล็กเหมาะสมกับทุกหน้าจอ") ── measured live at
+   768px (tablet): the card/hero-logo were sized to only ~27%/36% of the shell's own width, vs
+   ~46%/75% on mobile — the CENTRAL content was shrinking relative to its canvas while the scatter
+   decorations (below) stayed pinned to the raw edges, so the composition read as empty in the middle
+   and scattered at the corners the wider the screen got. --fw 204px→264px (fan) here + spv2-card
+   below unifies both stages at the same bigger size (they used to differ — 176 vs 204 — purely to
+   dodge the OLD short stage clamp overhanging into the headline; the taller clamp right below removes
+   that constraint, so both can share one number). height math: 264px wide × 7/5 aspect = 369.6px
+   tall; the new clamp's 390px MINIMUM (not just a vh-scaled preferred value) guarantees enough room
+   (plus ~20px margin) on every tablet/pc height tested down to a genuinely extreme 650px-tall
+   viewport, where 40vh alone would only be 260px (a first pass used a 350px floor — 19.6px short of
+   the 369.6px the card actually needs, which DID overflow the stage and poke into the caption text
+   below at 650px; caught by measuring the card's rendered height against the stage's, not just
+   eyeballing) — clamp()'s min floor is exactly for this: never less than 390 regardless of viewport
+   height. */
+:root[data-view="tablet"] .fan-stage,:root[data-view="pc"] .fan-stage,
+:root[data-view="tablet"] .spv2-stage,:root[data-view="pc"] .spv2-stage{height:clamp(390px,42vh,420px);}
+:root[data-view="tablet"] .fan-card,:root[data-view="pc"] .fan-card,
+:root[data-view="tablet"] .spv2-stage .spv2-card,:root[data-view="pc"] .spv2-stage .spv2-card{--fw:264px;}
 /* ── SPLASH PREVIEW V2 — "Card Back Reveal" (DEMO.splashVer==='v2', see renderSplash/startSpv2) ──
    A curiosity-first alternative to the fan carousel: the card BACK is the hero (dominant, centered,
    front-facing, highest z, subtle float + light-sweep), while the next persona's card FRONT peeks
@@ -2514,13 +2564,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    .fan-card so the splash composition/spacing is unchanged — only the preview's internal treatment
    differs. Card visual chrome (radius, shadow, aspect) is the shared .pc-face/.pc-tilt from the
    collectible card, reused verbatim. */
-.spv2-stage{position:relative;width:100%;height:clamp(250px,34vh,330px);perspective:1200px;}
-.spv2-card{--fw:172px;position:absolute;top:50%;left:50%;width:var(--fw);aspect-ratio:5/7;transform:translate(-50%,-50%);will-change:transform,opacity;}
-/* v2 keeps a smaller --fw than the fan carousel at tablet/pc (176 vs the fan's 204): a full-size
-   204px back card is 285px tall — taller than the stage's collapsed 250px min-height (clamp) — so it
-   would overhang and the vertical glimpse variants would poke into the headline/caption. 176px
-   (≈246px tall) fits the collapsed stage, and still reads as the dominant hero. */
-:root[data-view="tablet"] .spv2-stage .spv2-card,:root[data-view="pc"] .spv2-stage .spv2-card{--fw:176px;}
+/* same floor bump as .fan-stage above, same reason. */
+.spv2-stage{position:relative;width:100%;height:clamp(310px,34vh,330px);perspective:1200px;}
+/* same fix, same reasoning as .fan-card's own --fw above. */
+.spv2-card{--fw:min(44vw,210px);position:absolute;top:50%;left:50%;width:var(--fw);aspect-ratio:5/7;transform:translate(-50%,-50%);will-change:transform,opacity;}
 /* PREVIOUS — pure depth: a faded, blurred, shrunk card back mostly tucked behind the hero (only a
    faint upper-left corner shows), so it adds a sense of a stack without competing with the flip
    for the viewer's eye. Non-flippable — just the plain spv2BackCard(). */
@@ -2571,7 +2618,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    width:auto alone just shrinks to content; see .consent-btn's comment for the full explanation. */
 :root[data-view="mobile"] .sp-cta{position:sticky;bottom:0;z-index:6;width:auto;align-self:stretch;margin:auto calc(-1*var(--sp-edge)) 0;padding:24px var(--sp-edge) calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper) 45%,color-mix(in srgb,var(--paper) 50%,transparent) 75%,transparent);}
 /* brand logos */
-.sp-logo{display:block;height:24px;width:auto;margin:0 auto var(--sp-stack);opacity:.92;}
+/* height was a flat 24px for every mobile width — same fix/reasoning as .fan-card/.sp-sub above,
+   applied to the small top brand mark too (the 4th element named in the direction, alongside
+   card/title/subtitle). min(6.15vw,28px): 24px at 390px (unchanged), grows to a capped 28px right
+   around the 480px frame boundary. Deliberately the smallest bump of the four — this mark is meant
+   to stay visibly secondary to .sp-hero-logo, not compete with it. */
+.sp-logo{display:block;height:min(6.15vw,28px);width:auto;margin:0 auto var(--sp-stack);opacity:.92;}
 .sp-hero-logo{display:block;width:min(84%,420px);height:auto;margin:2px auto 0;}
 .tb-logo{height:32px;width:auto;object-fit:contain;}
 .hd-logo{cursor:pointer;}
@@ -2720,7 +2772,20 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    Book below the identity card, the quiz's ถัดไป button) into an unreachable void. overflow-y:auto
    makes the frame the scroll container; scrollbar hidden to preserve the device look. */
 @media(min-width:480px){:root[data-view="mobile"] .shell{max-width:400px;border-radius:30px;border:1px solid var(--line);box-shadow:0 30px 70px rgba(17,19,24,0.18);overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
-:root[data-view="mobile"] .shell::-webkit-scrollbar{display:none;}}
+:root[data-view="mobile"] .shell::-webkit-scrollbar{display:none;}
+/* .fan-card/.spv2-card/.sp-sub's own min(Xvw,cap) formulas (2026-09-04 audit, see their own comments)
+   track the RAW viewport width — correct below this breakpoint, where .shell has no cap and tracks
+   the viewport 1:1, but WRONG here: .shell just froze at a flat 400px while the raw viewport this
+   media query fires on keeps growing past 480px, so vw keeps climbing while the shell it's meant to
+   stay proportional to does not. Pin them to their own "as if shell were exactly 400px" flat values
+   instead (76%/44% of 400 — the same ratios the vw-formulas use, just no longer chasing a growing vw
+   once the shell it's inside has stopped growing). Confirmed via a live overlap check this ALSO fixes
+   a related collision: .sp-el-candle/.sp-el-bitcoin sit at the shell's own left:0%/right:0% edge, so
+   .sp-sub's own uncapped 480px-viewport-relative width (340px, sized for the WRONG, wider box) left
+   them almost no margin inside the now-narrower 400px shell; the correct 304px value restores it. */
+:root[data-view="mobile"] .fan-card,:root[data-view="mobile"] .spv2-card{--fw:176px!important;}
+:root[data-view="mobile"] .sp-sub{max-width:304px!important;}
+}
 /* Desktop (pc/tablet) is a SEAMLESS FULL PAGE, not a framed card: full-width topbar + backgrounds,
    with reading content held to a comfortable centered measure inside. The cloud backdrop + shell
    side-borders below (line ~588) are scoped to the mobile-frame preview only — on real desktop they
@@ -2743,15 +2808,21 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    5 tab items inside the identical 760px column — so "เหมือน header" for the background, "fix
    position เดิม เหมือน tablet" for the icons: only the backdrop changes, not where the items sit. */
 :root[data-view="pc"] .book-tabbar{max-width:none;padding-left:max(var(--sp-stack),calc((100% - 760px)/2));padding-right:max(var(--sp-stack),calc((100% - 760px)/2));}
-/* splash on larger canvases: SMALLER hero logo, and a MORE prominent subtitle (it's the line that
-   states what you're here to do — find your 1-of-12 type), roomier side padding */
-:root[data-view="tablet"] .sp-hero-logo,:root[data-view="pc"] .sp-hero-logo{width:min(58%,280px);}
-:root[data-view="tablet"] .sp-logo,:root[data-view="pc"] .sp-logo{height:28px;}
+/* splash on larger canvases (2026-09-04 audit — REVERSES the old "SMALLER hero logo" call below:
+   measured live, the 280px cap left the hero logo at only ~36% of the tablet shell's own width vs
+   ~75% on mobile, reading as undersized/empty on the bigger canvas — see the .fan-stage/.fan-card
+   comment above for the full measurement). 280px→360px, 58%→64%; --sp-logo (top brand mark) 28px→
+   34px, still visibly smaller than the hero wordmark (the correct hierarchy) but no longer barely
+   bigger than mobile's 24px. */
+:root[data-view="tablet"] .sp-hero-logo,:root[data-view="pc"] .sp-hero-logo{width:min(64%,360px);}
+:root[data-view="tablet"] .sp-logo,:root[data-view="pc"] .sp-logo{height:34px;}
 /* font-size:17px override removed (2026-08-15) — it existed to nudge desktop 1px above the old
    16px mobile base; --fs-sub is now 18px everywhere, already past that old override's value, so
    the raw literal was actively backwards (17 < 18) rather than just untokenized. max-width kept —
-   that part was a real responsive choice, unrelated to the size drift. */
-:root[data-view="tablet"] .sp-sub,:root[data-view="pc"] .sp-sub{max-width:32ch;}
+   that part was a real responsive choice, unrelated to the size drift. 32ch→38ch (2026-09-04, same
+   audit) — still a comfortable reading-line-length, just a bit more present alongside the bigger
+   logo/card above. */
+:root[data-view="tablet"] .sp-sub,:root[data-view="pc"] .sp-sub{max-width:38ch;}
 :root[data-view="tablet"] .splash,:root[data-view="pc"] .splash{padding-left:40px;padding-right:40px;}
 /* Bottom clearance fix (2026-09-01, per direction — splash CTA sat flush against the true bottom
    edge on tablet/pc, unlike the quiz nav's "ถัดไป" button which clears it via .q-scroll's own 34px
@@ -2774,6 +2845,54 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    individually — inline per-asset styles (line ~2347) win specificity ties, so !important is
    required here, same technique already used for the mobile @media rule below. top/bottom, per-asset
    size/opacity/drift are all untouched; only the horizontal anchor moves inward. */
+/* 2026-09-04 audit — extended to `tablet` too (was pc-only): tablet's shell is capped at 820px, not
+   pc's uncapped full-bleed width, but it's STILL 2-2.2x mobile's ~375-430px, wide enough for the same
+   "pinned to the literal corner" problem the pc fix above was written for — measured live at 768px,
+   e.g. the near-plane candle/bitcoin sat only 5-40px from the shell's own edge, 100+px away from the
+   hero-logo/card group they're meant to orbit. Same % values reused for both — percentages already
+   scale with whatever the shell's own width happens to be — but only up to a point: tablet's shell
+   is CAPPED at 820px while pc's is unbounded (often 1440px+ in real use), so reusing pc's exact 17-
+   19%/1.4x numbers on tablet's much narrower canvas pulled the (now also bigger) icons far enough in
+   to actually OVERLAP the hero-logo/fan-stage — confirmed via a getBoundingClientRect overlap check,
+   not just eyeballing. Tablet gets its OWN, gentler numbers below (smaller size bump, smaller inward
+   pull); pc keeps its original values/size (untouched — it was independently already verified before
+   this round, and wasn't part of what was reported this time). */
+:root[data-view="tablet"] .sp-el{width:calc(var(--w,88px) * 1.15);}
+/* Two earlier passes used % insets (first 9-11%, then pc's own 17-19%) — both measured WRONG at
+   tablet's own narrow end (700px, still inside the tablet range): a % inset shrinks in absolute px
+   right along with the shell, but the content it needs to clear (.sp-hero-logo/.fan-card) is now a
+   FIXED px width (see the --fw/hero-logo comments above — both hit their min()/flat-value cap well
+   before 700px), so the safe margin shrinks while the thing it's avoiding doesn't. Switched to a
+   fixed PX inset instead, computed directly from measured geometry at the worst case (700px, the
+   narrowest real tablet width) — since content stays fixed-width, a px inset that clears it at 700
+   only gets SAFER (more spare room) at every wider tablet width, monotonically, no re-derivation
+   needed. Each element's own vertical band (rest position AND its full drift-animation excursion,
+   both checked) only needs to clear whichever content zone it actually vertically overlaps — gold/
+   heart/bitcoin/candle clear .sp-hero-logo/.sp-sub; efin/card clear .fan-card's own stage. Verified
+   via a deterministic getBoundingClientRect overlap check (animations frozen, both the rest AND the
+   full-drift extreme measured explicitly — a live running check gave inconsistent/misleading reads
+   depending on which animation frame it happened to catch) — zero overlaps at 700/768/820/1024px
+   wide, 650/900/1024/1180px tall (650 needed 2 more small vertical nudges below — .sp-top's own
+   margin-top:auto, see its own comment further down, means the whole logo/sub group sits closer to
+   the true top at short viewports where there's less spare space to absorb into that margin, so a
+   fixed top:% tuned against a tall viewport can drift into a DIFFERENT content zone at a short one
+   — a horizontal-only inset can't fix a vertical-band problem). */
+:root[data-view="tablet"] .sp-el-gold{left:95px!important;}
+:root[data-view="tablet"] .sp-el-heart{right:95px!important;}
+:root[data-view="tablet"] .sp-el-bitcoin{right:50px!important;}
+/* efin's base top:47% (tuned for mobile) lands it squarely between .sp-hero-logo and .sp-sub at
+   normal tablet heights, but at a genuinely extreme 650px-tall viewport those two zones sit only
+   ~12px apart — LESS than efin's own ~77px height, so no top:% value can clear both at once. Same
+   call already made for narrow MOBILE widths (see the @media(max-width:575px) rule far above,
+   which drops this exact element for the same reason: not enough room, not a bug to keep chasing) —
+   drop it at short tablet heights too instead of forcing an impossible fit. */
+:root[data-view="tablet"] .sp-el-efin{left:110px!important;}
+@media(max-height:700px){:root[data-view="tablet"] .sp-el-efin{display:none;}}
+/* candle ALSO needs to clear .sp-hero-logo vertically (its base top:6%, tuned for mobile where the
+   logo sits much higher, puts its bottom edge into the logo's own top edge at tablet sizes) — lifted
+   to top:1% on top of the horizontal fix, rather than clamping the horizontal inset even tighter. */
+:root[data-view="tablet"] .sp-el-candle{left:22px!important;top:1%!important;}
+:root[data-view="tablet"] .sp-el-card{right:55px!important;}
 :root[data-view="pc"] .sp-el-gold{left:17%!important;}
 :root[data-view="pc"] .sp-el-heart{right:17%!important;}
 :root[data-view="pc"] .sp-el-bitcoin{right:19%!important;}
