@@ -716,6 +716,43 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .cr2-side{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
 .cr2-side .pc3d,.cr2-side .pc-tilt{width:100%;height:100%;aspect-ratio:auto;}
 .cr2-side .pc-face{box-shadow:none;border-radius:0;}
+/* BUG FIX (2026-09-04, found live in the Browser pane): real-photo cards have their title baked
+   into the photo (e.g. "The Planner"/"The Wave Rider"). When two DIFFERENT persona photos are
+   compared side-by-side here, .cr2-before's dynamic clip-path (paint(), above) slices through
+   whichever photo pixels sit at the divider — and since both titles sit in roughly the same
+   horizontal band, at most divider positions this spliced BOTH titles' fragments together into a
+   nonsense hybrid word (verified live: heroKey='planner' + postKey='waverider' at the default 52%
+   divider literally read "The Ple Rider" — "The Pl" from Planner's clipped-visible half + "e Rider"
+   from Wave Rider's exposed half showing through underneath). Patched by masking OUT the title band
+   on both sides entirely — its own clip-path/overflow already scopes this correctly per side, so the
+   patch only ever covers exactly what's currently visible of that side, nothing more. This is a safe
+   trade (not a text replacement) because the persona's identity is ALREADY unambiguous elsewhere on
+   this same component: the .cr2-chip-b/.cr2-chip-a pills above ("ก่อนงาน"/"หลังงาน") plus the live
+   description panel below the card (driven by the SAME divider position via onMove) — see
+   book2IdentityDetail/initCompareReveal's opts.onMove. The patch color (#f3f3f1) was sampled directly
+   from the shared photo backdrop (all 12 real card photos use the same near-white paper tone in this
+   band — confirmed via canvas pixel sampling across planner/waverider/guardian/collector, ~rgb(240-
+   246,240-246,238-244)), so it blends invisibly into the surrounding photo rather than reading as an
+   applied patch. 18% height clears the title band (found via a per-row darkest-pixel scan: text ink
+   ~10-13%, illustration linework begins abruptly ~19%) without eating into the art below. Scoped to
+   .cr2-side .pc-face only — the fan carousel / Book's own single (non-compared) hero card keep
+   showing their titles normally, untouched, since neither ever slices two different photos together
+   like this. */
+.cr2-side .pc-face::after{content:"";position:absolute;inset:0 0 auto 0;height:18%;background:#f3f3f1;z-index:2;pointer-events:none;}
+/* 2026-09-04, same-day follow-up — a same-technique mask was briefly ALSO added over the BOTTOM band
+   (Thai name/description/edition/tags), reasoning it would splice the same way. Reverted per direct
+   feedback ("preview card แสดงข้อมูลไม่เต้มทั้งการ์ด...ขาดรายละเอียดด้านล่าง") — masking it blanked out
+   real, wanted information the user needs to see, which is a worse outcome than the thing being
+   fixed. On reinspection the bottom band ISN'T actually the same bug as the title: the title is
+   CENTERED text, so almost any divider position bisects the SAME word on both photos and glues the
+   two halves into a nonsense hybrid ("The Ple Rider" — confirmed live). The bottom band instead has
+   each card's OWN info pinned to a FIXED side of ITS OWN layout (Thai description bottom-LEFT, asset
+   tags bottom-RIGHT, per the approved card template) — so at a normal divider position you see the
+   "before" card's own (complete, legible) left-aligned description block sitting beside the "after"
+   card's own (complete, legible) right-aligned tags block: two genuine, unmangled info blocks, not a
+   character-level splice. Slightly mismatched (one side's Thai description next to the other side's
+   English tags) but never nonsense text — so it stays visible; only the genuinely-broken title band
+   above is masked. */
 .cr2-before{clip-path:inset(0 48% 0 0);z-index:2;will-change:clip-path;}
 .cr2-chip{position:absolute;top:10px;z-index:6;pointer-events:none;padding:var(--sp-stack-tight) var(--sp-list);border-radius:var(--rpill);color:var(--white);background:rgba(17,19,24,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-label);letter-spacing:.03em;line-height:1;transition:opacity .18s ease;}
 .cr2-chip-b{left:10px;}
@@ -2462,10 +2499,62 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* fan carousel — adapted from a GSAP card-fan reference (rot/scale/x/y per slot, arc shape) into
    pure CSS transitions: all 12 real persona cards sit stacked at dead-center, each one's transform
    is recomputed every tick from its signed distance to the current center card, so cards smoothly
-   glide along the SAME arc into/out of the 7 visible slots. Auto-plays forever, no action required. */
+   glide along the SAME arc into/out of the 7 visible slots. Auto-plays forever; the centered card
+   (.center, see paintFan/bindFanFlip) is also tappable to flip and see the card-back art — every
+   other slot stays pointer-events:none, purely decorative. */
 .fan-stage{position:relative;width:100%;height:clamp(250px,34vh,330px);}
 .fan-card{--fw:172px;position:absolute;top:50%;left:50%;width:var(--fw);aspect-ratio:5/7;transition:transform 1s cubic-bezier(.22,1,.36,1),opacity .6s var(--ease);will-change:transform,opacity;pointer-events:none;}
+.fan-card.center{pointer-events:auto;cursor:pointer;}
 :root[data-view="tablet"] .fan-card,:root[data-view="pc"] .fan-card{--fw:204px;}
+/* ── SPLASH PREVIEW V2 — "Card Back Reveal" (DEMO.splashVer==='v2', see renderSplash/startSpv2) ──
+   A curiosity-first alternative to the fan carousel: the card BACK is the hero (dominant, centered,
+   front-facing, highest z, subtle float + light-sweep), while the next persona's card FRONT peeks
+   out from behind it as a PARTIAL glimpse only (~25-30%, never the full face). A faded card-back
+   sits further back for depth. Same stage box (height clamp) + card sizing (--fw) as .fan-stage/
+   .fan-card so the splash composition/spacing is unchanged — only the preview's internal treatment
+   differs. Card visual chrome (radius, shadow, aspect) is the shared .pc-face/.pc-tilt from the
+   collectible card, reused verbatim. */
+.spv2-stage{position:relative;width:100%;height:clamp(250px,34vh,330px);perspective:1200px;}
+.spv2-card{--fw:172px;position:absolute;top:50%;left:50%;width:var(--fw);aspect-ratio:5/7;transform:translate(-50%,-50%);will-change:transform,opacity;}
+/* v2 keeps a smaller --fw than the fan carousel at tablet/pc (176 vs the fan's 204): a full-size
+   204px back card is 285px tall — taller than the stage's collapsed 250px min-height (clamp) — so it
+   would overhang and the vertical glimpse variants would poke into the headline/caption. 176px
+   (≈246px tall) fits the collapsed stage, and still reads as the dominant hero. */
+:root[data-view="tablet"] .spv2-stage .spv2-card,:root[data-view="pc"] .spv2-stage .spv2-card{--fw:176px;}
+/* PREVIOUS — pure depth: a faded, blurred, shrunk card back mostly tucked behind the hero (only a
+   faint upper-left corner shows), so it adds a sense of a stack without competing with the flip
+   for the viewer's eye. Non-flippable — just the plain spv2BackCard(). */
+.spv2-prev{z-index:1;opacity:.26;filter:blur(3.5px);transform:translate(-50%,-50%) translate(-9%,-8%) scale(.85) rotate(-4deg);}
+/* BACK — the dominant hero, and (2026-09-04 rework) the card that actually FLIPS to reveal a random
+   persona's front — see spv2DomCard/spv2Cycle. Centering lives here (static, on .spv2-card); the
+   float/sweep animate the .pc3d child so they compose with centering instead of clobbering it; the
+   flip itself animates the .pc-flip grandchild — 3 independent transforms on 3 nested elements,
+   same proven nesting pcStatic(key,true) already uses for v1's tap-to-flip. */
+.spv2-back{z-index:5;}
+.spv2-back .pc3d{animation:spv2Float 6.5s ease-in-out infinite;transform-origin:50% 60%;}
+@keyframes spv2Float{0%,100%{transform:translateY(0) rotate(-1.2deg);}50%{transform:translateY(-9px) rotate(1.2deg);}}
+/* light sweep across the card-back FRONT face only — clipped by .pc-face's own overflow:hidden. */
+.spv2-sweep{position:absolute;inset:0;background:linear-gradient(115deg,transparent 34%,rgba(255,255,255,.42) 50%,transparent 66%);transform:translateX(-125%);animation:spv2Sweep 6s ease-in-out infinite;mix-blend-mode:screen;pointer-events:none;z-index:4;}
+@keyframes spv2Sweep{0%,58%{transform:translateX(-125%);}80%,100%{transform:translateX(125%);}}
+/* Slower, more deliberate flip for the v2 gimmick (2026-09-04, per direction "จังหวะการเปิดปิด...
+   อยากให้ช้ากว่านี้") — overrides the global `.pc-flip{transition:transform .7s}` (v1's own
+   tap-to-flip keeps that original .7s, untouched) with a longer, more premium curve. JS's
+   SPV2_FLIP_MS mirrors this duration so "hold" only starts counting once the open animation has
+   actually finished (see spv2Cycle). Scoped by #spv2Dom so nothing else on the page is affected. */
+#spv2Dom .pc-flip{transition:transform 1s cubic-bezier(.65,0,.35,1);}
+/* tap-to-pause (see bindSpv2Tap) — freezes the ambient float/sweep so the viewer can dwell on
+   whichever face (back or the open persona) is currently showing. */
+.spv2-stage.paused .spv2-back .pc3d,.spv2-stage.paused .spv2-sweep{animation-play-state:paused;}
+.spv2-stage{cursor:pointer;}
+/* Reduced motion — the card is seated statically flipped open (see initSpv2, no cycle timer at all
+   under RM) instead of mid-animation; kill the ambient float/sweep AND the one-time flip transition
+   so it never visibly rotates even once. Scoped to #spv2Dom only — v1's own tap-to-flip elsewhere on
+   this page keeps its normal transition under RM, untouched. */
+@media(prefers-reduced-motion:reduce){.spv2-back .pc3d,.spv2-sweep{animation:none!important;}#spv2Dom .pc-flip{transition:none!important;}}
+/* Mobile — the prev depth card tucks in a touch more so nothing risks the narrower viewport edge.
+   The dominant card's own flip needs no mobile-specific tuning — it's a same-box rotation, never
+   changes footprint, so the tablet/pc --fw override above is the only sizing concern (see below). */
+:root[data-view="mobile"] .spv2-prev{transform:translate(-50%,-50%) translate(-12%,-9%) scale(.86) rotate(-4deg);}
 /* .sp-preview-note ("พรีวิวการ์ดตัวตนนักลงทุน 12 แบบ") and .sp-cap (the PDPA acceptance line)
    removed entirely 2026-08-15, per direction. */
 /* The ONE action on this screen that matters — was a styled .btn-primary, now the Liquid Metal CTA
@@ -2917,7 +3006,15 @@ var ICON_IMG={s1q2:'assets/s1q2.png',s2q6:'assets/s2q6.png',s2q7:'assets/s2q7.pn
 var BG_IMG={nightSky:'assets/nightSky.jpg',room1:'assets/room1.jpg'};
 var BG_VIDEO={sky:'assets/sky.mp4'};
 var ASSET_IMG=/*__ASSET_IMG__*/{candle:'assets/candle.png',gold:'assets/gold.png',bitcoin:'assets/bitcoin.png',card:'assets/card.png',heart:'assets/heart.png',efin:'assets/efin-2.png'};
-var REAL_CARD_IMG={harvester:'assets/harvester.jpg',diamondhand:'assets/diamondhand.jpg',waverider:'assets/waverider.jpg'}; // 2 real illustrated cards (Diamond Hand/Wave Rider, approved final art) — rest stay CSS editorial (matching the new format)
+/* 2026-09-04: all 12 personas now have approved final photographed card art (replaces the earlier
+   3-card partial set — harvester/diamondhand/waverider — with the full set), so pcFrontInner's CSS
+   editorial-mockup branch is unreached for every real persona now; left in place as a safe fallback
+   only. CARD_BACK_IMG is the shared physical card-back design (one image, same for all 12 — the
+   cards' back is generic, unlike the front which differs per persona). Source files (12 fronts +
+   1 back, 1418×1985 PNG/WEBP originals) resized to 700px-wide JPEG q85 via sharp, matching this
+   file's existing compression convention for these photos (~100-116KB each). */
+var REAL_CARD_IMG={guardian:'assets/guardian.jpg',harvester:'assets/harvester.jpg',steadyhand:'assets/steadyhand.jpg',diamondhand:'assets/diamondhand.jpg',analyst:'assets/analyst.jpg',planner:'assets/planner.jpg',explorer:'assets/explorer.jpg',sage:'assets/sage.jpg',maverick:'assets/maverick.jpg',waverider:'assets/waverider.jpg',contrarian:'assets/contrarian.jpg',collector:'assets/collector.jpg'};
+var CARD_BACK_IMG='assets/cardback.jpg';
 
 /* Family umbrellas — accent hue only; persona content is what actually differs.
    th/strengths/watchouts sourced verbatim from "Playbook Final.html" (BetterTrade 2026
@@ -3081,12 +3178,14 @@ function skillCardHTML(h){
     '<div class="conf-bars">'+rows+'</div></div>';
 }
 function roman(n){return ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][n]||(''+n);}
-/* front — real illustrated art for the 3 personas that have approved final art (Harvester/Diamond
-   Hand/Wave Rider); editorial CSS poster for the other 9, laid out to echo that approved format: serif
-   title top-center, art middle, then one CENTERED info column (name → description → asset tags →
-   edition #) — no ornate frame/corner-brackets/roman-badge/wedge (the real cards don't have them
-   either). Bindings deliberately quiet (line-drawing glyph, no icon halo) so the card's one real
-   accent moment is the small spectrum-gradient divider + sparkles, not a big colorful icon block. */
+/* front — real photographed art for all 12 personas (see REAL_CARD_IMG, 2026-09-04 full-set update).
+   The editorial CSS poster branch below is now unreached in practice (kept as a fallback only) —
+   it was originally built to echo the approved photo format for the personas that didn't have real
+   art yet: serif title top-center, art middle, then one CENTERED info column (name → description →
+   asset tags → edition #) — no ornate frame/corner-brackets/roman-badge/wedge (the real cards don't
+   have them either). Bindings deliberately quiet (line-drawing glyph, no icon halo) so the card's
+   one real accent moment is the small spectrum-gradient divider + sparkles, not a big colorful icon
+   block. */
 function pcFrontInner(key){
   if(REAL_CARD_IMG[key])return '<img class="pcE-photo" src="'+REAL_CARD_IMG[key]+'" alt="การ์ด '+HEROES[key].en+'" loading="lazy">';
   var h=HEROES[key];
@@ -3148,8 +3247,17 @@ function sizeHeroGlow(){
   },{threshold:.2});
   HERO_GLOW_IO.observe(gw);
 }
-/* static front-only card (carousel) */
-function pcStatic(key){return '<div class="pc3d"><div class="pc-tilt"><div class="pc-face front">'+pcFrontInner(key)+'</div></div></div>';}
+/* static card (carousel + compare-reveal). Front-only by default — pass flippable:true (splash
+   fan carousel only, see renderSplash/bindFanFlip below) to also render a back face showing the
+   real physical card-back photo (CARD_BACK_IMG, one shared image — the back is generic, not
+   per-persona). Reuses the .pc-flip/.pc-face.back 3D-flip CSS that already existed for the old
+   Book v1 draggable card (removed 2026-08-30) — untouched since, just unused until now. Left
+   false/omitted for the compare-reveal slider's own pcStatic() calls so its drag gesture keeps
+   working exactly as before — those never render a back face at all, zero behavior change there. */
+function pcStatic(key,flippable){
+  var back=flippable?'<div class="pc-face back"><img class="pcE-photo" src="'+CARD_BACK_IMG+'" alt="ด้านหลังการ์ด" loading="lazy"></div>':'';
+  return '<div class="pc3d'+(flippable?' pc-flippable':'')+'"><div class="pc-tilt"><div class="pc-flip"><div class="pc-face front">'+pcFrontInner(key)+'</div>'+back+'</div></div></div>';
+}
 /* pcViewer()/bindViewer() (the full interactive drag-to-rotate + flip card viewer, with its
    .pcv-wrap/.pcv-hint/.pcv-ctas/.pcv-btn CSS) removed 2026-08-30 along with คู่มือ 1 — see the
    removal note near BOOK2_TAB — since it was only ever used by the Book v1 layout this replaced.
@@ -3162,7 +3270,7 @@ var RM=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').m
    the SAME 7-slot arc (rot/scale/x/y per |distance|) the reference GSAP component used, translated
    to plain CSS transitions since a passive attract-loop doesn't need per-frame elastic physics. */
 var SPTIMER=null;
-function stopSplashTimer(){if(SPTIMER){clearInterval(SPTIMER);SPTIMER=null;}}
+function stopSplashTimer(){if(SPTIMER){clearInterval(SPTIMER);SPTIMER=null;}if(typeof stopSpv2==='function')stopSpv2();}
 function splashGo(dir){var n=PORDER.length;st.spidx=(st.spidx+dir+n)%n;paintFan();}
 var FAN_ARC=[ // index = |distance| from center, 0..3
   {rot:0, scale:1,    xn:0,    yn:0,   z:10},
@@ -3194,11 +3302,20 @@ function paintFan(){
     card.style.transform='translate(-50%,-50%) translate('+(s.xn*SPREAD_X).toFixed(1)+'px,'+(s.yn*SPREAD_Y).toFixed(1)+'px) rotate('+s.rot.toFixed(1)+'deg) scale('+s.scale.toFixed(3)+')';
     card.style.zIndex=s.z;
     card.style.opacity=s.visible?1:0;
+    /* only the centered card is tappable-to-flip (see bindFanFlip) — every other card is
+       force-unflipped here so a card can never rotate away from center still showing its back. */
+    card.classList.toggle('center',diff===0);
+    if(diff!==0){var pc=card.querySelector('.pc3d');if(pc)pc.classList.remove('flipped');}
   });
 }
 function renderSplash(){
   stopSplashTimer();
-  var slides=PORDER.map(function(k){return '<div class="fan-card">'+pcStatic(k)+'</div>';}).join('');
+  /* Splash preview version (DEMO.splashVer, demo-panel toggle — default 'v1' ALWAYS). v1 = the
+     shipped fan carousel of card fronts; v2 = the Card Back Reveal curiosity preview. Everything
+     ELSE on this screen (logo, headline, sub, scatter, CTA) is identical between the two — only the
+     .sp-stage's internal preview + the post-render init below branch. */
+  var v2=DEMO.splashVer==='v2';
+  var slides=v2?'':PORDER.map(function(k){return '<div class="fan-card">'+pcStatic(k,true)+'</div>';}).join('');
   /* depth-tiered brand-asset scatter — 3 planes for real perspective:
      FAR (z0): small · blurred · faint · slow, small drift  · behind everything
      MID (z1): medium · light blur · moderate
@@ -3229,12 +3346,178 @@ function renderSplash(){
       '<div class="sp-kick">เกมค้นหาตัวตนนักลงทุน</div>'+
       '<img class="sp-hero-logo" src="'+LOGO_IMG.nwnp+'" alt="New World, New Playbook · BetterTrade 2026">'+
       '<p class="sp-sub">โลกการลงทุนใบใหม่ เริ่มจากรู้จักตัวเอง พบตัวตนนักลงทุน 1 ใน 12 แบบที่เป็นคุณ</p></div>'+
-    '<div class="sp-stage"><div class="fan-stage" id="fanStage">'+slides+'</div></div>'+
+    '<div class="sp-stage">'+(v2
+      /* v2 stage — 2 depth layers: a faded card-back for depth (prev, static), and the dominant
+         center card (back) which ACTUALLY FLIPS open/closed to reveal a random persona's front —
+         see spv2DomCard/spv2Cycle. */
+      ? '<div class="spv2-stage" id="spv2Stage">'+
+          '<div class="spv2-card spv2-prev">'+spv2BackCard()+'</div>'+
+          '<div class="spv2-card spv2-back">'+spv2DomCard()+'</div>'+
+        '</div>'
+      : '<div class="fan-stage" id="fanStage">'+slides+'</div>')+'</div>'+
+    /* reuses .cr2-cap verbatim (same centered/muted/280px-cap micro-hint the compare-reveal slider
+       uses for "ลากเส้นแบ่ง...") for this preview's own hint line. */
+    '<p class="cr2-cap">'+(v2?'ตัวตนนักลงทุนของคุณ 1 ใน 12 กำลังรอเปิดเผย':'แตะการ์ดกลางเพื่อดูด้านหลัง')+'</p>'+
     '<div class="sp-cta"><div id="cta-slot"></div></div>'+
   '</div>';
-  paintFan();
+  if(v2){
+    initSpv2();            // seat the front (hidden) + start the controlled-random tease; ambient float/sweep are CSS
+  }else{
+    paintFan();
+    bindFanFlip();
+    if(!RM)SPTIMER=setInterval(function(){splashGo(1);},2800);
+  }
   mountSplashCTA();
-  if(!RM)SPTIMER=setInterval(function(){splashGo(1);},2800);
+}
+/* ── SPLASH PREVIEW V2 helpers ── */
+/* card BACK inner — simple, non-flippable. Used only by the faint depth layer (.spv2-prev). Reuses
+   the collectible card's .pc3d/.pc-tilt/.pc-face chrome verbatim, filled with the one shared
+   CARD_BACK_IMG photo. aria-hidden: purely decorative preview. */
+function spv2BackCard(){
+  return '<div class="pc3d"><div class="pc-tilt"><div class="pc-face" aria-hidden="true">'+
+    '<img class="pcE-photo" src="'+CARD_BACK_IMG+'" alt=""></div></div></div>';
+}
+/* THE DOMINANT center card — an actual FLIP card (2026-09-04 rework, per follow-up direction: the
+   earlier "front peeks out from behind the back, offset + translated" approach read as "nothing is
+   happening" in practice — a real flip of the card the viewer is actually looking at is unambiguous:
+   "อยากให้มีการสลับ เปิดไพ่กลางที่อยู่ด้านหน้า ให้เห็น character บ้าง"). Reuses the EXACT
+   .pc3d/.pc-tilt/.pc-flip/.pc-face(.back) structure + the global `.pc3d.flipped .pc-flip{rotateY
+   (180deg)}`/`.pc-face.back{rotateY(180deg)}` rules pcStatic(key,true) already uses for v1's own
+   tap-to-flip — proven, no new flip CSS needed. Front face = the shared CARD_BACK_IMG (at rest,
+   always dominant) + the light-sweep. Back face (#spv2Open) starts EMPTY and is filled by
+   spv2Cycle with whichever persona is currently teased, right before the card flips open — so the
+   swap never flashes mid-flip. */
+function spv2DomCard(){
+  return '<div class="pc3d" id="spv2Dom"><div class="pc-tilt"><div class="pc-flip">'+
+    '<div class="pc-face front" aria-hidden="true"><img class="pcE-photo" src="'+CARD_BACK_IMG+'" alt=""><span class="spv2-sweep"></span></div>'+
+    '<div class="pc-face back" id="spv2Open" aria-hidden="true"></div>'+
+    '</div></div></div>';
+}
+/* ── RANDOMIZED FRONT TEASE (controlled randomness) ── The dominant card stays CLOSED (card back)
+   most of the time; at irregular intervals it flips OPEN to reveal a random persona's front, holds
+   for a randomized duration, then flips back CLOSED — so the viewer can't predict which card is
+   next ("จะเป็นใบไหนนะ?"), and an occasional long hold reads as "เฮ้ย ใบนี้หรือเปล่า?" before it's
+   pulled back. Controlled, NOT chaotic: no immediate repeat of the same character, never two long
+   holds in a row, timing randomized only within tuned ranges. The flip itself uses a dedicated
+   transition (SPV2_FLIP_MS / #spv2Dom .pc-flip, 1s — still slower than v1's own .7s tap-to-flip) per
+   direction "การพลิกการ์ดช้าลง...ใช้เวลา 1 วินาที". The card's own box never moves or resizes — only
+   its two faces swap via rotateY — so there's zero risk of it poking outside the stage bounds at any
+   breakpoint (unlike the earlier translate-based peek). */
+function spv2Rand(a,b){return a+Math.random()*(b-a);}
+var SPV2_FLIP_MS=1000; // mirrors #spv2Dom .pc-flip's own transition-duration (CSS) — see spv2Cycle
+/* GIMMICK, not a systematic per-card intro (2026-09-04, per direction "ไม่ได้ใช้เป็นการเปิดแนะนำทุก
+   การ์ด หลักๆ อยากให้เป็นกิมมิค เปิดให้เห็นบ้าง...ให้ผู้ใช้งานได้ลุ้นว่าใบต่อไปที่จะเปิดให้เห็นเป็น
+   ใบอะไร"; pacing tightened same day, later round, per "การพลิกการ์ดเกิดขึ้นน้อยลง...สุ่มให้เป็น 4
+   วินาที") — the card spends most of its time CLOSED (ambient float+sweep only); SPV2_BACKHOLD_MS is
+   the randomized idle gap between flips (~4s) that makes an open genuinely feel like a rare,
+   anticipated event ("ใบต่อไปจะเป็นใบไหนนะ?") rather than a carousel working through all 12 in turn.
+   SPV2_HOLD is the — much shorter — variety in how long a flip STAYS OPEN once it happens: quick
+   ("hint", barely registers) / normal ("tease") / rare long hold ("false reveal" — stays open long
+   enough to feel like it might be the real result, before snapping back). */
+var SPV2_BACKHOLD_MS=[3800,4200]; // randomized, centered on ~4s per direction
+var SPV2_HOLD=[
+  {name:'quick', hold:[320,520]},
+  {name:'normal',hold:[850,1250]},
+  {name:'long',  hold:[1900,2700]}
+];
+var SPV2_TIMER=null;              // the single pending setTimeout in the self-scheduling chain
+var spv2Last={char:-1,lvl:-1};    // last picks, to avoid immediate repeats
+function stopSpv2(){if(SPV2_TIMER){clearTimeout(SPV2_TIMER);SPV2_TIMER=null;}}
+/* weighted hold-level pick — mostly quick/normal, rarely long; never two long holds in a row. */
+function spv2PickLevel(){
+  var r=Math.random(),li=(r<0.45)?0:(r<0.85?1:2);
+  if(li===2&&spv2Last.lvl===2)li=1;
+  spv2Last.lvl=li;return li;
+}
+function spv2PickDistinct(n,last){var i;do{i=Math.floor(Math.random()*n);}while(i===last&&n>1);return i;}
+/* one tease cycle: pick a random (distinct-from-last) persona + hold level, load it into the still-
+   CLOSED card's hidden back face, flip OPEN, hold, flip CLOSED, then schedule the NEXT cycle after a
+   long randomized back-hold (SPV2_BACKHOLD_MS — the "gimmick, not every card" pacing). Self-
+   scheduling (setTimeout chain, not setInterval) so each cycle's rhythm differs. Guard: bails if
+   splash/v2 is gone. Paused (tap): early-returns; resume re-enters via the tap handler.
+   SPV2_FLIP_MS buffer ≈ the .pc-flip's own transition duration, so "hold" only starts counting once
+   the card has actually finished opening (and the close-timer only fires the next cycle once the
+   close animation has actually finished). */
+function spv2Cycle(){
+  if(st.phase!=='splash'||DEMO.splashVer!=='v2'){stopSpv2();return;}
+  var stage=document.getElementById('spv2Stage'),dom=document.getElementById('spv2Dom'),open=document.getElementById('spv2Open');
+  if(!stage||!dom||!open)return;
+  if(stage.classList.contains('paused'))return;
+  var ci=spv2PickDistinct(PORDER.length,spv2Last.char);spv2Last.char=ci;
+  open.innerHTML=pcFrontInner(PORDER[ci]);                              // load while still closed (no flash)
+  var lvl=SPV2_HOLD[spv2PickLevel()];
+  requestAnimationFrame(function(){dom.classList.add('flipped');});    // OPEN
+  var hold=spv2Rand(lvl.hold[0],lvl.hold[1]);
+  SPV2_TIMER=setTimeout(function(){                                    // hold → CLOSE
+    if(stage.classList.contains('paused'))return;
+    dom.classList.remove('flipped');
+    SPV2_TIMER=setTimeout(spv2Cycle,SPV2_FLIP_MS+spv2Rand(SPV2_BACKHOLD_MS[0],SPV2_BACKHOLD_MS[1])); // close settles → long back-hold → next cycle
+  },SPV2_FLIP_MS+hold);
+}
+/* Seat the initial state + start. Non-RM: card starts CLOSED and sits idle (float+sweep only) for a
+   long moment before the FIRST tease ever fires — the gimmick shouldn't announce itself the instant
+   the splash loads. Reduced-motion (§18): no cycle/float/sweep at all — the card is seated statically
+   FLIPPED OPEN on one persona (no repeated rotation, ever) so the "a character is hiding behind the
+   back" idea still reads, minus all continuous/repeated motion. */
+function initSpv2(){
+  stopSpv2();bindSpv2Tap();
+  var dom=document.getElementById('spv2Dom'),open=document.getElementById('spv2Open');
+  if(!dom||!open)return;
+  spv2Last={char:-1,lvl:-1};
+  if(RM){
+    var ci=spv2PickDistinct(PORDER.length,-1);spv2Last.char=ci;
+    open.innerHTML=pcFrontInner(PORDER[ci]);
+    dom.classList.add('flipped');
+    return;
+  }
+  dom.classList.remove('flipped');       // start closed (card back showing)
+  SPV2_TIMER=setTimeout(spv2Cycle,2400);
+}
+/* Tap-to-pause / dwell (§16): freezes the ambient float/sweep (CSS .paused) and the tease cycle.
+   Tapping while CLOSED force-opens a fresh random persona to dwell on ("look closely, see
+   something"); tapping again closes it and resumes the random cycle. Tapping while already OPEN
+   (mid-tease) just holds that reveal indefinitely instead of forcing a new pick. Delegated +
+   idempotency-guarded like bindFanFlip so repeated renderSplash() calls don't stack listeners. */
+function bindSpv2Tap(){
+  var stage=document.getElementById('spv2Stage');
+  if(!stage||stage.dataset.tapBound)return;
+  stage.dataset.tapBound='1';
+  stage.addEventListener('click',function(){
+    var dom=document.getElementById('spv2Dom'),open=document.getElementById('spv2Open');
+    if(stage.classList.contains('paused')){
+      stage.classList.remove('paused');
+      if(dom)dom.classList.remove('flipped');                 // close whatever's showing
+      if(!RM)SPV2_TIMER=setTimeout(spv2Cycle,SPV2_FLIP_MS);   // resume once the close settles
+    }else{
+      stage.classList.add('paused');stopSpv2();
+      if(dom&&open&&!dom.classList.contains('flipped')){
+        var ci=spv2PickDistinct(PORDER.length,spv2Last.char);spv2Last.char=ci;
+        open.innerHTML=pcFrontInner(PORDER[ci]);
+        dom.classList.add('flipped');
+      }
+    }
+  });
+}
+/* Tap-to-flip on the splash fan carousel's centered card only (2026-09-04, per direction — now that
+   all 12 personas have real card-back art too, see CARD_BACK_IMG/pcStatic(key,true) above). Every
+   OTHER fan-card keeps pointer-events:none (its default, decorative-only) — only `.fan-card.center`
+   (paintFan marks it each repaint) gets pointer-events:auto via CSS, so a tap only ever hits the
+   one card actually facing the viewer. Flipping pauses the auto-advance timer (same stopSplashTimer
+   used elsewhere) so the reveal is actually visible instead of getting yanked away by the next
+   2.8s auto-rotate; tapping again un-flips and resumes it. Delegated + idempotency-guarded on
+   #fanStage itself so repeated renderSplash() calls (resetQuiz, etc.) never stack duplicate
+   listeners — same guard idiom sizeHeroGlow() uses for its own resize listener. */
+function bindFanFlip(){
+  var stage=document.getElementById('fanStage');
+  if(!stage||stage.dataset.flipBound)return;
+  stage.dataset.flipBound='1';
+  stage.addEventListener('click',function(e){
+    var pc=e.target.closest('.fan-card.center .pc3d.pc-flippable');
+    if(!pc)return;
+    var flipped=pc.classList.toggle('flipped');
+    stopSplashTimer();
+    if(!flipped&&!RM)SPTIMER=setInterval(function(){splashGo(1);},2800);
+  });
 }
 /* Liquid Metal CTA bridge — see the two <script type="module"> tags right after #root. The module
    dispatches 'lmb:ready' once window.mountLiquidMetalCta exists; since module scripts always run
@@ -5402,7 +5685,7 @@ function renderProfile(){
    "already done" mock defaults. Switching to 'pre' does NOT touch RESULT/quizDone — a pre-event
    visitor may already have taken the quiz online, so identity content stays independently gated on
    RESULT alone (see renderBook's empty state, buildRoute's personalized flag). */
-var DEMO={view:'auto',quizDone:false,draw:'auto',eventPhase:'pre',multiTicket:false,boothVer:'v1'}; // draw: 'auto' (default, resolves to eligible) | 'ok' | 'need' — see renderBooth. boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
+var DEMO={view:'auto',quizDone:false,draw:'auto',eventPhase:'pre',multiTicket:false,boothVer:'v1',splashVer:'v1'}; // draw: 'auto' (default, resolves to eligible) | 'ok' | 'need' — see renderBooth. boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. splashVer (2026-09-04, per direction "เพิ่ม preview splash scene เป็น 2 กรณี...ให้ default เป็นเวอร์ชันนี้ [v1] เสมอ"): 'v1' = the shipped fan-carousel of card fronts (unchanged, ALWAYS the default); 'v2' = a "Card Back Reveal" curiosity preview — the same splash page/logo/headline/CTA/scatter, but the Character Card Preview area only is swapped for a card-back-dominant stack where the back is the hero (~75%) and the next character's FRONT peeks out only as a partial glimpse (~25%), building "what comes next?" instead of showing the answer. Gated on this flag so v1 stays byte-identical. eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
 /* 'auto' now always resolves to mobile (2026-08-26, per direction "อัตโนมัติ default ไว้ที่ mobile
    size") — was real window.innerWidth-based detection (w<768→mobile/w<1440→tablet/else pc); PC/
    แท็บเล็ต/มือถือ stay available as explicit manual overrides, 'อัตโนมัติ' just no longer reacts to
@@ -5473,6 +5756,12 @@ function buildDemo(){
        เดินบูธ tab only (renderBooth's `v2` flag); nothing else in the app reads DEMO.boothVer. */
     '<div class="demo-lbl">หน้าเดินบูธ (พรีวิว)</div>'+seg('segBoothVer',[{v:'v1',t:'v1 เดิม'},{v:'v2',t:'v2 แผนที่ Sync'}],DEMO.boothVer)+
     '<div class="demo-stub">* v2 = แผนที่มีหมุดเลขตรงกับ Step + แตะ Step/หมุดเพื่อโฟกัสกัน</div>'+
+    /* พรีวิว Splash (2026-09-04) — separate preview toggle for the Character Card Preview area on the
+       splash screen only: v1 is the shipped fan-carousel of card fronts (default, unchanged); v2 is
+       the "Card Back Reveal" curiosity preview (back dominant, front only a glimpse). Affects
+       renderSplash's stage region only via DEMO.splashVer; nothing else reads it. */
+    '<div class="demo-lbl">หน้า Splash (พรีวิวการ์ด)</div>'+seg('segSplashVer',[{v:'v1',t:'v1 เดิม'},{v:'v2',t:'v2 พลิกเผยตัวตน'}],DEMO.splashVer)+
+    '<div class="demo-stub">* v2 = โชว์หลังการ์ดเป็นหลัก เผยหน้าการ์ดแค่บางส่วน สร้างความสงสัย</div>'+
     '<div class="demo-lbl">ผลเกมย้อนเวลาพอร์ต → สิ่งที่ทำจริง</div><select class="demo-sel" id="demoCrisis"><option>ตอนวิกฤต "คงเส้น" (ถือ)</option><option>ตอนวิกฤต "ขายหนี" (ตัดขาย)</option><option>ตอนวิกฤต "ช้อนซื้อ" (เก็บเพิ่ม)</option></select>'+
     '<div class="demo-lbl">วิกฤตรอบที่ 2 (สวนขั้วกัน = ยังไม่นิ่ง)</div><select class="demo-sel" id="demoCrisis2"><option>เหมือนรอบแรก</option><option>สวนทางรอบแรก</option></select>'+
     '<div class="demo-stub">* เกมในงานยังไม่ออกแบบ — 2 ช่องนี้เป็น stub</div>'+
@@ -5492,6 +5781,7 @@ function buildDemo(){
   document.getElementById('segView').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.view=b.dataset.v;document.querySelectorAll('#segView button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');applyView();};});
   document.getElementById('segDraw').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.draw=b.dataset.v;document.querySelectorAll('#segDraw button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segBoothVer').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.boothVer=b.dataset.v;BOOTH_SEL=null;document.querySelectorAll('#segBoothVer button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
+  document.getElementById('segSplashVer').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.splashVer=b.dataset.v;document.querySelectorAll('#segSplashVer button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='splash')renderSplash();};});
   document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.multiTicket=(b.dataset.v==='2');document.querySelectorAll('#segTicketCount button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('demoPersona').onchange=function(){if(this.value){DEMO.quizDone=true;document.getElementById('demoQuiz').classList.add('on');forcePersona(this.value);}};
   document.getElementById('demoQuiz').onclick=function(){DEMO.quizDone=!DEMO.quizDone;this.classList.toggle('on',DEMO.quizDone);};
