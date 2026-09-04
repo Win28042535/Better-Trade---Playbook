@@ -4204,11 +4204,11 @@ function famBadgeStyle(hero){return 'background:linear-gradient(135deg,var(--whi
 /* Card-less detail body (signature → assets → strengths/watchouts) — extracted from heroPanelBody so
    the คู่มือ 2 (Book v2) identity tab can pair it with a compare-reveal slider instead of the single
    pcViewer, without duplicating the copy. */
-function heroDetailBody(hero){
+function heroDetailBody(hero,previewOnly){
   var strengths=hero.strengths.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
   var watch=hero.watchouts.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
   var chips=hero.assets.map(function(a){return '<span class="chip" style="background:color-mix(in srgb,'+hero.accent+' 26%,var(--white));color:'+hero.accent+'">'+ic(a.icon)+a.t+'</span>';}).join('');
-  return '<div class="hero-sig-c">'+hero.sig+'</div>'+
+  var body='<div class="hero-sig-c">'+hero.sig+'</div>'+
     /* Revised (2026-08-15, per direction "border card สีอิงตาม สีสินทรัพย์ แต่ title เป็นสีดำ และ bg
        เป็นสีอิงตามสินทรัพย์ แต่ soft") — the neutral --paper/--line-soft version from the same day's
        earlier pass read as TOO flat next to .str-box/.str-box.wn once those went neutral too; this
@@ -4216,11 +4216,17 @@ function heroDetailBody(hero){
        goes to plain --ink instead of hero.accent — color lives in the surface now, not the text. */
     '<div class="ast-block" style="background:color-mix(in srgb,'+hero.accent+' 8%,var(--white));border:1px solid color-mix(in srgb,'+hero.accent+' 24%,transparent)">'+
       '<div class="ast-lbl">สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div></div>'+
-    '<div class="str-grid" style="margin-top:var(--sp-stack)"><div class="str-box"><div class="str-hd">'+ic('lc-check-circle')+'ความแข็งแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'สิ่งที่ต้องระวัง</div>'+watch+'</div></div>'+
-    /* SKILL ประจำการ์ด (2026-08-31) — right after สิ่งที่ต้องระวัง, per direction. heroDetailBody is
-       shared by both the Pre-Event and On-Event identity tabs (see the function's own top comment),
-       so this one call site covers both without duplicating it. */
-    skillCardHTML(hero);
+    '<div class="str-grid" style="margin-top:var(--sp-stack)"><div class="str-box"><div class="str-hd">'+ic('lc-check-circle')+'ความแข็งแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'สิ่งที่ต้องระวัง</div>'+watch+'</div></div>';
+  /* previewOnly (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้
+     ลงทะเบียน...เห็นแค่ preview card ลงมาจนถึง จุดแข็ง/จุดที่ต้องระวัง เนื้อหาด้านล่างอื่นๆจะไม่แสดง") —
+     an unregistered quiz-taker's Book (renderBook, see its `unreg` branch) stops right here; skips
+     skillCardHTML() (the SKILL badge card) same as it skips everything else below it. Default
+     (undefined/falsy) keeps the full body exactly as before for every other caller. */
+  if(previewOnly)return body;
+  /* SKILL ประจำการ์ด (2026-08-31) — right after สิ่งที่ต้องระวัง, per direction. heroDetailBody is
+     shared by both the Pre-Event and On-Event identity tabs (see the function's own top comment),
+     so this one call site covers both without duplicating it. */
+  return body+skillCardHTML(hero);
 }
 /* heroPanelBody()/evoPanelHTML() (heroDetailBody + the old pcViewer, wrapped for the pre/post
    persona tabs) removed 2026-08-30 along with คู่มือ 1 — see the removal note near BOOK2_TAB. Their
@@ -4395,7 +4401,10 @@ var BOOK2_TABS=[
    progress) that's meaningless before doors open, so only the identity card + AI-insight analysis
    stay reachable. renderBook mirrors this same filter when deciding which .b2-panel divs to render
    at all — see the `pre` guard there. */
-function book2Tabs(){return DEMO.eventPhase==='pre'?BOOK2_TABS.filter(function(t){return t.k==='identity'||t.k==='analysis';}):BOOK2_TABS;}
+/* Unregistered case (2026-09-04, per direction — see renderBook's `unreg` branch) — locked to just
+   ตัวตน regardless of eventPhase; checked first so it wins over the pre-event identity+analysis
+   filter below. */
+function book2Tabs(){if(!DEMO.registered)return BOOK2_TABS.filter(function(t){return t.k==='identity';});return DEMO.eventPhase==='pre'?BOOK2_TABS.filter(function(t){return t.k==='identity'||t.k==='analysis';}):BOOK2_TABS;}
 function book2Subnav(active){
   return '<nav class="toc bt-tabs bt-tabs--secondary" role="tablist" aria-label="หมวดคู่มือ 2">'+book2Tabs().map(function(t){
     return '<button class="bt-tab" type="button" role="tab" aria-selected="'+(t.k===active?'true':'false')+'" data-b2="'+t.k+'"><span class="bt-tab-icon">'+ic(t.icon)+'</span><span class="bt-tab-label">'+t.label+'</span></button>';
@@ -4466,15 +4475,51 @@ function initCompareReveal(opts){
    คนละตัวกัน ต้องการให้ข้อมูลทั้งหมด ใน section preview นี้เปลี่ยนตาม card ที่ active อยู่"). Kept as
    its own swappable block (id="b2ident-detail") separate from the compare-reveal markup itself, so
    swapping personas only replaces this innerHTML — the slider's own drag state/DOM is untouched. */
-function book2IdentityDetail(hero){
+function book2IdentityDetail(hero,previewOnly){
   // .hero-leg ("แรงบันดาลใจจาก") removed 2026-08-19, per direction — applies to both sides of the
   // compare-reveal (this same function renders both the pre-event and post-event detail block).
   return '<div class="fam-badge" style="'+famBadgeStyle(hero)+'"><span>'+hero.famTh+'</span></div>'+
-    heroDetailBody(hero);
+    heroDetailBody(hero,previewOnly);
+}
+/* Unregistered-quiz-taker CTA (2026-09-04, per direction — see renderBook's `unreg` branch) — takes
+   over right where the identity tab gets cut short (after จุดแข็ง/จุดที่ต้องระวัง), reusing Games'
+   pre-event "Coming soon" .ev-empty recipe (icon → shimmer headline → ev-empty-s body → tinted
+   ast-block callout, see renderGames' `pre` branch) as its structure, per direction "อยากให้ใช้ dna
+   ของ section coming soon (หน้าเกมส์หลัก) มาเป็นโครงสร้าง" — just re-worded for "this is only a
+   preview, come register to unlock the rest" instead of "come back once doors open," and the icon
+   swapped from the hourglass to ICON_BOOK_PNG (a Playbook, not a wait, is what's on offer here).
+   The disclaimer line above it reuses .hero-note (same component skillCardHTML's own SKILL
+   disclaimer places right after strengths/watchouts elsewhere in this same tab, see heroDetailBody —
+   one continuous "note" idiom, not a new one), recolored to the app's one amber (--amber-bg/-border/
+   -text, per direction "ให้เป็นโทนส้ม" — the same trio .str-box.wn/.prof-tier/the sponsor chip all
+   already share, not a new orange). The CTA button is REG_CTA_HTML's own .btn.btn-primary + REG_URL,
+   full-size (not the compressed .reg-cta header variant) inside .hero-acts — the same full-width
+   wrapper this tab's own "แชร์ภาพการ์ด" button uses — per direction "ใช้ dna เดียวกับปุ่มลงทะเบียน
+   มุมขวาบน" (now the only register CTA on this screen — the header's own copy is dropped, see
+   renderBook's header markup). */
+function unregisteredCtaHTML(){
+  return '<div class="hero-note" style="margin-top:var(--sp-stack);background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber-text)">'+ic('lc-info')+'<span>ผลลัพธ์นี้เป็นเพียง <b style="color:var(--amber-text)">Preview ของ Investment DNA</b></span></div>'+
+    '<div class="ev-empty" style="margin-top:var(--sp-stack)">'+
+      '<div class="ev-empty-ic" style="background:none;width:48px;height:48px"><img src="'+ICON_BOOK_PNG+'" alt=""></div>'+
+      '<div class="ev-empty-t shimmer-violet" style="font-size:26px">Investment DNA ของคุณคือจุดเริ่มต้น</div>'+
+      '<div class="ev-empty-s" style="max-width:44ch">ร่วมเดินทางต่อในวันงาน กับ <b>10 INVESTMENT EXPERIENCES</b> • <b>6 INVESTMENT GAMES</b> พร้อม efin AI • Speaker ชั้นนำ • PAVILION ZONE</div>'+
+      '<div class="ev-empty-s ast-block" style="max-width:44ch;display:inline-block;font-weight:700;font-size:16px;color:var(--violet);background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)">รับ <span style="white-space:nowrap">PLAY BOOK</span> คู่มือการลงทุนส่วนตัว เพื่อสแกนทุกโอกาสการลงทุนในโลกยุคใหม่</div>'+
+    '</div>'+
+    /* text-decoration:none inline (not a new CSS rule) — .btn-primary is normally a <button>
+       everywhere else in this file; only .reg-cta (the header's own register link) already resets
+       link underline, and this is the one other spot a plain-anchor .btn-primary shows up. */
+    '<div class="hero-acts"><a class="btn btn-primary" style="text-decoration:none" href="'+REG_URL+'" target="_blank" rel="noopener">'+ic('lc-globe')+'ลงทะเบียนเข้าร่วมงาน</a></div>';
 }
 function renderBook(){
   if(!RESULT){st.phase='splash';render();return;}
   var pre=DEMO.eventPhase==='pre';
+  /* Unregistered case (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้
+     ลงทะเบียน...จะเห็นแค่ tab ตัวตน เท่านั้น...ไม่มีการแสดง bottom navigation") — a visitor who took the
+     quiz without going through the registration site: locked to the ตัวตน tab (book2Tabs() mirrors
+     this filter), a truncated identity panel (see the `unreg` branches below), no other .b2-panel,
+     and no bottom app-tabbar — their only way forward is the register CTA (unregisteredCtaHTML). */
+  var unreg=!DEMO.registered;
+  if(unreg)BOOK2_TAB='identity';
   // A tab left selected on พอร์ต/เส้นทาง from before the demo panel switched to Pre-Event would
   // otherwise render with no matching subnav button (book2Subnav no longer emits one) and no
   // .b2-panel showing 'show' (see the pre guard below) — fall back to the one tab that's always
@@ -4507,7 +4552,14 @@ function renderBook(){
      2-game baseline) reaches exactly the "hasn't really been to the event yet" case being asked for,
      without touching evoCompute()'s own semantics (Book v1's evoPanelHTML still depends on it). */
   var noActivity=boothCheckinCount()===0&&boothActivityCount()===0&&gamesPlayedCount()<=2;
-  var compareBlock=noActivity
+  /* unreg: no ก่อนงาน/หลังงาน comparison at all — just the one static ก่อนงาน card, no chips, no
+     divider/handle, no drag (no data-cr2, so initCompareReveal's own querySelectorAll never touches
+     it — see the `if(!unreg)` guard around that call below). Reuses .cr2's own frame (300px-capped
+     box, aspect-ratio 5/7, shadow, radius) with .cr2-side for its inset:0 fill, just the one side and
+     cursor reset to default instead of the slider's ew-resize. */
+  var compareBlock=unreg
+    ? '<div class="cr2" style="cursor:default"><div class="cr2-side">'+pcStatic(r.heroKey)+'</div></div>'
+    : (noActivity
     ? '<div class="cr2" data-cr2 data-start="90"><div class="cr2-side cr2-after">'+pcStatic(postKey)+
         '<div class="cr2-lock">'+ic('lc-lock')+'<span>ยังไม่มีข้อมูล</span></div></div>'+
         '<div class="cr2-side cr2-before">'+pcStatic(r.heroKey)+'</div>'+
@@ -4518,19 +4570,28 @@ function renderBook(){
         '<div class="cr2-side cr2-before">'+pcStatic(r.heroKey)+'</div>'+
         '<span class="cr2-chip cr2-chip-b">ก่อนงาน</span><span class="cr2-chip cr2-chip-a">หลังงาน'+(realPost?'':' · ตัวอย่าง')+'</span>'+
         '<div class="cr2-divider"><button class="cr2-handle" type="button" aria-label="เลื่อนเทียบการ์ดก่อนงานและหลังงาน">'+arrows+'</button></div></div>'+
-        '<p class="cr2-cap">ลากเส้นแบ่งเพื่อเทียบการ์ดตัวตน <b>ก่อนงาน</b> ↔ <b>หลังงาน</b> — ข้อมูลด้านล่างจะเปลี่ยนตามฝั่งที่เห็นเต็ม'+(realPost?'':' (ฝั่งหลังงานเป็นตัวอย่าง จนกว่าจะมีข้อมูลกิจกรรมจริงในงาน)')+'</p>';
+        '<p class="cr2-cap">ลากเส้นแบ่งเพื่อเทียบการ์ดตัวตน <b>ก่อนงาน</b> ↔ <b>หลังงาน</b> — ข้อมูลด้านล่างจะเปลี่ยนตามฝั่งที่เห็นเต็ม'+(realPost?'':' (ฝั่งหลังงานเป็นตัวอย่าง จนกว่าจะมีข้อมูลกิจกรรมจริงในงาน)')+'</p>');
   root.innerHTML=
-  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="BetterTrade — กลับหน้าหลัก" style="margin-right:auto">'+REG_CTA_HTML+'<div id="qr-cta-slot"></div></header>'+
-  book2Subnav(tab)+
+  /* unreg drops REG_CTA_HTML too (2026-09-04, per direction "เอาปุ่มลงทะเบียนมุมขวาบนออก เพราะย้ายมา
+     ไว้ด้านล่างแล้ว") — unregisteredCtaHTML()'s own CTA at the bottom is now the only register button
+     on this screen, so the header goes back to just the logo. */
+  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="BetterTrade — กลับหน้าหลัก" style="margin-right:auto">'+(unreg?'':REG_CTA_HTML+'<div id="qr-cta-slot"></div>')+'</header>'+
+  /* unreg also drops the ตัวตน subnav pill entirely (2026-09-04, per direction "เอา tab ตัวตน
+     ออก...ไม่มีข้อมูล tab อื่นให้เลือกอยู่แล้ว") — book2Tabs() already resolves to a single-item list
+     for this case, but a 1-choice tab bar has nothing left to switch between, so skip rendering it. */
+  (unreg?'':book2Subnav(tab))+
   '<main class="scroll fade">'+
     '<div class="b2-panel'+(tab==='identity'?' show':'')+'" data-panel="identity">'+
       '<section class="hero-sec"><div class="hero-gw">'+heroGlowMarkup()+'<div class="hero-in scroll-reveal">'+
         compareBlock+
-        '<div id="b2ident-detail">'+book2IdentityDetail(h)+'</div>'+
-        redeemCardHTML(isUltimate)+
-        '<div class="hero-acts"><button class="btn btn-primary hero-share-btn" id="shareCardBtn">'+ic('lc-upload')+'แชร์ภาพการ์ด</button></div>'+
+        '<div id="b2ident-detail">'+book2IdentityDetail(h,unreg)+'</div>'+
+        (unreg?unregisteredCtaHTML():(
+          redeemCardHTML(isUltimate)+
+          '<div class="hero-acts"><button class="btn btn-primary hero-share-btn" id="shareCardBtn">'+ic('lc-upload')+'แชร์ภาพการ์ด</button></div>'
+        ))+
       '</div></div></section>'+
     '</div>'+
+    (unreg?'':(
     '<div class="b2-panel'+(tab==='analysis'?' show':'')+'" data-panel="analysis">'+
       /* efin AI banner added here 2026-08-19, per direction ("ยังไม่มีใน พรีวิว คู่มือ 2") — Book v1
          puts this directly above its own "AI Insight" card; same relative order kept here since
@@ -4558,9 +4619,10 @@ function renderBook(){
         '<div class="route-steps">'+routeStep('done','','ทำ DNA Quiz','ตอบครบ 10 ข้อ เสร็จแล้ว — ได้ตัวตน '+h.th)+routeStep('act','2','ทำครบ 6 ด้าน','เสร็จแล้ว 2 จาก 6 — เหลืออีก 4 ด้านในบูธ')+routeStep('fut','3','รับ Playbook ส่วนตัวสมบูรณ์','เมื่อครบ 6 ด้าน รับกลยุทธ์เฉพาะตัวตน')+routeStep('fut','4','ติดตามบน efin.finance','Playbook sync ขึ้นแอปหลังงาน')+'</div></section>'+
       '<section class="card scroll-reveal"><div class="s-pad"><div class="list-row klib-row" id="klibRow"><div class="klib-ic">'+ic('lc-library')+'</div><div class="klib-tx"><div class="klib-t">คลังความรู้</div><div class="klib-s">41 บทความที่คัดมาสำหรับ '+h.th+'</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
     '</div>'
+    ))
     ))+
   '</main>'+
-  appTabbar('book');
+  (unreg?'':appTabbar('book'));
   bindTabbar();bindBook2Nav();sizeHeroGlow();
   bindEfinBanner(h);
   // Linked preview: crossing the slider's 50% midpoint swaps #b2ident-detail to whichever persona
@@ -4571,6 +4633,9 @@ function renderBook(){
   // real to demonstrate regardless of whether ev's own real divergence produced one — UNLESS
   // noActivity, where the detail below the "หลังงาน" side is deliberately empty (reusing v1's own
   // .ev-empty pattern) rather than describing a persona that isn't real data yet.
+  /* unreg has no slider at all (compareBlock is a single static card, no data-cr2) — this whole
+     before/after crossing handler has nothing to bind to, so skip setting it up. */
+  if(unreg)return;
   var emptyDetailHTML='<div class="ev-empty"><div class="ev-empty-ic">'+ic('lc-hourglass')+'</div>'+
     '<div class="ev-empty-t">ยังไม่มีข้อมูลจากในงาน</div>'+
     '<div class="ev-empty-s">เล่นเกมและเดินบูธในงานก่อน แล้วค่อยกลับมาดูว่าตัวตนที่ "ทำจริง" ตรงกับที่ DNA Quiz บอกไหม</div>'+
@@ -4584,10 +4649,13 @@ function renderBook(){
     if(!det)return;
     /* pdfDownloadHTML() appended on the post side only (2026-08-19, per direction — was in the
        mockup but missing here) — same PDF-download prompt Book v1 shows in its post-event tab,
-       shown regardless of noActivity since it's gated by ticket tier, not by booth activity data. */
-    det.innerHTML=wantPre?book2IdentityDetail(h):((noActivity?emptyDetailHTML:book2IdentityDetail(postHero))+pdfDownloadHTML());
+       shown regardless of noActivity since it's gated by ticket tier, not by booth activity data.
+       Unregistered (unreg) drops it — same "nothing below จุดที่ต้องระวัง" rule book2IdentityDetail's
+       own previewOnly param already applies to the initial render, threaded here too so crossing the
+       slider mid-preview can't re-reveal it. */
+    det.innerHTML=wantPre?book2IdentityDetail(h,unreg):((noActivity?emptyDetailHTML:book2IdentityDetail(postHero,unreg))+(unreg?'':pdfDownloadHTML()));
     if(!wantPre&&noActivity){var eg=det.querySelector('#evGoGames2');if(eg)eg.onclick=function(){st.phase='games';render();};}
-    if(!wantPre)mountPdfDlBtn(); // det is always visible here, unlike v1's #heroEvPost — no hidden-panel 0-width risk
+    if(!wantPre&&!unreg)mountPdfDlBtn(); // det is always visible here, unlike v1's #heroEvPost — no hidden-panel 0-width risk
     /* re-init chart reveal on the swapped-in subtree (bug fix, 2026-08-31 — found while investigating
        "fix bug") — book2IdentityDetail() now renders skillCardHTML()'s .conf-box/.viz-bar (added same
        day), and this handler replaces det's ENTIRE innerHTML with a brand-new one every crossing.
@@ -4606,8 +4674,10 @@ function renderBook(){
   var kr=root.querySelector('#klibRow');if(kr)kr.onclick=function(){LIB_OPEN=null;st.phase='library';render();};
   var sc=root.querySelector('#shareCardBtn');if(sc)sc.onclick=openShare;
   var confPlayBtn2=root.querySelector('#confPlayBtn');if(confPlayBtn2)confPlayBtn2.onclick=function(){st.phase='games';render();};
-  mountHeaderQR();
-  bindHeaderLogo();
+  /* unreg: no qr-cta-slot in the header to mount into (see the header markup above), and the logo's
+     usual "tap to go Home" shortcut is skipped too — Home is one of the "หน้าอื่นๆ" this case can't
+     see, so the register CTA stays the only way out. */
+  if(!unreg){mountHeaderQR();bindHeaderLogo();}
   initCharts(root);
   bindAllocHover(root);bindRadarTap(root);
 }
@@ -5804,7 +5874,7 @@ function renderProfile(){
    "already done" mock defaults. Switching to 'pre' does NOT touch RESULT/quizDone — a pre-event
    visitor may already have taken the quiz online, so identity content stays independently gated on
    RESULT alone (see renderBook's empty state, buildRoute's personalized flag). */
-var DEMO={view:'auto',quizDone:false,draw:'auto',eventPhase:'pre',multiTicket:false,boothVer:'v1',splashVer:'v1'}; // draw: 'auto' (default, resolves to eligible) | 'ok' | 'need' — see renderBooth. boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. splashVer (2026-09-04, per direction "เพิ่ม preview splash scene เป็น 2 กรณี...ให้ default เป็นเวอร์ชันนี้ [v1] เสมอ"): 'v1' = the shipped fan-carousel of card fronts (unchanged, ALWAYS the default); 'v2' = a "Card Back Reveal" curiosity preview — the same splash page/logo/headline/CTA/scatter, but the Character Card Preview area only is swapped for a card-back-dominant stack where the back is the hero (~75%) and the next character's FRONT peeks out only as a partial glimpse (~25%), building "what comes next?" instead of showing the answer. Gated on this flag so v1 stays byte-identical. eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
+var DEMO={view:'auto',quizDone:false,draw:'auto',eventPhase:'pre',multiTicket:false,boothVer:'v1',splashVer:'v1',registered:true}; // draw: 'auto' (default, resolves to eligible) | 'ok' | 'need' — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. splashVer (2026-09-04, per direction "เพิ่ม preview splash scene เป็น 2 กรณี...ให้ default เป็นเวอร์ชันนี้ [v1] เสมอ"): 'v1' = the shipped fan-carousel of card fronts (unchanged, ALWAYS the default); 'v2' = a "Card Back Reveal" curiosity preview — the same splash page/logo/headline/CTA/scatter, but the Character Card Preview area only is swapped for a card-back-dominant stack where the back is the hero (~75%) and the next character's FRONT peeks out only as a partial glimpse (~25%), building "what comes next?" instead of showing the answer. Gated on this flag so v1 stays byte-identical. eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
 /* 'auto' now always resolves to mobile (2026-08-26, per direction "อัตโนมัติ default ไว้ที่ mobile
    size") — was real window.innerWidth-based detection (w<768→mobile/w<1440→tablet/else pc); PC/
    แท็บเล็ต/มือถือ stay available as explicit manual overrides, 'อัตโนมัติ' just no longer reacts to
@@ -5866,6 +5936,12 @@ function buildDemo(){
     '<div class="demo-stub">* พรีวิว Home + โปรไฟล์ เท่านั้น ไม่กระทบสิทธิ์ของคุณด้านบน</div>'+
     '<div class="demo-lbl">การ์ดตัวตน</div><select class="demo-sel" id="demoPersona"><option value="">— เลือกเพื่อดูการ์ด —</option>'+personaOpts+'</select>'+
     '<div class="demo-lbl">สถานะ</div><div class="demo-row"><span class="rl">'+ic('lc-book-open')+'ทำแบบทดสอบตัวตนแล้ว</span><span class="sw'+(DEMO.quizDone?' on':'')+'" id="demoQuiz"></span></div>'+
+    /* การลงทะเบียน (2026-09-04) — separate preview toggle for a quiz-taker who never went through the
+       registration site (see DEMO.registered / renderBook's `unreg` branches). 'ยังไม่ได้ลงทะเบียน'
+       only changes what คู่มือ/ตัวตน renders — it doesn't touch RESULT/quizDone above, so pick a
+       persona first (or leave the seeded default) to actually see the locked tab. */
+    '<div class="demo-lbl">การลงทะเบียน</div>'+seg('segRegistered',[{v:'yes',t:'ลงทะเบียนแล้ว'},{v:'no',t:'ยังไม่ได้ลงทะเบียน'}],DEMO.registered?'yes':'no')+
+    '<div class="demo-stub">* ยังไม่ได้ลงทะเบียน = คู่มือเห็นแค่ tab ตัวตน ตัดจบที่จุดแข็ง/จุดที่ต้องระวัง + CTA ชวนลงทะเบียน ไม่มี bottom nav</div>'+
     /* Force the "เดินบูธ ✦ ลุ้นรางวัล" draw-status card's eligible/not-eligible state for preview
        (2026-08-26, per direction "อยากให้จำลองเคส...ไว้ด้วย กรณีครบเงื่อนไขแล้ว และกรณียังขาด") —
        'auto' keeps the real boothCheckinCount()/boothActivityCount() math; see renderBooth. */
@@ -5902,6 +5978,7 @@ function buildDemo(){
   document.getElementById('segBoothVer').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.boothVer=b.dataset.v;BOOTH_SEL=null;document.querySelectorAll('#segBoothVer button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segSplashVer').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.splashVer=b.dataset.v;document.querySelectorAll('#segSplashVer button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='splash')renderSplash();};});
   document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.multiTicket=(b.dataset.v==='2');document.querySelectorAll('#segTicketCount button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
+  document.getElementById('segRegistered').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.registered=(b.dataset.v==='yes');document.querySelectorAll('#segRegistered button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='book')render();};});
   document.getElementById('demoPersona').onchange=function(){if(this.value){DEMO.quizDone=true;document.getElementById('demoQuiz').classList.add('on');forcePersona(this.value);}};
   document.getElementById('demoQuiz').onclick=function(){DEMO.quizDone=!DEMO.quizDone;this.classList.toggle('on',DEMO.quizDone);};
   document.getElementById('demoReset').onclick=function(){DEMO.quizDone=false;document.getElementById('demoQuiz').classList.remove('on');document.getElementById('demoPersona').value='';DEMO.draw='auto';document.getElementById('segDraw').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='auto');});DEMO.multiTicket=false;document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='1');});panel.classList.remove('open');resetQuiz();};
