@@ -4575,7 +4575,12 @@ function renderBook(){
   /* unreg drops REG_CTA_HTML too (2026-09-04, per direction "เอาปุ่มลงทะเบียนมุมขวาบนออก เพราะย้ายมา
      ไว้ด้านล่างแล้ว") — unregisteredCtaHTML()'s own CTA at the bottom is now the only register button
      on this screen, so the header goes back to just the logo. */
-  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="BetterTrade — กลับหน้าหลัก" style="margin-right:auto">'+(unreg?'':REG_CTA_HTML+'<div id="qr-cta-slot"></div>')+'</header>'+
+  /* Bug fix (found while investigating "fix bug"): .hd-logo carries a blanket cursor:pointer rule
+     (it's normally the system-wide "tap logo to go Home" affordance), but bindHeaderLogo() below is
+     deliberately skipped when unreg — so without this override the logo LOOKED clickable while
+     actually doing nothing on tap, the exact "affordance promises an escape hatch that isn't there"
+     bug this whole `unreg` branch exists to avoid. cursor:default here overrides it inline. */
+  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="BetterTrade — กลับหน้าหลัก" style="margin-right:auto'+(unreg?';cursor:default':'')+'">'+(unreg?'':REG_CTA_HTML+'<div id="qr-cta-slot"></div>')+'</header>'+
   /* unreg also drops the ตัวตน subnav pill entirely (2026-09-04, per direction "เอา tab ตัวตน
      ออก...ไม่มีข้อมูล tab อื่นให้เลือกอยู่แล้ว") — book2Tabs() already resolves to a single-item list
      for this case, but a 1-choice tab bar has nothing left to switch between, so skip rendering it. */
