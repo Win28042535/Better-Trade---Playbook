@@ -2602,6 +2602,128 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    The dominant card's own flip needs no mobile-specific tuning — it's a same-box rotation, never
    changes footprint, so the tablet/pc --fw override above is the only sizing concern (see below). */
 :root[data-view="mobile"] .spv2-prev{transform:translate(-50%,-50%) translate(-12%,-9%) scale(.86) rotate(-4deg);}
+/* ── SPLASH PREVIEW V3 — "3D Character Card Flow" (DEMO.splashVer==='v3', see renderSplash/initSpv3) ──
+   A 3D spatial field instead of one card: multiple vertical STREAMS (lanes) of character cards drift
+   through a shallow depth-of-field, alternating up/down at different speeds. Most cards show the
+   shared card BACK; some rotate to tease/reveal a persona FRONT at irregular moments; one card at a
+   time becomes a temporary visual FOCUS (scale + glow). Depth is 2.5D (per-lane scale/opacity/blur +
+   parallax speed), so nothing can project outside the stage the way a real rotateX floor could — the
+   only real 3D is each card's own rotateY flip (reusing the collectible card's .pc3d perspective).
+   Everything is scoped under .spv3-* so v1/v2 stay byte-identical. Stage box + height clamp mirror
+   .fan-stage/.spv2-stage so the splash composition/spacing is unchanged.
+   ── Seamless loop: each lane's track is the SAME set of cards rendered twice (set+set) and cards
+   carry margin-bottom (not flex gap) so the content pitch is perfectly uniform — translateY(-50%)
+   then maps set2 onto set1 with zero seam jump. Reveal timing is baked into per-card inline delays,
+   identical across the two copies, so the tease phase also matches at the wrap. */
+.spv3-stage{position:relative;width:100%;height:clamp(310px,34vh,330px);overflow:hidden;z-index:2;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 13%,#000 87%,transparent 100%);
+          mask-image:linear-gradient(to bottom,transparent 0,#000 13%,#000 87%,transparent 100%);}
+:root[data-view="tablet"] .spv3-stage,:root[data-view="pc"] .spv3-stage{height:clamp(390px,42vh,420px);}
+/* field = the depth band the lanes live in; capped on wide desktop so the flow stays an editorial
+   centered composition instead of sprawling edge-to-edge on a 1920px canvas (mirrors .sp-cta's cap). */
+/* card size unified to a flat 196px across all breakpoints (2026-09-04, per direction — mobile/
+   tablet/pc all render the same physical card size now, not a vw-scaled one). Safe down to a real
+   ~320px-wide phone: a single centred 196px card + this field's own edge mask leaves margin on every
+   side, no min()-vw fallback needed the way the old scaled size required. */
+.spv3-field{position:absolute;inset:0;margin:0 auto;--v3fw:196px;--v3gap:clamp(12px,4vw,18px);}
+.spv3-lane{position:absolute;top:0;bottom:0;left:var(--lpos,50%);width:var(--v3fw);
+  transform:translateX(-50%) scale(var(--pscale,1));transform-origin:center center;will-change:transform;}
+.spv3-track{position:absolute;left:0;right:0;top:0;animation:spv3Up var(--dur,26s) linear infinite;will-change:transform;}
+.spv3-lane.dir-down .spv3-track{animation-name:spv3Down;}
+@keyframes spv3Up{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+@keyframes spv3Down{from{transform:translateY(-50%)}to{transform:translateY(0)}}
+.spv3-card{position:relative;width:100%;aspect-ratio:5/7;margin-bottom:var(--v3gap);
+  transition:transform .55s var(--ease),filter .55s var(--ease);}
+/* card chrome reuse — .pc3d keeps its own perspective (for the rotateY flip); override .pc-tilt's
+   own 5/7 aspect-ratio here since the .spv3-card box already owns the aspect, and kill its idle
+   tilt transition so only the flip animates. */
+.spv3-card .pc3d{position:absolute;inset:0;width:100%;height:100%;}
+.spv3-card .pc-tilt{width:100%;height:100%;aspect-ratio:auto;transition:none;}
+/* no flip transition on v3 cards — every rotation here is either a static REST value (below) or a
+   CSS keyframe animation; without this, the .pc-flip base rule's own .7s transition (built for spv2's
+   JS-triggered tap flip) would animate every card in from 0deg the instant the splash first paints. */
+.spv3-card .pc-flip{transition:none;}
+/* depth planes (per lane): near = full size/opacity/sharp · mid = slightly smaller · far = small,
+   faint, softly blurred and set deepest. */
+.spv3-lane.plane-near{--pscale:1;z-index:6;}
+.spv3-lane.plane-mid{--pscale:.86;z-index:4;opacity:.9;}
+.spv3-lane.plane-far{--pscale:.7;z-index:2;opacity:.5;filter:blur(1.5px) saturate(.92);}
+/* MOBILE (base) — 1 stream only (the near/hero lane, centred); the rest hidden. A single deliberate
+   column reads calmer on the narrowest canvas than a crowded multi-lane field. */
+.spv3-lane.l0,.spv3-lane.l2,.spv3-lane.l3{display:none;}
+.spv3-lane.l1{--lpos:50%;}
+/* front face = the shared card BACK photo; back face = the persona FRONT art. A rotateY(180deg)
+   .pc-flip is what makes the persona face the viewer, so "front-dominant" resting means the FLIP
+   sits at 180 by default — inverted from the original back-dominant build (2026-09-04, per direction
+   "ไพ่ส่วนใหญ่แสดงด้านหน้าได้...ไพ่บางใบสามารถแสดงด้านหลัง" — most cards should show the persona
+   FRONT at rest now, only some show the card BACK). Every card carries a REST class (.rf = resting
+   front/persona, majority · .rb = resting back/mystery, minority) that fixes its static rotateY via
+   plain `transform` — no animation needed for most of the field, since CSS animation only overrides
+   `transform` while actually running, and reduced-motion (below) disables every animation, so the
+   REST class's static value is exactly what's left once motion is off. A `.rf` card can ALSO carry a
+   MOTION class (rev-edge/rev-turn) layered on top for variety — always dipping AWAY from its front
+   rest toward a back glimpse, never the other way, since only front-resting cards test this option. */
+.spv3-card.rf .pc-flip{transform:rotateY(180deg);}
+.spv3-card.rb .pc-flip{transform:rotateY(0deg);}
+/* MOTION on top of a .rf card — Edge: a shallow partial dip off the persona (~136deg, doesn't reach
+   all the way to the back). Turn: the fuller "peek behind" — dips all the way to the card BACK
+   (0deg), holds briefly, then returns to its persona rest. Each card's --rdl/--rdur (inline,
+   randomised) desync the field so it feels alive, not marching. */
+.spv3-card.rev-edge .pc-flip{animation:spv3Edge var(--rdur,16s) ease-in-out var(--rdl,0s) infinite;}
+.spv3-card.rev-turn .pc-flip{animation:spv3Turn var(--rdur,18s) ease-in-out var(--rdl,0s) infinite;}
+@keyframes spv3Edge{0%,66%,100%{transform:rotateY(180deg)}80%{transform:rotateY(136deg)}}
+@keyframes spv3Turn{0%,58%,100%{transform:rotateY(180deg)}70%,84%{transform:rotateY(0deg)}}
+/* FOCUS — one card at a time, promoted by initSpv3's timer: pop scale + a soft spectrum glow around
+   the frame. --v3glow is a per-card spectrum tint (inline). Restricted by JS to near/mid lanes (no
+   blur to fight through). The .55s transition on .spv3-card cross-fades focus in/out. */
+.spv3-card.spv3-focus{transform:scale(1.14);z-index:30;}
+.spv3-card.spv3-focus .pc-face{box-shadow:0 16px 42px rgba(17,19,24,.30),0 0 30px -4px var(--v3glow,rgba(31,135,230,.55));}
+/* subtle light sheen across a resting card face (near/mid only — skipped on the faint far plane).
+   Sits on the FRONT .pc-face only (see spv3CardHTML), so it only ever plays across the card-back
+   photo — never drawn over persona art, front-resting or not. */
+.spv3-sheen{position:absolute;inset:0;background:linear-gradient(120deg,transparent 40%,rgba(255,255,255,.30) 50%,transparent 60%);transform:translateX(-130%);mix-blend-mode:screen;pointer-events:none;z-index:3;animation:spv3Sheen var(--rdur,16s) ease-in-out var(--rdl,0s) infinite;}
+.spv3-lane.plane-far .spv3-sheen{display:none;}
+@keyframes spv3Sheen{0%,72%{transform:translateX(-130%)}86%,100%{transform:translateX(130%)}}
+/* HOVER (desktop only) — dwell: the hovered lane pauses, and the hovered card gently pops and turns
+   its persona front toward the viewer (tactile "look closely"). No arrows/dots — pure motion. */
+@media(hover:hover){
+  .spv3-lane:hover .spv3-track{animation-play-state:paused;}
+  .spv3-card:hover{z-index:25;transform:scale(1.07);}
+  .spv3-card:hover .pc-flip{animation:none;transform:rotateY(180deg);transition:transform .6s var(--ease);}
+}
+/* TABLET — 2 streams (near·mid), capped field, card size unified with mobile/pc at 196px (2026-09-04,
+   per direction). max-width recomputed for that fixed 196px card at the same 25/75 --lpos spread to
+   land the gap at the requested +64px (near's full 196px vs mid's .86-scaled ~169px footprint —
+   verified live, not just by the nominal math, since the .plane-mid scale is a transform, not a width
+   change, so its actual rendered box is what's measured). */
+:root[data-view="tablet"] .spv3-field{max-width:494px;--v3fw:196px;--v3gap:22px;}
+:root[data-view="tablet"] .spv3-lane.l0{display:none;}
+:root[data-view="tablet"] .spv3-lane.l1{--lpos:25%;}
+:root[data-view="tablet"] .spv3-lane.l2{display:block;--lpos:75%;}
+:root[data-view="tablet"] .spv3-lane.l3{display:none;}
+/* PC — 3 streams (far·near·mid), capped field, same unified 196px card. max-width recomputed at the
+   existing 18/50/82 --lpos spread to land the far↔near gap at +32px and near↔mid at +16px (their
+   footprints differ — far is .7-scaled, mid is .86-scaled — so the two gaps are never equal at a
+   flat lane spacing; solved for the one field width that hits both targets at once). */
+:root[data-view="pc"] .spv3-field{max-width:620px;--v3fw:196px;--v3gap:24px;}
+:root[data-view="pc"] .spv3-lane.l0{display:block;--lpos:18%;}
+:root[data-view="pc"] .spv3-lane.l1{--lpos:50%;}
+:root[data-view="pc"] .spv3-lane.l2{display:block;--lpos:82%;}
+:root[data-view="pc"] .spv3-lane.l3{display:none;}
+/* Off-screen (IntersectionObserver, see initSpv3) — freeze every animation to save the GPU when the
+   splash isn't visible; the focus timer also idles (JS). */
+.spv3-stage.spv3-off .spv3-track,.spv3-stage.spv3-off .spv3-sheen,.spv3-stage.spv3-off .pc-flip{animation-play-state:paused;}
+/* Reduced motion (§23) — no drift, no flips, no sheen: a calm static field where each card just sits
+   at its own REST value (.rf persona-front majority / .rb card-back minority, both set above by plain
+   `transform`, unaffected by this block) so "most cards show their front" still reads with zero
+   continuous motion. The focus timer never starts under RM (see initSpv3). Disabling `animation` here
+   is enough on its own — with no animation running, the cascade falls straight back to the .rf/.rb
+   static transform, no extra override needed for rev-edge/rev-turn cards. */
+@media(prefers-reduced-motion:reduce){
+  .spv3-track{animation:none!important;}
+  .spv3-sheen{display:none!important;}
+  .spv3-card .pc-flip{animation:none!important;}
+}
 /* .sp-preview-note ("พรีวิวการ์ดตัวตนนักลงทุน 12 แบบ") and .sp-cap (the PDPA acceptance line)
    removed entirely 2026-08-15, per direction. */
 /* The ONE action on this screen that matters — was a styled .btn-primary, now the Liquid Metal CTA
@@ -2641,12 +2763,30 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    back bullet-list body text. */
 .pc3d{perspective:900px;width:100%;}
 .pc-tilt{position:relative;width:100%;aspect-ratio:5/7;transform-style:preserve-3d;transition:transform .5s var(--ease);will-change:transform;}
-.pc-flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .7s var(--ease);}
+/* fix bug (2026-09-04): a stretched/skewed frame briefly escaping the rounded card frame during a
+   flip — reported on v2's tease-open flip and on v3's rev-edge/rev-turn cards, both of which flip
+   while an ANCESTOR is also actively animating (v2: the dominant card's own ambient float; v3: the
+   lane's continuous drift). `.pc-tilt` (this rotation's sibling) already carried its own
+   will-change:transform; `.pc-flip` — the element whose `transform` is what's actually being
+   animated by every flip in the app — never did. Without it, the browser has to promote this element
+   onto its own GPU compositing layer AT THE INSTANT the flip's transform animation starts, and if an
+   ancestor is simultaneously mid-transform, that promotion can land a frame late — the exact "content
+   briefly escapes its clip" symptom, since backface-visibility + overflow:hidden clipping is only
+   reliable once the element is properly layered. Promoting it ahead of time (same treatment as
+   .pc-tilt) removes the race entirely. v1's own flip never showed this because its flipping card is
+   always the fan's CENTERED slot, whose own ancestor transform is idle (paintFan settles it at
+   dead-center, xn/yn/rot all 0) while flipped — no concurrent ancestor animation to race against. */
+.pc-flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .7s var(--ease);will-change:transform;}
 .pc3d.flipped .pc-flip{transform:rotateY(180deg);}
 /* border-radius promoted 14px->var(--r2) (2026-08-31, per corner-radius audit) — see .cr2's comment;
    same repeated "media frame" magic number, folded onto the same token. */
-.pc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--r2);overflow:hidden;box-shadow:0 10px 30px rgba(17,19,24,0.15),0 2px 6px rgba(17,19,24,0.09);}
-.pc-face.back{transform:rotateY(180deg);}
+/* translateZ(0) (2026-09-04, same fix bug as .pc-flip's own comment above) — each FACE gets its own
+   GPU layer too, so the overflow:hidden + border-radius clip that keeps art inside the rounded frame
+   is enforced on an already-composited layer instead of being recomputed jointly with the ancestor's
+   live transform every frame. `.pc-face.back` folds its own rotateY(180deg) into the same
+   `transform` declaration since a layer-promotion hint can't be layered on via a second property. */
+.pc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--r2);overflow:hidden;box-shadow:0 10px 30px rgba(17,19,24,0.15),0 2px 6px rgba(17,19,24,0.09);transform:translateZ(0);}
+.pc-face.back{transform:rotateY(180deg) translateZ(0);}
 /* ══ EDITORIAL CARD (front) ══ cream paper · ornate frame · roman numeral · iridescent hero · blue wedge. Always light (it's art — does not theme-switch). */
 /* Editorial CSS poster (the 9 personas without approved final art) — restyled to match the
    approved real-card format now in use for Diamond Hand/Wave Rider (plain paper, no ornate
@@ -3389,7 +3529,7 @@ var RM=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').m
    the SAME 7-slot arc (rot/scale/x/y per |distance|) the reference GSAP component used, translated
    to plain CSS transitions since a passive attract-loop doesn't need per-frame elastic physics. */
 var SPTIMER=null;
-function stopSplashTimer(){if(SPTIMER){clearInterval(SPTIMER);SPTIMER=null;}if(typeof stopSpv2==='function')stopSpv2();}
+function stopSplashTimer(){if(SPTIMER){clearInterval(SPTIMER);SPTIMER=null;}if(typeof stopSpv2==='function')stopSpv2();if(typeof stopSpv3==='function')stopSpv3();}
 function splashGo(dir){var n=PORDER.length;st.spidx=(st.spidx+dir+n)%n;paintFan();}
 var FAN_ARC=[ // index = |distance| from center, 0..3
   {rot:0, scale:1,    xn:0,    yn:0,   z:10},
@@ -3433,8 +3573,8 @@ function renderSplash(){
      shipped fan carousel of card fronts; v2 = the Card Back Reveal curiosity preview. Everything
      ELSE on this screen (logo, headline, sub, scatter, CTA) is identical between the two — only the
      .sp-stage's internal preview + the post-render init below branch. */
-  var v2=DEMO.splashVer==='v2';
-  var slides=v2?'':PORDER.map(function(k){return '<div class="fan-card">'+pcStatic(k,true)+'</div>';}).join('');
+  var v2=DEMO.splashVer==='v2',v3=DEMO.splashVer==='v3';
+  var slides=(v2||v3)?'':PORDER.map(function(k){return '<div class="fan-card">'+pcStatic(k,true)+'</div>';}).join('');
   /* depth-tiered brand-asset scatter — 3 planes for real perspective:
      FAR (z0): small · blurred · faint · slow, small drift  · behind everything
      MID (z1): medium · light blur · moderate
@@ -3473,14 +3613,19 @@ function renderSplash(){
           '<div class="spv2-card spv2-prev">'+spv2BackCard()+'</div>'+
           '<div class="spv2-card spv2-back">'+spv2DomCard()+'</div>'+
         '</div>'
+      : v3
+      /* v3 stage — a 3D field of drifting character-card streams (see spv3Build/initSpv3). */
+      ? '<div class="spv3-stage" id="spv3Stage">'+spv3Build()+'</div>'
       : '<div class="fan-stage" id="fanStage">'+slides+'</div>')+'</div>'+
     /* reuses .cr2-cap verbatim (same centered/muted/280px-cap micro-hint the compare-reveal slider
        uses for "ลากเส้นแบ่ง...") for this preview's own hint line. */
-    '<p class="cr2-cap">'+(v2?'ตัวตนนักลงทุนของคุณ 1 ใน 12 กำลังรอเปิดเผย':'แตะการ์ดกลางเพื่อดูด้านหลัง')+'</p>'+
+    '<p class="cr2-cap">'+(v2?'ตัวตนนักลงทุนของคุณ 1 ใน 12 กำลังรอเปิดเผย':v3?'ตัวตนนักลงทุน 1 ใน 12 กำลังเคลื่อนผ่าน — ใบไหนจะหันมาหาคุณ?':'แตะการ์ดกลางเพื่อดูด้านหลัง')+'</p>'+
     '<div class="sp-cta"><div id="cta-slot"></div></div>'+
   '</div>';
   if(v2){
     initSpv2();            // seat the front (hidden) + start the controlled-random tease; ambient float/sweep are CSS
+  }else if(v3){
+    initSpv3();            // wire IntersectionObserver + start the focus cycle; all drift/reveal motion is CSS
   }else{
     paintFan();
     bindFanFlip();
@@ -3616,6 +3761,95 @@ function bindSpv2Tap(){
       }
     }
   });
+}
+/* ══ SPLASH PREVIEW V3 — "3D Character Card Flow" helpers (DEMO.splashVer==='v3') ══
+   Builds N vertical streams of character cards that drift through a shallow depth field. All the
+   MOTION (drift, reveal flips, sheen, depth) is CSS (see the .spv3-* block) — JS only (a) builds the
+   markup with controlled randomness and (b) runs the one live behaviour CSS can't: promoting a
+   single card to FOCUS at a time. Reuses pcFrontInner()/CARD_BACK_IMG and the .pc3d/.pc-flip/.pc-face
+   chrome verbatim — no new card component, no asset duplication. */
+/* fixed lane roster — plane (depth), direction, and drift duration per stream. CSS decides which
+   lanes are visible per breakpoint (mobile 1 · tablet 2 · pc 3) and where each sits (--lpos), so this
+   same DOM works across every view without a rebuild (view switches don't re-render the splash). */
+var SPV3_LANE_CFG=[
+  {plane:'far', dir:'down',dur:31},
+  {plane:'near',dir:'up',  dur:22},
+  {plane:'mid', dir:'down',dur:26},
+  {plane:'far', dir:'up',  dur:34}
+];
+/* resting-state weights (2026-09-04, per direction "ไพ่ส่วนใหญ่แสดงด้านหน้าได้...ไพ่บางใบสามารถแสดง
+   ด้านหลัง" — inverted from the original back-dominant build): MOST cards rest showing the persona
+   FRONT ('rf'), a MINORITY rest on the card BACK ('rb', the mystery ones a viewer has to wait out).
+   Two of the 'rf' picks also carry a MOTION class (rev-edge/rev-turn) — a front-resting card that
+   occasionally dips toward its own back for variety, never the reverse. Keeps the field curious but
+   calm, never a flip-fest. */
+var SPV3_STATES=['rf','rf','rf','rf','rf','rf','rf rev-edge','rf rev-turn','rb','rb'];
+var SPV3_GLOW=['rgba(0,212,254,.55)','rgba(31,135,230,.55)','rgba(17,60,243,.5)','rgba(114,45,244,.5)','rgba(230,59,216,.5)','rgba(247,147,25,.5)'];
+var SPV3_CARDS_PER=6;   // cards per set; each lane renders the set twice for a seamless loop
+function spv3Shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+/* one card: pc-face.front = shared card BACK photo (+ sheen), pc-face.back = this persona's FRONT
+   art. Rest/motion class(es) + randomised --rdl/--rdur are baked in so the two duplicated copies stay
+   perfectly in sync. */
+function spv3CardHTML(key){
+  var state=SPV3_STATES[Math.floor(Math.random()*SPV3_STATES.length)];
+  var dl=spv2Rand(0,9).toFixed(1),dur=spv2Rand(12,20).toFixed(1);
+  var glow=SPV3_GLOW[Math.floor(Math.random()*SPV3_GLOW.length)];
+  return '<div class="spv3-card '+state+'" style="--rdl:'+dl+'s;--rdur:'+dur+'s;--v3glow:'+glow+'">'+
+    '<div class="pc3d"><div class="pc-tilt"><div class="pc-flip">'+
+      '<div class="pc-face front" aria-hidden="true"><img class="pcE-photo" src="'+CARD_BACK_IMG+'" alt="" loading="lazy"><span class="spv3-sheen"></span></div>'+
+      '<div class="pc-face back" aria-hidden="true">'+pcFrontInner(key)+'</div>'+
+    '</div></div></div>'+
+  '</div>';
+}
+function spv3LaneHTML(idx){
+  var cfg=SPV3_LANE_CFG[idx];
+  var seq=spv3Shuffle(PORDER).slice(0,SPV3_CARDS_PER);
+  if(seq[0]===seq[seq.length-1]){var t=seq[1];seq[1]=seq[0];seq[0]=t;} // no same persona across the loop seam
+  var set=seq.map(spv3CardHTML).join('');
+  return '<div class="spv3-lane l'+idx+' plane-'+cfg.plane+' dir-'+cfg.dir+'" style="--dur:'+cfg.dur+'s">'+
+    '<div class="spv3-track">'+set+set+'</div>'+   // set twice → seamless translateY(-50%) loop
+  '</div>';
+}
+function spv3Build(){
+  var lanes='';for(var i=0;i<SPV3_LANE_CFG.length;i++)lanes+=spv3LaneHTML(i);
+  return '<div class="spv3-field">'+lanes+'</div>';
+}
+/* ── FOCUS cycle ── the one thing CSS can't do: pick a single card that's currently sitting in the
+   central band of a near/mid stream and promote it (scale + glow) for a randomised dwell, then move
+   attention on. Self-scheduling setTimeout chain so the rhythm varies; guards bail if the splash/v3
+   is gone or the stage scrolled off (IntersectionObserver → .spv3-off). */
+var SPV3_FOCUS_TIMER=null,SPV3_IO=null;
+function stopSpv3(){if(SPV3_FOCUS_TIMER){clearTimeout(SPV3_FOCUS_TIMER);SPV3_FOCUS_TIMER=null;}if(SPV3_IO){SPV3_IO.disconnect();SPV3_IO=null;}}
+/* eligible = a card in a near/mid lane whose CURRENT (it's always moving) vertical centre is within
+   the middle ~52% of the stage — so focus never lands on a card fading out at the masked edges. */
+function spv3PickFocus(stage){
+  var cards=[].slice.call(stage.querySelectorAll('.spv3-lane.plane-near .spv3-card,.spv3-lane.plane-mid .spv3-card'));
+  var sr=stage.getBoundingClientRect(),b0=sr.top+sr.height*0.24,b1=sr.bottom-sr.height*0.24,elig=[];
+  for(var i=0;i<cards.length;i++){var r=cards[i].getBoundingClientRect(),cy=r.top+r.height/2;if(cy>b0&&cy<b1&&r.width>0)elig.push(cards[i]);}
+  return elig.length?elig[Math.floor(Math.random()*elig.length)]:null;
+}
+function spv3FocusTick(){
+  if(st.phase!=='splash'||DEMO.splashVer!=='v3'){stopSpv3();return;}
+  var stage=document.getElementById('spv3Stage');if(!stage){stopSpv3();return;}
+  var prev=stage.querySelector('.spv3-card.spv3-focus');if(prev)prev.classList.remove('spv3-focus');
+  var gap;
+  if(stage.classList.contains('spv3-off')){gap=1400;}          // idle while off-screen
+  else{var pick=spv3PickFocus(stage);if(pick){pick.classList.add('spv3-focus');gap=spv2Rand(2200,3600);}else{gap=700;}}
+  SPV3_FOCUS_TIMER=setTimeout(spv3FocusTick,gap);
+}
+/* Seat + start. RM: no focus timer at all (the field is static under RM — see the @media block). Non-
+   RM: wire an IntersectionObserver to freeze/thaw the whole preview when the splash scrolls out, then
+   kick off the focus cycle after a short beat so it doesn't announce itself the instant the splash
+   loads (same restraint as spv2's first-tease delay). */
+function initSpv3(){
+  stopSpv3();
+  var stage=document.getElementById('spv3Stage');if(!stage)return;
+  if(RM)return;
+  if(window.IntersectionObserver){
+    SPV3_IO=new IntersectionObserver(function(es){es.forEach(function(e){stage.classList.toggle('spv3-off',!e.isIntersecting);});},{threshold:0.05});
+    SPV3_IO.observe(stage);
+  }
+  SPV3_FOCUS_TIMER=setTimeout(spv3FocusTick,1600);
 }
 /* Tap-to-flip on the splash fan carousel's centered card only (2026-09-04, per direction — now that
    all 12 personas have real card-back art too, see CARD_BACK_IMG/pcStatic(key,true) above). Every
@@ -5960,8 +6194,8 @@ function buildDemo(){
        splash screen only: v1 is the shipped fan-carousel of card fronts (default, unchanged); v2 is
        the "Card Back Reveal" curiosity preview (back dominant, front only a glimpse). Affects
        renderSplash's stage region only via DEMO.splashVer; nothing else reads it. */
-    '<div class="demo-lbl">หน้า Splash (พรีวิวการ์ด)</div>'+seg('segSplashVer',[{v:'v1',t:'v1 เดิม'},{v:'v2',t:'v2 พลิกเผยตัวตน'}],DEMO.splashVer)+
-    '<div class="demo-stub">* v2 = โชว์หลังการ์ดเป็นหลัก เผยหน้าการ์ดแค่บางส่วน สร้างความสงสัย</div>'+
+    '<div class="demo-lbl">หน้า Splash (พรีวิวการ์ด)</div>'+seg('segSplashVer',[{v:'v1',t:'v1 เดิม'},{v:'v2',t:'v2 พลิกเผยตัวตน'},{v:'v3',t:'v3 การ์ดลอย 3 มิติ'}],DEMO.splashVer)+
+    '<div class="demo-stub">* v2 = โชว์หลังการ์ดเป็นหลัก เผยหน้าการ์ดแค่บางส่วน · v3 = สนามการ์ด 3 มิติ หลายสาย ลอยผ่านกัน ลุ้นใบต่อไป</div>'+
     '<div class="demo-lbl">ผลเกมย้อนเวลาพอร์ต → สิ่งที่ทำจริง</div><select class="demo-sel" id="demoCrisis"><option>ตอนวิกฤต "คงเส้น" (ถือ)</option><option>ตอนวิกฤต "ขายหนี" (ตัดขาย)</option><option>ตอนวิกฤต "ช้อนซื้อ" (เก็บเพิ่ม)</option></select>'+
     '<div class="demo-lbl">วิกฤตรอบที่ 2 (สวนขั้วกัน = ยังไม่นิ่ง)</div><select class="demo-sel" id="demoCrisis2"><option>เหมือนรอบแรก</option><option>สวนทางรอบแรก</option></select>'+
     '<div class="demo-stub">* เกมในงานยังไม่ออกแบบ — 2 ช่องนี้เป็น stub</div>'+
