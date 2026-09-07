@@ -4742,7 +4742,23 @@ function unregisteredCtaHTML(){
     /* text-decoration:none inline (not a new CSS rule) — .btn-primary is normally a <button>
        everywhere else in this file; only .reg-cta (the header's own register link) already resets
        link underline, and this is the one other spot a plain-anchor .btn-primary shows up. */
-    '<div class="hero-acts"><a class="btn btn-primary" style="text-decoration:none" href="'+REG_URL+'" target="_blank" rel="noopener">'+ic('lc-globe')+'ลงทะเบียนเข้าร่วมงาน</a></div>';
+    '<div class="hero-acts"><a class="btn btn-primary" style="text-decoration:none" href="'+REG_URL+'" target="_blank" rel="noopener">'+ic('lc-globe')+'ลงทะเบียนเข้าร่วมงาน</a></div>'+
+    /* Share-card button, unreg case (2026-09-07, per direction "เพิ่มปุ่มแชร์ภาพการ์ดด้านล่างปุ่ม
+       ลงทะเบียน...ให้ button dna เป็นแบบเดียวกับปุ่มย่อกำหนดการ") — reuses .ag-more as-is (Home tab's
+       agenda "ย่อกำหนดการ/ดูกำหนดการทั้งวัน" toggle), not .btn-secondary; .ag-more is already
+       full-width + its own margin-top, so it drops in directly below .hero-acts with no extra
+       wrapper needed. Same #shareCardBtn id as the registered-case button further down (renderBook,
+       both event phases) — bindBook's single querySelector('#shareCardBtn') below wires whichever
+       one actually rendered, and since same-day direction below, both now share this exact markup.
+       Text size + corner radius tuned up 2026-09-07 (per direction "text size เท่ากับ primary
+       button และ corner radius 999") to match .btn's own values (var(--fs-sub)/var(--rpill) — .btn's
+       48px radius already reads as a full pill at this button's height, same as literal 999px would)
+       — inline so only THIS button changes, not .ag-more's original ย่อกำหนดการ toggle on Home.
+       Registered-case button (renderBook, all event phases) unified onto this exact same markup
+       same day, per follow-up direction "แชร์ภาพการ์ด กรณี pre, on-event ทั้งหมด ทั้งที่ลงทะเบียน
+       แล้ว และยัง ให้ปรับมาใช้รูปแบบล่าสุดทั้งหมด" — retiring the old solid-fill
+       .btn-primary.hero-share-btn there. */
+    '<button class="ag-more" id="shareCardBtn" style="font-size:var(--fs-sub);border-radius:var(--rpill)">'+ic('lc-upload')+'แชร์ภาพการ์ด</button>';
 }
 function renderBook(){
   if(!RESULT){st.phase='splash';render();return;}
@@ -4826,7 +4842,14 @@ function renderBook(){
         '<div id="b2ident-detail">'+book2IdentityDetail(h,unreg)+'</div>'+
         (unreg?unregisteredCtaHTML():(
           redeemCardHTML(isUltimate)+
-          '<div class="hero-acts"><button class="btn btn-primary hero-share-btn" id="shareCardBtn">'+ic('lc-upload')+'แชร์ภาพการ์ด</button></div>'
+          /* Unified onto the unreg case's own share-button DNA (2026-09-07, per direction "แชร์
+             ภาพการ์ด กรณี pre, on-event ทั้งหมด ทั้งที่ลงทะเบียนแล้ว และยัง ให้ปรับมาใช้รูปแบบล่าสุด
+             ทั้งหมด") — same .ag-more pill (var(--rpill)) + primary-sized text (var(--fs-sub)) as
+             unregisteredCtaHTML()'s button above, dropping the old solid-fill .btn-primary.hero-
+             share-btn/.hero-acts wrapper (now unused — .hero-share-btn's own CSS rule stays only
+             for history, nothing renders it anymore). This one line covers both event phases
+             (pre/on-event) since renderBook never branches this button on `pre`. */
+          '<button class="ag-more" id="shareCardBtn" style="font-size:var(--fs-sub);border-radius:var(--rpill)">'+ic('lc-upload')+'แชร์ภาพการ์ด</button>'
         ))+
       '</div></div></section>'+
     '</div>'+
@@ -4864,6 +4887,12 @@ function renderBook(){
   (unreg?'':appTabbar('book'));
   bindTabbar();bindBook2Nav();sizeHeroGlow();
   bindEfinBanner(h);
+  /* #shareCardBtn bound here (not down with klibRow/confPlayBtn2 etc. below) because unreg's own
+     copy of this button (unregisteredCtaHTML(), 2026-09-07) needs wiring too, and everything past
+     the `if(unreg)return;` a few lines down is skipped entirely for that case — the registered-case
+     button still exists further down but this one binding now covers both, so nothing there needs
+     to duplicate it. */
+  var scBtn=root.querySelector('#shareCardBtn');if(scBtn)scBtn.onclick=openShare;
   // Linked preview: crossing the slider's 50% midpoint swaps #b2ident-detail to whichever persona
   // is now showing MORE of its card (pos>=50 -> pre-event's .cr2-before layer covers more of the
   // frame; see initCompareReveal's clip-path math) — threshold-gated so this only fires on an
@@ -4911,7 +4940,6 @@ function renderBook(){
   root.querySelectorAll('.side-row').forEach(function(rw){rw.onclick=function(){togSide(rw);};});
   mountSideCtaBtn();
   var kr=root.querySelector('#klibRow');if(kr)kr.onclick=function(){LIB_OPEN=null;st.phase='library';render();};
-  var sc=root.querySelector('#shareCardBtn');if(sc)sc.onclick=openShare;
   var confPlayBtn2=root.querySelector('#confPlayBtn');if(confPlayBtn2)confPlayBtn2.onclick=function(){st.phase='games';render();};
   /* unreg: no qr-cta-slot in the header to mount into (see the header markup above), and the logo's
      usual "tap to go Home" shortcut is skipped too — Home is one of the "หน้าอื่นๆ" this case can't
