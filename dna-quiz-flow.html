@@ -4441,14 +4441,20 @@ function famBadgeStyle(hero){return 'background:linear-gradient(135deg,var(--whi
 function heroDetailBody(hero,previewOnly){
   var strengths=hero.strengths.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
   var watch=hero.watchouts.map(function(s){return '<div class="str-li">'+s+'</div>';}).join('');
-  var chips=hero.assets.map(function(a){return '<span class="chip" style="background:color-mix(in srgb,'+hero.accent+' 26%,var(--white));color:'+hero.accent+'">'+ic(a.icon)+a.t+'</span>';}).join('');
+  /* Flattened to a single fixed violet (2026-09-09, per direction "ทำให้เหลือสีเดียว violet
+     #9c91ff") — was hero.accent (per-FAMILY: cyan/violet/pink, see FAM), so every persona's assets
+     block used to read as that persona's own family color; now every persona renders identically in
+     var(--violet) (already exactly #9c91ff — the codebase's existing token, not a new hex), so this
+     section no longer signals family at all. Both the chips below AND .ast-block's own wash/border
+     right after (previously the same hero.accent) switched together — they're one visual unit. */
+  var chips=hero.assets.map(function(a){return '<span class="chip" style="background:color-mix(in srgb,var(--violet) 26%,var(--white));color:var(--violet)">'+ic(a.icon)+a.t+'</span>';}).join('');
   var body='<div class="hero-sig-c">'+hero.sig+'</div>'+
     /* Revised (2026-08-15, per direction "border card สีอิงตาม สีสินทรัพย์ แต่ title เป็นสีดำ และ bg
        เป็นสีอิงตามสินทรัพย์ แต่ soft") — the neutral --paper/--line-soft version from the same day's
        earlier pass read as TOO flat next to .str-box/.str-box.wn once those went neutral too; this
        card gets its color signal back (a soft accent wash + accent border), but the title itself
        goes to plain --ink instead of hero.accent — color lives in the surface now, not the text. */
-    '<div class="ast-block" style="background:color-mix(in srgb,'+hero.accent+' 8%,var(--white));border:1px solid color-mix(in srgb,'+hero.accent+' 24%,transparent)">'+
+    '<div class="ast-block" style="background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)">'+
       '<div class="ast-lbl">สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div></div>'+
     '<div class="str-grid" style="margin-top:var(--sp-stack)"><div class="str-box"><div class="str-hd">'+ic('lc-check-circle')+'ความแข็งแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'สิ่งที่ต้องระวัง</div>'+watch+'</div></div>';
   /* previewOnly (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้
