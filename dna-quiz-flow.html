@@ -2007,6 +2007,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bp-frac{font-size:var(--fs-bodysm);font-weight:var(--w-label);white-space:nowrap;}
 .bp-bar{margin-top:auto;height:6px;border-radius:var(--rpill);background:var(--accent);overflow:hidden;}
 .bp-fill{height:100%;border-radius:var(--rpill);transition:width .25s var(--ease);}
+/* points total (Phase 4, 2026-09-09) — display-only stat, see boothPointsTotal()'s own comment. */
+.bp-pts{display:flex;align-items:center;gap:var(--sp-list);font-size:var(--fs-label);color:var(--ink);background:color-mix(in srgb,var(--amber-text) 10%,transparent);border:1px solid color-mix(in srgb,var(--amber-text) 28%,transparent);border-radius:var(--r1);padding:var(--sp-list) var(--sp-inline);margin-bottom:var(--sp-stack);}
+.bp-pts svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--amber-text);flex:0 0 auto;}
+.bp-pts b{font-weight:var(--w-label);}
 /* draw-status (เดินบูธ ✦ ลุ้นรางวัล's "ยังขาด"/"ครบเงื่อนไขแล้ว" card) reskinned onto the shared
    .next-step DNA (2026-08-26, per direction "อยากให้ทั้ง 2 กรณี ใช้ design dna เดียวกับ [เล่นเกมนี้
    ต่อ]...แต่ยังคงการใช้สีทั้ง 2 กรณีเหมือนเดิม") — same icon-badge + eyebrow/title/body + cta-slot
@@ -2121,6 +2125,42 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .scan-note span{font-size:var(--fs-label);color:var(--ink);line-height:1.5;}
 .scan-confirm{width:100%;}
 .scan-demo-note{font-size:var(--fs-label);color:var(--muted);text-align:center;margin-top:var(--sp-list);}
+/* ══ MINI-GAME PLAY MODAL ══ (2026-09-09) real question-and-answer flow for the 6 main games
+   (เกมหลัก, Games tab) + 10 asset-booth games (เดินบูธ tab) — replaces the old instant-toggle mock.
+   Same overlay family as .scan-modal/.howto-modal (scrim + centered card + inset close X), just
+   taller/scrollable since a multi-question flow needs more room than a QR frame. Reuses .q-opts/
+   .q-opt/.opt-key/.opt-text verbatim from the DNA quiz's own question screen (renderQuiz) so the
+   choice-button look is identical everywhere in the app. See MINIGAME_Q/BOOTH_Q (data) + openPlay/
+   renderPlayBody (logic), added right after renderGames() below. */
+.play-modal{position:fixed;inset:0;z-index:96;display:none;align-items:center;justify-content:center;padding:22px;}
+.play-modal.show{display:flex;}
+.play-scrim{position:absolute;inset:0;background:rgba(17,19,24,.6);}
+.play-card{position:relative;width:100%;max-width:400px;max-height:calc(100vh - 44px);overflow-y:auto;background:var(--white);border-radius:var(--r2);padding:var(--sp-card-pad-sm);box-shadow:var(--shadow-lg);}
+.play-x{position:absolute;right:12px;top:12px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--ink);border:none;cursor:pointer;z-index:1;}
+.play-x svg{width:var(--ic-md);height:var(--ic-md);}
+.play-eyebrow{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline);font-size:var(--fs-eyebrow);color:var(--muted);margin-bottom:var(--sp-list);padding-right:30px;}
+.play-timer{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--white);background:var(--pink);padding:2px var(--sp-list);border-radius:var(--rpill);flex:0 0 auto;}
+.play-timer svg{width:13px;height:13px;}
+.play-dots{display:flex;gap:5px;justify-content:center;margin-bottom:var(--sp-stack);}
+.play-dot{width:6px;height:6px;border-radius:50%;background:var(--line-strong);}
+.play-dot.on{background:var(--violet);}
+.play-intro{display:flex;gap:var(--sp-list);align-items:flex-start;padding:var(--sp-list) var(--sp-inline);border-radius:var(--r2);background:color-mix(in srgb,var(--violet) 8%,transparent);border:1px solid color-mix(in srgb,var(--violet) 25%,transparent);margin-bottom:var(--sp-stack);}
+.play-intro svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);flex:0 0 auto;margin-top:1px;}
+.play-intro span{font-size:var(--fs-label);color:var(--ink);line-height:1.5;}
+.play-q{font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--ink);line-height:1.5;margin-bottom:2px;}
+.play-sub{font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin-bottom:var(--sp-stack);}
+.play-opts .q-opts{margin-bottom:var(--sp-stack);}
+.play-skip{display:block;width:100%;text-align:center;background:none;border:none;font-family:var(--font);font-size:var(--fs-label);color:var(--muted);text-decoration:underline;cursor:pointer;padding:0 0 var(--sp-stack);}
+.play-insight{display:flex;gap:var(--sp-list);align-items:flex-start;padding:var(--sp-list) var(--sp-inline);border-radius:var(--r2);background:color-mix(in srgb,var(--cyan) 8%,transparent);border:1px solid color-mix(in srgb,var(--cyan) 25%,transparent);margin-bottom:var(--sp-stack);}
+.play-insight svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);flex:0 0 auto;margin-top:1px;}
+.play-insight span{font-size:var(--fs-label);color:var(--ink);line-height:1.5;}
+.play-nav{display:flex;gap:var(--sp-inline);align-items:center;justify-content:space-between;}
+.play-sum-list{display:flex;flex-direction:column;gap:var(--sp-list);margin-bottom:var(--sp-stack);}
+.play-sum-item{display:flex;gap:var(--sp-list);align-items:flex-start;padding:var(--sp-list) var(--sp-inline);border-radius:var(--r1);background:var(--paper);}
+.play-sum-item svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--cyan);flex:0 0 auto;margin-top:1px;}
+.play-sum-item span{font-size:var(--fs-label);color:var(--ink);line-height:1.5;}
+.play-sum-pts{display:flex;align-items:center;gap:var(--sp-list);justify-content:center;font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);background:color-mix(in srgb,var(--amber-text) 10%,transparent);border:1px solid color-mix(in srgb,var(--amber-text) 28%,transparent);border-radius:var(--r2);padding:var(--sp-stack);margin-bottom:var(--sp-stack);}
+.play-sum-pts svg{width:var(--ic-md);height:var(--ic-md);color:var(--amber-text);flex:0 0 auto;}
 /* ══ SHARE MODAL ══ social-share sheet for the persona card (opened by the Book page's share
    buttons). Restyled to match the OTHER system modals (.scan-modal/.scan-card) — centered card,
    close X inset in the card's own top-right corner, title+subtitle header — instead of the earlier
@@ -2251,6 +2291,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    of staying ink, so it visually steps back once its job is done. */
 .bc-play{background:var(--ink);border-color:var(--ink);color:var(--cloud);}
 .bc-play.played{background:var(--done-fill);border-color:var(--done-border);color:var(--ink);}
+/* locked (2026-09-09) — booth not checked in yet, matches "วิธีเล่น"'s own promised sequence
+   (เช็คอิน → ปลดเกมประจำโซน → ร่วมกิจกรรม), which the button never actually enforced before this.
+   Muted/disabled look — same "quiet, not clickable" treatment as a disabled .btn elsewhere. */
+.bc-play.locked{background:var(--accent);border-color:var(--line-soft);color:var(--muted);cursor:not-allowed;}
 .booth-legend{display:flex;flex-wrap:wrap;gap:var(--sp-list) var(--sp-inline);margin:var(--sp-inline) 0 var(--sp-inline);font-size:var(--fs-eyebrow);color:var(--muted);}
 .booth-legend span{display:inline-flex;align-items:center;gap:var(--sp-stack-tight);}
 /* border-radius bumped 3px->4px (2026-08-31, per corner-radius audit) — see .alloc-dot's comment. */
@@ -2541,10 +2585,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    768px (tablet): the card/hero-logo were sized to only ~27%/36% of the shell's own width, vs
    ~46%/75% on mobile — the CENTRAL content was shrinking relative to its canvas while the scatter
    decorations (below) stayed pinned to the raw edges, so the composition read as empty in the middle
-   and scattered at the corners the wider the screen got. --fw 204px→264px (fan) here + spv2-card
-   below unifies both stages at the same bigger size (they used to differ — 176 vs 204 — purely to
-   dodge the OLD short stage clamp overhanging into the headline; the taller clamp right below removes
-   that constraint, so both can share one number). height math: 264px wide × 7/5 aspect = 369.6px
+   and scattered at the corners the wider the screen got. --fw 204px→264px (fan) here (this rule
+   originally unified sizing with the since-removed v2 preview's own stage too). height math: 264px wide × 7/5 aspect = 369.6px
    tall; the new clamp's 390px MINIMUM (not just a vh-scaled preferred value) guarantees enough room
    (plus ~20px margin) on every tablet/pc height tested down to a genuinely extreme 650px-tall
    viewport, where 40vh alone would only be 260px (a first pass used a 350px floor — 19.6px short of
@@ -2552,56 +2594,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    below at 650px; caught by measuring the card's rendered height against the stage's, not just
    eyeballing) — clamp()'s min floor is exactly for this: never less than 390 regardless of viewport
    height. */
-:root[data-view="tablet"] .fan-stage,:root[data-view="pc"] .fan-stage,
-:root[data-view="tablet"] .spv2-stage,:root[data-view="pc"] .spv2-stage{height:clamp(390px,42vh,420px);}
-:root[data-view="tablet"] .fan-card,:root[data-view="pc"] .fan-card,
-:root[data-view="tablet"] .spv2-stage .spv2-card,:root[data-view="pc"] .spv2-stage .spv2-card{--fw:264px;}
-/* ── SPLASH PREVIEW V2 — "Card Back Reveal" (DEMO.splashVer==='v2', see renderSplash/startSpv2) ──
-   A curiosity-first alternative to the fan carousel: the card BACK is the hero (dominant, centered,
-   front-facing, highest z, subtle float + light-sweep), while the next persona's card FRONT peeks
-   out from behind it as a PARTIAL glimpse only (~25-30%, never the full face). A faded card-back
-   sits further back for depth. Same stage box (height clamp) + card sizing (--fw) as .fan-stage/
-   .fan-card so the splash composition/spacing is unchanged — only the preview's internal treatment
-   differs. Card visual chrome (radius, shadow, aspect) is the shared .pc-face/.pc-tilt from the
-   collectible card, reused verbatim. */
-/* same floor bump as .fan-stage above, same reason. */
-.spv2-stage{position:relative;width:100%;height:clamp(310px,34vh,330px);perspective:1200px;}
-/* same fix, same reasoning as .fan-card's own --fw above. */
-.spv2-card{--fw:min(44vw,210px);position:absolute;top:50%;left:50%;width:var(--fw);aspect-ratio:5/7;transform:translate(-50%,-50%);will-change:transform,opacity;}
-/* PREVIOUS — pure depth: a faded, blurred, shrunk card back mostly tucked behind the hero (only a
-   faint upper-left corner shows), so it adds a sense of a stack without competing with the flip
-   for the viewer's eye. Non-flippable — just the plain spv2BackCard(). */
-.spv2-prev{z-index:1;opacity:.26;filter:blur(3.5px);transform:translate(-50%,-50%) translate(-9%,-8%) scale(.85) rotate(-4deg);}
-/* BACK — the dominant hero, and (2026-09-04 rework) the card that actually FLIPS to reveal a random
-   persona's front — see spv2DomCard/spv2Cycle. Centering lives here (static, on .spv2-card); the
-   float/sweep animate the .pc3d child so they compose with centering instead of clobbering it; the
-   flip itself animates the .pc-flip grandchild — 3 independent transforms on 3 nested elements,
-   same proven nesting pcStatic(key,true) already uses for v1's tap-to-flip. */
-.spv2-back{z-index:5;}
-.spv2-back .pc3d{animation:spv2Float 6.5s ease-in-out infinite;transform-origin:50% 60%;}
-@keyframes spv2Float{0%,100%{transform:translateY(0) rotate(-1.2deg);}50%{transform:translateY(-9px) rotate(1.2deg);}}
-/* light sweep across the card-back FRONT face only — clipped by .pc-face's own overflow:hidden. */
-.spv2-sweep{position:absolute;inset:0;background:linear-gradient(115deg,transparent 34%,rgba(255,255,255,.42) 50%,transparent 66%);transform:translateX(-125%);animation:spv2Sweep 6s ease-in-out infinite;mix-blend-mode:screen;pointer-events:none;z-index:4;}
-@keyframes spv2Sweep{0%,58%{transform:translateX(-125%);}80%,100%{transform:translateX(125%);}}
-/* Slower, more deliberate flip for the v2 gimmick (2026-09-04, per direction "จังหวะการเปิดปิด...
-   อยากให้ช้ากว่านี้") — overrides the global `.pc-flip{transition:transform .7s}` (v1's own
-   tap-to-flip keeps that original .7s, untouched) with a longer, more premium curve. JS's
-   SPV2_FLIP_MS mirrors this duration so "hold" only starts counting once the open animation has
-   actually finished (see spv2Cycle). Scoped by #spv2Dom so nothing else on the page is affected. */
-#spv2Dom .pc-flip{transition:transform 1s cubic-bezier(.65,0,.35,1);}
-/* tap-to-pause (see bindSpv2Tap) — freezes the ambient float/sweep so the viewer can dwell on
-   whichever face (back or the open persona) is currently showing. */
-.spv2-stage.paused .spv2-back .pc3d,.spv2-stage.paused .spv2-sweep{animation-play-state:paused;}
-.spv2-stage{cursor:pointer;}
-/* Reduced motion — the card is seated statically flipped open (see initSpv2, no cycle timer at all
-   under RM) instead of mid-animation; kill the ambient float/sweep AND the one-time flip transition
-   so it never visibly rotates even once. Scoped to #spv2Dom only — v1's own tap-to-flip elsewhere on
-   this page keeps its normal transition under RM, untouched. */
-@media(prefers-reduced-motion:reduce){.spv2-back .pc3d,.spv2-sweep{animation:none!important;}#spv2Dom .pc-flip{transition:none!important;}}
-/* Mobile — the prev depth card tucks in a touch more so nothing risks the narrower viewport edge.
-   The dominant card's own flip needs no mobile-specific tuning — it's a same-box rotation, never
-   changes footprint, so the tablet/pc --fw override above is the only sizing concern (see below). */
-:root[data-view="mobile"] .spv2-prev{transform:translate(-50%,-50%) translate(-12%,-9%) scale(.86) rotate(-4deg);}
+:root[data-view="tablet"] .fan-stage,:root[data-view="pc"] .fan-stage{height:clamp(390px,42vh,420px);}
+:root[data-view="tablet"] .fan-card,:root[data-view="pc"] .fan-card{--fw:264px;}
 /* ── SPLASH PREVIEW V3 — "3D Character Card Flow" (DEMO.splashVer==='v3', see renderSplash/initSpv3) ──
    A 3D spatial field instead of one card: multiple vertical STREAMS (lanes) of character cards drift
    through a shallow depth-of-field, alternating up/down at different speeds. Most cards show the
@@ -2609,8 +2603,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    time becomes a temporary visual FOCUS (scale + glow). Depth is 2.5D (per-lane scale/opacity/blur +
    parallax speed), so nothing can project outside the stage the way a real rotateX floor could — the
    only real 3D is each card's own rotateY flip (reusing the collectible card's .pc3d perspective).
-   Everything is scoped under .spv3-* so v1/v2 stay byte-identical. Stage box + height clamp mirror
-   .fan-stage/.spv2-stage so the splash composition/spacing is unchanged.
+   Everything is scoped under .spv3-* so v1 stays byte-identical. Stage box + height clamp mirror
+   .fan-stage so the splash composition/spacing is unchanged.
    ── Seamless loop: each lane's track is the SAME set of cards rendered twice (set+set) and cards
    carry margin-bottom (not flex gap) so the content pitch is perfectly uniform — translateY(-50%)
    then maps set2 onto set1 with zero seam jump. Reveal timing is baked into per-card inline delays,
@@ -2640,7 +2634,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .spv3-card .pc3d{position:absolute;inset:0;width:100%;height:100%;}
 .spv3-card .pc-tilt{width:100%;height:100%;aspect-ratio:auto;transition:none;}
 /* no flip transition on v3 cards — every rotation here is either a static REST value (below) or a
-   CSS keyframe animation; without this, the .pc-flip base rule's own .7s transition (built for spv2's
+   CSS keyframe animation; without this, the .pc-flip base rule's own .7s transition (built for v1's
    JS-triggered tap flip) would animate every card in from 0deg the instant the splash first paints. */
 .spv3-card .pc-flip{transition:none;}
 /* depth planes (per lane): near = full size/opacity/sharp · mid = slightly smaller · far = small,
@@ -2913,7 +2907,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    makes the frame the scroll container; scrollbar hidden to preserve the device look. */
 @media(min-width:480px){:root[data-view="mobile"] .shell{max-width:400px;border-radius:30px;border:1px solid var(--line);box-shadow:0 30px 70px rgba(17,19,24,0.18);overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
 :root[data-view="mobile"] .shell::-webkit-scrollbar{display:none;}
-/* .fan-card/.spv2-card/.sp-sub's own min(Xvw,cap) formulas (2026-09-04 audit, see their own comments)
+/* .fan-card/.sp-sub's own min(Xvw,cap) formulas (2026-09-04 audit, see their own comments)
    track the RAW viewport width — correct below this breakpoint, where .shell has no cap and tracks
    the viewport 1:1, but WRONG here: .shell just froze at a flat 400px while the raw viewport this
    media query fires on keeps growing past 480px, so vw keeps climbing while the shell it's meant to
@@ -2923,7 +2917,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    a related collision: .sp-el-candle/.sp-el-bitcoin sit at the shell's own left:0%/right:0% edge, so
    .sp-sub's own uncapped 480px-viewport-relative width (340px, sized for the WRONG, wider box) left
    them almost no margin inside the now-narrower 400px shell; the correct 304px value restores it. */
-:root[data-view="mobile"] .fan-card,:root[data-view="mobile"] .spv2-card{--fw:176px!important;}
+:root[data-view="mobile"] .fan-card{--fw:176px!important;}
 :root[data-view="mobile"] .sp-sub{max-width:304px!important;}
 }
 /* Desktop (pc/tablet) is a SEAMLESS FULL PAGE, not a framed card: full-width topbar + backgrounds,
@@ -3152,6 +3146,154 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    carousel is its own deliberate attract-motion, not a gap. */
 .scroll-reveal{will-change:transform;transform-origin:50% 100%;}
 @media(prefers-reduced-motion:reduce){.scroll-reveal{transform:none!important;}}
+
+/* ══ CHARACTER CARD REVEAL (motion) ══ the "coming alive" bridge Analysis → Playbook. One-shot
+   cinematic sequence performed ON the real result card (pcStatic(heroKey) — the SAME photographed
+   art the ตัวตน tab shows), never a character change mid-play, per the Character Card Animation
+   direction. Two branches, both driven by a JS timeline in renderCardReveal():
+   • has a matching midjourney_session clip (CARD_ANIM_VIDEO — all 12 personas as of 2026-09-09) — the
+     static card cross-fades into that persona's own living-card video once it starts (.cr-video/.has-vid
+     below), no hard swap, and the clip plays to its own real end (never looped) before the reveal
+     continues.
+   • no clip — falls back to a CSS-only flip-from-card-back standing in for "the character begins
+     moving". Unreached for any current persona (all 12 have a clip now); kept as a defensive fallback
+     for a future persona added before its own clip is ready.
+   Either way the scene classes run s-appear → s-settle → s-activate → s-move ("character begins
+   moving" — the flip, or the clip starting) → s-alive (ambient float+glow) → s-peak (name reveal) →
+   s-final (settle) → s-bridge (cross-fade into the Playbook). Ambient layers (ring spin, glow pulse,
+   particle rise) may visually repeat inside the window, but the reveal SEQUENCE itself plays once and
+   settles — no loop, no re-swap. Reduced motion: the global *{animation/transition:none} rule flattens
+   the CSS-only branch entirely; renderCardReveal's own RM branch also skips starting the video (real
+   playback isn't something that CSS rule can stop) and just shows the final front-facing card + name
+   on a timer. Built on .consent.reveal-scene so it inherits the same aurora light-field + centered
+   column the analyzing screen uses (visual continuity from the screen right before it). */
+.cr-scene{--cr-accent:var(--violet);--cr-rgb:156,145,255;overflow:clip;gap:0;}
+/* Aurora blobs off for THIS screen only (2026-09-08, per direction "เอาแสงเรืองสีม่วง มุมซ้ายบน และแสง
+   สีเขียวมุมขวาล่าง...ออก") — .reveal-scene::before/::after (the violet/pink top-left + cyan/yellow
+   bottom-right blobs, see AURORA-BACKGROUND-DNA.md) stay exactly as-is for the analyzing screen that
+   still uses plain .reveal-scene; equal specificity (one class + pseudo, same as the base rule) plus
+   later source order is what wins the override here, same technique .reveal-scene::before itself
+   already uses to override .consent::before above it. */
+.cr-scene::before,.cr-scene::after{content:none;}
+/* card shadow off for THIS screen only (2026-09-08, per direction "เอา shadow ของการ์ดออก") — .pc-face's
+   own box-shadow (used everywhere else a card renders — Book, splash, compare-reveal) stays untouched;
+   two classes here outguns its one on specificity alone, no !important needed. */
+.cr-scene .pc-face{box-shadow:none;}
+.cr-kicker{position:relative;z-index:3;margin-bottom:22px;font-family:var(--font);font-size:var(--fs-body);font-weight:var(--w-label);letter-spacing:normal;color:var(--muted);opacity:0;transform:translateY(-8px);transition:opacity .6s var(--ease),transform .6s var(--ease);}
+.cr-scene.s-appear .cr-kicker{opacity:1;transform:none;}
+.cr-stage{position:relative;display:flex;align-items:center;justify-content:center;width:100%;z-index:1;}
+/* translateY-only, never scale() (2026-09-08, per direction "ขอบรอบการ์ด...เห็นเส้นบางๆ เข้มๆ...
+   บางจังหวะ...ทั้งการ์ดภาพนิ่ง และการ์ด animation") — root-caused to Chromium's classic "rounded-corner
+   compositor layer transformed by an ancestor" seam bug: .pc-face (border-radius+overflow:hidden,
+   promoted to its own GPU layer via translateZ(0) so the flip/backface-visibility stack composites
+   correctly) gets rasterized once, and when an AncESTOR further up this tree (.cr-cardwrap here) then
+   SCALES that already-rasterized layer, the rounded-corner edge's anti-aliasing can show a hairline
+   seam of whatever's behind it for the scaled frames — happens identically whether .pc-face itself is
+   showing a static photo or a live video, since the bug is purely about the ancestor's scale transform,
+   not the content. .cr-cardwrap had THREE separate scale() beats (appear .84→1, peak 1→1.06, final
+   1.06→1) — all three removed, translateY-only now; the peak "pop" lift bumped 4px→8px so it still
+   reads as a distinct beat without scale doing the work. */
+.cr-cardwrap{position:relative;z-index:3;width:min(300px,64vw);pointer-events:none;opacity:0;transform:translateY(38px);transition:opacity .8s var(--ease),transform .8s var(--ease);}
+:root[data-view="pc"] .cr-cardwrap,:root[data-view="tablet"] .cr-cardwrap{width:336px;}
+.cr-scene.s-appear .cr-cardwrap{opacity:1;transform:translateY(0);}
+.cr-scene.s-peak .cr-cardwrap{transform:translateY(-8px);}
+.cr-scene.s-final .cr-cardwrap{transform:translateY(0);}
+/* float lives on an inner wrapper so its continuous transform never fights .cr-cardwrap's discrete
+   translateY transitions (peak/settle) — same "separate the animated property onto its own layer"
+   idiom the .cr-ring / .cr-ring-i split below uses. rotate() dropped from crFloat (2026-09-08, same
+   border-line fix as above — a continuously-ROTATING ancestor is the other half of that same "ancestor
+   transform vs. rounded compositor layer" seam trigger; crFloatSm, the mobile variant, never had
+   rotation and was already clean). translateY-only bob now, on every view. */
+.cr-float{position:relative;}
+.cr-scene.s-alive .cr-float{animation:crFloat 4.6s ease-in-out .1s infinite alternate;}
+@keyframes crFloat{0%{transform:translateY(0);}100%{transform:translateY(-12px);}}
+:root[data-view="mobile"] .cr-scene.s-alive .cr-float{animation-name:crFloatSm;}
+@keyframes crFloatSm{0%{transform:translateY(0);}100%{transform:translateY(-7px);}}
+/* accent glow field behind the card */
+.cr-glowfield{position:absolute;top:50%;left:50%;width:152%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;z-index:0;opacity:0;pointer-events:none;background:radial-gradient(circle,rgba(var(--cr-rgb),.5) 0%,rgba(var(--cr-rgb),.15) 42%,transparent 68%);filter:blur(22px);transition:opacity .8s var(--ease);}
+.cr-scene.s-activate .cr-glowfield{opacity:.9;}
+.cr-scene.s-alive .cr-glowfield{animation:crPulse 3s ease-in-out infinite;}
+.cr-scene.s-final .cr-glowfield{opacity:.72;}
+@keyframes crPulse{0%,100%{opacity:.68;}50%{opacity:1;}}
+/* spectrum energy ring — scale+opacity on .cr-ring (transitioned), continuous spin on .cr-ring-i.
+   Softened 2026-09-08 (per direction "ให้นุ่มนวลกว่านี้...ตอนนี้ดูแข็งๆ เห็นขอบ และกระด้าง"): the old
+   12%/40%/62%/88% conic stops + 57%→62%/85%→93% mask bands were tight enough to read as a crisp
+   graphic ring with visible spoke edges; widened both (conic bands now ease in/out over ~25-28% of
+   the sweep instead of ~5-8%, mask transitions now ~16-20% instead of ~5-8%) and blur went 2px→10px —
+   between the two, this reads as a soft ambient energy field with no hard edge anywhere, inner or
+   outer. Peak intensity also came down a touch (.55/.42→.4/.32) since a wider band at the old opacity
+   looked busier, not just softer. */
+.cr-ring{position:absolute;top:50%;left:50%;width:134%;aspect-ratio:1;transform:translate(-50%,-50%) scale(.6);z-index:1;opacity:0;pointer-events:none;transition:opacity .7s var(--ease),transform .9s var(--ease);}
+:root[data-view="mobile"] .cr-ring{width:150%;}
+.cr-ring-i{position:absolute;inset:0;border-radius:50%;filter:blur(8px);background:conic-gradient(from 0deg,rgba(var(--cr-rgb),0),rgba(var(--cr-rgb),.4) 22%,rgba(var(--cr-rgb),0) 46%,rgba(var(--cr-rgb),.32) 68%,rgba(var(--cr-rgb),0) 94%);-webkit-mask:radial-gradient(farthest-side,transparent 42%,#000 60%,#000 76%,transparent 96%);mask:radial-gradient(farthest-side,transparent 42%,#000 60%,#000 76%,transparent 96%);}
+.cr-scene.s-activate .cr-ring{opacity:.85;transform:translate(-50%,-50%) scale(1);}
+.cr-scene.s-activate .cr-ring-i{animation:crSpin 9s linear infinite;}
+.cr-scene.s-peak .cr-ring{opacity:1;transform:translate(-50%,-50%) scale(1.12);}
+.cr-scene.s-final .cr-ring{opacity:.6;transform:translate(-50%,-50%) scale(1.04);}
+@keyframes crSpin{to{transform:rotate(360deg);}}
+/* one-shot expanding flash at peak */
+.cr-flash{position:absolute;top:50%;left:50%;width:74%;aspect-ratio:1;transform:translate(-50%,-50%) scale(.4);border-radius:50%;z-index:1;opacity:0;pointer-events:none;border:2px solid rgba(var(--cr-rgb),.6);}
+.cr-scene.s-peak .cr-flash{animation:crFlash .85s ease-out 1 both;}
+@keyframes crFlash{0%{opacity:.8;transform:translate(-50%,-50%) scale(.4);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.55);}}
+/* light sweep across the card as the front is revealed (once) */
+.cr-sheen{position:absolute;inset:0;z-index:4;border-radius:var(--r2);overflow:hidden;pointer-events:none;opacity:0;}
+.cr-sheen::before{content:"";position:absolute;top:-30%;left:-60%;width:42%;height:160%;transform:rotate(18deg) translateX(0);background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);filter:blur(4px);}
+.cr-scene.s-move .cr-sheen{opacity:1;}
+.cr-scene.s-move .cr-sheen::before{animation:crSheen 1s ease-out .28s 1 both;}
+@keyframes crSheen{from{transform:rotate(18deg) translateX(0);}to{transform:rotate(18deg) translateX(520%);}}
+/* floating particles (count set per view in JS; each carries its own --pdur/--pdl/--ph) */
+.cr-atmos{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:clip;opacity:0;transition:opacity 1s var(--ease);}
+.cr-scene.s-activate .cr-atmos{opacity:1;}
+.cr-particle{position:absolute;bottom:-2%;border-radius:50%;background:radial-gradient(circle,rgba(var(--cr-rgb),.9),rgba(var(--cr-rgb),0) 70%);opacity:0;animation:crRise var(--pdur,6s) linear var(--pdl,0s) infinite;}
+@keyframes crRise{0%{transform:translateY(0) scale(.5);opacity:0;}12%{opacity:.9;}80%{opacity:.6;}100%{transform:translateY(var(--ph,-600px)) scale(1.1);opacity:0;}}
+/* ── living-card clip (has-vid branch) ── the video sits inside the SAME .pc-face.front the static photo
+   already fills (identical position:absolute;inset:0 box — see .pcE-photo), cross-fading in over it once
+   the clip starts (renderCardReveal's startVideo()) rather than a hard cut, per "ห้าม hard-swap Static
+   Asset → Animated Asset". Its own art already carries plenty of visual richness (the same illustrated
+   scene as the static card, just alive) at a gentle, slow pace — so `.has-vid` dials the CSS-only
+   atmosphere WAY back wherever it would otherwise compete with the clip: no big flash burst (the clip's
+   own colour-cycle IS the peak moment), a softer glow/ring, and far fewer particles (set in JS). Overrides
+   win on specificity alone (one extra class, `.has-vid`, stacked onto each stage selector) — no !important
+   needed. Any persona with no clip (none currently — see CARD_ANIM_VIDEO) never gets this class, so it
+   would keep the original CSS-only recipe as-is. */
+.cr-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s var(--ease);z-index:2;}
+.cr-video.on{opacity:1;}
+.cr-scene.has-vid .cr-flash{display:none;}
+.cr-scene.has-vid.s-activate .cr-glowfield{opacity:.4;}
+.cr-scene.has-vid.s-alive .cr-glowfield{animation:crPulse 4.6s ease-in-out infinite;opacity:.38;}
+.cr-scene.has-vid.s-final .cr-glowfield{opacity:.32;}
+.cr-scene.has-vid.s-activate .cr-ring{opacity:.5;transform:translate(-50%,-50%) scale(.92);}
+.cr-scene.has-vid.s-peak .cr-ring{opacity:.6;transform:translate(-50%,-50%) scale(.98);}
+.cr-scene.has-vid.s-final .cr-ring{opacity:.34;transform:translate(-50%,-50%) scale(.94);}
+.cr-scene.has-vid .cr-atmos{opacity:.55;}
+/* hero name — blur→sharp reveal at peak */
+.cr-name{position:relative;z-index:3;margin-top:26px;text-align:center;opacity:0;transform:translateY(14px);filter:blur(8px);transition:opacity .7s var(--ease),transform .7s var(--ease),filter .7s var(--ease);}
+.cr-scene.s-peak .cr-name,.cr-scene.s-final .cr-name{opacity:1;transform:translateY(0);filter:blur(0);}
+/* English name. History (2026-09-08, same day): started at --serif/32px/700 (matching the physical
+   card art's own printed title style) → briefly moved to the consent screen's headline DNA (.consent-h
+   + its .ch-2 — var(--font)/64px/w-label/ink/-0.01em/1.06), sized down to 56px → reverted to --serif
+   per direct follow-up ("ให้เป็น serif family"), sized to 48px per the same follow-up. weight/color/
+   letter-spacing/line-height kept from the consent-h DNA pass (not asked to revert), only family+size
+   changed back.
+   Shimmer added per direct follow-up ("ต้องการให้มี shimmer แบบหน้ากำลังวิเคราะห์") — same recipe as
+   that screen's own .consent-h.reveal-h .ch-2 (verified live: still shimmering — the 2026-08-20 "เอา
+   shimmer ออก" removal was scoped to :not(.reveal-h), i.e. only the CONSENT screen's "รู้จัก ตัวคุณ?",
+   the analyzing screen's own headline kept it all along), which is also exactly the codebase's existing
+   .shimmer-ink utility (see .ev-empty-t.shimmer-ink) — same shimmerSweep keyframe, same ink-tinted
+   sweep band, reused verbatim rather than re-invented. */
+.cr-en{font-family:var(--serif);font-size:48px;font-weight:var(--w-label);color:var(--ink);line-height:1.06;letter-spacing:-0.01em;background-repeat:no-repeat;background-size:220% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-image:linear-gradient(100deg,var(--ink) 0%,var(--ink) 34%,color-mix(in srgb,var(--violet) 78%,var(--ink) 22%) 48%,color-mix(in srgb,var(--violet) 78%,var(--ink) 22%) 52%,var(--ink) 66%,var(--ink) 100%);animation:shimmerSweep 4.2s ease-in-out infinite;}
+/* Thai name — same text DNA as the splash's own subtitle (.sp-sub, "โลกการลงทุนใบใหม่...") per direction. */
+.cr-th{font-family:var(--font);font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--ink);line-height:1.55;margin-top:6px;}
+/* hint — same text DNA as the splash fan carousel's own caption (.cr2-cap, "แตะการ์ดกลางเพื่อดูด้านหลัง") per direction. */
+.cr-hint{position:relative;z-index:3;margin-top:16px;font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;max-width:280px;margin-left:auto;margin-right:auto;opacity:0;transition:opacity .6s var(--ease);}
+.cr-scene.s-appear .cr-hint{opacity:.8;}
+.cr-scene.s-peak .cr-hint,.cr-scene.s-final .cr-hint{opacity:0;}
+/* cross-fade the whole scene out as we hand off to the Playbook (bridge, not hard cut) */
+.cr-scene.s-bridge{animation:crBridge .55s var(--ease) forwards;}
+@keyframes crBridge{to{opacity:0;transform:scale(1.02);}}
+/* demo-panel two-button row for the Character Animation controls */
+.demo-row-btns{display:flex;gap:8px;margin-top:6px;}
+.demo-row-btns .btn{flex:1;justify-content:center;}
 </style>
 
 <!-- Lucide icons — inline symbol defs (MIT, lucide.dev), per Design DNA §07. -->
@@ -3274,6 +3416,30 @@ var ASSET_IMG=/*__ASSET_IMG__*/{candle:'assets/candle.png',gold:'assets/gold.png
    file's existing compression convention for these photos (~100-116KB each). */
 var REAL_CARD_IMG={guardian:'assets/guardian.jpg',harvester:'assets/harvester.jpg',steadyhand:'assets/steadyhand.jpg',diamondhand:'assets/diamondhand.jpg',analyst:'assets/analyst.jpg',planner:'assets/planner.jpg',explorer:'assets/explorer.jpg',sage:'assets/sage.jpg',maverick:'assets/maverick.jpg',waverider:'assets/waverider.jpg',contrarian:'assets/contrarian.jpg',collector:'assets/collector.jpg'};
 var CARD_BACK_IMG='assets/cardback.jpg';
+/* Character Card Reveal — living-card clips (2026-09-08, per direction "ฝังคลิปเหล่านั้นลงไป...อิงตาม
+   midjourney_session"). Every persona's MJ session clip (528×736, ratio 0.717 — the same 5/7 card aspect
+   as REAL_CARD_IMG) is a near-identical cinemagraph render of that SAME persona's real card art
+   (title/figure/signature object/tagline/tags all matching REAL_CARD_IMG 1:1) with a slow iridescent
+   colour-cycle on the card's signature object — verified frame-by-frame against the static photos before
+   mapping. Copied into assets/card-anim/<key>.mp4 (renamed from MJ's raw export filenames) rather than
+   embedded, matching this file's existing external-video convention (BG_VIDEO).
+   Re-encoded 2026-09-08 (per direction "ความยาวคลิป...เท่ากันที่ 5 วินาที" + "ลดขนาดคลิป"): MJ's raw
+   exports varied 5.04-5.21s at a needlessly high ~5.6-6.0Mbps (h264, 528×736@24fps — a mostly-static
+   illustration with only a slow colour-shift, nowhere near complex enough to need that bitrate). Every
+   clip is trimmed to EXACTLY 120 frames @ 24fps (=5.000s, verified via ffprobe) and re-encoded at libx264
+   CRF28/preset slow/yuv420p/+faststart/no audio track — visually indistinguishable from the originals in
+   a direct side-by-side frame comparison (the iridescent gradients were the compression-risk area; no
+   visible banding at this CRF). Originals kept outside the repo (scratchpad only) in case a future pass
+   wants to re-derive from them.
+   Coverage history: shipped 2026-09-08 with 10 of 12 (sage/contrarian had no matching clip in the
+   midjourney_session/ export yet — renderCardReveal fell back to the CSS-only flip reveal for just those
+   two). Completed 2026-09-09 once both were added to midjourney_session/ (identified the same way as the
+   original 10 — frame-matched against REAL_CARD_IMG's title/art before mapping) and re-encoded with the
+   identical pipeline above (both confirmed dur=5.000000/frames=120 via ffprobe). All 12 personas now have
+   a living-card clip; the CSS-only flip path stays in renderCardReveal as a defensive fallback only (e.g.
+   a future persona added without one yet), never reached for any current persona. assets/card-anim/ is
+   now 4.0MB total for all 12. */
+var CARD_ANIM_VIDEO={guardian:'assets/card-anim/guardian.mp4',harvester:'assets/card-anim/harvester.mp4',steadyhand:'assets/card-anim/steadyhand.mp4',diamondhand:'assets/card-anim/diamondhand.mp4',analyst:'assets/card-anim/analyst.mp4',planner:'assets/card-anim/planner.mp4',explorer:'assets/card-anim/explorer.mp4',sage:'assets/card-anim/sage.mp4',maverick:'assets/card-anim/maverick.mp4',waverider:'assets/card-anim/waverider.mp4',contrarian:'assets/card-anim/contrarian.mp4',collector:'assets/card-anim/collector.mp4'};
 
 /* Family umbrellas — accent hue only; persona content is what actually differs.
    th/strengths/watchouts sourced verbatim from "Playbook Final.html" (BetterTrade 2026
@@ -3513,9 +3679,13 @@ function sizeHeroGlow(){
    Book v1 draggable card (removed 2026-08-30) — untouched since, just unused until now. Left
    false/omitted for the compare-reveal slider's own pcStatic() calls so its drag gesture keeps
    working exactly as before — those never render a back face at all, zero behavior change there. */
-function pcStatic(key,flippable){
+function pcStatic(key,flippable,startFlipped){
   var back=flippable?'<div class="pc-face back"><img class="pcE-photo" src="'+CARD_BACK_IMG+'" alt="ด้านหลังการ์ด" loading="lazy"></div>':'';
-  return '<div class="pc3d'+(flippable?' pc-flippable':'')+'"><div class="pc-tilt"><div class="pc-flip"><div class="pc-face front">'+pcFrontInner(key)+'</div>'+back+'</div></div></div>';
+  /* startFlipped (optional, 2026-09-09 — splash v4's mixed rest states, see fanRestState) seats the
+     card already showing its BACK on first paint, rather than always starting front-facing. Only
+     meaningful alongside flippable:true (no back face to flip to otherwise); every existing caller
+     omits it, so this is purely additive. */
+  return '<div class="pc3d'+(flippable?' pc-flippable':'')+(startFlipped?' flipped':'')+'"><div class="pc-tilt"><div class="pc-flip"><div class="pc-face front">'+pcFrontInner(key)+'</div>'+back+'</div></div></div>';
 }
 /* pcViewer()/bindViewer() (the full interactive drag-to-rotate + flip card viewer, with its
    .pcv-wrap/.pcv-hint/.pcv-ctas/.pcv-btn CSS) removed 2026-08-30 along with คู่มือ 1 — see the
@@ -3529,7 +3699,7 @@ var RM=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').m
    the SAME 7-slot arc (rot/scale/x/y per |distance|) the reference GSAP component used, translated
    to plain CSS transitions since a passive attract-loop doesn't need per-frame elastic physics. */
 var SPTIMER=null;
-function stopSplashTimer(){if(SPTIMER){clearInterval(SPTIMER);SPTIMER=null;}if(typeof stopSpv2==='function')stopSpv2();if(typeof stopSpv3==='function')stopSpv3();}
+function stopSplashTimer(){if(SPTIMER){clearInterval(SPTIMER);SPTIMER=null;}if(typeof stopSpv3==='function')stopSpv3();}
 function splashGo(dir){var n=PORDER.length;st.spidx=(st.spidx+dir+n)%n;paintFan();}
 var FAN_ARC=[ // index = |distance| from center, 0..3
   {rot:0, scale:1,    xn:0,    yn:0,   z:10},
@@ -3545,6 +3715,22 @@ function fanSlot(diff){
   var xn=ad>3?1.28:f.xn, yn=ad>3?1.15:f.yn, scale=ad>3?.72:f.scale, rot=ad>3?28:f.rot;
   return {rot:sign*rot, scale:scale, xn:sign*xn, yn:yn, z:visible?f.z:0, visible:visible};
 }
+/* v4 mixed rest states (2026-09-09, per direction "ต้องการให้มีการคละ back card เข้าไปด้วย (ไม่ได้
+   แสดงแต่ front card ต่อเนื่องทั้งหมด)") — v1 always rests every card front-facing (only the CENTER
+   card is ever tappable-to-flip, and paintFan force-resets every OTHER card back to front every tick
+   — see the comment on that reset below). v4 instead bakes a persistent rest orientation per card at
+   build time (see renderSplash), so as the carousel parades personas through, some show their real
+   photo and some consistently pass through (and can even land in the CENTER slot) still showing the
+   generic card-back — a "mystery" card the viewer can still tap open, exactly like any other center
+   card. v1 itself is untouched — it never calls this.
+   Ratio bumped 80/20 → 50/50 (same-day follow-up, per direction "อยากให้การแสดง back card...เห็นมาก
+   กว่านี้...สไลท์คละแสดงมาเลยเหมือน front card อื่นๆ" — 20% read as "basically never happens, you have
+   to tap to ever see a back" in casual viewing; wanted it to show up in the auto-cycle just as often
+   as front does, not merely more often), then dialed back to a specific 75/25 (same-day 2nd follow-up,
+   "สัดส่วนการแสดง front card 75% back card 25%") — 50/50 apparently over-corrected the other way (too
+   few clips playing, since a back-resting card never autoplays one — see fanVideoSync). */
+var FAN_REST=['front','front','front','back'];
+function fanRestState(){return FAN_REST[Math.floor(Math.random()*FAN_REST.length)];}
 function paintFan(){
   var stage=document.getElementById('fanStage');if(!stage)return;
   var n=PORDER.length,center=st.spidx;
@@ -3553,6 +3739,9 @@ function paintFan(){
      half-card-width + 1×SPREAD_X must stay under roughly half the shell width */
   var dv=document.documentElement.getAttribute('data-view');
   var SPREAD_X=cardW*(dv==='mobile'?0.42:0.56), SPREAD_Y=cardW*0.11;
+  /* v4 ("การ์ดมีชีวิต") tracks which card lands in the center slot this tick — see fanVideoSync below,
+     called once after the loop so it only ever has to look at the ONE card that's actually centered. */
+  var v4=DEMO.splashVer==='v4',centerCard=null,centerKey=null;
   stage.querySelectorAll('.fan-card').forEach(function(card,i){
     var diff=i-center;
     if(diff>n/2)diff-=n;
@@ -3561,20 +3750,93 @@ function paintFan(){
     card.style.transform='translate(-50%,-50%) translate('+(s.xn*SPREAD_X).toFixed(1)+'px,'+(s.yn*SPREAD_Y).toFixed(1)+'px) rotate('+s.rot.toFixed(1)+'deg) scale('+s.scale.toFixed(3)+')';
     card.style.zIndex=s.z;
     card.style.opacity=s.visible?1:0;
-    /* only the centered card is tappable-to-flip (see bindFanFlip) — every other card is
-       force-unflipped here so a card can never rotate away from center still showing its back. */
+    /* only the centered card is tappable-to-flip (see bindFanFlip) — every other card is reset here so
+       a card can never rotate away from center still showing whatever a user tap left it as. v1 always
+       resets to FRONT; v4 instead returns each card to its OWN baked rest orientation (see
+       fanRestState) — mostly front, a few back — so the mixed look survives a full lap of the fan, not
+       just a single tick. */
     card.classList.toggle('center',diff===0);
-    if(diff!==0){var pc=card.querySelector('.pc3d');if(pc)pc.classList.remove('flipped');}
+    if(diff!==0){
+      var pc=card.querySelector('.pc3d');
+      if(pc){if(v4)pc.classList.toggle('flipped',card.dataset.rest==='back');else pc.classList.remove('flipped');}
+    }
+    if(diff===0){centerCard=card;centerKey=PORDER[i];}
   });
+  if(v4)fanVideoSync(centerCard,centerKey);
+}
+/* ── v4 "การ์ดมีชีวิต" — duplicates v1's fan carousel verbatim (same paintFan/bindFanFlip/splashGo/
+   FAN_ARC math, untouched above) and layers exactly ONE thing on top: whichever card is currently in
+   the CENTER slot gets its persona's own living-card clip (CARD_ANIM_VIDEO — the same 12 clips the
+   Character Card Reveal phase uses, see that section) cross-fading in over its static front photo.
+   Reuses .cr-video verbatim (defined near CHARACTER CARD REVEAL) — same position:absolute;inset:0;
+   object-fit:cover;opacity fade, so zero new CSS is needed. Unlike the Reveal phase's one-shot clip,
+   this LOOPS (ambient attract-loop chrome, not a one-time cinematic beat). Only the center card ever
+   has a live <video> — as the carousel advances, the outgoing center's clip is torn down and the
+   incoming center's mounts fresh, so at most one clip decodes at a time (mounting all 12 at once would
+   be pure GPU/battery waste for cards mostly glimpsed at a glance in the fan's outer arc). RM (reduced
+   motion) never mounts a clip at all — v4 falls back to looking exactly like v1 under RM, same as
+   every other motion on this page. */
+var FAN_VIDEO_KEY=null,FAN_VIDEO_EL=null;
+function fanVideoTeardown(){
+  if(FAN_VIDEO_EL){FAN_VIDEO_EL.pause();FAN_VIDEO_EL.remove();}
+  FAN_VIDEO_KEY=null;FAN_VIDEO_EL=null;
+}
+function fanVideoSync(centerCard,key){
+  /* A card resting/tapped to its BACK (see fanRestState + bindFanFlip) isn't showing the persona photo
+     at all right now, so no clip should play over it — wantKey collapses to null in that case, which
+     tears any live clip down exactly like leaving center does. bindFanFlip re-calls this same function
+     after a manual tap-flip so the clip starts/stops immediately on that gesture too, not just on the
+     next auto-advance tick. */
+  var pc=centerCard&&centerCard.querySelector('.pc3d');
+  var showingFront=!!pc&&!pc.classList.contains('flipped');
+  var wantKey=(key&&showingFront)?key:null;
+  if(wantKey===FAN_VIDEO_KEY)return; // already showing (or already correctly not showing) the right clip
+  fanVideoTeardown();
+  if(!centerCard||!wantKey||RM)return;
+  key=wantKey; // reassign the param — from here down, wantKey IS the key (front-facing, non-null)
+  var src=CARD_ANIM_VIDEO[key];if(!src)return; // no clip for this persona (none currently, see CARD_ANIM_VIDEO)
+  var front=centerCard.querySelector('.pc-face.front');if(!front)return;
+  var vid=document.createElement('video');
+  vid.className='cr-video';vid.muted=true;vid.loop=true;vid.playsInline=true;
+  vid.setAttribute('playsinline','');vid.setAttribute('webkit-playsinline','');vid.preload='auto';vid.src=src;
+  front.appendChild(vid);
+  FAN_VIDEO_KEY=key;FAN_VIDEO_EL=vid; // set now so a rapid center-change mid-load still tears THIS one down correctly
+  var p=vid.play();
+  if(p&&p.then)p.then(function(){if(FAN_VIDEO_EL===vid)vid.classList.add('on');})
+    .catch(function(){if(FAN_VIDEO_EL===vid){vid.remove();FAN_VIDEO_KEY=null;FAN_VIDEO_EL=null;}}); // asset failed — falls back to the static photo underneath
+  else vid.classList.add('on'); // very old browsers whose play() doesn't return a promise at all
 }
 function renderSplash(){
   stopSplashTimer();
+  /* bug fix (2026-09-09): this used to just null the refs, assuming the impending innerHTML rebuild
+     would take care of the old element — but a detached media element does NOT auto-pause per spec
+     (only auto-pausing on navigate/unload, not on DOM removal), so an old fan-video could keep silently
+     decoding in memory (muted, invisible, but real CPU) until GC eventually reclaims it. fanVideoTeardown()
+     already does this correctly (pause+remove) for every other path (center change, tap-flip, leaving
+     v4 via stopSpv3's sibling); this was the one spot that skipped it. */
+  fanVideoTeardown();
   /* Splash preview version (DEMO.splashVer, demo-panel toggle — default 'v1' ALWAYS). v1 = the
-     shipped fan carousel of card fronts; v2 = the Card Back Reveal curiosity preview. Everything
-     ELSE on this screen (logo, headline, sub, scatter, CTA) is identical between the two — only the
-     .sp-stage's internal preview + the post-render init below branch. */
-  var v2=DEMO.splashVer==='v2',v3=DEMO.splashVer==='v3';
-  var slides=(v2||v3)?'':PORDER.map(function(k){return '<div class="fan-card">'+pcStatic(k,true)+'</div>';}).join('');
+     shipped fan carousel of card fronts; v3 = the 3D Character Card Flow field; v4 = "การ์ดมีชีวิต" —
+     v1's EXACT same fan carousel (v4 shares its whole markup/paintFan/bindFanFlip/auto-advance path
+     below, see fanVideoSync near paintFan), just with the CENTER card's own living-card clip
+     (CARD_ANIM_VIDEO) looping over its static front photo AND some cards mixed in resting on their
+     generic BACK instead of always front (see fanRestState near FAN_ARC — 2026-09-09 follow-up, "ต้องการ
+     ให้มีการคละ back card เข้าไปด้วย"); v5 = the same pairing applied to v3 instead
+     — v3's EXACT same drifting lane field (v5 shares spv3Build/initSpv3/spv3FocusTick below verbatim),
+     just with whichever card the FOCUS cycle promotes looping its own living-card clip for the
+     duration it stays focused (see spv3VideoMount near spv3FocusTick). Everything ELSE on this screen
+     (logo, headline, sub, scatter, CTA) is identical across all versions — only the .sp-stage's
+     internal preview + the post-render init below branch. (v2 "Card Back Reveal" and the earlier,
+     different, v4 "Living Card" previews were removed 2026-09-08, per direction — เอา v2, v4 ออก; this
+     v4 was a fresh, unrelated build added 2026-09-09 reusing that now-free version slot, and v5 is a
+     same-day follow-up applying the same idea to v3.) */
+  var v3=DEMO.splashVer==='v3',v5=DEMO.splashVer==='v5',v3field=v3||v5,v4=DEMO.splashVer==='v4';
+  /* data-rest bakes each card's persistent orientation (see fanRestState) — 'front' always for v1 (its
+     shipped, unchanged look: every card starts front-facing, only the CENTER card is ever tappable);
+     v4 mixes in some 'back' cards too, seated already flipped via pcStatic's 3rd param (see paintFan's
+     per-tick reset + fanVideoSync, both of which read this same data-rest). data-key lets bindFanFlip
+     look up which persona the tapped center card is, for its own fanVideoSync re-sync call. */
+  var slides=v3field?'':PORDER.map(function(k){var rest=v4?fanRestState():'front';return '<div class="fan-card" data-key="'+k+'" data-rest="'+rest+'">'+pcStatic(k,true,rest==='back')+'</div>';}).join('');
   /* depth-tiered brand-asset scatter — 3 planes for real perspective:
      FAR (z0): small · blurred · faint · slow, small drift  · behind everything
      MID (z1): medium · light blur · moderate
@@ -3605,26 +3867,17 @@ function renderSplash(){
       '<div class="sp-kick">เกมค้นหาตัวตนนักลงทุน</div>'+
       '<img class="sp-hero-logo" src="'+LOGO_IMG.nwnp+'" alt="New World, New Playbook · BetterTrade 2026">'+
       '<p class="sp-sub">โลกการลงทุนใบใหม่ เริ่มจากรู้จักตัวเอง พบตัวตนนักลงทุน 1 ใน 12 แบบที่เป็นคุณ</p></div>'+
-    '<div class="sp-stage">'+(v2
-      /* v2 stage — 2 depth layers: a faded card-back for depth (prev, static), and the dominant
-         center card (back) which ACTUALLY FLIPS open/closed to reveal a random persona's front —
-         see spv2DomCard/spv2Cycle. */
-      ? '<div class="spv2-stage" id="spv2Stage">'+
-          '<div class="spv2-card spv2-prev">'+spv2BackCard()+'</div>'+
-          '<div class="spv2-card spv2-back">'+spv2DomCard()+'</div>'+
-        '</div>'
-      : v3
-      /* v3 stage — a 3D field of drifting character-card streams (see spv3Build/initSpv3). */
+    '<div class="sp-stage">'+(v3field
+      /* v3/v5 stage — a 3D field of drifting character-card streams (see spv3Build/initSpv3); v5 is
+         the exact same field, spv3FocusTick just also mounts a clip on whichever card it focuses. */
       ? '<div class="spv3-stage" id="spv3Stage">'+spv3Build()+'</div>'
       : '<div class="fan-stage" id="fanStage">'+slides+'</div>')+'</div>'+
     /* reuses .cr2-cap verbatim (same centered/muted/280px-cap micro-hint the compare-reveal slider
        uses for "ลากเส้นแบ่ง...") for this preview's own hint line. */
-    '<p class="cr2-cap">'+(v2?'ตัวตนนักลงทุนของคุณ 1 ใน 12 กำลังรอเปิดเผย':v3?'ตัวตนนักลงทุน 1 ใน 12 กำลังเคลื่อนผ่าน — ใบไหนจะหันมาหาคุณ?':'แตะการ์ดกลางเพื่อดูด้านหลัง')+'</p>'+
+    '<p class="cr2-cap">'+(v3field?(v5?'จับตาไว้ — ใบที่ถูกโฟกัสกำลังมีชีวิตขึ้นมา':'ตัวตนนักลงทุน 1 ใน 12 กำลังเคลื่อนผ่าน — ใบไหนจะหันมาหาคุณ?'):'แตะการ์ดกลางเพื่อดูด้านหลัง')+'</p>'+
     '<div class="sp-cta"><div id="cta-slot"></div></div>'+
   '</div>';
-  if(v2){
-    initSpv2();            // seat the front (hidden) + start the controlled-random tease; ambient float/sweep are CSS
-  }else if(v3){
+  if(v3field){
     initSpv3();            // wire IntersectionObserver + start the focus cycle; all drift/reveal motion is CSS
   }else{
     paintFan();
@@ -3632,135 +3885,6 @@ function renderSplash(){
     if(!RM)SPTIMER=setInterval(function(){splashGo(1);},2800);
   }
   mountSplashCTA();
-}
-/* ── SPLASH PREVIEW V2 helpers ── */
-/* card BACK inner — simple, non-flippable. Used only by the faint depth layer (.spv2-prev). Reuses
-   the collectible card's .pc3d/.pc-tilt/.pc-face chrome verbatim, filled with the one shared
-   CARD_BACK_IMG photo. aria-hidden: purely decorative preview. */
-function spv2BackCard(){
-  return '<div class="pc3d"><div class="pc-tilt"><div class="pc-face" aria-hidden="true">'+
-    '<img class="pcE-photo" src="'+CARD_BACK_IMG+'" alt=""></div></div></div>';
-}
-/* THE DOMINANT center card — an actual FLIP card (2026-09-04 rework, per follow-up direction: the
-   earlier "front peeks out from behind the back, offset + translated" approach read as "nothing is
-   happening" in practice — a real flip of the card the viewer is actually looking at is unambiguous:
-   "อยากให้มีการสลับ เปิดไพ่กลางที่อยู่ด้านหน้า ให้เห็น character บ้าง"). Reuses the EXACT
-   .pc3d/.pc-tilt/.pc-flip/.pc-face(.back) structure + the global `.pc3d.flipped .pc-flip{rotateY
-   (180deg)}`/`.pc-face.back{rotateY(180deg)}` rules pcStatic(key,true) already uses for v1's own
-   tap-to-flip — proven, no new flip CSS needed. Front face = the shared CARD_BACK_IMG (at rest,
-   always dominant) + the light-sweep. Back face (#spv2Open) starts EMPTY and is filled by
-   spv2Cycle with whichever persona is currently teased, right before the card flips open — so the
-   swap never flashes mid-flip. */
-function spv2DomCard(){
-  return '<div class="pc3d" id="spv2Dom"><div class="pc-tilt"><div class="pc-flip">'+
-    '<div class="pc-face front" aria-hidden="true"><img class="pcE-photo" src="'+CARD_BACK_IMG+'" alt=""><span class="spv2-sweep"></span></div>'+
-    '<div class="pc-face back" id="spv2Open" aria-hidden="true"></div>'+
-    '</div></div></div>';
-}
-/* ── RANDOMIZED FRONT TEASE (controlled randomness) ── The dominant card stays CLOSED (card back)
-   most of the time; at irregular intervals it flips OPEN to reveal a random persona's front, holds
-   for a randomized duration, then flips back CLOSED — so the viewer can't predict which card is
-   next ("จะเป็นใบไหนนะ?"), and an occasional long hold reads as "เฮ้ย ใบนี้หรือเปล่า?" before it's
-   pulled back. Controlled, NOT chaotic: no immediate repeat of the same character, never two long
-   holds in a row, timing randomized only within tuned ranges. The flip itself uses a dedicated
-   transition (SPV2_FLIP_MS / #spv2Dom .pc-flip, 1s — still slower than v1's own .7s tap-to-flip) per
-   direction "การพลิกการ์ดช้าลง...ใช้เวลา 1 วินาที". The card's own box never moves or resizes — only
-   its two faces swap via rotateY — so there's zero risk of it poking outside the stage bounds at any
-   breakpoint (unlike the earlier translate-based peek). */
-function spv2Rand(a,b){return a+Math.random()*(b-a);}
-var SPV2_FLIP_MS=1000; // mirrors #spv2Dom .pc-flip's own transition-duration (CSS) — see spv2Cycle
-/* GIMMICK, not a systematic per-card intro (2026-09-04, per direction "ไม่ได้ใช้เป็นการเปิดแนะนำทุก
-   การ์ด หลักๆ อยากให้เป็นกิมมิค เปิดให้เห็นบ้าง...ให้ผู้ใช้งานได้ลุ้นว่าใบต่อไปที่จะเปิดให้เห็นเป็น
-   ใบอะไร"; pacing tightened same day, later round, per "การพลิกการ์ดเกิดขึ้นน้อยลง...สุ่มให้เป็น 4
-   วินาที") — the card spends most of its time CLOSED (ambient float+sweep only); SPV2_BACKHOLD_MS is
-   the randomized idle gap between flips (~4s) that makes an open genuinely feel like a rare,
-   anticipated event ("ใบต่อไปจะเป็นใบไหนนะ?") rather than a carousel working through all 12 in turn.
-   SPV2_HOLD is the — much shorter — variety in how long a flip STAYS OPEN once it happens: quick
-   ("hint", barely registers) / normal ("tease") / rare long hold ("false reveal" — stays open long
-   enough to feel like it might be the real result, before snapping back). */
-var SPV2_BACKHOLD_MS=[3800,4200]; // randomized, centered on ~4s per direction
-var SPV2_HOLD=[
-  {name:'quick', hold:[320,520]},
-  {name:'normal',hold:[850,1250]},
-  {name:'long',  hold:[1900,2700]}
-];
-var SPV2_TIMER=null;              // the single pending setTimeout in the self-scheduling chain
-var spv2Last={char:-1,lvl:-1};    // last picks, to avoid immediate repeats
-function stopSpv2(){if(SPV2_TIMER){clearTimeout(SPV2_TIMER);SPV2_TIMER=null;}}
-/* weighted hold-level pick — mostly quick/normal, rarely long; never two long holds in a row. */
-function spv2PickLevel(){
-  var r=Math.random(),li=(r<0.45)?0:(r<0.85?1:2);
-  if(li===2&&spv2Last.lvl===2)li=1;
-  spv2Last.lvl=li;return li;
-}
-function spv2PickDistinct(n,last){var i;do{i=Math.floor(Math.random()*n);}while(i===last&&n>1);return i;}
-/* one tease cycle: pick a random (distinct-from-last) persona + hold level, load it into the still-
-   CLOSED card's hidden back face, flip OPEN, hold, flip CLOSED, then schedule the NEXT cycle after a
-   long randomized back-hold (SPV2_BACKHOLD_MS — the "gimmick, not every card" pacing). Self-
-   scheduling (setTimeout chain, not setInterval) so each cycle's rhythm differs. Guard: bails if
-   splash/v2 is gone. Paused (tap): early-returns; resume re-enters via the tap handler.
-   SPV2_FLIP_MS buffer ≈ the .pc-flip's own transition duration, so "hold" only starts counting once
-   the card has actually finished opening (and the close-timer only fires the next cycle once the
-   close animation has actually finished). */
-function spv2Cycle(){
-  if(st.phase!=='splash'||DEMO.splashVer!=='v2'){stopSpv2();return;}
-  var stage=document.getElementById('spv2Stage'),dom=document.getElementById('spv2Dom'),open=document.getElementById('spv2Open');
-  if(!stage||!dom||!open)return;
-  if(stage.classList.contains('paused'))return;
-  var ci=spv2PickDistinct(PORDER.length,spv2Last.char);spv2Last.char=ci;
-  open.innerHTML=pcFrontInner(PORDER[ci]);                              // load while still closed (no flash)
-  var lvl=SPV2_HOLD[spv2PickLevel()];
-  requestAnimationFrame(function(){dom.classList.add('flipped');});    // OPEN
-  var hold=spv2Rand(lvl.hold[0],lvl.hold[1]);
-  SPV2_TIMER=setTimeout(function(){                                    // hold → CLOSE
-    if(stage.classList.contains('paused'))return;
-    dom.classList.remove('flipped');
-    SPV2_TIMER=setTimeout(spv2Cycle,SPV2_FLIP_MS+spv2Rand(SPV2_BACKHOLD_MS[0],SPV2_BACKHOLD_MS[1])); // close settles → long back-hold → next cycle
-  },SPV2_FLIP_MS+hold);
-}
-/* Seat the initial state + start. Non-RM: card starts CLOSED and sits idle (float+sweep only) for a
-   long moment before the FIRST tease ever fires — the gimmick shouldn't announce itself the instant
-   the splash loads. Reduced-motion (§18): no cycle/float/sweep at all — the card is seated statically
-   FLIPPED OPEN on one persona (no repeated rotation, ever) so the "a character is hiding behind the
-   back" idea still reads, minus all continuous/repeated motion. */
-function initSpv2(){
-  stopSpv2();bindSpv2Tap();
-  var dom=document.getElementById('spv2Dom'),open=document.getElementById('spv2Open');
-  if(!dom||!open)return;
-  spv2Last={char:-1,lvl:-1};
-  if(RM){
-    var ci=spv2PickDistinct(PORDER.length,-1);spv2Last.char=ci;
-    open.innerHTML=pcFrontInner(PORDER[ci]);
-    dom.classList.add('flipped');
-    return;
-  }
-  dom.classList.remove('flipped');       // start closed (card back showing)
-  SPV2_TIMER=setTimeout(spv2Cycle,2400);
-}
-/* Tap-to-pause / dwell (§16): freezes the ambient float/sweep (CSS .paused) and the tease cycle.
-   Tapping while CLOSED force-opens a fresh random persona to dwell on ("look closely, see
-   something"); tapping again closes it and resumes the random cycle. Tapping while already OPEN
-   (mid-tease) just holds that reveal indefinitely instead of forcing a new pick. Delegated +
-   idempotency-guarded like bindFanFlip so repeated renderSplash() calls don't stack listeners. */
-function bindSpv2Tap(){
-  var stage=document.getElementById('spv2Stage');
-  if(!stage||stage.dataset.tapBound)return;
-  stage.dataset.tapBound='1';
-  stage.addEventListener('click',function(){
-    var dom=document.getElementById('spv2Dom'),open=document.getElementById('spv2Open');
-    if(stage.classList.contains('paused')){
-      stage.classList.remove('paused');
-      if(dom)dom.classList.remove('flipped');                 // close whatever's showing
-      if(!RM)SPV2_TIMER=setTimeout(spv2Cycle,SPV2_FLIP_MS);   // resume once the close settles
-    }else{
-      stage.classList.add('paused');stopSpv2();
-      if(dom&&open&&!dom.classList.contains('flipped')){
-        var ci=spv2PickDistinct(PORDER.length,spv2Last.char);spv2Last.char=ci;
-        open.innerHTML=pcFrontInner(PORDER[ci]);
-        dom.classList.add('flipped');
-      }
-    }
-  });
 }
 /* ══ SPLASH PREVIEW V3 — "3D Character Card Flow" helpers (DEMO.splashVer==='v3') ══
    Builds N vertical streams of character cards that drift through a shallow depth field. All the
@@ -3787,14 +3911,19 @@ var SPV3_STATES=['rf','rf','rf','rf','rf','rf','rf rev-edge','rf rev-turn','rb',
 var SPV3_GLOW=['rgba(0,212,254,.55)','rgba(31,135,230,.55)','rgba(17,60,243,.5)','rgba(114,45,244,.5)','rgba(230,59,216,.5)','rgba(247,147,25,.5)'];
 var SPV3_CARDS_PER=6;   // cards per set; each lane renders the set twice for a seamless loop
 function spv3Shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+/* small shared utility (was named spv2Rand back when the now-removed v2 splash preview owned it) —
+   a random float in [a,b), used by v3's own per-card timing + the card-reveal particle field. */
+function randF(a,b){return a+Math.random()*(b-a);}
 /* one card: pc-face.front = shared card BACK photo (+ sheen), pc-face.back = this persona's FRONT
    art. Rest/motion class(es) + randomised --rdl/--rdur are baked in so the two duplicated copies stay
    perfectly in sync. */
 function spv3CardHTML(key){
   var state=SPV3_STATES[Math.floor(Math.random()*SPV3_STATES.length)];
-  var dl=spv2Rand(0,9).toFixed(1),dur=spv2Rand(12,20).toFixed(1);
+  var dl=randF(0,9).toFixed(1),dur=randF(12,20).toFixed(1);
   var glow=SPV3_GLOW[Math.floor(Math.random()*SPV3_GLOW.length)];
-  return '<div class="spv3-card '+state+'" style="--rdl:'+dl+'s;--rdur:'+dur+'s;--v3glow:'+glow+'">'+
+  /* data-pkey: which persona this card is (v5 only reads this, to look up CARD_ANIM_VIDEO when the
+     card gets focused — see spv3VideoMount) — harmless extra attribute for v3/v1, unused there. */
+  return '<div class="spv3-card '+state+'" data-pkey="'+key+'" style="--rdl:'+dl+'s;--rdur:'+dur+'s;--v3glow:'+glow+'">'+
     '<div class="pc3d"><div class="pc-tilt"><div class="pc-flip">'+
       '<div class="pc-face front" aria-hidden="true"><img class="pcE-photo" src="'+CARD_BACK_IMG+'" alt="" loading="lazy"><span class="spv3-sheen"></span></div>'+
       '<div class="pc-face back" aria-hidden="true">'+pcFrontInner(key)+'</div>'+
@@ -3819,28 +3948,67 @@ function spv3Build(){
    attention on. Self-scheduling setTimeout chain so the rhythm varies; guards bail if the splash/v3
    is gone or the stage scrolled off (IntersectionObserver → .spv3-off). */
 var SPV3_FOCUS_TIMER=null,SPV3_IO=null;
-function stopSpv3(){if(SPV3_FOCUS_TIMER){clearTimeout(SPV3_FOCUS_TIMER);SPV3_FOCUS_TIMER=null;}if(SPV3_IO){SPV3_IO.disconnect();SPV3_IO=null;}}
+/* v5 "โฟกัสมีชีวิต" — same one-video-at-a-time rule as v4's fanVideoSync (see its own comment near
+   paintFan): whichever card spv3FocusTick currently has focused gets its persona's living-card clip
+   (CARD_ANIM_VIDEO) looping over the persona art (.pc-face.back — see spv3CardHTML's front/back
+   naming note) for exactly as long as it stays focused; unfocusing tears it down. v3 itself never
+   calls these (only reached when DEMO.splashVer==='v5', see spv3FocusTick). */
+var SPV5_VIDEO_KEY=null,SPV5_VIDEO_EL=null;
+function spv3VideoTeardown(){
+  if(SPV5_VIDEO_EL){SPV5_VIDEO_EL.pause();SPV5_VIDEO_EL.remove();}
+  SPV5_VIDEO_KEY=null;SPV5_VIDEO_EL=null;
+}
+function spv3VideoMount(card){
+  var key=card.dataset.pkey;
+  if(key===SPV5_VIDEO_KEY)return;
+  spv3VideoTeardown();
+  if(!key||RM)return;
+  var src=CARD_ANIM_VIDEO[key];if(!src)return; // no clip for this persona (none currently, see CARD_ANIM_VIDEO)
+  var back=card.querySelector('.pc-face.back');if(!back)return;
+  var vid=document.createElement('video');
+  vid.className='cr-video';vid.muted=true;vid.loop=true;vid.playsInline=true;
+  vid.setAttribute('playsinline','');vid.setAttribute('webkit-playsinline','');vid.preload='auto';vid.src=src;
+  back.appendChild(vid);
+  SPV5_VIDEO_KEY=key;SPV5_VIDEO_EL=vid; // set now so a rapid re-focus mid-load still tears THIS one down correctly
+  var p=vid.play();
+  if(p&&p.then)p.then(function(){if(SPV5_VIDEO_EL===vid)vid.classList.add('on');})
+    .catch(function(){if(SPV5_VIDEO_EL===vid){vid.remove();SPV5_VIDEO_KEY=null;SPV5_VIDEO_EL=null;}}); // asset failed — falls back to the static persona art underneath
+  else vid.classList.add('on'); // very old browsers whose play() doesn't return a promise at all
+}
+function stopSpv3(){if(SPV3_FOCUS_TIMER){clearTimeout(SPV3_FOCUS_TIMER);SPV3_FOCUS_TIMER=null;}if(SPV3_IO){SPV3_IO.disconnect();SPV3_IO=null;}spv3VideoTeardown();}
 /* eligible = a card in a near/mid lane whose CURRENT (it's always moving) vertical centre is within
-   the middle ~52% of the stage — so focus never lands on a card fading out at the masked edges. */
-function spv3PickFocus(stage){
+   the middle ~52% of the stage — so focus never lands on a card fading out at the masked edges.
+   frontOnly (v5 only) narrows this further to cards actually resting on their PERSONA face right now
+   (plain 'rf', no rev-edge/rev-turn dip-to-back motion layered on) — a clip only makes sense over a
+   card that's actually showing the art it animates, and forcing every card to flip on focus (rather
+   than skip the ones mid-flip or resting on the mystery back) was more invasive than this direction
+   asked for. */
+function spv3PickFocus(stage,frontOnly){
   var cards=[].slice.call(stage.querySelectorAll('.spv3-lane.plane-near .spv3-card,.spv3-lane.plane-mid .spv3-card'));
+  if(frontOnly)cards=cards.filter(function(c){return c.classList.contains('rf')&&!c.classList.contains('rev-edge')&&!c.classList.contains('rev-turn');});
   var sr=stage.getBoundingClientRect(),b0=sr.top+sr.height*0.24,b1=sr.bottom-sr.height*0.24,elig=[];
   for(var i=0;i<cards.length;i++){var r=cards[i].getBoundingClientRect(),cy=r.top+r.height/2;if(cy>b0&&cy<b1&&r.width>0)elig.push(cards[i]);}
   return elig.length?elig[Math.floor(Math.random()*elig.length)]:null;
 }
 function spv3FocusTick(){
-  if(st.phase!=='splash'||DEMO.splashVer!=='v3'){stopSpv3();return;}
+  if(st.phase!=='splash'||(DEMO.splashVer!=='v3'&&DEMO.splashVer!=='v5')){stopSpv3();return;}
   var stage=document.getElementById('spv3Stage');if(!stage){stopSpv3();return;}
-  var prev=stage.querySelector('.spv3-card.spv3-focus');if(prev)prev.classList.remove('spv3-focus');
+  var v5=DEMO.splashVer==='v5';
+  var prev=stage.querySelector('.spv3-card.spv3-focus');
+  if(prev){prev.classList.remove('spv3-focus');if(v5)spv3VideoTeardown();}
   var gap;
   if(stage.classList.contains('spv3-off')){gap=1400;}          // idle while off-screen
-  else{var pick=spv3PickFocus(stage);if(pick){pick.classList.add('spv3-focus');gap=spv2Rand(2200,3600);}else{gap=700;}}
+  else{
+    var pick=spv3PickFocus(stage,v5);
+    if(pick){pick.classList.add('spv3-focus');gap=randF(2200,3600);if(v5)spv3VideoMount(pick);}
+    else{gap=700;}
+  }
   SPV3_FOCUS_TIMER=setTimeout(spv3FocusTick,gap);
 }
 /* Seat + start. RM: no focus timer at all (the field is static under RM — see the @media block). Non-
    RM: wire an IntersectionObserver to freeze/thaw the whole preview when the splash scrolls out, then
    kick off the focus cycle after a short beat so it doesn't announce itself the instant the splash
-   loads (same restraint as spv2's first-tease delay). */
+   loads. */
 function initSpv3(){
   stopSpv3();
   var stage=document.getElementById('spv3Stage');if(!stage)return;
@@ -3867,9 +4035,23 @@ function bindFanFlip(){
   stage.addEventListener('click',function(e){
     var pc=e.target.closest('.fan-card.center .pc3d.pc-flippable');
     if(!pc)return;
+    var card=pc.closest('.fan-card');
     var flipped=pc.classList.toggle('flipped');
+    /* v4 only: a manual tap can flip a 'back'-resting card open (revealing the persona photo) or flip
+       a 'front'-resting one closed (tucking it away) — either way, re-run the same orientation-aware
+       fanVideoSync() paintFan uses so the clip starts/stops on THIS gesture, not on the next tick. */
+    if(DEMO.splashVer==='v4')fanVideoSync(card,card&&card.dataset.key);
     stopSplashTimer();
-    if(!flipped&&!RM)SPTIMER=setInterval(function(){splashGo(1);},2800);
+    /* Resume auto-advance only once the card is back at ITS OWN baked rest (see fanRestState) — bug
+       fix (2026-09-09): the old rule ("resume iff !flipped") silently assumed every card rests front,
+       true for v1 but wrong for v4's back-resting cards — tapping one open (flipped→false, the exact
+       moment the persona is finally revealed) hit `!flipped===true` and immediately RESUMED rotation,
+       whisking the reveal away within one 2.8s tick instead of pausing to let it be seen, the opposite
+       of what a "front"-resting card does when tapped open. Comparing against data-rest generalizes
+       correctly for both: v1's cards all rest 'front', so this reduces to the exact original rule
+       (resume iff not flipped) — zero behavior change there. */
+    var atRest=flipped===(card&&card.dataset.rest==='back');
+    if(atRest&&!RM)SPTIMER=setInterval(function(){splashGo(1);},2800);
   });
 }
 /* Liquid Metal CTA bridge — see the two <script type="module"> tags right after #root. The module
@@ -3980,6 +4162,11 @@ var S3_OPTS=[
 var TOTAL=11; /* S1(3) + S2(7) + S3(1 multi-select) */
 var st={phase:'splash',spidx:0,idx:0,s1:[null,null,null],s2:[null,null,null,null,null,null,null],s3:[]};
 var RESULT=null;
+/* Set true only by the Character Card Reveal handoff (renderCardReveal → goBook) so the very next
+   renderBook() plays a one-time staged content reveal on the ตัวตน panel (Card → detail → CTA cascade,
+   per "Playbook Reveal" direction). Consumed + cleared on that render; normal tab switches never set it,
+   so ordinary Book navigation is untouched. */
+var PB_INTRO=false;
 var root=document.getElementById('root');
 function ic(id,cls){return '<svg viewBox="0 0 24 24" class="lucide'+(cls?' '+cls:'')+'"><use href="#'+id+'"/></svg>';}
 
@@ -4037,22 +4224,32 @@ function initBtTabs(tablist,onSelect){
 /* On-Event gate (2026-09-01, per direction "เอา flow ส่วน dna quiz ออกทั้งหมด...เอา splash, หน้า 2
    [consent], กำลังวิเคราะห์ [reveal] ออก — หน้าเหล่านี้จะใช้งานได้เฉพาะช่วง Pre-Event") — the whole
    onboarding+quiz-taking flow (splash intro -> consent -> the 11 quiz questions -> the "กำลังวิเคราะห์"
-   reveal screen) is Pre-Event only; once DEMO.eventPhase is 'on' nothing should be able to reach any of
-   these 4 phases. Single choke point in render() itself (every phase change already funnels through
-   here) rather than patching each of the ~6 call sites that can set one of these phases — catches the
-   quiz's own internal transitions (splash->consent->quiz->reveal), the two "no RESULT yet" redirects-to-
-   splash inside renderBook()/renderLibrary(), and the demo panel's own resetQuiz() alike, with no risk of
-   a new future entry point slipping through unguarded. Redirects to 'book' if a RESULT already exists
-   (nothing to re-take, just show what they have) or 'home' otherwise — never leaves phase sitting on a
-   blocked value, so this can't loop or render blank. */
+   reveal screen -> the Character Card Reveal) is Pre-Event only; once DEMO.eventPhase is 'on' nothing
+   should be able to reach any of these 5 phases. Single choke point in render() itself (every phase
+   change already funnels through here) rather than patching each of the ~6 call sites that can set one
+   of these phases — catches the quiz's own internal transitions (splash->consent->quiz->reveal->
+   cardreveal), the two "no RESULT yet" redirects-to-splash inside renderBook()/renderLibrary(), and the
+   demo panel's own resetQuiz() alike, with no risk of a new future entry point slipping through
+   unguarded. Redirects to 'book' if a RESULT already exists (nothing to re-take, just show what they
+   have) or 'home' otherwise — never leaves phase sitting on a blocked value, so this can't loop or
+   render blank.
+   Bug fix (found while investigating "fix bug"): 'cardreveal' itself was missing from this list —
+   added 2026-09-08, after this gate was already written, so it slipped through exactly the gap the
+   comment above promises can't happen. Concretely reachable via demoPlayCardReveal() (the demo panel's
+   "เล่นอนิเมชัน"/"เล่นซ้ำ" buttons set st.phase='cardreveal' unconditionally, with no event-phase check
+   of their own — same pattern the demo's resetQuiz() already relies on this gate for) or by switching
+   the demo panel's ช่วงงาน toggle to On-Event while a card reveal is already mid-play. Both left the
+   Pre-Event-only reveal screen showing during On-Event, same class of bug this gate exists to prevent. */
 function render(){
-  if(DEMO.eventPhase==='on'&&['splash','consent','quiz','reveal'].indexOf(st.phase)>-1)st.phase=RESULT?'book':'home';
+  if(DEMO.eventPhase==='on'&&['splash','consent','quiz','reveal','cardreveal'].indexOf(st.phase)>-1)st.phase=RESULT?'book':'home';
   if(st.phase!=='splash')stopSplashTimer();
   if(st.phase!=='reveal')clearRevealTimer(); // don't force-advance to Book if the user left the analyzing screen
+  if(st.phase!=='cardreveal')clearCardRevealTimer(); // cancel any pending character-reveal steps once we've left that scene
   if(st.phase==='splash')renderSplash();
   else if(st.phase==='consent')renderConsent();
   else if(st.phase==='quiz')renderQuiz();
   else if(st.phase==='reveal')renderReveal();
+  else if(st.phase==='cardreveal')renderCardReveal();
   else if(st.phase==='book')renderBook();
   else if(st.phase==='library')renderLibrary();
   else if(st.phase==='home')renderHome();
@@ -4272,7 +4469,141 @@ function renderReveal(){
        CSS, which both screens read from. */
     '<div class="consent-h reveal-h"><span class="ch-2">ตัวตนนักลงทุนของคุณ</span><span class="ch-1">กำลังจะปรากฏ&hellip;</span></div>'+
   '</div>';
-  REVEALTIMER=setTimeout(function(){REVEALTIMER=null;st.phase='book';render();},3000);
+  /* was st.phase='book' — now the analyzing beat hands off to the Character Card Reveal (renderCardReveal
+     below) as an intermediate step before the Playbook, per the Character Card Animation direction. */
+  REVEALTIMER=setTimeout(function(){REVEALTIMER=null;st.phase='cardreveal';render();},3000);
+}
+
+/* ══ CHARACTER CARD REVEAL — the intermediate "coming alive" step between Analysis and the Playbook.
+   Plays a one-shot cinematic sequence ON the user's real result card: every persona has a matching
+   CARD_ANIM_VIDEO clip (all 12 as of 2026-09-09), so the static card (pcStatic(RESULT.heroKey))
+   cross-fades into that persona's own living-card clip once it starts (never a hard swap) and the clip
+   plays to its own natural end; a persona with no clip (none currently) falls back to a CSS-only
+   flip-from-card-back substituting for "the character begins moving" — kept only as a defensive path.
+   Either way the card settles, peaks with the name,
+   then cross-fades into the Playbook (ตัวตน tab). No loop, no character change mid-play. See the
+   CHARACTER CARD REVEAL (motion) CSS block for the per-stage styling; the JS below just paces it (and,
+   for the video branch, paces it to the CLIP's own real duration — "จังหวะของคลิป" — not a guess). */
+var CARDREVEAL_TIMERS=[];
+function clearCardRevealTimer(){CARDREVEAL_TIMERS.forEach(function(t){clearTimeout(t);});CARDREVEAL_TIMERS=[];}
+function crStep(ms,fn){CARDREVEAL_TIMERS.push(setTimeout(fn,ms));}
+function renderCardReveal(){
+  if(!RESULT){st.phase='splash';render();return;} // nothing to reveal — bounce to the attract splash
+  clearRevealTimer();clearCardRevealTimer();
+  var r=RESULT,h=r.hero,fam=FAM[h.fam];
+  var vidSrc=CARD_ANIM_VIDEO[r.heroKey];
+  var hasVid=!!vidSrc&&!RM; // RM: never autoplay the clip — see the RM branch below
+  root.innerHTML=
+  '<div class="cr-scene consent reveal-scene fade'+(hasVid?' has-vid':'')+'" style="--cr-accent:'+fam.accent+';--cr-rgb:'+fam.rgb+'">'+
+    '<div class="cr-atmos" aria-hidden="true"></div>'+
+    '<div class="cr-kicker">ตัวตนนักลงทุนของคุณ</div>'+
+    '<div class="cr-stage">'+
+      '<div class="cr-glowfield" aria-hidden="true"></div>'+
+      '<div class="cr-ring" aria-hidden="true"><div class="cr-ring-i"></div></div>'+
+      '<div class="cr-flash" aria-hidden="true"></div>'+
+      /* flippable (card-back face) only matters for the no-video branch's flip beat — the video branch
+         never flips, so it skips building that 2nd face entirely (nothing needs it). */
+      '<div class="cr-cardwrap"><div class="cr-float">'+pcStatic(r.heroKey,!hasVid)+'<div class="cr-sheen" aria-hidden="true"></div></div></div>'+
+    '</div>'+
+    '<div class="cr-name" aria-live="polite"><div class="cr-en">'+h.en+'</div><div class="cr-th">'+h.th+'</div></div>'+
+    '<div class="cr-hint">กำลังเปิดเผยตัวตนของคุณ&hellip;</div>'+
+  '</div>';
+  var scene=root.querySelector('.cr-scene');
+  var pc=scene.querySelector('.pc3d');
+  var goBook=function(){clearCardRevealTimer();PB_INTRO=true;BOOK2_TAB='identity';st.phase='book';render();};
+  /* Reduced motion — the global *{animation/transition:none} rule kills every stage class below (and we
+     skip the clip outright, real video playback isn't something that rule can stop for us) — so don't
+     stage anything: show the final front-facing card + name straight away, hold briefly, advance.
+     (Static Card → Subtle Reveal → Final Character State → Playbook, per the Reduced Motion direction.) */
+  if(RM){if(pc)pc.classList.remove('flipped');scene.classList.add('s-appear','s-final');crStep(1500,goBook);return;}
+  var pv=document.documentElement.getAttribute('data-view');
+
+  if(!hasVid){
+    /* ── no clip for this persona — original CSS-only flip reveal, unchanged. Unreached today (all 12
+       personas have a clip, see CARD_ANIM_VIDEO); kept as a defensive fallback for a future persona
+       added before its own clip is ready. ── */
+    if(pc)pc.classList.add('flipped'); // start face-DOWN (shared card back) — the "static" beat before it awakens
+    var pcount=pv==='mobile'?9:(pv==='pc'?18:14);
+    var sh=scene.getBoundingClientRect().height||640,frag='';
+    for(var i=0;i<pcount;i++){
+      var sz=(4+Math.random()*5).toFixed(1);
+      frag+='<span class="cr-particle" style="left:'+(Math.random()*100).toFixed(1)+'%;width:'+sz+'px;height:'+sz+'px;'+
+        '--pdur:'+randF(5,9).toFixed(1)+'s;--pdl:'+(Math.random()*6).toFixed(1)+'s;--ph:-'+Math.round(sh*(0.6+Math.random()*0.45))+'px"></span>';
+    }
+    scene.querySelector('.cr-atmos').innerHTML=frag;
+    /* one-shot timeline (~7.05s). Maps to the direction's suggested beat sheet:
+       appear → settle → light activation → character begins moving (flip) → alive → peak → settle → bridge.
+       Peak→bridge gap is 3000ms (2026-09-08, per direction "แสดงชื่อ...ค้างไว้ 2 วิ ก่อนเข้าหน้าคู่มือ",
+       bumped to 3s same day per direct follow-up "Name hold — 3 seconds") — the name (both Thai+English)
+       stays fully visible from s-peak until s-bridge starts fading the whole scene, so that gap IS the
+       on-screen hold time; only it moved (850ms peak→final settle beat kept as-is), everything before
+       s-peak is untouched. */
+    requestAnimationFrame(function(){scene.classList.add('s-appear');});      // 0%  card appears (face-down)
+    crStep(820, function(){scene.classList.add('s-settle');});                // 15% card settles
+    crStep(1250,function(){scene.classList.add('s-activate');});              // 25% light / energy / particles
+    crStep(1900,function(){scene.classList.add('s-move');if(pc)pc.classList.remove('flipped');}); // 40% flip → front reveal
+    crStep(2750,function(){scene.classList.add('s-alive');});                 // 60% ambient float + glow pulse
+    crStep(3500,function(){scene.classList.add('s-peak');});                  // peak reveal — name appears
+    crStep(4350,function(){scene.classList.remove('s-peak');scene.classList.add('s-final');}); // card settles, name stays visible
+    crStep(6500,function(){scene.classList.add('s-bridge');});                // name has now held 3.0s — cross-fade toward Playbook
+    crStep(7050,goBook);
+    return;
+  }
+
+  /* ── has a living-card clip — cross-fade the static card into it, let it play once, pace the rest of
+     the reveal off its own real duration/'ended' event rather than a fixed guess ("จังหวะของคลิป"). ── */
+  var frontFace=scene.querySelector('.pc-face.front');
+  var vid=document.createElement('video');
+  vid.className='cr-video';vid.muted=true;vid.playsInline=true;vid.setAttribute('playsinline','');vid.setAttribute('webkit-playsinline','');vid.preload='auto';vid.src=vidSrc;
+  frontFace.appendChild(vid);
+  /* atmosphere is deliberately much lighter here (see .has-vid CSS) — the clip's own illustrated scene
+     already carries the visual richness; a handful of soft particles is plenty, none at all on mobile. */
+  var pcount=pv==='mobile'?0:5;
+  var sh=scene.getBoundingClientRect().height||640,frag='';
+  for(var j=0;j<pcount;j++){
+    var sz2=(4+Math.random()*5).toFixed(1);
+    frag+='<span class="cr-particle" style="left:'+(Math.random()*100).toFixed(1)+'%;width:'+sz2+'px;height:'+sz2+'px;'+
+      '--pdur:'+randF(6,10).toFixed(1)+'s;--pdl:'+(Math.random()*6).toFixed(1)+'s;--ph:-'+Math.round(sh*(0.5+Math.random()*0.35))+'px"></span>';
+  }
+  scene.querySelector('.cr-atmos').innerHTML=frag;
+  var started=false,finished=false;
+  /* Peak→bridge gap is 3000ms (2026-09-08, per direction "แสดงชื่อ...ค้างไว้ 2 วิ ก่อนเข้าหน้าคู่มือ",
+     bumped to 3s same day per direct follow-up "Name hold — 3 seconds") — the name (Thai+English)
+     stays fully visible from s-peak until s-bridge starts fading the whole scene, so that gap IS the
+     on-screen hold time. The 550ms peak→final settle beat is unchanged. */
+  var finishReveal=function(){
+    if(finished)return;finished=true;
+    scene.classList.add('s-peak');                                              // peak reveal — name appears
+    crStep(550, function(){scene.classList.remove('s-peak');scene.classList.add('s-final');}); // card settles, name stays visible
+    crStep(3000,function(){scene.classList.add('s-bridge');});                   // name has now held 3.0s — cross-fade toward Playbook
+    crStep(3550,goBook);
+  };
+  var startVideo=function(){
+    if(started)return;started=true;
+    scene.classList.add('s-move');
+    /* Bug fix (found while investigating "fix bug"): .cr-video.on used to be added HERE, synchronously,
+       right alongside calling play() — but play() returning a promise only means playback has been
+       REQUESTED, not that a frame is actually ready to paint; on a slow/congested connection (a crowded
+       event booth's WiFi is exactly this) the video could still be buffering for a beat, and revealing
+       an empty/black video layer over the static photo at that moment is the exact "hard-swap" flash
+       this whole cross-fade design exists to avoid. Now .on only gets added once play()'s own promise
+       RESOLVES — which the spec only does once playback has actually begun — so the cross-fade always
+       has a real frame to fade into. No rAF wrapper needed for it (unlike the s-appear kickoffs, which
+       need one tick so the browser paints the "from" state before the transition's "to" state) — by the
+       time this fires, the scene has had its full initial paint plus 1.5s, so the opacity transition
+       already has a settled 0-state to animate from. */
+    var p=vid.play();
+    if(p&&p.then)p.then(function(){vid.classList.add('on');}).catch(finishReveal);
+    else vid.classList.add('on'); // very old browsers whose play() doesn't return a promise at all
+  };
+  vid.addEventListener('ended',finishReveal);
+  vid.addEventListener('error',function(){scene.classList.remove('has-vid');finishReveal();}); // asset failed to load — fall back to just the static card + name
+  requestAnimationFrame(function(){scene.classList.add('s-appear');}); // 0%  card appears (already front-facing, static)
+  crStep(600, function(){scene.classList.add('s-settle');});           // card settles
+  crStep(1000,function(){scene.classList.add('s-activate');});         // light / energy build
+  crStep(1500,startVideo);                                             // "character begins moving" = the clip itself starts
+  crStep(2300,function(){scene.classList.add('s-alive');});            // ambient float continues under the clip
+  crStep(1500+5600,finishReveal); // safety net only — every clip is trimmed to exactly 5.000s (120 frames @ 24fps, see CARD_ANIM_VIDEO), so 'ended' always fires well before this
 }
 
 function compute(){
@@ -4899,6 +5230,11 @@ function renderBook(){
      button still exists further down but this one binding now covers both, so nothing there needs
      to duplicate it. */
   var scBtn=root.querySelector('#shareCardBtn');if(scBtn)scBtn.onclick=openShare;
+  /* One-time staged reveal after the Character Card animation handed off to us (see PB_INTRO). Placed
+     BEFORE the `if(unreg)return;` below so both the registered and unregistered identity panels get it.
+     Opacity-only cascade (never transform) so it can't fight the .scroll-reveal engine, which owns
+     these same elements' transforms via revealTick(). */
+  if(PB_INTRO){PB_INTRO=false;playIdentityIntro();}
   // Linked preview: crossing the slider's 50% midpoint swaps #b2ident-detail to whichever persona
   // is now showing MORE of its card (pos>=50 -> pre-event's .cr2-before layer covers more of the
   // frame; see initCompareReveal's clip-path math) — threshold-gated so this only fires on an
@@ -4953,6 +5289,27 @@ function renderBook(){
   if(!unreg){mountHeaderQR();bindHeaderLogo();}
   initCharts(root);
   bindAllocHover(root);bindRadarTap(root);
+}
+/* One-time staged reveal of the ตัวตน panel after the Character Card animation (PB_INTRO). Cascades
+   the identity panel's blocks in — the compare/card block first, then each section inside
+   #b2ident-detail (title → description → SKILL/DNA data → …), then the CTA — so content arrives in
+   order AFTER the card is already settled, per the "Playbook Reveal" direction. Opacity-only + inline
+   transition-delay; RM (which also has the global animation/transition kill) skips it and everything
+   just shows. Inline styles are self-cleaning so nothing here lingers to affect later interactions. */
+function playIdentityIntro(){
+  if(RM)return;
+  var hero=root.querySelector('.b2-panel[data-panel="identity"] .hero-in');
+  if(!hero)return;
+  var det=hero.querySelector('#b2ident-detail');
+  var seq=[];
+  [].slice.call(hero.children).forEach(function(k){
+    if(k===det)seq=seq.concat([].slice.call(det.children)); // expand the detail block into its own sections for a finer cascade
+    else seq.push(k);
+  });
+  if(!seq.length)return;
+  seq.forEach(function(el,i){el.style.opacity='0';el.style.transition='opacity .5s var(--ease) '+(i*0.12).toFixed(2)+'s';});
+  requestAnimationFrame(function(){requestAnimationFrame(function(){seq.forEach(function(el){el.style.opacity='';});});});
+  setTimeout(function(){seq.forEach(function(el){el.style.transition='';});},900+seq.length*130);
 }
 /* ── App shell: shared bottom tab bar across the 5 companion-app screens (home/book/passport/games/
    profile), ported 1:1 from Playbook Final's `tabs` array (labels/icons/order). Each screen renders
@@ -5452,7 +5809,7 @@ function mountHomeNsCta(ns){
    than erroring on a missing target. */
 function mountNgCta(nextIdx){
   if(nextIdx<0||!window.mountLiquidMetalButtonInto)return;
-  window.mountLiquidMetalButtonInto('#ng-cta-slot','cta',{label:'เล่นเกม',icon:ic('lc-play-circle'),onClick:function(){GAME_PLAYED[nextIdx]=true;GAME_OPEN=nextIdx;renderGames();}});
+  window.mountLiquidMetalButtonInto('#ng-cta-slot','cta',{label:'เล่นเกม',icon:ic('lc-play-circle'),onClick:function(){openPlay('game',nextIdx);}});
 }
 /* Home's multi-ticket pass-card (DEMO.multiTicket only — see MULTI_TICKET_DEMO/buildDemo). Per
    direction "ใช้ข้อมูล หรือ dna เดียวกับบัตร 1 ใบ แต่เพิ่มข้อมูลบัตรใบที่ 2 เข้าไป mapping เพิ่มด้วย" —
@@ -5553,6 +5910,7 @@ function renderHome(){
    bars and grand-prize gate react; the floorplan (MAP_IMG) is the real event floor plan asset. */
 var CHECKIN_NEED=5,ACTIVITY_NEED=5;
 var BOOTH_CHK={},BOOTH_ACT={},BOOTH_HOWTO=false,DRAW_JOINED=false; // BOOTH_CHK[assetIdx]=Set(companyIdx); BOOTH_ACT[assetIdx]=bool; DRAW_JOINED=tapped "ร่วมลุ้นรางวัล"
+var BOOTH_ANSWERS={}; // BOOTH_ANSWERS[assetIdx] = the real answers given in that booth's mini-game (see BOOTH_Q/openPlay below) — captured but not yet read by any scoring logic (still persona-based, see [[games-questions-dna]] memory "Phase 3")
 /* Booth v2 preview only (DEMO.boothVer==='v2', see renderBooth): the route step / map marker the
    user has focused via the two-way Step↔Map sync. null = nothing focused. Persists across the
    partial re-renders renderBooth() does (scan/activity toggles) so the focus survives a check-in. */
@@ -5608,6 +5966,112 @@ var ZONE_BOOTHS=[
   ['Bitkub','Binance TH'],
   ['Art Auction','Rare Collectibles'],
   ['BDMS Wellness']
+];
+/* ══ BOOTH_Q (2026-09-09) ══ real question content for the 10 asset-booth mini-games (เกมประจำ
+   Asset 10 เกม), sourced verbatim from GAMES-QUESTIONS-DNA.md Part B (itself from "คำถาม 6 ด้าน
+   กับ คำถาม 10 สินทรัพย์ 8-9-69.docx"). Index i matches BOOTHS[i] 1:1. Each question:
+   {q, sub?, opts:[text,...], insight?, locked?, timer?, multi?, skippable?, skipLabel?} — insight
+   is ONE line per question (shown after ANY answer, not per-option — matches the source's single
+   "→ ความรู้ที่ขึ้นหลังตอบ" line per question). `locked:true` marks a
+   "[ตัดสินใจแล้วย้อนกลับไม่ได้]" question — see openPlay/playGoNext below for how that disables
+   back-navigation for the rest of that play session. `points` is the "+N แต้ม" this booth awards
+   toward the "สะสมแต้มลุ้นรางวัลใหญ่" prize mechanic (display only for now — see [[games-questions-
+   dna]] memory, item #4, for the still-open prize-threshold decision). Booth 4 (ทองคำ) intentionally
+   duplicates MINIGAME_Q[5]'s content verbatim — confirmed intentional reuse, not a bug, see that
+   doc's own cross-reference note. */
+var BOOTH_Q=[
+  {points:12,questions:[
+    {q:'มีหุ้นตัวหนึ่งกำลังเป็นที่พูดถึง คุณจะตัดสินใจซื้อจากอะไรเป็นหลัก?',locked:true,
+     opts:['ดูว่าธุรกิจทำอะไร และงบการเงินเป็นยังไง','ดูกราฟราคาและจังหวะซื้อ','เพื่อนหรือข่าวในกลุ่มบอกว่าน่าสนใจ'],
+     insight:'ตัดสินใจจากข้อมูลของธุรกิจ ไม่ใช่จากคำบอกเล่า'},
+    {q:'ถ้ามีเงินก้อนหนึ่งจะลงทุน คุณจะ...',
+     opts:['ลงกับหุ้นตัวเดียวที่มั่นใจที่สุด','แบ่งลงหลายตัวหรือลงผ่านกองทุน 5-10 อย่าง','ทยอยซื้อทีละน้อยหลายงวด (DCA)'],
+     insight:'การแบ่งเงินไปหลายที่ ช่วยลดผลกระทบเวลาที่ใดที่หนึ่งไม่เป็นไปตามคาด'}
+  ]},
+  {points:10,questions:[
+    {q:'ถ้าเงินลงทุนของคุณมีแต่ของไทย คุณคิดว่าเพียงพอไหม?',
+     opts:['พอแล้ว ลงในสิ่งที่เราคุ้นเคย','ควรแบ่งไปต่างประเทศบ้าง','ย้ายไปต่างประเทศเป็นหลักเลย'],
+     insight:'คนส่วนใหญ่มักลงแต่ในประเทศที่คุ้นเคย ทั้งที่โลกมีตัวเลือกมากกว่านั้น'},
+    {q:'ลงทุนหุ้นต่างประเทศ มีความเสี่ยงอะไรเพิ่มขึ้นจากหุ้นไทย?',
+     opts:['ความเสี่ยงจากค่าเงิน เพราะต้องแลกเป็นเงินสกุลอื่น','ไม่มีอะไรต่างจากหุ้นไทย','เสี่ยงน้อยกว่า เพราะบริษัทใหญ่'],
+     insight:'เวลาลงทุนข้ามประเทศ กำไรขาดทุนขึ้นกับค่าเงินด้วย ไม่ใช่แค่ราคาหุ้น'}
+  ]},
+  {points:11,questions:[
+    {q:'กอง A ผลตอบแทนเด่น ค่าธรรมเนียม 2.00% ต่อปี · กอง B ผลตอบแทนใกล้กัน ค่าธรรมเนียม 0.50% ต่อปี คุณเลือกกองไหน?',
+     opts:['กอง A เพราะผลงานดูดีกว่า','กอง B เพราะค่าธรรมเนียมถูกกว่า','ขอดูข้อมูลมากกว่านี้ก่อน'],
+     insight:'ค่าธรรมเนียมถูกหักทุกปี ระยะยาวส่วนต่างเล็กๆ กลายเป็นเงินก้อนใหญ่ได้'},
+    {q:'กองที่มีผู้จัดการคอยเลือกหุ้นให้ เทียบกับกองที่ลงตามดัชนีตลาดซึ่งค่าธรรมเนียมถูกกว่า ระยะยาวต่างกันแค่ไหน?',
+     opts:['กองที่มีคนเลือกให้ เพราะมีมืออาชีพดูแล','กองที่ลงตามดัชนีตลาด เพราะถูกและไปตามตลาด','ผสมทั้งสองแบบ'],
+     insight:'ทั้งสองแบบมีที่ใช้ ต่างกันที่ค่าธรรมเนียมและวิธีทำงาน'}
+  ]},
+  {points:9,questions:[
+    {q:'สมมติว่ามีรายได้เข้ามาก้อนหนึ่ง ก่อนเอาไปลงทุน คุณจะกันไว้เป็นเงินสำรองเผื่อฉุกเฉินแค่ไหน?',
+     opts:['กันให้ครบเท่ารายจ่าย 6 เดือนก่อน','กันไว้ราว 3 เดือน แล้วเริ่มลงทุนคู่กันไป','ไม่กัน เอาไปลงทุนให้เต็มที่'],
+     insight:'เงินสำรองเผื่อฉุกเฉินคือตาข่ายที่ทำให้เราไม่ต้องขายของตอนราคาแย่'},
+    {q:'เงินสำรองก้อนนี้ ควรเก็บไว้ที่ไหน?',
+     opts:['บัญชีออมทรัพย์หรือกองทุนตลาดเงิน ถอนได้ทันที','ฝากประจำล็อก 2 ปี ได้ดอกเบี้ยสูงกว่า','เอาไปลงหุ้นปันผล ได้ทั้งปันผลและโต'],
+     insight:'เงินสำรองต้องถอนออกมาใช้ได้เร็วเมื่อจำเป็น (สภาพคล่อง) สำคัญกว่าได้ผลตอบแทนสูง'}
+  ]},
+  {points:13,questions:[
+    {q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บ วันนี้อันไหนซื้อของได้มากกว่ากัน?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้',
+     opts:['เงินสด เพราะยังเป็น 100,000 บาท เท่าเดิม','ทอง น่าจะซื้อของได้มากกว่า','น่าจะพอๆ กัน'],
+     insight:'เงินสดตัวเลขเท่าเดิม แต่ซื้อของได้น้อยลงเพราะเงินเฟ้อ ส่วนทองมักขยับตามค่าของเงิน'},
+    {q:'สมมติว่าเกิดวิกฤต หุ้นทั่วโลกร่วง 40% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่าทองจะเป็นยังไง?',
+     opts:['ร่วงตามหุ้นไปด้วย','ทรงตัวหรือขึ้นสวนทางกับหุ้น','ราคาไม่ขยับ แต่ขายไม่ออก'],
+     insight:'ในหลายวิกฤต ทองมักไม่ไปทางเดียวกับหุ้น จึงช่วยพยุงภาพรวมได้'},
+    {q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินลงทุนทั้งหมดซื้อทองเลยดีไหม?',
+     opts:['ใช่ ซื้อทองทั้งหมด ปลอดภัยที่สุด','ไม่ แบ่งไว้ส่วนหนึ่งพอ ที่เหลือไปอย่างอื่น','ไม่ซื้อเลย ชอบของที่งอกเงยกว่า'],
+     insight:'ทองไม่สร้างรายได้ระหว่างถือ จึงมักใช้เป็นส่วนหนึ่ง ไม่ใช่ทั้งหมด'}
+  ]},
+  {points:8,questions:[
+    {q:'ห้องเช่าโฆษณาว่า "ผลตอบแทน 8% ต่อปี" — หลังหักค่าใช้จ่ายจริง คุณคิดว่าเหลือเท่าไร?',
+     opts:['น่าจะเหลือราว 3-5%','ก็ 8% ตามที่โฆษณา','ต้องขอดูตัวเลขค่าใช้จ่ายก่อน'],
+     insight:'ตัวเลขที่โฆษณามักยังไม่หักค่าส่วนกลาง ค่าซ่อม ภาษี และช่วงที่ไม่มีคนเช่า'},
+    {q:'ถ้าอยากมีรายได้จากอสังหาฯ จะซื้อห้องเองตรงๆ หรือซื้อกองทุนอสังหาฯ (REIT)?',
+     opts:['ซื้อห้องเอง เพราะจับต้องได้','ซื้อกองทุนอสังหาฯ เพราะเริ่มด้วยเงินน้อยและขายง่ายกว่า','ยังไม่แน่ใจ ขอเข้าใจก่อน'],
+     insight:'ซื้อเองต้องดูแลเองและขายยากกว่า · กองทุนอสังหาฯ เริ่มเงินน้อยกว่าและซื้อขายง่ายกว่า'}
+  ]},
+  {points:10,questions:[
+    {q:'สมมติว่าคนที่หาเลี้ยงครอบครัวต้องหยุดทำงานไปกะทันหัน ครอบครัวจะมีเงินใช้ได้นานแค่ไหน?',sub:'คำถามนี้ไม่ต้องกังวล เราถามเพื่อให้เห็นภาพเท่านั้น',
+     opts:['ยังไม่เคยคิดเรื่องนี้เลย','พอมีเก็บไว้ราว 1-2 ปี','เตรียมไว้แล้ว หรือมีประกันอยู่'],
+     insight:'ความเสี่ยงบางอย่างรับเองไม่ไหว จึงมีเครื่องมือช่วยรับความเสี่ยงนั้นแทน'},
+    {q:'"ประกันคือการลงทุนที่ดีไหม?"',
+     opts:['ใช่ ควรซื้อแบบที่ได้เงินคืนเยอะๆ','ไม่ ประกันมีไว้คุ้มครอง ส่วนการลงทุนแยกกัน','ยังไม่แน่ใจ'],
+     insight:'ประกันมีหน้าที่คุ้มครองเวลาเกิดเรื่อง ไม่ใช่เครื่องมือหลักในการทำให้เงินโต'}
+  ]},
+  {points:9,questions:[
+    {q:'ถ้าคุณอยากลองของที่ขึ้นลงแรง เช่น คริปโต จะแบ่งเงินไปเท่าไรของเงินลงทุนทั้งหมด?',locked:true,
+     opts:['ราว 5% ถือว่าเป็นเงินที่เสียได้','ราว 15-20%','ครึ่งหนึ่งขึ้นไป ของมันต้องลอง'],
+     insight:'หลักง่ายๆ คือแบ่งเท่าที่เสียได้โดยไม่กระทบชีวิต'},
+    {q:'สมมติว่าลงไปแล้ว คืนเดียวราคาร่วง 40% คุณจะทำอะไร?',
+     opts:['ขายหนีทันที กลัวลงต่อ','ถือตามแผนเดิม ไม่แตะ','ซื้อเพิ่มเลย ของถูก'],
+     insight:'ของที่ขึ้นลงแรงต้องมาพร้อมแผนที่ตั้งไว้ก่อน ไม่ใช่ตัดสินใจตอนใจสั่น'}
+  ]},
+  {points:8,questions:[
+    {q:'พระเครื่อง นาฬิกา หรืองานศิลป์ — เป็นการลงทุนที่ดีไหม?',
+     opts:['ดีมาก ราคาขึ้นได้เยอะ','เป็นของที่รักและสะสม มากกว่าจะเป็นการลงทุนหลัก','เสี่ยง ขอเข้าใจก่อน'],
+     insight:'ของสะสมขึ้นกับคนที่อยากได้ต่อ และเวลาจะขายอาจใช้เวลานาน'},
+    {q:'ถ้าจะมีของสะสมรวมอยู่ในเงินลงทุน ควรเป็นสัดส่วนเท่าไร?',
+     opts:['ส่วนเล็กๆ เท่าที่เสียได้','ปานกลาง ถ้าเรารู้จริงในเรื่องนั้น','เยอะเลย เพราะของมันมีค่า'],
+     insight:'ยิ่งเป็นของที่ขายยาก ยิ่งควรเป็นส่วนเล็กของภาพรวม'}
+  ]},
+  {points:10,questions:[
+    {q:'สุขภาพเกี่ยวกับเรื่องเงินยังไง?',
+     opts:['ไม่ค่อยเกี่ยว เป็นคนละเรื่อง','เกี่ยวมาก ป่วยครั้งเดียวเงินหายเป็นก้อน','สุขภาพคือฐานของทุกอย่าง'],
+     insight:'สุขภาพเป็นสินทรัพย์ที่คนมักลืมนับ แต่เป็นตัวที่ปกป้องสินทรัพย์อื่นไว้'},
+    {q:'ลงทุนกับสุขภาพวันนี้ แบบไหนคุ้มที่สุด?',
+     opts:['ออกกำลังกาย กินให้ดี ตรวจสุขภาพประจำ','ทำประกันสุขภาพไว้','ค่อยคิดตอนป่วย'],
+     insight:'ค่าดูแลตัวเองวันนี้มักถูกกว่าค่ารักษาในวันที่สายไปแล้ว'},
+    {q:'ตอนนี้คุณมีประกันสุขภาพหรือประกันค่ารักษาไหม?',sub:'ถามข้อเท็จจริง ไม่มีคำตอบผิด',
+     opts:['มี และรู้วงเงินคุ้มครองคร่าวๆ','มี แต่ไม่แน่ใจว่าคุ้มครองแค่ไหน','ยังไม่มี'],
+     insight:'การรู้ว่าเรามีวงเงินคุ้มครองเท่าไร สำคัญเท่ากับการมีประกัน'},
+    {q:'สมมติว่าพรุ่งนี้ต้องจ่ายค่ารักษา 100,000 บาท คุณจะเอามาจากไหน?',
+     opts:['เงินเก็บหรือเงินสำรองที่มีอยู่','ประกันจ่ายให้','ต้องกู้ ขายของ หรือยืมคนอื่น'],
+     insight:'ค่ารักษาที่มาแบบไม่ทันตั้งตัว คือเหตุผลที่ควรมีเงินสำรองและความคุ้มครอง'},
+    {q:'ปีที่ผ่านมา คุณดูแลสุขภาพเชิงป้องกันแค่ไหน?',
+     opts:['ทำสม่ำเสมอ','ทำบ้าง ไม่สม่ำเสมอ','แทบไม่ได้ทำ'],
+     insight:'ตรวจสุขภาพประจำปี ก็เหมือนการเปิดดูภาพรวมเงินลงทุนของเรา'}
+  ]}
 ];
 /* 5 zones — name / sub-label / dot icon / accent, and the score fn (hero radar → route order). */
 var BOOTH_ZONES=[
@@ -5710,6 +6174,15 @@ function buildScanModal(){
 }
 function boothCheckinCount(){var n=0;for(var k in BOOTH_CHK){if(BOOTH_CHK[k]&&BOOTH_CHK[k].size>0)n++;}return n;}
 function boothActivityCount(){var n=0;for(var k in BOOTH_ACT){if(BOOTH_ACT[k])n++;}return n;}
+/* boothPointsTotal (Phase 4, 2026-09-09) — sums BOOTH_Q[i].points for every booth actually played
+   (BOOTH_ACT[i] true), matching the source docx's "เกมประจำ Asset 10 เกม · สะสมแต้มลุ้นรางวัลใหญ่"
+   framing. Display-only for now — NOT wired to any prize tier/threshold, since the real numbers
+   (how many points unlock which prize) aren't in any source document and need the team to supply
+   them (see [[games-questions-dna]] item #4, still the one open item this can't safely guess at —
+   unlike a scoring narrative, an invented prize threshold could actively mislead about a real
+   giveaway). The existing "ครบเงื่อนไขแล้ว/ยังขาด" gate below is UNCHANGED — still chk>=5 && act>=5,
+   untouched by this. */
+function boothPointsTotal(){var n=0;for(var bi=0;bi<BOOTH_Q.length;bi++){if(BOOTH_ACT[bi])n+=BOOTH_Q[bi].points||0;}return n;}
 function buildRoute(){
   var h=RESULT?RESULT.hero:null;
   var rd=h?h.radar:[0,0,0,0,0,0];
@@ -5748,7 +6221,7 @@ function renderBooth(){
   // Same personalized-map condition as buildRoute() (RESULT + qualifying tier) — recomputed here
   // rather than exposed off buildRoute's return so its per-stop array shape stays untouched.
   var mapPersonalized=!!RESULT&&(curTier().name==='Master Class'||curTier().name==='Ultimate');
-  var chk=boothCheckinCount(),act=boothActivityCount();
+  var chk=boothCheckinCount(),act=boothActivityCount(),pts=boothPointsTotal();
   var chkOK=chk>=CHECKIN_NEED,actOK=act>=ACTIVITY_NEED;
   /* DEMO.draw force (2026-08-26, per direction "อยากให้จำลองเคส...ไว้ด้วย กรณีครบเงื่อนไขแล้ว และ
      กรณียังขาด") — lets the demo panel preview both draw-status states without having to actually
@@ -5809,6 +6282,9 @@ function renderBooth(){
         '<div class="bp-card"><div class="bp-hd">'+ic('lc-qr-code')+'<span class="bp-lbl">เช็คอินบูธ</span><span class="bp-frac" style="color:'+(chkOK?'var(--cyan)':'var(--violet)')+'">'+(chkOK?('ครบแล้ว · '+chk+' บูธ'):(chk+'/'+CHECKIN_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,chk/CHECKIN_NEED*100)+'%;background:'+(chkOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
         '<div class="bp-card"><div class="bp-hd">'+ic('lc-building-2')+'<span class="bp-lbl">กิจกรรมประจำบูธ</span><span class="bp-frac" style="color:'+(actOK?'var(--cyan)':'var(--violet)')+'">'+(actOK?('ครบแล้ว · '+act+' บูธ'):(act+'/'+ACTIVITY_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,act/ACTIVITY_NEED*100)+'%;background:'+(actOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
       '</div>'+
+      /* Points total (Phase 4, 2026-09-09) — display-only, see boothPointsTotal()'s own comment for
+         why this doesn't gate anything yet (no real prize-tier numbers exist in any source doc). */
+      (pts>0?'<div class="bp-pts">'+ic('lc-sparkles')+'<span>สะสมแล้ว <b>'+pts+'</b> แต้มจากกิจกรรมประจำบูธ</span></div>':'')+
       (eligible
         ? '<div class="next-step ds-ok"><div class="ns-ic"><img src="'+ICON_GIFT_PNG+'" alt=""></div><div class="ns-tx"><div class="ns-ey">ลุ้นรางวัลใหญ่</div><div class="ns-t">ครบเงื่อนไขแล้ว ร่วมลุ้นรางวัลได้เลย</div></div>'+
             (DRAW_JOINED
@@ -5849,6 +6325,12 @@ function renderBooth(){
       '<div class="booth-grid">'+BOOTHS.map(function(b,bi){
         var z=BOOTH_ZONES[b.zone];
         var played=!!BOOTH_ACT[bi];
+        /* Booth check-in gate (2026-09-09) — the "วิธีเล่น" modal below has always promised
+           "เช็คอิน → ปลดเกมประจำโซน → ร่วมกิจกรรม" but the play button never actually enforced it
+           (found during a full 16-game audit). Locked until at least 1 partner at this booth is
+           checked in — matches that copy exactly, and is the SAME condition boothActivityCount's
+           sibling boothCheckinCount() already uses per-booth elsewhere (BOOTH_CHK[bi]?.size>0). */
+        var checkedIn=!!(BOOTH_CHK[bi]&&BOOTH_CHK[bi].size>0);
         var partners=ZONE_BOOTHS[bi].map(function(name,ci){var done=BOOTH_CHK[bi]&&BOOTH_CHK[bi].has(ci);return '<button class="bp-btn'+(done?' done':'')+'" data-b="'+bi+'" data-c="'+ci+'">'+ic(done?'lc-check-circle':'lc-qr-code')+name+'</button>';}).join('');
         var bcIcHTML=BOOTH_ICON_PNG[b.asset]?'<img class="bc-asset-ic" src="'+BOOTH_ICON_PNG[b.asset]+'" alt="">':ic(b.icon,'bc-asset-ic');
         /* Dropped the extra "เล่นแล้ว" .bc-zchip pill from the title row (2026-08-26, per direction
@@ -5857,7 +6339,10 @@ function renderBooth(){
            edge (under the icon), not the title-text indent .bc-game/.bc-partners get. Removing it
            is a clean fix rather than a reposition: the play button already carries this exact state
            (turns into a ✓ "เล่นแล้ว" button), so the pill was purely redundant. */
-        return '<div class="bc-card"><div class="bc-hd"><div class="bc-tx"><div class="bc-asset">'+bcIcHTML+'<span class="bc-asset-lbl"><span>'+b.asset+'</span><span class="bc-zchip" style="color:'+z.color+';background:color-mix(in srgb,'+z.color+' 12%,transparent)">'+z.chip+'</span></span></div><div class="bc-game">'+b.game+'</div></div><button class="howto-btn bc-play'+(played?' played':'')+'" data-play="'+bi+'">'+ic(played?'lc-check':'lc-play-circle')+(played?'เล่นแล้ว':'เล่นเกม')+'</button></div><div class="bc-partners">'+partners+'</div></div>';
+        var playBtnCls=played?' played':(checkedIn?'':' locked');
+        var playBtnIcon=played?'lc-check':(checkedIn?'lc-play-circle':'lc-lock');
+        var playBtnLabel=played?'เล่นแล้ว':(checkedIn?'เล่นเกม':'เช็คอินก่อน');
+        return '<div class="bc-card"><div class="bc-hd"><div class="bc-tx"><div class="bc-asset">'+bcIcHTML+'<span class="bc-asset-lbl"><span>'+b.asset+'</span><span class="bc-zchip" style="color:'+z.color+';background:color-mix(in srgb,'+z.color+' 12%,transparent)">'+z.chip+'</span></span></div><div class="bc-game">'+b.game+'</div></div><button class="howto-btn bc-play'+playBtnCls+'" data-play="'+bi+'"'+((!played&&!checkedIn)?' disabled':'')+'>'+ic(playBtnIcon)+playBtnLabel+'</button></div><div class="bc-partners">'+partners+'</div></div>';
       }).join('')+'</div>'+
     '</section>'))+
   '</main>'+
@@ -5886,7 +6371,7 @@ function renderBooth(){
     root.querySelector('#howtoClose').onclick=closeHowto;
     root.querySelector('#howtoScrim').onclick=closeHowto;
     root.querySelectorAll('.bp-btn').forEach(function(btn){btn.onclick=function(){openScan(+btn.dataset.b,+btn.dataset.c);};});
-    root.querySelectorAll('.bc-play').forEach(function(btn){btn.onclick=function(){var bi=+btn.dataset.play;BOOTH_ACT[bi]=!BOOTH_ACT[bi];renderBooth();};});
+    root.querySelectorAll('.bc-play').forEach(function(btn){btn.onclick=function(){var bi=+btn.dataset.play;var checkedIn=!!(BOOTH_CHK[bi]&&BOOTH_CHK[bi].size>0);if(!BOOTH_ACT[bi]&&checkedIn)openPlay('booth',bi);};});
   }
   var mapLightbox=root.querySelector('#mapLightbox');
   var openMap=function(){mapLightbox.classList.add('show');};
@@ -5937,11 +6422,138 @@ var SIDES=[
   {icon:'lc-route',title:'ก้าวแรก',from:'เกมก้าวแรก',measures:'กำแพงที่ทำให้ยังไม่เริ่ม + ก้าวเล็กที่สุด'},
   {icon:'lc-coins',title:'ทองคำในพอร์ต',from:'เกมทองคำในพอร์ต',measures:'บทบาทของทองคำสำหรับคุณ — ตัวถ่วงความเสี่ยง หรือตัวทำกำไร'}
 ];
+/* ══ MINIGAME_Q (2026-09-09) ══ real question content for the 6 main games, index i matching
+   SIDES[i] 1:1 — sourced verbatim from GAMES-QUESTIONS-DNA.md Part A. Same shape as BOOTH_Q (see
+   its own comment above renderBooth's BOOTH_Q for the full field-by-field explanation). Game-level
+   `noBack:true` (M1 only) disables back-navigation for the WHOLE game from question 1 — "ปุ่ม
+   ย้อนกลับปิดโดยตั้งใจ เพื่อเก็บความรู้สึกแรก" in the source; `intro` is the one-time banner shown
+   on question 1; `resultNote` is a closing note shown on the summary screen (some games' insight
+   is written at the whole-game level in the source, not per-question — M1's 4-type/M3's 3-type
+   result-page categories and M4/M5's closing narratives all landed here, since the actual
+   answer→category mapping rule is still an open decision, see [[games-questions-dna]] item #1). */
+var MINIGAME_Q=[
+  {noBack:true,intro:'เรากำลังพาคุณย้อนไปเจอเหตุการณ์จริงที่เคยเกิดขึ้น · ตอนนั้นไม่มีใครรู้ว่าพรุ่งนี้จะเป็นยังไง',
+   resultNote:'ทั้ง 4 แบบไม่มีแบบที่ผิด — สอดคล้อง (Aligned) / ใจไม่ถึงอย่างที่คิด / ใจถึงกว่าที่คิด / ยังค้นหาสไตล์ตัวเอง (ผลแบบเต็มดูได้ในคู่มือของคุณ)',
+   questions:[
+    {q:'คุณคิดว่าตัวเองรับ "เงินลงทุนติดลบ" ได้แค่ไหน?',sub:'ข้ามได้ถ้าตอบไว้แล้วตอนลงทะเบียน',
+     opts:['ขอไม่เห็นติดลบเกินราว 10% (ทุก 100 บาท เหลือราว 90 บาท)','ติดลบราว 30% ยังพอไหว','ติดลบเกิน 50% ก็ยังถือได้']},
+    {q:'ปี 2551 · วิกฤตแฮมเบอร์เกอร์ — เงินลงทุน 1,000,000 บาท เหลือ 430,000 บาท (ลดลง 57.00%) คุณจะทำอะไร?',locked:true,sub:'ตอนนั้นยังไม่มีใครรู้ว่าตลาดจะฟื้นเมื่อไหร่ ตอบตามที่ใจคุณคิดจริงๆ',
+     opts:['ขายทั้งหมด หนีก่อนจะเสียมากกว่านี้','ถือไว้ตามแผนเดิม ไม่แตะ','ซื้อเพิ่ม ของถูกมาก']},
+    {q:'ก.พ.–มี.ค. 2563 · วิกฤตโควิด — เงินลงทุนเหลือ 660,000 บาท (ลดลง 34.00% ในเดือนเดียว) รอบนี้จะทำอะไร?',locked:true,
+     opts:['ขายทั้งหมด รอบนี้แรงกว่าเดิม','ถือตามแผน เคยผ่านปี 2551 มาแล้ว','ซื้อเพิ่มเลย จังหวะนี้แหละ']}
+  ]},
+  {intro:'หน้าจอมีเครื่องมือให้กดเปิดเอง: ข้อมูลธุรกิจและงบการเงิน · กราฟราคาย้อนหลัง · ประวัติการจ่ายปันผล · ข่าวและกระแสในโซเชียล — ของจริงจะดูจากลำดับที่คุณกดเปิด เวอร์ชันนี้ถามตรงๆ แทน',
+   questions:[
+    {q:'รอบแรก · หุ้นปริศนาที่กำลังเป็นที่พูดถึงในโซเชียล — ดูเท่าที่อยากดูแล้ว คุณจะ?',
+     opts:['ตัดสินใจจากที่ดูข้อมูลมาเอง','ขอกระจายผ่านกองทุน หรือทยอยซื้อทีละน้อยทุกเดือน (DCA) แทนการเลือกตัวเดียว','ซื้อตามกระแสข่าวเลย เดี๋ยวไม่ทัน'],
+     insight:'ข่าวและกระแสเป็นสิ่งล่อ ไม่ใช่ข้อมูลที่ใช้ตัดสินใจ · งบการเงินบอกสุขภาพของธุรกิจ'},
+    {q:'รอบสอง · หุ้นปริศนาที่เงียบ ไม่มีใครพูดถึง — ดูแล้ว คุณจะ?',
+     opts:['สนใจ เลือกหุ้นตัวนี้ เพราะพื้นฐานและปันผลดี','ชอบแนวนี้ แต่ขอลงผ่านกองทุน หรือทยอยซื้อทีละน้อย กระจายหลายตัว','ข้ามไป ไม่มีกระแส ดูน่าเบื่อ'],
+     insight:'ของที่พื้นฐานมั่นคงมักไม่หวือหวาและไม่เป็นข่าว · การซื้อผ่านกองทุนหรือทยอยซื้อ คือการกระจายแทนการเลือกตัวเดียว'}
+  ]},
+  {resultNote:'เขียนแบบให้กำลังใจ — คนที่พลาดในเกมวันนี้คือคนที่ได้กฎกลับบ้านไปใช้จริง',
+   questions:[
+    {q:'ฉาก 1/3 — เหรียญชื่อ "MOON" ขึ้น 312.00% ในสัปดาห์เดียว คุณจะทำอะไร?',sub:'สถานการณ์สมมติ ไม่ใช่ของจริงในตลาด',timer:15,
+     opts:['ซื้อเลย เดี๋ยวไม่ทัน','ขอดูข้อมูลก่อน ว่ามันคืออะไร พื้นฐานเป็นยังไง','ไม่เอา ดูเร่งเร้าผิดปกติ'],
+     insight:'ความกลัวตกขบวนทำให้เราซื้อเพราะ "คนอื่นซื้อ" ไม่ใช่เพราะเข้าใจของ'},
+    {q:'ฉาก 2/3 — มีคนทักมาบอกว่า "การันตีผลตอบแทน 30.00% ต่อเดือน ไม่มีขาดทุน วันนี้วันสุดท้าย รีบโอนเลย"',
+     opts:['โอนเลย กลัวที่นั่งเต็ม','เช็กก่อน ว่าบริษัทมีใบอนุญาตจาก ก.ล.ต. ไหม','ปฏิเสธทันที และเตือนคนอื่นด้วย'],
+     insight:'สัญญาณหลอกลงทุน 3 อย่าง: การันตีผลตอบแทน · เร่งให้รีบตัดสินใจ · ไม่มีใบอนุญาต'},
+    {q:'ฉาก 3/3 — เลือกกฎที่คุณจะพกติดตัวไว้เตือนตัวเอง',
+     opts:['กฎ 24 ชั่วโมง — หยุดคิด 1 วันก่อนตัดสินใจ','ถ้ามีใครเร่งให้รีบ ให้ถือว่าอันตราย','เช็กใบอนุญาตจาก ก.ล.ต. ก่อนเสมอ']}
+  ]},
+  {resultNote:'บอกตรงๆ ว่าเป้าหมายของคุณ "เปลี่ยนไปตามวัย" หรือ "เหมือนเดิมตลอด 40 ปี" — ทั้งสองแบบเป็นข้อเท็จจริง ไม่ใช่ข้อผิดพลาด',
+   questions:[
+    {q:'บทที่ 1 · สมมติว่าคุณอายุ 25 เหลือเวลาก่อนเกษียณราว 40 ปี เงินลงทุนก้อนแรก คุณตั้งเป้าแบบไหน?',
+     opts:['เน้นให้โตมากที่สุด ขึ้นลงแรงก็รับได้','ค่อยๆ โต ขอสบายใจระหว่างทาง','เน้นปลอดภัยไว้ก่อน ไม่อยากขาดทุน'],
+     insight:'ยิ่งมีเวลานาน ยิ่งมีเวลารอให้ของฟื้นตัว'},
+    {q:'บทที่ 2 · สมมติว่าคุณอายุ 35 มีเป้าหมายใหญ่ 2 อย่างพร้อมกัน: ต้องใช้เงินก้อนในอีก 3 ปี และเก็บเพื่อเกษียณอีก 30 ปี คุณจะจัดการยังไง?',
+     opts:['แยกเป็น 2 กระเป๋า — เงินที่จะใช้เร็วเก็บแบบปลอดภัย เงินเกษียณเน้นให้โต','รวมเป็นก้อนเดียว ลงแบบเสี่ยงทั้งหมดให้โตเร็ว','รวมเป็นก้อนเดียว เก็บแบบปลอดภัยทั้งหมด'],
+     insight:'เงินที่จะใช้เร็วกับเงินที่ใช้อีกนาน ควรเก็บคนละแบบ'},
+    {q:'บทที่ 3 · สมมติว่าคุณอายุ 50 เหลือเวลาถึงเกษียณราว 15 ปี เงินลงทุนโตมาดี ควรปรับอะไรไหม?',
+     opts:['ค่อยๆ ลดส่วนที่เสี่ยงลง เพิ่มส่วนที่มั่นคง','คงไว้แบบเดิม เสี่ยงเท่าเดิม','ขายออกเป็นเงินสดทั้งหมด'],
+     insight:'ยิ่งใกล้วันที่ต้องใช้เงิน ยิ่งเหลือเวลารอให้ฟื้นน้อยลง'},
+    {q:'บทที่ 4 · สมมติว่าคุณอายุ 65 เกษียณแล้ว มีเงินเก็บอยู่ก้อนหนึ่ง เป้าหมายของเงินก้อนนี้คืออะไร?',
+     opts:['ให้มีเงินใช้ทุกเดือนอย่างสม่ำเสมอ','รักษาเงินต้นให้อยู่ครบ','เก็บส่งต่อให้ลูกหลาน หรือทำประโยชน์ให้สังคม'],
+     insight:'วิธีถอนเงินมาใช้หลังเกษียณ สำคัญไม่แพ้วิธีเก็บ'}
+  ]},
+  {resultNote:'เกมนี้ไม่สรุปว่าคุณเป็นคนประเภทไหน — ปิดท้ายด้วยสิ่งที่ได้เรียนรู้ และ "ก้าวแรก" ที่คุณเลือกเอง',
+   questions:[
+    {q:'ฉาก 1 · สมมติว่าคุณเพิ่งเก็บเงินก้อนแรกได้ 100,000 บาท แล้วมีคนชวนลงทุน บอกว่า "น่าจะได้กำไรดี"',
+     opts:['ลงทั้ง 100,000 บาท ไปเลย','แบ่งครึ่ง ลง 50,000 บาท เก็บไว้ 50,000 บาท','ยังไม่ลง เก็บไว้ก่อนทั้งหมด'],
+     insight:'ก่อนลงทุน ควรมีเงินสำรองเผื่อฉุกเฉินก่อน · แต่ถ้าเก็บเงินสดไว้เฉยๆ นานๆ ค่าของเงินก็ลดลงจากเงินเฟ้อ'},
+    {q:'ฉาก 2 · มีสองคนลงทุนเดือนละ 2,000 บาท เท่ากัน แต่เริ่มไม่พร้อมกัน — คุณคิดว่าใครได้เปรียบ?',
+     opts:['คนที่เริ่มตอนอายุ 25 แล้วลง 10 ปีจากนั้นหยุด','คนที่เริ่มตอนอายุ 35 แล้วลงต่อเนื่อง 30 ปี','พอๆ กัน เพราะลงเดือนละเท่ากัน'],
+     insight:'เวลาช่วยให้ดอกเบี้ยทบต้นทำงาน — เริ่มเร็วมักได้เปรียบกว่าลงเยอะแต่เริ่มช้า'},
+    {q:'ฉาก 3 · เงินส่วนที่จะลงทุน คุณเลือกเส้นทางไหน?',
+     opts:['เส้นทางสบายใจ ขึ้นลงน้อย','เส้นทางสมดุล','เส้นทางท้าทาย ขึ้นลงแรง'],
+     insight:'ผลตอบแทนที่หวังได้มาก มักมาพร้อมการขึ้นลงที่แรงขึ้น'},
+    {q:'ก้าวแรก ตอนที่ 1 · อะไรที่ทำให้คุณยังไม่ได้เริ่มลงทุนสักที?',sub:'ตอบตามจริงได้เลย ทุกข้อเป็นเรื่องปกติที่หลายคนเจอ',
+     opts:['เงินยังน้อย รอมีเงินก้อนก่อน','กลัวขาดทุน ยังไม่กล้า','ยุ่ง ไม่มีเวลา ค่อยทำทีหลัง','ไม่รู้จะเริ่มยังไง งงไปหมด']},
+    {q:'ก้าวแรก ตอนที่ 2 · ก้าวที่เล็กที่สุดที่คุณทำได้ภายในสัปดาห์นี้คืออะไร?',multi:true,skippable:true,skipLabel:'ยังไม่พร้อมเลือก ข้ามก่อน',
+     opts:['เปิดบัญชีหรือแอปลงทุน','ตั้งลงทุนอัตโนมัติรายเดือน','ลองของจริงด้วยเงิน 100 บาท วันนี้','เลือกกองทุน 1 กองมาศึกษา','กำหนดงบลงทุนต่อเดือนที่ไหว','จดรายรับ-รายจ่าย 7 วัน','เริ่มแยกเงินสำรองเผื่อฉุกเฉินก้อนแรก','นัดคุยกับผู้แนะนำการลงทุนที่มีใบอนุญาต']}
+  ]},
+  {intro:'ไม่ให้ทายราคาทอง · เป้าหมายคือให้เข้าใจว่าทองมีไว้ทำอะไร',
+   questions:[
+    {q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บไว้ วันนี้อันไหนซื้อของได้มากกว่ากัน?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้เลย',
+     opts:['เงินสด เพราะยังเป็น 100,000 บาท เท่าเดิม','ทอง น่าจะซื้อของได้มากกว่า','น่าจะพอๆ กัน'],
+     insight:'เงินสดตัวเลขเท่าเดิม แต่ซื้อของได้น้อยลงเพราะเงินเฟ้อ ส่วนทองมักขยับตามค่าของเงิน'},
+    {q:'สมมติว่าเกิดวิกฤตเศรษฐกิจ หุ้นทั่วโลกร่วง 40.00% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่าทองจะเป็นยังไง?',
+     opts:['ร่วงตามหุ้นไปด้วย','ทรงตัวหรือขึ้นสวนทางกับหุ้น','ราคาไม่ขยับ แต่ขายไม่ออก'],
+     insight:'ในหลายวิกฤต ทองมักไม่ไปทางเดียวกับหุ้น จึงช่วยพยุงภาพรวมได้'},
+    {q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินที่จะลงทุนทั้งหมดซื้อทองเลยดีไหม?',
+     opts:['ใช่ ซื้อทองทั้งหมด ปลอดภัยที่สุด','ไม่ แบ่งไว้ส่วนหนึ่งพอ ที่เหลือไปอย่างอื่น','ไม่ซื้อเลย ชอบของที่งอกเงยกว่า'],
+     insight:'ทองไม่สร้างรายได้ระหว่างถือ จึงมักใช้เป็นส่วนหนึ่งของภาพรวม ไม่ใช่ทั้งหมด'}
+  ]}
+];
 var GAME_PLAYED={0:true,1:true},GAME_OPEN=null;
+var GAME_ANSWERS={}; // GAME_ANSWERS[gameIdx] = the real answers given in that game's mini-game (see MINIGAME_Q/openPlay below) — captured but not yet read by sideResult() (still persona-based, see [[games-questions-dna]] memory "Phase 3")
+/* sideResultFromAnswers (Phase 3, 2026-09-09) — real-answer-driven result, takes over from the old
+   persona-based sideResult() below ONLY once GAME_ANSWERS[i] exists (i.e. the player actually
+   played the real mini-game added in Phase 1, not just a demo-seeded GAME_PLAYED flag with no real
+   answers) — every pre-existing demo state keeps showing the old persona text unchanged, zero
+   regression. Index mapping into `ans` matches MINIGAME_Q[i].questions' own order 1:1.
+   Mapping rules below are first-draft defaults (per direct user decision, 2026-09-09: ship with a
+   reasonable default now rather than block on the still-open exact rule, see [[games-questions-dna]]
+   items #1/#2) — safe to retune wording/thresholds here without touching openPlay/renderPlayBody. */
+function sideResultFromAnswers(i,ans){
+  switch(i){
+    case 0:{ // เกมย้อนเวลาพอร์ต — Q1 declared risk tier (0=low..2=high) vs Q2/Q3 revealed behavior (0=sold..2=bought more)
+      var declared=ans[0],r2=ans[1],r3=ans[2];
+      if(r2!==r3)return 'สองวิกฤตคุณตอบสวนทางกัน — "ยังค้นหาสไตล์ตัวเอง" ยังไม่นิ่งว่าจะรับความเสี่ยงจริงแค่ไหน';
+      if(r2>declared)return 'ตอนวิกฤตจริง คุณ "ใจถึงกว่าที่บอก" — กล้าซื้อเพิ่มเมื่อของถูกลง ความเสี่ยงที่ทำจริงสูงกว่าที่ประกาศไว้';
+      if(r2<declared)return 'พอเจอของจริง คุณ "ระวังกว่าที่คิด" — เลือกปกป้องเงินต้นก่อน ความเสี่ยงที่ทำจริงต่ำกว่าที่บอก';
+      return 'ที่คิดกับที่ทำ "สอดคล้องกัน" — คุณรู้จักระดับความเสี่ยงตัวเองดี';
+    }
+    case 1:{ // เกมเลือกเครื่องมือ — Q1 (รอบแรก): own-research / fund-DCA / news-chase
+      var lens=['เลนส์แรกที่คุณเปิดคือ "พื้นฐาน/งบการเงิน" — ตัดสินใจจากข้อมูลก่อนเสมอ','เลนส์แรกที่คุณเปิดคือ "กระจายผ่านกองทุน/DCA" — เน้นความเข้าใจก่อนลงมือ มากกว่าเลือกตัวเดียว','เลนส์แรกที่คุณเปิดคือ "กระแสข่าว" — ระวังการตัดสินใจตามกระแสมากกว่าเนื้อหาจริง'];
+      return lens[ans[0]]||lens[0];
+    }
+    case 2:{ // เกมทนกระแส — 2 traps: Q1(FOMO)/Q2(fraud), idx0 on either = failed that trap
+      var pass=(ans[0]!==0?1:0)+(ans[1]!==0?1:0);
+      return pass===2?'ต้านได้ทั้ง 2 กับดัก (แห่ซื้อ + ลวงโอนเงิน) — วินัยของคุณแน่นมาก':(pass===1?'ต้านได้ 1 พลาด 1 — ยังมีจุดให้ระวังเวลากระแสแรง':'โดนล่อได้ง่ายทั้ง 2 กับดัก — ควรตั้งกฎล่วงหน้าก่อนลงมือ');
+    }
+    case 3: // เกมเป้าหมายแต่ละวัย — บทที่ 3 (อายุ 50) เป็นตัวชี้วัดว่าปรับเปลี่ยนไปตามวัยหรือไม่ (idx1="คงไว้แบบเดิม")
+      return ans[2]===1?'เป้าหมายของคุณ "คงเดิม" ตลอด 40 ปี — เน้นความมั่นคงสม่ำเสมอในทุกช่วงวัย':'เป้าหมายของคุณ "เปลี่ยนตามวัย" — ปรับความเสี่ยงไปตามจังหวะชีวิตแต่ละช่วง';
+    case 4:{ // เกมก้าวแรก — ไม่มี type ให้สรุป (ตามเจตนาต้นฉบับ) แค่สะท้อนคำตอบจริงกลับไป
+      var wallOpts=['เงินยังน้อย รอมีเงินก้อนก่อน','กลัวขาดทุน ยังไม่กล้า','ยุ่ง ไม่มีเวลา ค่อยทำทีหลัง','ไม่รู้จะเริ่มยังไง งงไปหมด'];
+      var stepOpts=['เปิดบัญชีหรือแอปลงทุน','ตั้งลงทุนอัตโนมัติรายเดือน','ลองของจริงด้วยเงิน 100 บาท วันนี้','เลือกกองทุน 1 กองมาศึกษา','กำหนดงบลงทุนต่อเดือนที่ไหว','จดรายรับ-รายจ่าย 7 วัน','เริ่มแยกเงินสำรองเผื่อฉุกเฉินก้อนแรก','นัดคุยกับผู้แนะนำการลงทุนที่มีใบอนุญาต'];
+      var wall=wallOpts[ans[3]],steps=(ans[4]||[]).map(function(oi){return stepOpts[oi];}).filter(Boolean);
+      return (wall?('กำแพงหลักคือ "'+wall+'"'):'ยังไม่ได้ตอบว่าอะไรทำให้ยังไม่เริ่ม')+' — '+(steps.length?('ก้าวเล็กที่สุดที่คุณเลือก: '+steps.join(', ')):'ยังไม่ได้เลือกก้าวแรก — ข้ามไว้ก่อนได้เสมอ');
+    }
+    case 5:{ // เกมทองคำในพอร์ต — Q3 (ฉาก 3): all-gold / balanced / none
+      var gold=['คุณมองทองคำเป็นที่พึ่งหลักยามวิกฤต — ระวังอย่าให้เป็นสัดส่วนทั้งหมดของพอร์ต ทองไม่สร้างรายได้ระหว่างถือ','คุณมองทองคำเป็น "ตัวถ่วงพอร์ต" ไม่ใช่ตัวทำกำไรหลัก — แบ่งไว้ส่วนหนึ่ง สมดุลดี','คุณเปิดรับสินทรัพย์ที่โตเร็วกว่าเป็นหลัก มองทองคำเป็นตัวเลือกรองเท่านั้น'];
+      return gold[ans[2]]||gold[1];
+    }
+  }
+  return '';
+}
 /* sideResult — verbatim from Playbook Final's sideResult(i,hero), with fam mapped G/N/V → guardian/
    navigator/visionary, and case 5's persona check keyed on heroKey==='sage' (our sage's th differs
-   from the source's "ราชัน"). Driven by hero.skills [ใจกล้า,วินัย,กระจาย]. */
+   from the source's "ราชัน"). Driven by hero.skills [ใจกล้า,วินัย,กระจาย]. Now only the FALLBACK path
+   — see sideResultFromAnswers above, which takes over once GAME_ANSWERS[i] exists (Phase 3). */
 function sideResult(i,hero,key){
+  if(GAME_ANSWERS[i])return sideResultFromAnswers(i,GAME_ANSWERS[i]);
   if(!hero)return 'ทำแบบทดสอบตัวตนก่อน เพื่อดูว่าเกมนี้บอกอะไรเกี่ยวกับคุณ';
   var b=hero.skills[0],d=hero.skills[1],v=hero.skills[2];
   var fam={G:'guardian',N:'navigator',V:'visionary'}[hero.fam];
@@ -6059,12 +6671,155 @@ function renderGames(){
   appTabbar('games');
   bindTabbar();
   if(!pre){
-    root.querySelectorAll('[data-play]').forEach(function(b){b.onclick=function(e){e.stopPropagation();var i=+b.dataset.play;GAME_PLAYED[i]=true;GAME_OPEN=i;renderGames();};});
+    root.querySelectorAll('[data-play]').forEach(function(b){b.onclick=function(e){e.stopPropagation();openPlay('game',+b.dataset.play);};});
     root.querySelectorAll('[data-open]').forEach(function(t){t.onclick=function(){var i=+t.dataset.open;if(!GAME_PLAYED[i])return;togGame(i);};});
   }
   mountHeaderQR();
   bindHeaderLogo();
   if(!pre)mountNgCta(nextIdx);
+}
+
+/* ══ MINI-GAME PLAY MODAL (logic) ══ (2026-09-09) real question-and-answer flow shared by the
+   Games tab (kind='game', MINIGAME_Q) and the Booth tab (kind='booth', BOOTH_Q) — see the CSS
+   block above (.play-modal) and each data array's own comment for the full field reference.
+   Markup built once by buildPlayModal() and appended to <body>, same pattern as buildScanModal().
+   Deliberate Phase-1 scope (per direct user decision, 2026-09-09): this only replaces HOW a game
+   is "played" — real questions instead of an instant toggle. RESULT scoring is UNCHANGED (sideResult()
+   still reads persona hero.skills, not these answers) — GAME_ANSWERS/BOOTH_ANSWERS are captured and
+   stored purely so a future pass can switch scoring to real answers without touching this UI again. */
+var PLAY=null; // {kind:'game'|'booth', idx, qi, sel:[per-question answer or [] if multi], lockedBack} while a mini-game is open; null when closed
+var PLAY_TIMER=null,PLAY_TIMELEFT=0;
+function playSet(kind,idx){return kind==='game'?MINIGAME_Q[idx]:BOOTH_Q[idx];}
+function playLabel(kind,idx){return kind==='game'?SIDES[idx].title:BOOTHS[idx].game;}
+function openPlay(kind,idx){
+  var set=playSet(kind,idx);
+  PLAY={kind:kind,idx:idx,qi:0,sel:set.questions.map(function(q){return q.multi?[]:null;}),lockedBack:false,timerQi:null};
+  document.getElementById('playModal').classList.add('show');
+  renderPlayBody();
+}
+function clearPlayTimer(){if(PLAY_TIMER){clearInterval(PLAY_TIMER);PLAY_TIMER=null;}}
+function closePlay(){
+  var m=document.getElementById('playModal');if(m)m.classList.remove('show');
+  clearPlayTimer();
+  PLAY=null;
+}
+/* Countdown is atmospheric pressure ONLY (per เกมทนกระแส ฉาก 1's on-screen timer) — the source docx
+   never specifies what happens at 0 (an open item, see [[games-questions-dna]] #5), so this
+   deliberately never force-advances or locks the player out; it just stops counting at 0. */
+function startPlayTimer(seconds){
+  clearPlayTimer();
+  PLAY_TIMELEFT=seconds;
+  PLAY_TIMER=setInterval(function(){
+    PLAY_TIMELEFT--;
+    var el=document.getElementById('playTimerVal');
+    if(el)el.textContent=Math.max(0,PLAY_TIMELEFT);
+    if(PLAY_TIMELEFT<=0)clearPlayTimer();
+  },1000);
+}
+function completePlay(){
+  var kind=PLAY.kind,idx=PLAY.idx;
+  if(kind==='game'){GAME_ANSWERS[idx]=PLAY.sel;GAME_PLAYED[idx]=true;}
+  else{BOOTH_ANSWERS[idx]=PLAY.sel;BOOTH_ACT[idx]=true;}
+  closePlay();
+  if(kind==='game'){GAME_OPEN=idx;renderGames();}
+  else renderBooth();
+}
+function selectPlayAnswer(qi,oi){
+  var q=playSet(PLAY.kind,PLAY.idx).questions[qi];
+  if(q.multi){
+    var arr=PLAY.sel[qi],pos=arr.indexOf(oi);
+    if(pos>-1)arr.splice(pos,1);else arr.push(oi);
+  }else{
+    PLAY.sel[qi]=oi;
+  }
+  renderPlayBody();
+}
+function playGoNext(){
+  var set=playSet(PLAY.kind,PLAY.idx);
+  if(set.questions[PLAY.qi].locked)PLAY.lockedBack=true;
+  if(PLAY.qi>=set.questions.length-1){renderPlaySummary();return;}
+  PLAY.qi++;
+  renderPlayBody();
+}
+function playGoBack(){
+  if(PLAY.qi<=0||PLAY.lockedBack)return;
+  PLAY.qi--;
+  renderPlayBody();
+}
+function renderPlayBody(){
+  var kind=PLAY.kind,idx=PLAY.idx,qi=PLAY.qi;
+  var set=playSet(kind,idx),q=set.questions[qi],total=set.questions.length;
+  var sel=PLAY.sel[qi];
+  var answered=q.multi?(sel.length>0):(sel!==null);
+  var canBack=qi>0&&!PLAY.lockedBack&&!set.noBack;
+  var dots='';for(var d=0;d<total;d++)dots+='<span class="play-dot'+(d===qi?' on':'')+'"></span>';
+  var timerHTML=q.timer?'<span class="play-timer">'+ic('lc-hourglass')+'<span id="playTimerVal">'+q.timer+'</span>s</span>':'';
+  var introHTML=(qi===0&&set.intro)?'<div class="play-intro">'+ic('lc-info')+'<span>'+set.intro+'</span></div>':'';
+  var optsHTML='<div class="play-opts"><div class="q-opts">';
+  q.opts.forEach(function(t,oi){
+    var isSel=q.multi?(sel.indexOf(oi)>-1):(sel===oi);
+    optsHTML+='<button class="q-opt'+(isSel?' sel':'')+'" type="button" data-oi="'+oi+'"><span class="opt-key">'+(oi+1)+'</span><span class="opt-text">'+t+'</span></button>';
+  });
+  optsHTML+='</div></div>';
+  var insightHTML=(answered&&!q.multi&&q.insight)?'<div class="play-insight">'+ic('lc-sparkles')+'<span>'+q.insight+'</span></div>':'';
+  var skipHTML=q.skippable?'<button class="play-skip" type="button" id="playSkipBtn">'+(q.skipLabel||'ข้ามข้อนี้')+'</button>':'';
+  var isLast=qi>=total-1;
+  var nextLabel=isLast?('เสร็จสิ้น '+ic('lc-check','ic-fwd')):('ถัดไป '+ic('lc-arrow-right','ic-fwd'));
+  var body=document.getElementById('playBody');
+  body.innerHTML=
+    '<div class="play-eyebrow"><span>ข้อ '+(qi+1)+'/'+total+' · '+playLabel(kind,idx)+'</span>'+timerHTML+'</div>'+
+    '<div class="play-dots">'+dots+'</div>'+
+    introHTML+
+    '<div class="play-q">'+q.q+'</div>'+
+    (q.sub?'<div class="play-sub">'+q.sub+'</div>':'')+
+    optsHTML+
+    skipHTML+
+    insightHTML+
+    '<div class="play-nav">'+
+      (canBack?'<button class="btn btn-tertiary" type="button" id="playBackBtn">'+ic('lc-arrow-left','ic-back')+'ย้อนกลับ</button>':'<span></span>')+
+      '<button class="btn btn-primary" type="button" id="playNextBtn"'+(answered?'':' disabled')+'>'+nextLabel+'</button>'+
+    '</div>';
+  body.querySelectorAll('.q-opt').forEach(function(b){b.onclick=function(){selectPlayAnswer(qi,+b.dataset.oi);};});
+  var backBtn=body.querySelector('#playBackBtn');if(backBtn)backBtn.onclick=playGoBack;
+  body.querySelector('#playNextBtn').onclick=playGoNext;
+  var skipBtn=body.querySelector('#playSkipBtn');if(skipBtn)skipBtn.onclick=playGoNext;
+  // Bug fix (2026-09-09, found while demoing M3 live): renderPlayBody() re-runs on every option
+  // tap (selectPlayAnswer calls it again to repaint the selection + insight), not just on an actual
+  // question change — a naive "if(q.timer)startPlayTimer(...)" here restarted the countdown from
+  // full every single tap, which defeats the whole point of a time-pressure timer. Only (re)start it
+  // when we've genuinely landed on a NEW timed question (tracked via PLAY.timerQi); re-renders of
+  // the SAME question just leave the already-running interval alone.
+  if(q.timer&&PLAY.timerQi!==qi){PLAY.timerQi=qi;startPlayTimer(q.timer);}
+  else if(!q.timer)clearPlayTimer();
+}
+function renderPlaySummary(){
+  clearPlayTimer();
+  var kind=PLAY.kind,idx=PLAY.idx,set=playSet(kind,idx);
+  var insights=set.questions.map(function(q){return q.insight;}).filter(Boolean);
+  var ptsHTML=(kind==='booth'&&set.points)?'<div class="play-sum-pts">'+ic('lc-gift')+'<span>+'+set.points+' แต้ม</span></div>':'';
+  var body=document.getElementById('playBody');
+  body.innerHTML=
+    '<div class="play-eyebrow"><span>เล่นจบแล้ว</span></div>'+
+    '<div class="play-q">'+playLabel(kind,idx)+'</div>'+
+    (set.resultNote?'<div class="play-sub" style="margin-bottom:var(--sp-stack)">'+set.resultNote+'</div>':'')+
+    '<div class="play-sum-list">'+insights.map(function(t){return '<div class="play-sum-item">'+ic('lc-sparkles')+'<span>'+t+'</span></div>';}).join('')+'</div>'+
+    ptsHTML+
+    '<button class="btn btn-primary" type="button" id="playDoneBtn" style="width:100%">'+ic('lc-check-circle')+(kind==='game'?'ดูผลในคู่มือ':'เสร็จสิ้น')+'</button>';
+  body.querySelector('#playDoneBtn').onclick=completePlay;
+}
+function buildPlayModal(){
+  var wrap=document.createElement('div');
+  wrap.className='play-modal';
+  wrap.id='playModal';
+  wrap.innerHTML=
+    '<div class="play-scrim" id="playScrim"></div>'+
+    '<div class="play-card">'+
+      '<button class="play-x" type="button" id="playClose">'+ic('lc-x')+'</button>'+
+      '<div id="playBody"></div>'+
+    '</div>';
+  document.body.appendChild(wrap);
+  document.getElementById('playScrim').onclick=closePlay;
+  document.getElementById('playClose').onclick=closePlay;
 }
 
 /* ══ PROFILE TAB ══ content ported from Playbook Final's Profile screen — userName/userOrg/
@@ -6147,7 +6902,7 @@ function renderProfile(){
    "already done" mock defaults. Switching to 'pre' does NOT touch RESULT/quizDone — a pre-event
    visitor may already have taken the quiz online, so identity content stays independently gated on
    RESULT alone (see renderBook's empty state, buildRoute's personalized flag). */
-var DEMO={view:'auto',quizDone:false,draw:'auto',eventPhase:'pre',multiTicket:false,boothVer:'v1',splashVer:'v1',registered:true}; // draw: 'auto' (default, resolves to eligible) | 'ok' | 'need' — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. splashVer (2026-09-04, per direction "เพิ่ม preview splash scene เป็น 2 กรณี...ให้ default เป็นเวอร์ชันนี้ [v1] เสมอ"): 'v1' = the shipped fan-carousel of card fronts (unchanged, ALWAYS the default); 'v2' = a "Card Back Reveal" curiosity preview — the same splash page/logo/headline/CTA/scatter, but the Character Card Preview area only is swapped for a card-back-dominant stack where the back is the hero (~75%) and the next character's FRONT peeks out only as a partial glimpse (~25%), building "what comes next?" instead of showing the answer. Gated on this flag so v1 stays byte-identical. eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
+var DEMO={view:'auto',quizDone:false,draw:'auto',eventPhase:'pre',multiTicket:false,boothVer:'v1',splashVer:'v1',registered:true}; // draw: 'auto' (default, resolves to eligible) | 'ok' | 'need' — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. splashVer (2026-09-04, per direction "เพิ่ม preview splash scene เป็น 2 กรณี...ให้ default เป็นเวอร์ชันนี้ [v1] เสมอ"): 'v1' = the shipped fan-carousel of card fronts (unchanged, ALWAYS the default); 'v3' = a 3D field of drifting character-card streams (spv3Build/initSpv3). Gated on this flag so v1 stays byte-identical. (v2 "Card Back Reveal" and v4 "Living Card"/Case-02 preview modes existed briefly and were removed 2026-09-08, per direction "เอา v2, v4 ออก (ลบโค๊ด)" — their DEMO fields/handlers/CSS/JS are gone too.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
 /* 'auto' now always resolves to mobile (2026-08-26, per direction "อัตโนมัติ default ไว้ที่ mobile
    size") — was real window.innerWidth-based detection (w<768→mobile/w<1440→tablet/else pc); PC/
    แท็บเล็ต/มือถือ stay available as explicit manual overrides, 'อัตโนมัติ' just no longer reacts to
@@ -6168,14 +6923,28 @@ window.addEventListener('resize',function(){if(DEMO.view==='auto')applyView();})
    (sig>=3) — so picking ANY of the 12 demo personas reliably lands on a genuine 'evolved' state,
    and thanks to EVO_REP above, the post-event card is always real photographed art (diamondhand/
    waverider), never the CSS mockup, on that side. */
-function forcePersona(key){
+/* Build a plausible RESULT (+ demo activity) for a forced persona WITHOUT navigating — shared by the
+   demo persona picker (which then jumps to Book) and the demo Character-Animation Play button (which
+   jumps to the cardreveal instead). Splitting the seed from the navigation lets both entry points
+   reuse the exact same synthesized result. */
+function seedPersonaResult(key){
   var h=HEROES[key];
   var simGap=h.fam==='V'?-4:4;
   RESULT={hero:h,heroKey:key,declared:h.riskLevel,revealed:Math.max(1,Math.min(10,h.riskLevel+simGap)),gap:simGap,
     conf:74,confLevel:'สูง - สอดคล้องดี',
     subs:{identity:16,behavior:16,riskAlign:18,discipline:15},knowledge:'intermediate',horizon:'mid',votes:{},interests:[0,2,4]};
-  GAME_PLAYED={0:true,1:true,2:true,3:true};BOOTH_CHK={0:new Set([0])};BOOTH_ACT={0:true};
-  st.phase='book';stopSplashTimer();render();
+  GAME_PLAYED={0:true,1:true,2:true,3:true};GAME_ANSWERS={};BOOTH_CHK={0:new Set([0])};BOOTH_ACT={0:true};BOOTH_ANSWERS={};
+}
+function forcePersona(key){seedPersonaResult(key);st.phase='book';stopSplashTimer();render();}
+/* Demo-only: play the Character Card Reveal (Case 01 — After Analysis). Uses the persona currently
+   selected in the demo picker if any, else the current RESULT, else a random one — seeding a RESULT
+   first when needed so the reveal always has a real card to animate. */
+function demoPlayCardReveal(){
+  var sel=document.getElementById('demoPersona');
+  var key=sel&&sel.value?sel.value:(RESULT?RESULT.heroKey:PORDER[Math.floor(Math.random()*PORDER.length)]);
+  if(!RESULT||key!==RESULT.heroKey)seedPersonaResult(key);
+  DEMO.quizDone=true;var qsw=document.getElementById('demoQuiz');if(qsw)qsw.classList.add('on');
+  st.phase='cardreveal';stopSplashTimer();render();
 }
 
 /* ── DEMO SIMULATION PANEL (dev/booth demo) ── persists across renders (lives on <body>, not #root) ── */
@@ -6208,6 +6977,13 @@ function buildDemo(){
     '<div class="demo-lbl">จำนวนบัตร</div>'+seg('segTicketCount',[{v:'1',t:'บัตร 1 ใบ'},{v:'2',t:'บัตร 2 ใบ (ตัวอย่าง)'}],DEMO.multiTicket?'2':'1')+
     '<div class="demo-stub">* พรีวิว Home + โปรไฟล์ เท่านั้น ไม่กระทบสิทธิ์ของคุณด้านบน</div>'+
     '<div class="demo-lbl">การ์ดตัวตน</div><select class="demo-sel" id="demoPersona"><option value="">— เลือกเพื่อดูการ์ด —</option>'+personaOpts+'</select>'+
+    /* Character Card Reveal (2026-09-08) — demo trigger for the "coming alive" animation that now sits
+       between Analysis and the Playbook (see renderCardReveal). "เล่นซ้ำ" is a demo affordance only, NOT
+       part of the real user flow, per the direction. Uses the persona chosen above (or the current
+       result / a random one) so the reveal always has a real card. */
+    '<div class="demo-lbl">Character Animation — Case 01 (After Analysis)</div>'+
+    '<div class="demo-row-btns"><button class="btn btn-secondary" id="demoCardPlay">'+ic('lc-play-circle')+'เล่นอนิเมชัน</button><button class="btn btn-secondary" id="demoCardReplay">'+ic('lc-refresh-cw')+'เล่นซ้ำ</button></div>'+
+    '<div class="demo-stub">* เล่นครั้งเดียวใน flow จริง (หลังวิเคราะห์ → การ์ด → คู่มือ) — ปุ่ม "เล่นซ้ำ" สำหรับเดโมเท่านั้น</div>'+
     '<div class="demo-lbl">สถานะ</div><div class="demo-row"><span class="rl">'+ic('lc-book-open')+'ทำแบบทดสอบตัวตนแล้ว</span><span class="sw'+(DEMO.quizDone?' on':'')+'" id="demoQuiz"></span></div>'+
     /* การลงทะเบียน (2026-09-04) — separate preview toggle for a quiz-taker who never went through the
        registration site (see DEMO.registered / renderBook's `unreg` branches). 'ยังไม่ได้ลงทะเบียน'
@@ -6225,11 +7001,16 @@ function buildDemo(){
     '<div class="demo-lbl">หน้าเดินบูธ (พรีวิว)</div>'+seg('segBoothVer',[{v:'v1',t:'v1 เดิม'},{v:'v2',t:'v2 แผนที่ Sync'}],DEMO.boothVer)+
     '<div class="demo-stub">* v2 = แผนที่มีหมุดเลขตรงกับ Step + แตะ Step/หมุดเพื่อโฟกัสกัน</div>'+
     /* พรีวิว Splash (2026-09-04) — separate preview toggle for the Character Card Preview area on the
-       splash screen only: v1 is the shipped fan-carousel of card fronts (default, unchanged); v2 is
-       the "Card Back Reveal" curiosity preview (back dominant, front only a glimpse). Affects
-       renderSplash's stage region only via DEMO.splashVer; nothing else reads it. */
-    '<div class="demo-lbl">หน้า Splash (พรีวิวการ์ด)</div>'+seg('segSplashVer',[{v:'v1',t:'v1 เดิม'},{v:'v2',t:'v2 พลิกเผยตัวตน'},{v:'v3',t:'v3 การ์ดลอย 3 มิติ'}],DEMO.splashVer)+
-    '<div class="demo-stub">* v2 = โชว์หลังการ์ดเป็นหลัก เผยหน้าการ์ดแค่บางส่วน · v3 = สนามการ์ด 3 มิติ หลายสาย ลอยผ่านกัน ลุ้นใบต่อไป</div>'+
+       splash screen only: v1 is the shipped fan-carousel of card fronts (default, unchanged); v3 is
+       the 3D Character Card Flow field; v4 (added 2026-09-09) duplicates v1's exact fan carousel and
+       loops the centered card's own living-card clip over its static photo (see fanVideoSync near
+       paintFan); v5 (same day) applies the same idea to v3 instead — duplicates its exact drifting
+       lane field and loops a clip on whichever card the FOCUS cycle promotes (see spv3VideoMount near
+       spv3FocusTick). Affects renderSplash's stage region only via DEMO.splashVer; nothing else reads
+       it. (v2 "Card Back Reveal" and an earlier, different, v4 "Living Card"/Case-02 removed
+       2026-09-08, per direction "เอา v2, v4 ออก (ลบโค๊ด)" — this v4/v5 are fresh, unrelated builds.) */
+    '<div class="demo-lbl">หน้า Splash (พรีวิวการ์ด)</div>'+seg('segSplashVer',[{v:'v1',t:'v1 เดิม'},{v:'v3',t:'v3 การ์ดลอย 3 มิติ'},{v:'v4',t:'v4 การ์ดมีชีวิต'},{v:'v5',t:'v5 โฟกัสมีชีวิต'}],DEMO.splashVer)+
+    '<div class="demo-stub">* v3 = สนามการ์ด 3 มิติ หลายสาย ลอยผ่านกัน ลุ้นใบต่อไป · v4 = พัดการ์ดแบบ v1 เดิม แต่การ์ดตรงกลาง "มีชีวิต" (คลิปตัวละคร) และคละการ์ดหลังบางใบปนไปด้วย (แตะเพื่อเปิดดู) · v5 = สนามการ์ดแบบ v3 เดิม แต่ใบที่ถูกโฟกัส "มีชีวิต" ระหว่างที่เด่นอยู่</div>'+
     '<div class="demo-lbl">ผลเกมย้อนเวลาพอร์ต → สิ่งที่ทำจริง</div><select class="demo-sel" id="demoCrisis"><option>ตอนวิกฤต "คงเส้น" (ถือ)</option><option>ตอนวิกฤต "ขายหนี" (ตัดขาย)</option><option>ตอนวิกฤต "ช้อนซื้อ" (เก็บเพิ่ม)</option></select>'+
     '<div class="demo-lbl">วิกฤตรอบที่ 2 (สวนขั้วกัน = ยังไม่นิ่ง)</div><select class="demo-sel" id="demoCrisis2"><option>เหมือนรอบแรก</option><option>สวนทางรอบแรก</option></select>'+
     '<div class="demo-stub">* เกมในงานยังไม่ออกแบบ — 2 ช่องนี้เป็น stub</div>'+
@@ -6243,7 +7024,7 @@ function buildDemo(){
     var v=b.dataset.v;if(v===DEMO.eventPhase)return;
     DEMO.eventPhase=v;
     document.querySelectorAll('#segPhase button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
-    if(v==='on'){BOOTH_CHK={};BOOTH_ACT={};GAME_PLAYED={};DRAW_JOINED=false;} // fresh arrival — see DEMO.eventPhase comment above
+    if(v==='on'){BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};GAME_PLAYED={};GAME_ANSWERS={};DRAW_JOINED=false;} // fresh arrival — see DEMO.eventPhase comment above
     render();
   };});
   document.getElementById('segView').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.view=b.dataset.v;document.querySelectorAll('#segView button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');applyView();};});
@@ -6253,8 +7034,17 @@ function buildDemo(){
   document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.multiTicket=(b.dataset.v==='2');document.querySelectorAll('#segTicketCount button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segRegistered').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.registered=(b.dataset.v==='yes');document.querySelectorAll('#segRegistered button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='book')render();};});
   document.getElementById('demoPersona').onchange=function(){if(this.value){DEMO.quizDone=true;document.getElementById('demoQuiz').classList.add('on');forcePersona(this.value);}};
+  document.getElementById('demoCardPlay').onclick=function(){panel.classList.remove('open');demoPlayCardReveal();};
+  document.getElementById('demoCardReplay').onclick=function(){panel.classList.remove('open');demoPlayCardReveal();};
   document.getElementById('demoQuiz').onclick=function(){DEMO.quizDone=!DEMO.quizDone;this.classList.toggle('on',DEMO.quizDone);};
-  document.getElementById('demoReset').onclick=function(){DEMO.quizDone=false;document.getElementById('demoQuiz').classList.remove('on');document.getElementById('demoPersona').value='';DEMO.draw='auto';document.getElementById('segDraw').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='auto');});DEMO.multiTicket=false;document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='1');});panel.classList.remove('open');resetQuiz();};
+  document.getElementById('demoReset').onclick=function(){DEMO.quizDone=false;document.getElementById('demoQuiz').classList.remove('on');document.getElementById('demoPersona').value='';DEMO.draw='auto';document.getElementById('segDraw').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='auto');});DEMO.multiTicket=false;document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='1');});
+    // Bug fix (2026-09-09, found while setting up a clean way to test-play every one of the 16
+    // real mini-games added in Phase 1) — this button's own label ("รีเซ็ตเกมหลักที่เล่น") already
+    // promised a played-state reset, but the code never actually touched GAME_PLAYED/BOOTH_ACT (only
+    // resetQuiz()'s quiz-taking state st/RESULT). Now genuinely clears every game/booth back to
+    // unplayed so all 6 เกมหลัก + 10 บูธ can be replayed from scratch for testing.
+    GAME_PLAYED={};GAME_ANSWERS={};BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};DRAW_JOINED=false;
+    panel.classList.remove('open');resetQuiz();};
 }
 
 /* Go-to-top FAB (system-wide, all view modes incl. desktop/tablet). The page itself is what
@@ -6300,6 +7090,6 @@ function buildGoTop(){
   btn.onclick=function(){window.scrollTo({top:0,behavior:'smooth'});root.scrollTo({top:0,behavior:'smooth'});};
 }
 
-applyView();buildDemo();buildScanModal();buildShareModal();buildGoTop();
+applyView();buildDemo();buildScanModal();buildPlayModal();buildShareModal();buildGoTop();
 render();
 </script>

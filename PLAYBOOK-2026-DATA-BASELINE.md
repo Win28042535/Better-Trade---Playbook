@@ -99,6 +99,12 @@ to be meaningful:
 สแกนช่องโหว่ชีวิต (ประกัน) · โต้คลื่นความผันผวน (คริปโต) · นักตีราคาของสะสม (ของสะสม) ·
 เช็กสุขภาพกับเงิน (สุขภาพ)
 
+**✅ Full question content added 2026-09-08** — see [`GAMES-QUESTIONS-DNA.md`](GAMES-QUESTIONS-DNA.md)
+Part B for every booth's actual questions/options/insight-lines + point values, sourced from
+`คำถาม 6 ด้าน กับ คำถาม 10 สินทรัพย์ 8-9-69.docx`. This table above only ever had booth *names* —
+that file is now the canonical question-bank source for whenever a Passport/booth-game tab gets
+built.
+
 ---
 
 ## 5. Tabs / navigation (reference-only — not built in this prototype)
@@ -163,6 +169,13 @@ Investment Zone · Health Zone.
 `sideResult(i, hero)` narrative branch driven by hero.skills + hero.fam. This app's current
 "6 ด้าน" accordion content is original to this prototype and NOT yet reskinned to match these
 6 topics — flagged as the most likely next content-parity gap if the book page gets a deeper pass.
+
+**✅ Full question content added 2026-09-08** — see [`GAMES-QUESTIONS-DNA.md`](GAMES-QUESTIONS-DNA.md)
+Part A for the actual game-by-game questions/options/insight-lines/result-page rules behind each
+of these 6 sides (internal codes M1–M6), sourced from `คำถาม 6 ด้าน กับ คำถาม 10 สินทรัพย์
+8-9-69.docx`. Core mechanic confirmed by that doc: **เกมหลัก 6 เกม · เล่น 1 เกม เปิดคู่มือ 1 ด้าน**
+— each game unlock gates exactly one accordion side. This closes the content-parity gap flagged
+above (data now exists; the accordion still needs the actual reskin/wiring).
 
 ---
 
