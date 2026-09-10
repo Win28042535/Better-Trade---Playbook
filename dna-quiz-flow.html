@@ -6,7 +6,7 @@
      Content-Type header; any host/local server/tool that doesn't (many static preview servers
      don't) falls back to a legacy 8-bit encoding and every non-ASCII character — all the Thai
      copy, "→", "×", "✦" — renders as mojibake. -->
-<title>DNA Quiz → คู่มือลงทุนของคุณ</title>
+<title>DNA Quiz → Playbook ลงทุนของคุณ</title>
 <!-- Without this, mobile browsers with no viewport meta fall back to the classic ~980px desktop
      layout width, so every max-width:575px/480px breakpoint in this file (including the Liquid
      Metal CTA's own compactOptions switch) would never actually fire on a real phone. -->
@@ -942,6 +942,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    this is the highlight the customer should see they're "คู่ควรกับ", not a footnote. */
 .ast-block{border-radius:var(--r1);padding:var(--sp-card-pad-sm);margin-bottom:var(--sp-stack);}
 .ast-lbl{display:flex;align-items:center;gap:var(--sp-inline);font-family:var(--font);font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);margin-bottom:var(--sp-inline);}
+/* svg sizing (2026-09-10) — .ast-lbl's only call site used to be a plain text label
+   ("สินทรัพย์ที่ถนัด", no icon); renderPlaySummary's result card is the first to put an icon in
+   front of it, same icon-header idiom as .str-hd svg (--ic-lg/24px) right above. */
+.ast-lbl svg{width:var(--ic-lg);height:var(--ic-lg);flex:0 0 auto;}
 .ast-chips{display:flex;flex-wrap:wrap;gap:var(--sp-list);}
 /* Solid accent fill (prior pass) read as TOO loud — competing with the character card above it
    for attention. Back to a tint fill, but a stronger one than .ast-block's own 12% wrapper tint
@@ -1932,7 +1936,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* ══ POST-EVENT ("หลังจบงาน · ดูย้อนหลัง") ══ */
 .pe-report{display:flex;gap:var(--sp-inline);align-items:flex-start;padding:var(--sp-inline) var(--sp-stack);border-radius:var(--r1);background:var(--paper);margin-top:2px;}
 .pe-report.on{background:var(--done-wash);}
-.pe-report svg{width:var(--ic-md);height:var(--ic-md);flex:0 0 auto;margin-top:1px;color:var(--muted);}
+/* margin-top 1px->3px (2026-09-10, per direction "ให้ Alignment center กับบรรทัดแรก", pictured on
+   .bp-pts which shares this exact rule) — .pe-report-t's first line is 25.2px tall (fs-bodysm/18px ×
+   line-height 1.4); centering the 20px icon within it is (25.2-20)/2 ≈ 3px, not the old 1px. */
+.pe-report svg{width:var(--ic-md);height:var(--ic-md);flex:0 0 auto;margin-top:3px;color:var(--muted);}
 /* --cyan-ink (which this used to read via a fallback) was retired again 2026-08-15, per Design DNA
    review "--cyan-ink ทางเลือก B" — reverted to a flat --ink instead of wiring the token, since the
    chosen answer this time was to keep the icon's current (ink) look, not make it cyan. */
@@ -2007,10 +2014,32 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bp-frac{font-size:var(--fs-bodysm);font-weight:var(--w-label);white-space:nowrap;}
 .bp-bar{margin-top:auto;height:6px;border-radius:var(--rpill);background:var(--accent);overflow:hidden;}
 .bp-fill{height:100%;border-radius:var(--rpill);transition:width .25s var(--ease);}
-/* points total (Phase 4, 2026-09-09) — display-only stat, see boothPointsTotal()'s own comment. */
-.bp-pts{display:flex;align-items:center;gap:var(--sp-list);font-size:var(--fs-label);color:var(--ink);background:color-mix(in srgb,var(--amber-text) 10%,transparent);border:1px solid color-mix(in srgb,var(--amber-text) 28%,transparent);border-radius:var(--r1);padding:var(--sp-list) var(--sp-inline);margin-bottom:var(--sp-stack);}
-.bp-pts svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--amber-text);flex:0 0 auto;}
-.bp-pts b{font-weight:var(--w-label);}
+/* .bp-hd wraps on mobile (2026-09-10, per direction "responsive audit") — .bp-frac's own "ครบแล้ว N
+   บูธ" completed-state text (added after the wrap-tolerance comments above were written, back when
+   this was a short "3/5" fraction) is long enough at real mobile width to squeeze .bp-lbl down past
+   its own wrappable minimum, breaking "เช็คอินบูธ" mid-syllable across 3 lines instead of the clean
+   2-line wrap those comments describe. Dropping .bp-frac onto its own line under the label sidesteps
+   the squeeze entirely; tablet/pc keep the original single-line side-by-side layout (plenty of width
+   there — this never actually breaks past mobile). */
+:root[data-view="mobile"] .bp-hd{flex-wrap:wrap;}
+:root[data-view="mobile"] .bp-frac{flex:1 0 100%;margin-top:2px;}
+/* .bp-lbl reserves 2 lines' height on mobile (2026-09-10, bug fix — reported via screenshot: the two
+   .bp-frac status lines landed at different heights across the pair, "เช็คอินบูธ" 's one-line label
+   sitting shorter than "กิจกรรมประจำบูธ" 's wrapped two lines, so the cyan text below each started at
+   different Y positions instead of lining up). Since .bp-frac now always follows directly after
+   .bp-lbl in the wrapped flex flow (see the wrap rule above), the fix is reserving the SAME label
+   height regardless of whether that card's own label happens to wrap to 1 or 2 lines — explicit
+   line-height + min-height for exactly 2 lines of it, so .bp-frac always starts on the same line
+   across both cards in the .booth-prog pair. */
+:root[data-view="mobile"] .bp-lbl{line-height:1.3;min-height:calc(1.3em * 2);}
+/* points total (Phase 4, 2026-09-09) — display-only stat, see boothPointsTotal()'s own comment.
+   Reskinned onto .pe-report's own DNA (2026-09-10, per direction "section นี้ต้องการให้ใช้ dna เดียวกับ
+   รายงานพัฒนาการหลังงาน (หน้าหลัก)") — was a one-off amber-bordered pill (bold inline number, its own
+   color pair); markup now emits the shared .pe-report/.pe-report-t/.pe-report-s classes plus the "on"
+   modifier (this row only ever renders once pts>0, i.e. always the "achieved" state), so it reads as
+   the same icon+title/subtitle row on var(--done-wash) as the post-event report card. .bp-pts only
+   owns the trailing margin the standalone .pe-report doesn't need here. */
+.bp-pts{margin-bottom:var(--sp-stack);}
 /* draw-status (เดินบูธ ✦ ลุ้นรางวัล's "ยังขาด"/"ครบเงื่อนไขแล้ว" card) reskinned onto the shared
    .next-step DNA (2026-08-26, per direction "อยากให้ทั้ง 2 กรณี ใช้ design dna เดียวกับ [เล่นเกมนี้
    ต่อ]...แต่ยังคงการใช้สีทั้ง 2 กรณีเหมือนเดิม") — same icon-badge + eyebrow/title/body + cta-slot
@@ -2132,13 +2161,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    .q-opt/.opt-key/.opt-text verbatim from the DNA quiz's own question screen (renderQuiz) so the
    choice-button look is identical everywhere in the app. See MINIGAME_Q/BOOTH_Q (data) + openPlay/
    renderPlayBody (logic), added right after renderGames() below. */
-.play-modal{position:fixed;inset:0;z-index:96;display:none;align-items:center;justify-content:center;padding:22px;}
-.play-modal.show{display:flex;}
-.play-scrim{position:absolute;inset:0;background:rgba(17,19,24,.6);}
-.play-card{position:relative;width:100%;max-width:400px;max-height:calc(100vh - 44px);overflow-y:auto;background:var(--white);border-radius:var(--r2);padding:var(--sp-card-pad-sm);box-shadow:var(--shadow-lg);}
-.play-x{position:absolute;right:12px;top:12px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--ink);border:none;cursor:pointer;z-index:1;}
-.play-x svg{width:var(--ic-md);height:var(--ic-md);}
-.play-eyebrow{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline);font-size:var(--fs-eyebrow);color:var(--muted);margin-bottom:var(--sp-list);padding-right:30px;}
+/* (.play-modal/.play-scrim/.play-card/.play-x — the old floating-modal chrome — removed 2026-09-10:
+   mini-games are a real full page now, same .topbar/.q-scroll/.q-nav shell renderQuiz() uses; see
+   renderPlay()/renderPlayBrief()/renderPlayBody()/renderPlaySummary() below the share-modal block.) */
+/* Now holds only the timer/points badge row (no label text — that moved into the page's own
+   .topbar .tb-sub — and no close-X to clear space for, so centered instead of space-between). */
+.play-eyebrow{display:flex;align-items:center;justify-content:center;gap:var(--sp-inline);margin-bottom:var(--sp-stack);}
 .play-timer{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--white);background:var(--pink);padding:2px var(--sp-list);border-radius:var(--rpill);flex:0 0 auto;}
 .play-timer svg{width:13px;height:13px;}
 /* Booth points badge (2026-09-10, per direction "badge แต้มค้างอยู่ระหว่างตอบคำถาม") — sits in the
@@ -2146,20 +2174,25 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    game-side ฉาก 1 has a timer, only booth questions have points), so sharing the slot never collides. */
 .play-pts-badge{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--amber-text);background:var(--amber-bg);border:1px solid var(--amber-border);padding:2px var(--sp-list);border-radius:var(--rpill);flex:0 0 auto;}
 .play-pts-badge svg{width:13px;height:13px;}
-.play-dots{display:flex;gap:5px;justify-content:center;margin-bottom:var(--sp-stack);}
-.play-dot{width:6px;height:6px;border-radius:50%;background:var(--line-strong);}
-.play-dot.on{background:var(--violet);}
-/* (.play-intro — the old per-question q1 intro banner — removed 2026-09-10 along with its markup;
+/* (.play-dots/.play-dot — the per-question step-dot row under the eyebrow — removed 2026-09-10 per
+   direction; the "ข้อ N/M" text in .play-eyebrow already carries that progress info on its own.)
+   (.play-intro — the old per-question q1 intro banner — removed 2026-09-10 along with its markup;
    the pre-game briefing screen (.play-brief, below the share-modal block) replaced it.) */
-/* Question text (2026-09-10, per direction) — was --fs-sub/22px; bumped to --fs-h2/24px to read as
-   a real question again (still short of the DNA quiz's own --fs-title/36px .q-title, a deliberate
-   size difference approved by direction — this sits inside a modal, not a full screen). `b` matches
-   .q-title b's own bold-tail treatment (emphasizeQ() wraps the trailing clause in <b> — see
-   renderPlayBody). */
-.play-q{font-size:var(--fs-h2);font-weight:var(--w-body);color:var(--ink);line-height:1.3;margin-bottom:2px;}
+/* Question text (2026-09-10, per direction) — went --fs-sub/22px → --fs-h2/24px → a dedicated 32px
+   (this latest bump, same hardcoded-pixel treatment `.play-brief-h` already uses to override
+   .consent-h's 64px for this same modal — no existing token sits at 32px, so this is a deliberate
+   one-off size for the modal's own question text, not a repurposed --fs-* token). Still short of the
+   DNA quiz's own --fs-title/36px .q-title, staying a notch smaller since this lives in a modal, not
+   a full screen. `b` matches .q-title b's own bold-tail treatment (emphasizeQ() wraps the trailing
+   clause in <b> — see renderPlayBody). */
+.play-q{font-size:32px;font-weight:var(--w-body);color:var(--ink);line-height:1.3;margin-bottom:2px;}
 .play-q b{font-weight:var(--w-label);}
 .play-sub{font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin-bottom:var(--sp-stack);}
 .play-opts .q-opts{margin-bottom:var(--sp-stack);}
+/* .play-skip — SUPERSEDED 2026-09-10, per direction "(ภาพที่ 2) button dna ใช้แบบเดียวกับ ปุ่ม
+   ดูกำหนดการทั้งวัน 11 รายการ (หน้าหลัก)" — the skip button (multi-select questions' "ยังไม่พร้อมเลือก
+   ข้ามก่อน") now renders with the .ag-more class directly (see renderPlayBody's skipHTML) instead of
+   this plain underlined-text-link look. Rule kept for history only, nothing renders it anymore. */
 .play-skip{display:block;width:100%;text-align:center;background:none;border:none;font-family:var(--font);font-size:var(--fs-label);color:var(--muted);text-decoration:underline;cursor:pointer;padding:0 0 var(--sp-stack);}
 /* Insight box (2026-09-10, per direction) — moved cyan→violet: per DESIGN-DNA.md §2.2's status-tone
    ladder, cyan means "done/unlocked" (already the meaning of this SAME screen's "เล่นแล้ว" badge
@@ -2171,7 +2204,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    answering, not a UI element that was just always there. */
 .play-insight{display:flex;gap:var(--sp-list);align-items:flex-start;padding:var(--sp-list) var(--sp-inline);border-radius:var(--r2);background:color-mix(in srgb,var(--violet) 8%,transparent);border:1px solid color-mix(in srgb,var(--violet) 25%,transparent);margin-bottom:var(--sp-stack);opacity:0;transform:translateY(4px);}
 .play-insight.show{opacity:1;transform:none;transition:opacity .4s var(--ease) .15s,transform .4s var(--ease) .15s;}
-.play-insight svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);flex:0 0 auto;margin-top:1px;}
+/* margin-top 1px->4px (2026-09-10, per direction "ข้อมูลลักษณะนี้ทั้งหมด ในทุกคำถาม ให้ Alignment
+   center กับบรรทัดแรก") — align-items:flex-start on the parent top-aligns the icon against the WHOLE
+   (possibly 2-line) text block, which for this box's own 24px first-line height (fs-label/16px ×
+   line-height 1.5) left the 16px icon sitting near the top of that line, not centered in it. Exact
+   center math: (24px line - 16px icon) / 2 = 4px. */
+.play-insight svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);flex:0 0 auto;margin-top:4px;}
 .play-insight span{font-size:var(--fs-label);color:var(--ink);line-height:1.5;}
 @media(prefers-reduced-motion:reduce){.play-insight{opacity:1;transform:none;}.play-insight.show{transition:none;}}
 .play-nav{display:flex;gap:var(--sp-inline);align-items:center;justify-content:space-between;}
@@ -2198,7 +2236,16 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    that autoplays the instant this card mounts on the summary screen (no JS trigger needed — CSS
    animations run on insertion), same expanding-ring technique as the booth map's own `bmkFlash`
    marker-tap acknowledgment, retimed/retoned here for a "you just earned this" reward beat. */
-.play-sum-pts{display:flex;align-items:center;gap:var(--sp-list);justify-content:center;font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);background:color-mix(in srgb,var(--amber-text) 10%,transparent);border:1px solid color-mix(in srgb,var(--amber-text) 28%,transparent);border-radius:var(--r2);padding:var(--sp-stack);margin-bottom:var(--sp-stack);animation:ptsPop .6s var(--ease) 1;}
+/* Bumped from --fs-sub/22px + --ink to --fs-heading/28px + --amber-text (2026-09-10, per direction
+   "อยากให้เด่น หรือ bold มันขึ้นกว่านี้") — font-weight was already --w-label/700, the heaviest weight
+   this type scale has, so "bolder" had nowhere left to go on that axis; size + the reward card's own
+   amber tint (previously only on the background/border wash, not the payoff number itself) are what
+   actually make it read as a bigger moment now. margin-top:var(--sp-block) added the same pass (was
+   0 — .str-box carries no margin of its own, so this card used to sit flush against "สิ่งที่ได้เรียนรู้
+   จากเกมนี้" above it with no breathing room at all); --sp-block is this file's own "one labeled
+   sub-section to the next INSIDE the same card" token (see its :root definition near the top), which
+   is exactly the relationship these two boxes have — both live inside the same .hero-in frame. */
+.play-sum-pts{display:flex;align-items:center;gap:var(--sp-list);justify-content:center;font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--amber-text);background:color-mix(in srgb,var(--amber-text) 10%,transparent);border:1px solid color-mix(in srgb,var(--amber-text) 28%,transparent);border-radius:var(--r2);padding:var(--sp-stack);margin-top:var(--sp-block);margin-bottom:var(--sp-stack);animation:ptsPop .6s var(--ease) 1;}
 .play-sum-pts svg{width:var(--ic-md);height:var(--ic-md);color:var(--amber-text);flex:0 0 auto;}
 @keyframes ptsPop{0%{transform:scale(.92);box-shadow:0 0 0 2px color-mix(in srgb,var(--amber-text) 45%,transparent);}60%{transform:scale(1.04);}100%{transform:scale(1);box-shadow:0 0 0 14px color-mix(in srgb,var(--amber-text) 0%,transparent);}}
 @media(prefers-reduced-motion:reduce){.play-sum-pts{animation:none;}}
@@ -2210,15 +2257,22 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .play-brief{text-align:center;padding-top:2px;}
 .play-brief-badge{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--accent);border-radius:var(--rpill);padding:5px var(--sp-list);margin-bottom:var(--sp-stack);line-height:1.3;}
 .play-brief-badge .pb-emoji{font-size:16px;line-height:1;}
-/* overrides .consent-h's own 64px for the cramped modal; the .consent-h .ch-1/.ch-2 static two-tone
-   (muted + ink) still applies since the element keeps the .consent-h class (and no .reveal-h, so the
-   shimmer sweep stays off, exactly as on the real consent screen). */
-.play-brief-h{font-size:32px;margin-bottom:var(--sp-stack);}
+/* Back in use (2026-09-10, per direction "หน้าคั่น...text title size เล็กลงกว่านี้อีกหน่อย (ใช้ตามที่
+   .md มี)") — overrides .consent-h's own hero-specific 64px (a size bumped up 2026-08-19 purely for
+   the real consent screen's own spacious layout). First tried var(--fs-title)/36px (TYPOGRAPHY-DNA.md's
+   documented base for both .consent-h and .q-title), then corrected same-day to a dedicated 48px per
+   explicit follow-up direction ("var(--fs-title) 48px") — a deliberate one-off value for this cramped-
+   page heading specifically, not a change to the shared --fs-title token itself (still 36px everywhere
+   else — the real consent screen's own .q-title/.consent-h are untouched). The .consent-h .ch-1/.ch-2
+   two-tone (muted+ink) still applies unchanged since the element keeps the .consent-h class (and no
+   .reveal-h, so the shimmer sweep stays off, same as the real consent screen). */
+.play-brief-h{font-size:48px;margin-bottom:var(--sp-stack);}
 .play-brief-p{font-size:var(--fs-body);color:var(--muted);line-height:1.6;max-width:300px;margin:0 auto var(--sp-block);}
 .play-brief .round-cards{margin:0 0 var(--sp-stack);text-align:left;}
 .play-brief-note{display:flex;gap:var(--sp-list);align-items:flex-start;justify-content:center;font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin-bottom:var(--sp-block);}
 .play-brief-note svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;margin-top:1px;color:var(--ink);}
-.play-brief-cta{width:100%;}
+/* (.play-brief-cta — removed 2026-09-10, its "เริ่มเล่นเกม" button moved into the page's own .q-nav
+   which already sizes/positions .btn children, same as every other .q-nav pairing in this file.) */
 /* ══ SHARE MODAL ══ social-share sheet for the persona card (opened by the Book page's share
    buttons). Restyled to match the OTHER system modals (.scan-modal/.scan-card) — centered card,
    close X inset in the card's own top-right corner, title+subtitle header — instead of the earlier
@@ -4314,6 +4368,7 @@ function render(){
   else if(st.phase==='passport')renderBooth();
   else if(st.phase==='games')renderGames();
   else if(st.phase==='profile')renderProfile();
+  else if(st.phase==='play')renderPlay(); // mini-game full page (2026-09-10) — see renderPlay()'s own comment
   window.scrollTo(0,0);
   revealTick(); // sync .scroll-reveal transforms to the fresh DOM immediately, don't wait for a scroll event
 }
@@ -4397,7 +4452,7 @@ function renderConsent(){
        block so the whole group still centers together as before. */
     '<div class="consent-body scroll-reveal">'+
       '<div class="consent-h"><span class="ch-1">รู้จัก</span> <span class="ch-2">ตัวคุณ?</span></div>'+
-      '<div class="consent-p">ตอบคำถามสั้นๆ ตามใจจริง ไม่มีคำตอบผิด แล้วเราจะสรุปเป็น <b>"คู่มือลงทุนของคุณ"</b> เฉพาะตัว</div>'+
+      '<div class="consent-p">ตอบคำถามสั้นๆ ตามใจจริง ไม่มีคำตอบผิด แล้วเราจะสรุปเป็น <b>"Playbook ลงทุนของคุณ"</b> เฉพาะตัว</div>'+
       '<div class="round-cards">'+
         '<div class="round-card"><div class="rc-top"><span class="rc-dot" style="background:var(--yellow)"></span><span class="rc-kicker">ส่วนที่ 1</span></div><div class="rc-title">ความเสี่ยง</div><div class="rc-meta">3 ข้อ</div></div>'+
         '<div class="round-card"><div class="rc-top"><span class="rc-dot" style="background:var(--violet)"></span><span class="rc-kicker">ส่วนที่ 2</span></div><div class="rc-title">ตัวตน DNA</div><div class="rc-meta">7 ข้อ</div></div>'+
@@ -4423,6 +4478,14 @@ function toggleInterest(oi){var pos=st.s3.indexOf(oi);if(pos>-1){st.s3.splice(po
    actual crux of the question: "...คุณรับได้แค่ไหน?") without any hand-authored markup per question.
    A question with no space at all (a handful of the shorter ones) just renders as one plain weight —
    graceful fallback, not an error case. */
+/* emphasizeQ — bolds everything after the LAST space in a question. Since Thai is normally written
+   with no space inside one clause, that one manual space is how every q string in MINIGAME_Q/BOOTH_Q
+   marks where the "setup" ends and the actual bolded question begins (e.g. "...(ลดลง 57.00%) คุณจะทำ
+   อะไร?" bolds the whole "คุณจะทำอะไร?" clause). A question written as ONE continuous run with no
+   space at all silently gets NO bold (i<0 falls through unchanged) — bug fix 2026-09-10 (reported:
+   two questions had no trailing bold — "ประกัน คือการลงทุนที่ดีไหม?"/"สุขภาพ เกี่ยวกับเรื่องเงินยังไง?"
+   in BOOTH_Q, both originally one unspaced clause): a manual space was inserted before the clause
+   that should carry the emphasis, same convention as every other question in these two arrays. */
 function emphasizeQ(s){var i=s.lastIndexOf(' ');return i<0?s:s.slice(0,i+1)+'<b>'+s.slice(i+1)+'</b>';}
 function renderQuiz(){
   var idx=st.idx,q=getQ(idx),isInterests=(idx===10);
@@ -4950,7 +5013,7 @@ function redeemCardHTML(isUltimate){
        game-stat UIs conventionally mark a skill rating. Title <b> colored ink to match .redeem-note's
        own bold lead line (its color:var(--ink) is inherited from the block; this one sits inside
        .hero-note's own color:var(--muted), so needs the override explicit). */
-    '<div class="hero-note skill-note">'+ic('lc-zap')+'<span><b style="font-weight:var(--w-label);color:var(--ink)">ค่า SKILL บนการ์ดคือชั้นสนุกของการ์ดสะสม</b><br>ทีมออกแบบกำหนดและผู้เชี่ยวชาญสอบทาน ไม่ใช่ค่าที่วัดจากการเล่นของคุณ · ตัวตนจริงของคุณดูได้จากคู่มือทั้งหมด · มิใช่คำแนะนำการลงทุน</span></div>';
+    '<div class="hero-note skill-note">'+ic('lc-zap')+'<span><b style="font-weight:var(--w-label);color:var(--ink)">ค่า SKILL บนการ์ดคือชั้นสนุกของการ์ดสะสม</b><br>ทีมออกแบบกำหนดและผู้เชี่ยวชาญสอบทาน ไม่ใช่ค่าที่วัดจากการเล่นของคุณ · ตัวตนจริงของคุณดูได้จาก Playbook ทั้งหมด · มิใช่คำแนะนำการลงทุน</span></div>';
 }
 /* PLAY BOOK PDF download (2026-08-19, per direction — also present in the mockup, absent from the
    app). Shown in the post-event ("หลังงาน") view of both Book versions — locked behind Ultimate,
@@ -4971,7 +5034,7 @@ function pdfDownloadHTML(){
      unlock it" idiom .efin-banner's own locked state already implies, just made concrete here since
      this button, unlike that banner, has nothing else on the card to tap instead. */
   return '<div class="pdf-dl-slot" id="pdf-dl-slot"></div>'+
-    '<div class="pdf-dl-cap">บัตร Ultimate ปลดคู่มือฉบับเต็มพร้อมดาวน์โหลด - 1 วัน 1,500 บาท , 2 วัน 2,500 บาท</div>';
+    '<div class="pdf-dl-cap">บัตร Ultimate ปลด Playbook ฉบับเต็มพร้อมดาวน์โหลด - 1 วัน 1,500 บาท , 2 วัน 2,500 บาท</div>';
 }
 function mountPdfDlBtn(){
   if(!window.mountLiquidMetalButtonInto)return;
@@ -5035,7 +5098,7 @@ var BOOK2_TABS=[
    filter below. */
 function book2Tabs(){if(!DEMO.registered)return BOOK2_TABS.filter(function(t){return t.k==='identity';});return DEMO.eventPhase==='pre'?BOOK2_TABS.filter(function(t){return t.k==='identity'||t.k==='analysis';}):BOOK2_TABS;}
 function book2Subnav(active){
-  return '<nav class="toc bt-tabs bt-tabs--secondary" role="tablist" aria-label="หมวดคู่มือ 2">'+book2Tabs().map(function(t){
+  return '<nav class="toc bt-tabs bt-tabs--secondary" role="tablist" aria-label="หมวด Playbook">'+book2Tabs().map(function(t){
     return '<button class="bt-tab" type="button" role="tab" aria-selected="'+(t.k===active?'true':'false')+'" data-b2="'+t.k+'"><span class="bt-tab-icon">'+ic(t.icon)+'</span><span class="bt-tab-label">'+t.label+'</span></button>';
   }).join('')+'</nav>';
 }
@@ -5132,7 +5195,7 @@ function unregisteredCtaHTML(){
       '<div class="ev-empty-ic" style="background:none;width:48px;height:48px"><img src="'+ICON_BOOK_PNG+'" alt=""></div>'+
       '<div class="ev-empty-t shimmer-violet" style="font-size:26px">Investment DNA ของคุณคือจุดเริ่มต้น</div>'+
       '<div class="ev-empty-s" style="max-width:44ch">ร่วมเดินทางต่อในวันงาน กับ <b>10 INVESTMENT EXPERIENCES</b> • <b>6 INVESTMENT GAMES</b> พร้อม efin AI • Speaker ชั้นนำ • PAVILION ZONE</div>'+
-      '<div class="ev-empty-s ast-block" style="max-width:44ch;display:inline-block;font-weight:700;font-size:16px;color:var(--violet);background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)">รับ <span style="white-space:nowrap">PLAY BOOK</span> คู่มือการลงทุนส่วนตัว เพื่อสแกนทุกโอกาสการลงทุนในโลกยุคใหม่</div>'+
+      '<div class="ev-empty-s ast-block" style="max-width:44ch;display:inline-block;font-weight:700;font-size:16px;color:var(--violet);background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)">รับ <span style="white-space:nowrap">Playbook</span> การลงทุนส่วนตัว เพื่อสแกนทุกโอกาสการลงทุนในโลกยุคใหม่</div>'+
     '</div>'+
     /* text-decoration:none inline (not a new CSS rule) — .btn-primary is normally a <button>
        everywhere else in this file; only .reg-cta (the header's own register link) already resets
@@ -5219,13 +5282,12 @@ function renderBook(){
   root.innerHTML=
   /* unreg drops REG_CTA_HTML too (2026-09-04, per direction "เอาปุ่มลงทะเบียนมุมขวาบนออก เพราะย้ายมา
      ไว้ด้านล่างแล้ว") — unregisteredCtaHTML()'s own CTA at the bottom is now the only register button
-     on this screen, so the header goes back to just the logo. */
-  /* Bug fix (found while investigating "fix bug"): .hd-logo carries a blanket cursor:pointer rule
-     (it's normally the system-wide "tap logo to go Home" affordance), but bindHeaderLogo() below is
-     deliberately skipped when unreg — so without this override the logo LOOKED clickable while
-     actually doing nothing on tap, the exact "affordance promises an escape hatch that isn't there"
-     bug this whole `unreg` branch exists to avoid. cursor:default here overrides it inline. */
-  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="BetterTrade — กลับหน้าหลัก" style="margin-right:auto'+(unreg?';cursor:default':'')+'">'+(unreg?'':REG_CTA_HTML+'<div id="qr-cta-slot"></div>')+'</header>'+
+     on this screen, so the header goes back to just the logo. Logo is clickable again in this case too
+     (2026-09-10, per direction "ทำไมกด หน้า Playbook ไม่ได้ ในบางกรณี ต้องการให้กดได้ตลอด" — reversing
+     the 2026-09-04 "no escape hatch but the register CTA" design; see the bottom-tabbar comment below
+     for the other half of this reversal), so the old inline cursor:default override (which existed
+     only to keep the logo's look honest while its click WAS disabled) is gone too. */
+  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="BetterTrade — กลับหน้าหลัก" style="margin-right:auto">'+(unreg?'':REG_CTA_HTML+'<div id="qr-cta-slot"></div>')+'</header>'+
   /* unreg also drops the ตัวตน subnav pill entirely (2026-09-04, per direction "เอา tab ตัวตน
      ออก...ไม่มีข้อมูล tab อื่นให้เลือกอยู่แล้ว") — book2Tabs() already resolves to a single-item list
      for this case, but a 1-choice tab bar has nothing left to switch between, so skip rendering it. */
@@ -5274,12 +5336,27 @@ function renderBook(){
       sidesHTML(r)+
       '<section class="card scroll-reveal"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2></div>'+
         '<div class="route-steps">'+routeStep('done','','ทำ DNA Quiz','ตอบครบ 10 ข้อ เสร็จแล้ว — ได้ตัวตน '+h.th)+routeStep('act','2','ทำครบ 6 ด้าน','เสร็จแล้ว 2 จาก 6 — เหลืออีก 4 ด้านในบูธ')+routeStep('fut','3','รับ Playbook ส่วนตัวสมบูรณ์','เมื่อครบ 6 ด้าน รับกลยุทธ์เฉพาะตัวตน')+routeStep('fut','4','ติดตามบน efin.finance','Playbook sync ขึ้นแอปหลังงาน')+'</div></section>'+
+      /* learnedLedgerHTML (2026-09-10) — sits between the journey progress card and the static
+         คลังความรู้ shelf: specific (what YOU personally unlocked, from real GAME_PLAYED/BOOTH_ACT
+         answers) before general (the full 41-article reference shelf below). Top-level .card here,
+         same tier as klibRow's own section, deliberately NOT nested inside the identity tab's
+         .hero-gw glow frame with the compare-reveal/redeem-card content — that frame is reserved for
+         the persona card itself, and .card's own border would read as a card-inside-a-card there. */
+      learnedLedgerHTML()+
       '<section class="card scroll-reveal"><div class="s-pad"><div class="list-row klib-row" id="klibRow"><div class="klib-ic">'+ic('lc-library')+'</div><div class="klib-tx"><div class="klib-t">คลังความรู้</div><div class="klib-s">41 บทความที่คัดมาสำหรับ '+h.th+'</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
     '</div>'
     ))
     ))+
   '</main>'+
-  (unreg?'':appTabbar('book'));
+  /* Bottom app-tabbar now always renders, unreg included (2026-09-10, per direction "ทำไมกด หน้า
+     Playbook ไม่ได้ ในบางกรณี ต้องการให้กดได้ตลอด") — reverses the 2026-09-04 design that dropped it
+     for an unregistered quiz-taker (see the demo-stub text right above buildDemo's segRegistered
+     control): that made the truncated identity-only preview a genuine dead end (unregisteredCtaHTML's
+     register link was the ONLY tappable way off the screen). Every other tab still renders its own
+     normal content regardless of `unreg` — this only restores the ESCAPE HATCH, not the rest of the
+     registered-only Book content (book2Subnav/analysis/portfolio/journey panels stay unreg-gated
+     exactly as before). */
+  appTabbar('book');
   bindTabbar();bindBook2Nav();sizeHeroGlow();
   bindEfinBanner(h);
   /* #shareCardBtn bound here (not down with klibRow/confPlayBtn2 etc. below) because unreg's own
@@ -5293,6 +5370,12 @@ function renderBook(){
      Opacity-only cascade (never transform) so it can't fight the .scroll-reveal engine, which owns
      these same elements' transforms via revealTick(). */
   if(PB_INTRO){PB_INTRO=false;playIdentityIntro();}
+  // Logo bound unconditionally, ABOVE the unreg early-return just below (2026-09-10, per direction
+  // "ทำไมกด หน้า Playbook ไม่ได้ ในบางกรณี ต้องการให้กดได้ตลอด") — was skipped entirely for unreg
+  // (bindHeaderLogo() used to live only in the !unreg branch further down, alongside mountHeaderQR());
+  // now the logo's "tap to go Home" affordance works in every case, matching the header markup above
+  // which no longer overrides its cursor to look non-clickable.
+  bindHeaderLogo();
   // Linked preview: crossing the slider's 50% midpoint swaps #b2ident-detail to whichever persona
   // is now showing MORE of its card (pos>=50 -> pre-event's .cr2-before layer covers more of the
   // frame; see initCompareReveal's clip-path math) — threshold-gated so this only fires on an
@@ -5341,10 +5424,10 @@ function renderBook(){
   mountSideCtaBtn();
   var kr=root.querySelector('#klibRow');if(kr)kr.onclick=function(){LIB_OPEN=null;st.phase='library';render();};
   var confPlayBtn2=root.querySelector('#confPlayBtn');if(confPlayBtn2)confPlayBtn2.onclick=function(){st.phase='games';render();};
-  /* unreg: no qr-cta-slot in the header to mount into (see the header markup above), and the logo's
-     usual "tap to go Home" shortcut is skipped too — Home is one of the "หน้าอื่นๆ" this case can't
-     see, so the register CTA stays the only way out. */
-  if(!unreg){mountHeaderQR();bindHeaderLogo();}
+  /* unreg: no qr-cta-slot in the header to mount into (see the header markup above) — bindHeaderLogo()
+     moved up above the `if(unreg)return;` (2026-09-10) since the logo itself IS clickable in every
+     case now; only the QR mount stays gated here since unreg genuinely has nowhere to put it. */
+  if(!unreg)mountHeaderQR();
   initCharts(root);
   bindAllocHover(root);bindRadarTap(root);
 }
@@ -5374,7 +5457,7 @@ function playIdentityIntro(){
    appTabbar(activeKey) + calls bindTabbar() so taps switch st.phase and re-render. */
 var APP_TABS=[
   {k:'home',icon:'lc-home',label:'หน้าหลัก'},
-  {k:'book',icon:'lc-book-open',label:'คู่มือของคุณ'},
+  {k:'book',icon:'lc-book-open',label:'คู่มือของคุณ'}, // reverted from 'Playbook' 2026-09-10, per direction "หน้า คู่มือ ใช้ชื่อเมนู ว่า คู่มือ เหมือนเดิม" — the คู่มือ→Playbook rename stands everywhere else (see [[playbook-terminology]]), just not this one bottom-tab label.
   {k:'passport',icon:'lc-compass',label:'เดินบูธ'},
   {k:'games',icon:'lc-gamepad-2',label:'เกมหลัก'},
   {k:'profile',icon:'lc-user',label:'โปรไฟล์'}
@@ -5661,7 +5744,7 @@ var HOME_MST={agendaDay:1,agendaAll:false};
    full-color icon-set art specifically for the "บัตรของคุณ" pass-card. */
 var TIER_META={
   'Explorer':{sub:'สมาชิกระดับสำรวจ · 150/200 บาท',icon:'lc-compass'},
-  'Master Class':{sub:'คู่มือเต็ม + เวิร์กช็อป · 990/1,890 บาท',icon:'lc-gem'},
+  'Master Class':{sub:'Playbook เต็ม + เวิร์กช็อป · 990/1,890 บาท',icon:'lc-gem'},
   'Ultimate':{sub:'ทุกสิทธิ์ + การ์ดตัวจริง · 1,500/2,500 บาท',icon:'lc-crown'}
 };
 /* PNG icon-set counterparts for the 3 tier keys above — used only by tierIcHTML (the pass-card),
@@ -5775,7 +5858,7 @@ function homeNext(){
      than a quiz that's no longer open. */
   if(DEMO.eventPhase==='on'&&!RESULT)return {ey:'ช่วงงาน',t:'แบบทดสอบตัวตนปิดรับแล้ว',b:'แบบทดสอบตัวตนนักลงทุนเปิดให้ทำออนไลน์เฉพาะช่วง Pre-Event เท่านั้น เริ่มเดินบูธเพื่อสะสมกิจกรรมได้เลย',cta:'เริ่มเดินบูธ',icon:'lc-compass',go:function(){st.phase='passport';render();}};
   if(!RESULT)return {ey:'เริ่มตรงนี้',t:'ทำแบบทดสอบตัวตน 7 ข้อ',b:'ใช้เวลาราว 2 นาที แล้วคุณจะได้การ์ดตัวตนของตัวเอง',cta:'เริ่มทำแบบทดสอบ',icon:'lc-sparkles',go:function(){st.phase='splash';render();}};
-  return {ey:'ขั้นต่อไป',t:'เล่นเกมหลักอีก 4 เกม',b:'เล่นครบแล้วคู่มือของคุณจะเปิดครบทั้ง 6 ด้าน',cta:'ดูเกมที่เหลือ',icon:'lc-gamepad-2',iconPng:ICON_JOYSTICK_PNG,go:function(){st.phase='games';render();}};
+  return {ey:'ขั้นต่อไป',t:'เล่นเกมหลักอีก 4 เกม',b:'เล่นครบแล้ว Playbook ของคุณจะเปิดครบทั้ง 6 ด้าน',cta:'ดูเกมที่เหลือ',icon:'lc-gamepad-2',iconPng:ICON_JOYSTICK_PNG,go:function(){st.phase='games';render();}};
 }
 /* val was a hardcoded '2/5'/'2/6'/'2/5' mock, never actually wired to BOOTH_ACT/GAME_PLAYED/
    BOOTH_CHK — so these 3 tiles couldn't show a genuinely fresh/zero state (needed at the start of
@@ -5908,14 +5991,14 @@ function renderHome(){
      resolves safely (renderBook's own !RESULT guard redirects to splash, and render()'s on-event gate
      bounces that straight back to Home) but the OLD copy still promised a quiz that's no longer open;
      wrong copy, not a functional dead end. */
-  var bookTeaser=RESULT?'เติมแล้ว 2/6 ด้าน · เล่นเพิ่มเพื่อให้ครบ':(pre?'ทำแบบทดสอบตัวตน 7 ข้อ เพื่อเปิดคู่มือ':'ปิดรับทำแบบทดสอบแล้ว · เฉพาะช่วง Pre-Event');
+  var bookTeaser=RESULT?'เติมแล้ว 2/6 ด้าน · เล่นเพิ่มเพื่อให้ครบ':(pre?'ทำแบบทดสอบตัวตน 7 ข้อ เพื่อเปิด Playbook':'ปิดรับทำแบบทดสอบแล้ว · เฉพาะช่วง Pre-Event');
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
     /* v3 (2026-08-24, demo-panel preview toggle) — same dark poster as v2, but a looping video
        (BG_VIDEO.sky) instead of a still photo; see .hh-video/.home-hero.v3 for the layering. */
-    '<section class="home-hero scroll-reveal v3"><video class="hh-video" src="'+BG_VIDEO.sky+'" autoplay muted loop playsinline></video><div class="hh-badge">'+ic('lc-book-open')+'<span class="hh-badge-tx">คู่มือลงทุนของคุณ</span></div>'+
+    '<section class="home-hero scroll-reveal v3"><video class="hh-video" src="'+BG_VIDEO.sky+'" autoplay muted loop playsinline></video><div class="hh-badge">'+ic('lc-book-open')+'<span class="hh-badge-tx">Playbook ลงทุนของคุณ</span></div>'+
       '<img class="hh-logo" src="'+LOGO_IMG.nwnp+'" alt="New World New Playbook">'+
-      '<p class="hh-sub"><b>คู่มือการลงทุนส่วนตัวของคุณ ประกอบจากการ์ดตัวตนและสิ่งที่คุณทำจริงในงาน</b> ดูย้อนหลังได้บน efin.finance</p>'+
+      '<p class="hh-sub"><b>Playbook การลงทุนส่วนตัวของคุณ ประกอบจากการ์ดตัวตนและสิ่งที่คุณทำจริงในงาน</b> ดูย้อนหลังได้บน efin.finance</p>'+
       '<div class="hh-meta"><span>'+ic('lc-calendar')+'31 ต.ค. – 1 พ.ย. 2569</span><span>'+ic('lc-map-pin')+'Samyan Mitrtown ชั้น 5</span></div></section>'+
     (DEMO.multiTicket?passCardMultiHTML():(function(){var tp=(t.meta.sub||'').split(' · ');var benefit=tp[0]||'',price=tp[1]||'';
       /* Tier icon inline with .pass-ey (the "บัตรของคุณ" eyebrow), not .pass-name (2026-08-24, per
@@ -5931,7 +6014,7 @@ function renderHome(){
     (pre?'':(
     '<section class="next-step scroll-reveal"><div class="ns-ic">'+(ns.iconPng?'<img src="'+ns.iconPng+'" alt="">':ic(ns.icon))+'</div><div class="ns-tx"><div class="ns-ey">'+ns.ey+'</div><div class="ns-t">'+ns.t+'</div></div><div class="ns-cta-slot" id="ns-cta-slot"></div><div class="ns-body"><div class="ns-b">'+ns.b+'</div></div></section>'+
     '<div class="home-counters scroll-reveal">'+HOME_COUNTERS.map(function(c){return '<button class="hc-card" data-go="'+c.go+'"><svg viewBox="0 0 24 24" class="lucide" style="color:'+c.color+'"><use href="#'+c.icon+'"/></svg><div class="hc-val">'+c.val()+'</div><div class="hc-label">'+c.label+'</div></button>';}).join('')+'</div>'+
-    '<div class="list-row book-teaser" id="homeBook"><div class="klib-tx"><div class="bt-t"><img class="bt-t-ic" src="'+ICON_BOOK_PNG+'" alt="">คู่มือลงทุนของคุณ</div><div class="bt-s">'+bookTeaser+'</div></div>'+ic('lc-chevron-right','bt-cv')+'</div>'))+
+    '<div class="list-row book-teaser" id="homeBook"><div class="klib-tx"><div class="bt-t"><img class="bt-t-ic" src="'+ICON_BOOK_PNG+'" alt="">Playbook ลงทุนของคุณ</div><div class="bt-s">'+bookTeaser+'</div></div>'+ic('lc-chevron-right','bt-cv')+'</div>'))+
     '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">เวทีห้องใหญ่</div><div class="hcard-s">09.00–18.30 น. · Samyan Mitrtown ชั้น 5 · เวทีเดียว 2 วัน กำหนดการคนละชุด</div></div>'+
       '<div class="bt-tabs bt-tabs--primary" id="agTabs" role="tablist" aria-label="เลือกวันที่กำหนดการ"><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===1?'true':'false')+'" data-value="1"><span class="bt-tab-label">วันที่ 1 ✦ 31 ต.ค.</span></button><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===2?'true':'false')+'" data-value="2"><span class="bt-tab-label">วันที่ 2 ✦ 1 พ.ย.</span></button></div>'+
       '<div class="ag-list">'+shown.map(function(a){return '<div class="ag-row"><div class="ag-time">'+a.time+'</div><div><div class="ag-t">'+a.t+'</div>'+(a.by?'<div class="ag-by">'+a.by+'</div>':'')+'</div></div>';}).join('')+'</div>'+
@@ -6012,16 +6095,20 @@ var BOOTH_ICON_PNG={
   'ตราสารหนี้':ICON_BOND_PNG,'อสังหา/REIT':ICON_REALESTATE_PNG,'ทองคำ':ICON_GOLD_PNG,'สุขภาพ':ICON_HEALTH_PNG,
   'ประกัน':ICON_INSURANCE_PNG,'คริปโต':ICON_CRYPTO_PNG,'ของสะสม':ICON_COLLECTIBLE_PNG
 };
-/* partner companies per asset — verbatim from ZONE_BOOTHS (the real check-in points). */
+/* partner companies per asset — verbatim from ZONE_BOOTHS (the real check-in points).
+   3 assets (หุ้นไทย/กองทุนรวม/คริปโต) padded to the 12-booth max with sample/placeholder partner
+   names (2026-09-10, per direction "แต่ละสินทรัพย์ มีบูธ ได้มากสุด 12 บูธ...ลองวางบางสินทรัพย์ให้ได้
+   ถึง 12 (ใช้ข้อมูลตัวอย่างก่อนได้)") — real names used as realistic sample data only, not a
+   confirmed sponsor list; the remaining 7 assets are left at their original counts. */
 var ZONE_BOOTHS=[
-  ['บล. กสิกรไทย','บล. อินโนเวสท์ เอกซ์','บล. บัวหลวง'],
+  ['บล. กสิกรไทย','บล. อินโนเวสท์ เอกซ์','บล. บัวหลวง','บล. ทรีนีตี้','บล. เมย์แบงก์ (ประเทศไทย)','บล. หยวนต้า (ประเทศไทย)','บล. เอเซีย พลัส','บล. ฟิลลิป (ประเทศไทย)','บล. ดีบีเอส วิคเคอร์ส (ประเทศไทย)','บล. เคทีบีเอสที','บล. ซีจีเอส อินเตอร์เนชั่นแนล (ประเทศไทย)','บล. กรุงศรี'],
   ['บล. เกียรตินาคินภัทร'],
-  ['บลจ. กสิกรไทย','บลจ. ไทยพาณิชย์'],
+  ['บลจ. กสิกรไทย','บลจ. ไทยพาณิชย์','บลจ. กรุงไทย','บลจ. บัวหลวง','บลจ. ทหารไทยธนชาต','บลจ. กรุงศรี','บลจ. เอ็มเอฟซี','บลจ. พรินซิเพิล','บลจ. ยูโอบี (ประเทศไทย)','บลจ. อีสท์สปริง (ประเทศไทย)','บลจ. วรรณ','บลจ. แลนด์ แอนด์ เฮ้าส์'],
   ['ThaiBMA'],
   ['YLG','ฮั่วเซ่งเฮง','MTS Gold'],
   ['แสนสิริ','AP Thai'],
   ['เมืองไทยประกันชีวิต','AIA'],
-  ['Bitkub','Binance TH'],
+  ['Bitkub','Binance TH','Zipmex','Satang Pro','Upbit Thailand','Gulf Binance','InnovestX Coins','OKX TH','Bybit','Orbix','GSC (Gulf Innova)','Merkle Capital'],
   ['Art Auction','Rare Collectibles'],
   ['BDMS Wellness']
 ];
@@ -6031,16 +6118,16 @@ var ZONE_BOOTHS=[
    just adds the short topical description. Kept as its own array (not folded into the big BOOTH_Q
    literal) so the question data stays untouched. */
 var BOOTH_BRIEF=[
-  'ลองเลือกหุ้นแบบนักลงทุน — ดูว่าคุณตัดสินใจซื้อจากอะไรเป็นหลัก',
+  'ลองเลือกหุ้นแบบนักลงทุน ดูว่าคุณตัดสินใจซื้อจากอะไรเป็นหลัก',
   'ก้าวออกไปไกลกว่าหุ้นไทย พร้อมรู้จักความเสี่ยงใหม่ที่ตามมา',
-  'เทียบกองทุนแบบเจาะลึก — ผลตอบแทนกับค่าธรรมเนียม อันไหนสำคัญกว่า',
+  'เทียบกองทุนแบบเจาะลึก ผลตอบแทนกับค่าธรรมเนียม อันไหนสำคัญกว่า',
   'วางตาข่ายเงินสำรองให้ดี ก่อนออกไปลงสนามลงทุน',
   'ทำความรู้จักทองคำ ในฐานะเพื่อนยามวิกฤตของพอร์ต',
-  'ไล่หาผลตอบแทนจากอสังหาฯ — ดูตัวเลขจริงหลังหักค่าใช้จ่าย',
+  'ไล่หาผลตอบแทนจากอสังหาฯ ดูตัวเลขจริงหลังหักค่าใช้จ่าย',
   'สแกนหาความเสี่ยงที่รับเองไม่ไหว และเครื่องมือที่ช่วยรับแทน',
   'ลองโต้คลื่นของที่ขึ้นลงแรง ด้วยแผนที่ตั้งไว้ล่วงหน้า',
   'ตีราคาของสะสม ระหว่างของที่รักกับการลงทุนจริง',
-  'เช็กว่าสุขภาพเกี่ยวกับเรื่องเงินยังไง — สินทรัพย์ที่คนมักลืมนับ'
+  'เช็กว่าสุขภาพเกี่ยวกับเรื่องเงินยังไง สินทรัพย์ที่คนมักลืมนับ'
 ];
 /* ══ BOOTH_Q (2026-09-09) ══ real question content for the 10 asset-booth mini-games (เกมประจำ
    Asset 10 เกม), sourced verbatim from GAMES-QUESTIONS-DNA.md Part B (itself from "คำถาม 6 ด้าน
@@ -6056,107 +6143,111 @@ var BOOTH_BRIEF=[
    doc's own cross-reference note. */
 var BOOTH_Q=[
   {points:12,questions:[
-    {q:'มีหุ้นตัวหนึ่งกำลังเป็นที่พูดถึง คุณจะตัดสินใจซื้อจากอะไรเป็นหลัก?',locked:true,
+    {icon:'lc-file-text',q:'มีหุ้นตัวหนึ่งกำลังเป็นที่พูดถึง คุณจะตัดสินใจซื้อจากอะไรเป็นหลัก?',locked:true,
      opts:['ดูว่าธุรกิจทำอะไร และงบการเงินเป็นยังไง','ดูกราฟราคาและจังหวะซื้อ','เพื่อนหรือข่าวในกลุ่มบอกว่าน่าสนใจ'],
      insight:'ตัดสินใจจากข้อมูลของธุรกิจ ไม่ใช่จากคำบอกเล่า'},
-    {q:'ถ้ามีเงินก้อนหนึ่งจะลงทุน คุณจะ...',
+    {icon:'lc-pie-chart',q:'ถ้ามีเงินก้อนหนึ่งจะลงทุน คุณจะ...',
      opts:['ลงกับหุ้นตัวเดียวที่มั่นใจที่สุด','แบ่งลงหลายตัวหรือลงผ่านกองทุน 5-10 อย่าง','ทยอยซื้อทีละน้อยหลายงวด (DCA)'],
      insight:'การแบ่งเงินไปหลายที่ ช่วยลดผลกระทบเวลาที่ใดที่หนึ่งไม่เป็นไปตามคาด'}
   ]},
   {points:10,questions:[
-    {q:'ถ้าเงินลงทุนของคุณมีแต่ของไทย คุณคิดว่าเพียงพอไหม?',
+    {icon:'lc-globe',q:'ถ้าเงินลงทุนของคุณมีแต่ของไทย คุณคิดว่าเพียงพอไหม?',
      opts:['พอแล้ว ลงในสิ่งที่เราคุ้นเคย','ควรแบ่งไปต่างประเทศบ้าง','ย้ายไปต่างประเทศเป็นหลักเลย'],
      insight:'คนส่วนใหญ่มักลงแต่ในประเทศที่คุ้นเคย ทั้งที่โลกมีตัวเลือกมากกว่านั้น'},
-    {q:'ลงทุนหุ้นต่างประเทศ มีความเสี่ยงอะไรเพิ่มขึ้นจากหุ้นไทย?',
+    {icon:'lc-refresh-cw',q:'ลงทุนหุ้นต่างประเทศ มีความเสี่ยงอะไรเพิ่มขึ้นจากหุ้นไทย?',
      opts:['ความเสี่ยงจากค่าเงิน เพราะต้องแลกเป็นเงินสกุลอื่น','ไม่มีอะไรต่างจากหุ้นไทย','เสี่ยงน้อยกว่า เพราะบริษัทใหญ่'],
      insight:'เวลาลงทุนข้ามประเทศ กำไรขาดทุนขึ้นกับค่าเงินด้วย ไม่ใช่แค่ราคาหุ้น'}
   ]},
   {points:11,questions:[
-    {q:'กอง A ผลตอบแทนเด่น ค่าธรรมเนียม 2.00% ต่อปี · กอง B ผลตอบแทนใกล้กัน ค่าธรรมเนียม 0.50% ต่อปี คุณเลือกกองไหน?',
+    {icon:'lc-coins',q:'กอง A ผลตอบแทนเด่น ค่าธรรมเนียม 2.00% ต่อปี กอง B ผลตอบแทนใกล้กัน ค่าธรรมเนียม 0.50% ต่อปี คุณเลือกกองไหน?',
      opts:['กอง A เพราะผลงานดูดีกว่า','กอง B เพราะค่าธรรมเนียมถูกกว่า','ขอดูข้อมูลมากกว่านี้ก่อน'],
      insight:'ค่าธรรมเนียมถูกหักทุกปี ระยะยาวส่วนต่างเล็กๆ กลายเป็นเงินก้อนใหญ่ได้'},
-    {q:'กองที่มีผู้จัดการคอยเลือกหุ้นให้ เทียบกับกองที่ลงตามดัชนีตลาดซึ่งค่าธรรมเนียมถูกกว่า ระยะยาวต่างกันแค่ไหน?',
+    {icon:'lc-target',q:'กองที่มีผู้จัดการคอยเลือกหุ้นให้ เทียบกับกองที่ลงตามดัชนีตลาดซึ่งค่าธรรมเนียมถูกกว่า ระยะยาวต่างกันแค่ไหน?',
      opts:['กองที่มีคนเลือกให้ เพราะมีมืออาชีพดูแล','กองที่ลงตามดัชนีตลาด เพราะถูกและไปตามตลาด','ผสมทั้งสองแบบ'],
      insight:'ทั้งสองแบบมีที่ใช้ ต่างกันที่ค่าธรรมเนียมและวิธีทำงาน'}
   ]},
   {points:9,questions:[
-    {q:'สมมติว่ามีรายได้เข้ามาก้อนหนึ่ง ก่อนเอาไปลงทุน คุณจะกันไว้เป็นเงินสำรองเผื่อฉุกเฉินแค่ไหน?',
+    {icon:'lc-shield',q:'สมมติว่ามีรายได้เข้ามาก้อนหนึ่ง ก่อนเอาไปลงทุน คุณจะกันไว้เป็นเงินสำรองเผื่อฉุกเฉินแค่ไหน?',
      opts:['กันให้ครบเท่ารายจ่าย 6 เดือนก่อน','กันไว้ราว 3 เดือน แล้วเริ่มลงทุนคู่กันไป','ไม่กัน เอาไปลงทุนให้เต็มที่'],
      insight:'เงินสำรองเผื่อฉุกเฉินคือตาข่ายที่ทำให้เราไม่ต้องขายของตอนราคาแย่'},
-    {q:'เงินสำรองก้อนนี้ ควรเก็บไว้ที่ไหน?',
+    {icon:'lc-landmark',q:'เงินสำรองก้อนนี้ ควรเก็บไว้ที่ไหน?',
      opts:['บัญชีออมทรัพย์หรือกองทุนตลาดเงิน ถอนได้ทันที','ฝากประจำล็อก 2 ปี ได้ดอกเบี้ยสูงกว่า','เอาไปลงหุ้นปันผล ได้ทั้งปันผลและโต'],
      insight:'เงินสำรองต้องถอนออกมาใช้ได้เร็วเมื่อจำเป็น (สภาพคล่อง) สำคัญกว่าได้ผลตอบแทนสูง'}
   ]},
   {points:13,questions:[
-    {q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บ วันนี้อันไหนซื้อของได้มากกว่ากัน?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้',
+    {icon:'lc-trending-up',q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บ วันนี้อันไหนซื้อของได้มากกว่ากัน?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้',
      opts:['เงินสด เพราะยังเป็น 100,000 บาท เท่าเดิม','ทอง น่าจะซื้อของได้มากกว่า','น่าจะพอๆ กัน'],
      insight:'เงินสดตัวเลขเท่าเดิม แต่ซื้อของได้น้อยลงเพราะเงินเฟ้อ ส่วนทองมักขยับตามค่าของเงิน'},
-    {q:'สมมติว่าเกิดวิกฤต หุ้นทั่วโลกร่วง 40% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่าทองจะเป็นยังไง?',
+    {icon:'lc-shield',q:'สมมติว่าเกิดวิกฤต หุ้นทั่วโลกร่วง 40% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่าทองจะเป็นยังไง?',
      opts:['ร่วงตามหุ้นไปด้วย','ทรงตัวหรือขึ้นสวนทางกับหุ้น','ราคาไม่ขยับ แต่ขายไม่ออก'],
      insight:'ในหลายวิกฤต ทองมักไม่ไปทางเดียวกับหุ้น จึงช่วยพยุงภาพรวมได้'},
-    {q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินลงทุนทั้งหมดซื้อทองเลยดีไหม?',
+    {icon:'lc-pie-chart',q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินลงทุนทั้งหมดซื้อทองเลยดีไหม?',
      opts:['ใช่ ซื้อทองทั้งหมด ปลอดภัยที่สุด','ไม่ แบ่งไว้ส่วนหนึ่งพอ ที่เหลือไปอย่างอื่น','ไม่ซื้อเลย ชอบของที่งอกเงยกว่า'],
      insight:'ทองไม่สร้างรายได้ระหว่างถือ จึงมักใช้เป็นส่วนหนึ่ง ไม่ใช่ทั้งหมด'}
   ]},
   {points:8,questions:[
-    {q:'ห้องเช่าโฆษณาว่า "ผลตอบแทน 8% ต่อปี" — หลังหักค่าใช้จ่ายจริง คุณคิดว่าเหลือเท่าไร?',
+    {icon:'lc-building-2',q:'ห้องเช่าโฆษณาว่า "ผลตอบแทน 8% ต่อปี" หลังหักค่าใช้จ่ายจริง คุณคิดว่าเหลือเท่าไร?',
      opts:['น่าจะเหลือราว 3-5%','ก็ 8% ตามที่โฆษณา','ต้องขอดูตัวเลขค่าใช้จ่ายก่อน'],
      insight:'ตัวเลขที่โฆษณามักยังไม่หักค่าส่วนกลาง ค่าซ่อม ภาษี และช่วงที่ไม่มีคนเช่า'},
-    {q:'ถ้าอยากมีรายได้จากอสังหาฯ จะซื้อห้องเองตรงๆ หรือซื้อกองทุนอสังหาฯ (REIT)?',
+    {icon:'lc-home',q:'ถ้าอยากมีรายได้จากอสังหาฯ จะซื้อห้องเองตรงๆ หรือซื้อกองทุนอสังหาฯ (REIT)?',
      opts:['ซื้อห้องเอง เพราะจับต้องได้','ซื้อกองทุนอสังหาฯ เพราะเริ่มด้วยเงินน้อยและขายง่ายกว่า','ยังไม่แน่ใจ ขอเข้าใจก่อน'],
      insight:'ซื้อเองต้องดูแลเองและขายยากกว่า · กองทุนอสังหาฯ เริ่มเงินน้อยกว่าและซื้อขายง่ายกว่า'}
   ]},
   {points:10,questions:[
-    {q:'สมมติว่าคนที่หาเลี้ยงครอบครัวต้องหยุดทำงานไปกะทันหัน ครอบครัวจะมีเงินใช้ได้นานแค่ไหน?',sub:'คำถามนี้ไม่ต้องกังวล เราถามเพื่อให้เห็นภาพเท่านั้น',
+    {icon:'lc-heart',q:'สมมติว่าคนที่หาเลี้ยงครอบครัวต้องหยุดทำงานไปกะทันหัน ครอบครัวจะมีเงินใช้ได้นานแค่ไหน?',sub:'คำถามนี้ไม่ต้องกังวล เราถามเพื่อให้เห็นภาพเท่านั้น',
      opts:['ยังไม่เคยคิดเรื่องนี้เลย','พอมีเก็บไว้ราว 1-2 ปี','เตรียมไว้แล้ว หรือมีประกันอยู่'],
      insight:'ความเสี่ยงบางอย่างรับเองไม่ไหว จึงมีเครื่องมือช่วยรับความเสี่ยงนั้นแทน'},
-    {q:'"ประกันคือการลงทุนที่ดีไหม?"',
+    {icon:'lc-shield',q:'"ประกัน คือการลงทุนที่ดีไหม?"',
      opts:['ใช่ ควรซื้อแบบที่ได้เงินคืนเยอะๆ','ไม่ ประกันมีไว้คุ้มครอง ส่วนการลงทุนแยกกัน','ยังไม่แน่ใจ'],
      insight:'ประกันมีหน้าที่คุ้มครองเวลาเกิดเรื่อง ไม่ใช่เครื่องมือหลักในการทำให้เงินโต'}
   ]},
   {points:9,questions:[
-    {q:'ถ้าคุณอยากลองของที่ขึ้นลงแรง เช่น คริปโต จะแบ่งเงินไปเท่าไรของเงินลงทุนทั้งหมด?',locked:true,
+    {icon:'lc-bitcoin',q:'ถ้าคุณอยากลองของที่ขึ้นลงแรง เช่น คริปโต จะแบ่งเงินไปเท่าไรของเงินลงทุนทั้งหมด?',locked:true,
      opts:['ราว 5% ถือว่าเป็นเงินที่เสียได้','ราว 15-20%','ครึ่งหนึ่งขึ้นไป ของมันต้องลอง'],
      insight:'หลักง่ายๆ คือแบ่งเท่าที่เสียได้โดยไม่กระทบชีวิต'},
-    {q:'สมมติว่าลงไปแล้ว คืนเดียวราคาร่วง 40% คุณจะทำอะไร?',
+    {icon:'lc-zap',q:'สมมติว่าลงไปแล้ว คืนเดียวราคาร่วง 40% คุณจะทำอะไร?',
      opts:['ขายหนีทันที กลัวลงต่อ','ถือตามแผนเดิม ไม่แตะ','ซื้อเพิ่มเลย ของถูก'],
      insight:'ของที่ขึ้นลงแรงต้องมาพร้อมแผนที่ตั้งไว้ก่อน ไม่ใช่ตัดสินใจตอนใจสั่น'}
   ]},
   {points:8,questions:[
-    {q:'พระเครื่อง นาฬิกา หรืองานศิลป์ — เป็นการลงทุนที่ดีไหม?',
+    {icon:'lc-gem',q:'พระเครื่อง นาฬิกา หรืองานศิลป์ เป็นการลงทุนที่ดีไหม?',
      opts:['ดีมาก ราคาขึ้นได้เยอะ','เป็นของที่รักและสะสม มากกว่าจะเป็นการลงทุนหลัก','เสี่ยง ขอเข้าใจก่อน'],
      insight:'ของสะสมขึ้นกับคนที่อยากได้ต่อ และเวลาจะขายอาจใช้เวลานาน'},
-    {q:'ถ้าจะมีของสะสมรวมอยู่ในเงินลงทุน ควรเป็นสัดส่วนเท่าไร?',
+    {icon:'lc-target',q:'ถ้าจะมีของสะสมรวมอยู่ในเงินลงทุน ควรเป็นสัดส่วนเท่าไร?',
      opts:['ส่วนเล็กๆ เท่าที่เสียได้','ปานกลาง ถ้าเรารู้จริงในเรื่องนั้น','เยอะเลย เพราะของมันมีค่า'],
      insight:'ยิ่งเป็นของที่ขายยาก ยิ่งควรเป็นส่วนเล็กของภาพรวม'}
   ]},
   {points:10,questions:[
-    {q:'สุขภาพเกี่ยวกับเรื่องเงินยังไง?',
+    {icon:'lc-heart',q:'สุขภาพ เกี่ยวกับเรื่องเงินยังไง?',
      opts:['ไม่ค่อยเกี่ยว เป็นคนละเรื่อง','เกี่ยวมาก ป่วยครั้งเดียวเงินหายเป็นก้อน','สุขภาพคือฐานของทุกอย่าง'],
      insight:'สุขภาพเป็นสินทรัพย์ที่คนมักลืมนับ แต่เป็นตัวที่ปกป้องสินทรัพย์อื่นไว้'},
-    {q:'ลงทุนกับสุขภาพวันนี้ แบบไหนคุ้มที่สุด?',
+    {icon:'lc-target',q:'ลงทุนกับสุขภาพวันนี้ แบบไหนคุ้มที่สุด?',
      opts:['ออกกำลังกาย กินให้ดี ตรวจสุขภาพประจำ','ทำประกันสุขภาพไว้','ค่อยคิดตอนป่วย'],
      insight:'ค่าดูแลตัวเองวันนี้มักถูกกว่าค่ารักษาในวันที่สายไปแล้ว'},
-    {q:'ตอนนี้คุณมีประกันสุขภาพหรือประกันค่ารักษาไหม?',sub:'ถามข้อเท็จจริง ไม่มีคำตอบผิด',
+    {icon:'lc-shield',q:'ตอนนี้คุณมีประกันสุขภาพหรือประกันค่ารักษาไหม?',sub:'ถามข้อเท็จจริง ไม่มีคำตอบผิด',
      opts:['มี และรู้วงเงินคุ้มครองคร่าวๆ','มี แต่ไม่แน่ใจว่าคุ้มครองแค่ไหน','ยังไม่มี'],
      insight:'การรู้ว่าเรามีวงเงินคุ้มครองเท่าไร สำคัญเท่ากับการมีประกัน'},
-    {q:'สมมติว่าพรุ่งนี้ต้องจ่ายค่ารักษา 100,000 บาท คุณจะเอามาจากไหน?',
+    {icon:'lc-coins',q:'สมมติว่าพรุ่งนี้ต้องจ่ายค่ารักษา 100,000 บาท คุณจะเอามาจากไหน?',
      opts:['เงินเก็บหรือเงินสำรองที่มีอยู่','ประกันจ่ายให้','ต้องกู้ ขายของ หรือยืมคนอื่น'],
      insight:'ค่ารักษาที่มาแบบไม่ทันตั้งตัว คือเหตุผลที่ควรมีเงินสำรองและความคุ้มครอง'},
-    {q:'ปีที่ผ่านมา คุณดูแลสุขภาพเชิงป้องกันแค่ไหน?',
+    {icon:'lc-check-circle',q:'ปีที่ผ่านมา คุณดูแลสุขภาพเชิงป้องกันแค่ไหน?',
      opts:['ทำสม่ำเสมอ','ทำบ้าง ไม่สม่ำเสมอ','แทบไม่ได้ทำ'],
      insight:'ตรวจสุขภาพประจำปี ก็เหมือนการเปิดดูภาพรวมเงินลงทุนของเรา'}
   ]}
 ];
 /* 5 zones — name / sub-label / dot icon / accent, and the score fn (hero radar → route order). */
 var BOOTH_ZONES=[
-  {name:'Capital Zone',zone:'โซนกิจกรรม · บูธ 1',icon:'lc-landmark',chip:'เงินทุน',color:'#0090c8',score:function(rd,h){return Math.round((rd[2]+rd[0])/2);}},
+  /* chip relabeled Thai asset-category -> English zone-derived name (2026-09-10, per direction
+     "badge ประเภทสินทรัพย์...ให้ปรับใช้ชื่อเดียวกันกับ ชื่อโซน...เป็น Eng") — each chip is now just
+     `name` with " Zone"/" Investment Zone" dropped, so the badge next to the asset title reads the
+     same identity as the zone header above it instead of a separate Thai taxonomy. */
+  {name:'Capital Zone',zone:'โซนกิจกรรม · บูธ 1',icon:'lc-landmark',chip:'Capital',color:'#0090c8',score:function(rd,h){return Math.round((rd[2]+rd[0])/2);}},
   /* color unified to --amber-text (2026-08-15, per Color DNA review "05") — was a second, darker,
      unrelated gold (#b88a10) rendering on the same Booth screen as .rt-badge.feat's --amber-text. */
-  {name:'Crypto Zone',zone:'โซนกิจกรรม · บูธ 2',icon:'lc-bitcoin',chip:'คริปโต',color:'var(--amber-text)',featured:true,score:function(rd,h){return rd[3];}},
-  {name:'Commodity Zone',zone:'โซนกิจกรรม · บูธ 3',icon:'lc-coins',chip:'โภคภัณฑ์',color:'#d1622a',score:function(rd,h){return rd[4];}},
-  {name:'Alternative Investment Zone',zone:'โซนกิจกรรม · บูธ 4',icon:'lc-gem',chip:'ทางเลือก',color:'#9c6bd0',score:function(rd,h){return /สะสม/.test(JSON.stringify(h.assets))?78:(h.fam==='V'?48:30);}},
-  {name:'Health Zone',zone:'โซนกิจกรรม · บูธ 5',icon:'lc-heart',chip:'สุขภาพ',color:'#c048b6',score:function(rd,h){return rd[5];}}
+  {name:'Crypto Zone',zone:'โซนกิจกรรม · บูธ 2',icon:'lc-bitcoin',chip:'Crypto',color:'var(--amber-text)',featured:true,score:function(rd,h){return rd[3];}},
+  {name:'Commodity Zone',zone:'โซนกิจกรรม · บูธ 3',icon:'lc-coins',chip:'Commodity',color:'#d1622a',score:function(rd,h){return rd[4];}},
+  {name:'Alternative Investment Zone',zone:'โซนกิจกรรม · บูธ 4',icon:'lc-gem',chip:'Alternative',color:'#9c6bd0',score:function(rd,h){return /สะสม/.test(JSON.stringify(h.assets))?78:(h.fam==='V'?48:30);}},
+  {name:'Health Zone',zone:'โซนกิจกรรม · บูธ 5',icon:'lc-heart',chip:'Health',color:'#c048b6',score:function(rd,h){return rd[5];}}
 ];
 /* ══ QR SCAN MODAL (logic) ══ single reusable mocked scan flow, analyzed from the demo export's
    openScan/scanMode/confirmScan (itself fully mocked, no camera API — see the CSS comment above
@@ -6296,6 +6387,12 @@ function renderBooth(){
   // Same personalized-map condition as buildRoute() (RESULT + qualifying tier) — recomputed here
   // rather than exposed off buildRoute's return so its per-stop array shape stays untouched.
   var mapPersonalized=!!RESULT&&(curTier().name==='Master Class'||curTier().name==='Ultimate');
+  /* Map tier split (2026-09-10, per direction) — Explorer sees ONLY the bare map image (no header/
+     badge, no v2 tracking markers, no zone route-list below); Master Class/Ultimate keep the full
+     experience unchanged. Deliberately keyed on the tier alone, not mapPersonalized (which also
+     requires RESULT) — an Explorer ticket-holder without a RESULT yet still gets the minimal map,
+     never the full one. */
+  var mapOnly=curTier().name==='Explorer';
   var chk=boothCheckinCount(),act=boothActivityCount(),pts=boothPointsTotal();
   var chkOK=chk>=CHECKIN_NEED,actOK=act>=ACTIVITY_NEED;
   /* DEMO.draw force (2026-08-26, per direction "อยากให้จำลองเคส...ไว้ด้วย กรณีครบเงื่อนไขแล้ว และ
@@ -6357,12 +6454,17 @@ function renderBooth(){
          map/route section right after it. */
       : '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">เดินบูธ <span class="hd-star">✦</span> ลุ้นรางวัล</div><div class="hcard-s">เช็คอินบูธ · กิจกรรมประจำบูธ · ลุ้นรางวัลใหญ่</div></div>'+
       '<div class="booth-prog">'+
-        '<div class="bp-card"><div class="bp-hd">'+ic('lc-qr-code')+'<span class="bp-lbl">เช็คอินบูธ</span><span class="bp-frac" style="color:'+(chkOK?'var(--cyan)':'var(--violet)')+'">'+(chkOK?('ครบแล้ว · '+chk+' บูธ'):(chk+'/'+CHECKIN_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,chk/CHECKIN_NEED*100)+'%;background:'+(chkOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
-        '<div class="bp-card"><div class="bp-hd">'+ic('lc-building-2')+'<span class="bp-lbl">กิจกรรมประจำบูธ</span><span class="bp-frac" style="color:'+(actOK?'var(--cyan)':'var(--violet)')+'">'+(actOK?('ครบแล้ว · '+act+' บูธ'):(act+'/'+ACTIVITY_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,act/ACTIVITY_NEED*100)+'%;background:'+(actOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
+        /* "ครบแล้ว · N บูธ" -> "ครบแล้ว N บูธ" (2026-09-10, per direction — the "·" removal sweep) +
+           .bp-hd now wraps on mobile (see .bp-hd/.bp-frac CSS) — "กิจกรรมประจำบูธ" is long enough that
+           the old single-line layout squeezed .bp-lbl down to almost nothing at real mobile width,
+           breaking "เช็คอินบูธ" mid-syllable across 3 lines instead of wrapping the shorter .bp-frac
+           status text underneath. */
+        '<div class="bp-card"><div class="bp-hd">'+ic('lc-qr-code')+'<span class="bp-lbl">เช็คอินบูธ</span><span class="bp-frac" style="color:'+(chkOK?'var(--cyan)':'var(--violet)')+'">'+(chkOK?('ครบแล้ว '+chk+' บูธ'):(chk+'/'+CHECKIN_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,chk/CHECKIN_NEED*100)+'%;background:'+(chkOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
+        '<div class="bp-card"><div class="bp-hd">'+ic('lc-building-2')+'<span class="bp-lbl">กิจกรรมประจำบูธ</span><span class="bp-frac" style="color:'+(actOK?'var(--cyan)':'var(--violet)')+'">'+(actOK?('ครบแล้ว '+act+' บูธ'):(act+'/'+ACTIVITY_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,act/ACTIVITY_NEED*100)+'%;background:'+(actOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
       '</div>'+
       /* Points total (Phase 4, 2026-09-09) — display-only, see boothPointsTotal()'s own comment for
          why this doesn't gate anything yet (no real prize-tier numbers exist in any source doc). */
-      (pts>0?'<div class="bp-pts">'+ic('lc-sparkles')+'<span>สะสมแล้ว <b>'+pts+'</b> แต้มจากกิจกรรมประจำบูธ</span></div>':'')+
+      (pts>0?'<div class="pe-report on bp-pts">'+ic('lc-sparkles')+'<div><div class="pe-report-t">สะสมแล้ว '+pts+' แต้ม</div><div class="pe-report-s">จากกิจกรรมประจำบูธ</div></div></div>':'')+
       (eligible
         ? '<div class="next-step ds-ok"><div class="ns-ic"><img src="'+ICON_GIFT_PNG+'" alt=""></div><div class="ns-tx"><div class="ns-ey">ลุ้นรางวัลใหญ่</div><div class="ns-t">ครบเงื่อนไขแล้ว ร่วมลุ้นรางวัลได้เลย</div></div>'+
             (DRAW_JOINED
@@ -6376,7 +6478,13 @@ function renderBooth(){
           '<div class="ns-body"><div class="ns-b">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">✓ กดร่วมลุ้นก่อน 16:00 น. ของวันที่ 2</div></div></div>'
         : '<div class="next-step ds-need"><div class="ns-ic"><img src="'+ICON_GIFT_PNG+'" alt=""></div><div class="ns-tx"><div class="ns-ey">ลุ้นรางวัลใหญ่</div><div class="ns-t">ยังขาด</div></div><div class="ns-body"><div class="ds-chips">'+need.map(function(n){return '<span class="ds-chip">'+n+'</span>';}).join('')+'</div><div class="ns-b">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">ครบเมื่อไหร่ ปุ่มร่วมลุ้นรางวัลใหญ่จะขึ้นตรงนี้ให้กด</div></div></div>')+
     '</section>')+
-    '<section class="home-card scroll-reveal"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline)"><div class="s-h" style="margin-bottom:0">'+(mapPersonalized?'แผนที่เดินบูธเฉพาะคุณ':'แผนที่เดินบูธ (เส้นทางแนะนำ)')+'</div><span class="route-badge">'+visited+'/'+route.length+' จุด</span></div>'+
+    (mapOnly
+      /* Explorer — bare map only (2026-09-10, per direction): no header/badge, no v2 tracking
+         markers, no legend, no route-list. Keeps the same .map-ph/.mp-img/.mp-cap/#mapZoomBtn markup
+         (so the existing zoom-lightbox binding below still works unchanged) minus every "personalized
+         journey" element, none of which an Explorer ticket is meant to see. */
+      ? '<section class="home-card scroll-reveal"><div class="map-ph has-img"><img class="mp-img" src="'+MAP_IMG+'" alt="ผังงาน BetterTrade 2026 · Samyan Mitrtown ชั้น 5"><span class="mp-cap">ผังงาน · Samyan Mitrtown ชั้น 5</span><button class="mp-zoom" id="mapZoomBtn" aria-label="ดูแผนที่แบบเต็มจอ">'+ic('lc-maximize-2')+'<span>ดูแบบเต็มจอ</span></button></div></section>'
+      : '<section class="home-card scroll-reveal"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline)"><div class="s-h" style="margin-bottom:0">'+(mapPersonalized?'แผนที่เดินบูธเฉพาะคุณ':'แผนที่เดินบูธ (เส้นทางแนะนำ)')+'</div><span class="route-badge">'+visited+'/'+route.length+' จุด</span></div>'+
       '<div class="map-ph has-img'+(v2?' v2':'')+'"><img class="mp-img" src="'+MAP_IMG+'" alt="ผังงาน BetterTrade 2026 · Samyan Mitrtown ชั้น 5">'+
         /* v2 markers — one per route stop, numbered to match its step, placed at BOOTH_MAP_POS % and
            colored by the shared semantic state. Number shows by default; the short label reveals on
@@ -6395,7 +6503,7 @@ function renderBooth(){
         }
         return '<div class="rt-row'+(p.topPick?' top':'')+'"><div class="rt-rail"><div class="rt-dot" style="background:'+p.dotColor+'">'+ic(p.icon)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+'</div><div class="rt-meta">'+p.zone+' · '+p.status+'</div></div></div>';
       }).join('')+'</div>'+
-    '</section>'+
+    '</section>')+
     (pre?'':(
     '<section class="home-card scroll-reveal"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline);flex-wrap:wrap"><div class="s-h" style="margin-bottom:0">กิจกรรมประจำโซน</div><button class="howto-btn" id="howtoBtn">'+ic('lc-info')+'วิธีเล่น</button></div>'+
       '<div class="hcard-s" style="margin-top:-6px">แตะชื่อบูธเพื่อเช็คอิน — เช็คอินก่อน แล้วเกมของโซนนั้นจะปลดให้เล่น</div>'+
@@ -6434,7 +6542,7 @@ function renderBooth(){
   (pre?'':(
   '<div class="howto-modal" id="howtoModal"><div class="howto-scrim" id="howtoScrim"></div><div class="howto-card"><button class="howto-x" id="howtoClose">'+ic('lc-x')+'</button>'+
     '<div class="howto-hd"><div class="howto-t">วิธีเล่นกิจกรรมประจำโซน</div><div class="howto-s">เช็คอิน → ปลดเกมประจำโซน → ร่วมกิจกรรม</div></div>'+
-    '<div class="zh-in"><div class="zh-li"><b>1)</b><span>เช็คอิน — แตะชื่อบูธแล้วสแกน QR ที่บูธ (หรือเปิด QR ของคุณให้เจ้าหน้าที่สแกน ได้ผลเหมือนกัน)</span></div><div class="zh-li"><b>2)</b><span>เกมประจำโซนปลดให้เล่น — ไม่บังคับ แต่เล่นแล้วคู่มือของคุณสมบูรณ์ขึ้น</span></div><div class="zh-li"><b>3)</b><span>ร่วมกิจกรรมประจำบูธ — สแกน QR กิจกรรม (บางบูธใช้ QR ใบเดียวกับเช็คอิน บางบูธแยก 2 ใบ ดูป้ายที่บูธ)</span></div><div class="zh-note">เช็คอิน 5 บูธ + ร่วมกิจกรรม 5 บูธ = สิทธิ์ลุ้นรางวัลใหญ่ · เป็นคนละบูธกันได้</div></div>'+
+    '<div class="zh-in"><div class="zh-li"><b>1)</b><span>เช็คอิน — แตะชื่อบูธแล้วสแกน QR ที่บูธ (หรือเปิด QR ของคุณให้เจ้าหน้าที่สแกน ได้ผลเหมือนกัน)</span></div><div class="zh-li"><b>2)</b><span>เกมประจำโซนปลดให้เล่น — ไม่บังคับ แต่เล่นแล้ว Playbook ของคุณสมบูรณ์ขึ้น</span></div><div class="zh-li"><b>3)</b><span>ร่วมกิจกรรมประจำบูธ — สแกน QR กิจกรรม (บางบูธใช้ QR ใบเดียวกับเช็คอิน บางบูธแยก 2 ใบ ดูป้ายที่บูธ)</span></div><div class="zh-note">เช็คอิน 5 บูธ + ร่วมกิจกรรม 5 บูธ = สิทธิ์ลุ้นรางวัลใหญ่ · เป็นคนละบูธกันได้</div></div>'+
   '</div></div>'))+
   '<div class="map-lightbox" id="mapLightbox"><div class="ml-scrim" id="mlScrim"></div><div class="ml-card"><button class="ml-close" id="mlClose">'+ic('lc-x')+'</button><div class="ml-body"><img class="ml-img" src="'+MAP_IMG+'" alt="ผังงาน BetterTrade 2026 · Samyan Mitrtown ชั้น 5"></div><div class="ml-cap">ผังงาน · Samyan Mitrtown ชั้น 5</div></div></div>'+
   appTabbar('passport');
@@ -6512,12 +6620,12 @@ function renderBooth(){
    briefing's 2nd info card. These REPLACE the old per-question q1 intro banner (MINIGAME_Q.intro,
    now removed) — one intro surface, not two. */
 var SIDES=[
-  {icon:'lc-refresh-cw',title:'เกมย้อนเวลาพอร์ต',side:'ความเสี่ยงแท้จริง',emoji:'🎭',intro:'เรากำลังพาคุณย้อนไปเจอเหตุการณ์จริงที่เคยเกิดขึ้น · ตอนนั้นไม่มีใครรู้ว่าพรุ่งนี้จะเป็นยังไง',rule:'ตอบแล้วไปต่อ ย้อนกลับไม่ได้',measures:'เทียบความเสี่ยงที่ "บอก" กับที่ "ทำจริง" ตอนวิกฤต'}, // refresh-cw = rewinding back through past crises
-  {icon:'lc-file-text',title:'เกมเลือกเครื่องมือ',side:'สิ่งที่คุณดูก่อนตัดสินใจ',emoji:'🔍',intro:'ก่อนตัดสินใจ คุณจะเลือกดูข้อมูลแบบไหน — เราดูจากสิ่งที่คุณเลือกดูจริง ไม่ใช่แค่คำตอบสุดท้าย',rule:'เลือกจากสิ่งที่คุณดูจริง',measures:'ลำดับเครื่องมือวิเคราะห์ที่คุณเปิดจริง'}, // file-text = the business/financial-statement tool you choose to open
+  {icon:'lc-refresh-cw',title:'เกมย้อนเวลาพอร์ต',side:'ความเสี่ยงแท้จริง',emoji:'🎭',intro:'เรากำลังพาคุณย้อนไปเจอเหตุการณ์จริงที่เคยเกิดขึ้น ตอนนั้นไม่มีใครรู้ว่าพรุ่งนี้จะเป็นยังไง',rule:'ตอบแล้วไปต่อ ย้อนกลับไม่ได้',measures:'เทียบความเสี่ยงที่ "บอก" กับที่ "ทำจริง" ตอนวิกฤต'}, // refresh-cw = rewinding back through past crises
+  {icon:'lc-file-text',title:'เกมเลือกเครื่องมือ',side:'สิ่งที่คุณดูก่อนตัดสินใจ',emoji:'🔍',intro:'ก่อนตัดสินใจ คุณจะเลือกดูข้อมูลแบบไหน เราดูจากสิ่งที่คุณเลือกดูจริง ไม่ใช่แค่คำตอบสุดท้าย',rule:'เลือกจากสิ่งที่คุณดูจริง',measures:'ลำดับเครื่องมือวิเคราะห์ที่คุณเปิดจริง'}, // file-text = the business/financial-statement tool you choose to open
   {icon:'lc-alert-triangle',title:'เกมทนกระแส',side:'ภูมิคุ้มกันความกลัวตกขบวน',emoji:'🔥',intro:'เจอสถานการณ์ที่ยั่วให้รีบตัดสินใจ ลองดูว่าคุณจะทนกระแสและกับดักได้แค่ไหน',rule:'บางฉากมีเวลาจำกัด',measures:'วินัยภายใต้แรงกดดันจากกระแส'}, // alert-triangle = the FOMO/scam traps this game tests resistance to
   {icon:'lc-calendar',title:'เกมเป้าหมายแต่ละวัย',side:'เป้าหมายตามวัย',emoji:'🗺️',intro:'สวมบทบาทในแต่ละช่วงวัย ตั้งแต่ 25 ถึง 65 ปี แล้วดูว่าเป้าหมายเงินของคุณเปลี่ยนไปไหม',rule:'ย้อนกลับแก้ไขได้ทุกข้อ',measures:'เป้าหมายเงินตั้งแต่วัย 25 ถึง 65'}, // calendar = goals across different ages/life-stages (25→65)
-  {icon:'lc-compass',title:'เกมก้าวแรก',side:'ก้าวแรก',emoji:'🚀',intro:'เกมนี้ไม่ตัดสินว่าคุณเป็นคนแบบไหน — ปิดท้ายด้วย "ก้าวแรก" เล็กๆ ที่คุณเลือกเอง',rule:'เลือกก้าวแรกได้หลายข้อ',measures:'กำแพงที่ทำให้ยังไม่เริ่ม + ก้าวเล็กที่สุด'}, // compass = finding your direction/first step as a new investor
-  {icon:'lc-shield',title:'เกมทองคำ เพื่อนยามวิกฤต',side:'ทองคำในพอร์ต',emoji:'🛡️',intro:'ไม่ต้องทายราคาทอง · เป้าหมายคือเข้าใจว่าทองคำมีไว้ทำอะไรในพอร์ตของคุณ',rule:'เดาจากความรู้สึกได้เลย',measures:'บทบาทของทองคำสำหรับคุณ — ตัวถ่วงความเสี่ยง หรือตัวทำกำไร'} // shield = "เพื่อนยามวิกฤต" — gold as a protective refuge during a crisis
+  {icon:'lc-compass',title:'เกมก้าวแรก',side:'ก้าวแรก',emoji:'🚀',intro:'เกมนี้ไม่ตัดสินว่าคุณเป็นคนแบบไหน ปิดท้ายด้วย "ก้าวแรก" เล็กๆ ที่คุณเลือกเอง',rule:'เลือกก้าวแรกได้หลายข้อ',measures:'กำแพงที่ทำให้ยังไม่เริ่ม + ก้าวเล็กที่สุด'}, // compass = finding your direction/first step as a new investor
+  {icon:'lc-shield',title:'เกมทองคำ เพื่อนยามวิกฤต',side:'ทองคำในพอร์ต',emoji:'🛡️',intro:'ไม่ต้องทายราคาทอง เป้าหมายคือเข้าใจว่าทองคำมีไว้ทำอะไรในพอร์ตของคุณ',rule:'เดาจากความรู้สึกได้เลย',measures:'บทบาทของทองคำสำหรับคุณ — ตัวถ่วงความเสี่ยง หรือตัวทำกำไร'} // shield = "เพื่อนยามวิกฤต" — gold as a protective refuge during a crisis
 ];
 /* ══ MINIGAME_Q (2026-09-09) ══ real question content for the 6 main games, index i matching
    SIDES[i] 1:1 — sourced verbatim from GAMES-QUESTIONS-DNA.md Part A. Same shape as BOOTH_Q (see
@@ -6532,73 +6640,73 @@ var SIDES=[
    answer→category mapping rule is still an open decision, see [[games-questions-dna]] item #1). */
 var MINIGAME_Q=[
   {noBack:true,
-   resultNote:'ทั้ง 4 แบบไม่มีแบบที่ผิด — สอดคล้อง (Aligned) / ใจไม่ถึงอย่างที่คิด / ใจถึงกว่าที่คิด / ยังค้นหาสไตล์ตัวเอง (ผลแบบเต็มดูได้ในคู่มือของคุณ)',
+   resultNote:'ทั้ง 4 แบบไม่มีแบบที่ผิด — สอดคล้อง (Aligned) / ใจไม่ถึงอย่างที่คิด / ใจถึงกว่าที่คิด / ยังค้นหาสไตล์ตัวเอง (ผลแบบเต็มดูได้ใน Playbook ของคุณ)',
    questions:[
-    {q:'คุณคิดว่าตัวเองรับ "เงินลงทุนติดลบ" ได้แค่ไหน?',sub:'ข้ามได้ถ้าตอบไว้แล้วตอนลงทะเบียน',
+    {icon:'lc-alert-triangle',q:'คุณคิดว่าตัวเองรับ "เงินลงทุนติดลบ" ได้แค่ไหน?',sub:'ข้ามได้ถ้าตอบไว้แล้วตอนลงทะเบียน',
      opts:['ขอไม่เห็นติดลบเกินราว 10% (ทุก 100 บาท เหลือราว 90 บาท)','ติดลบราว 30% ยังพอไหว','ติดลบเกิน 50% ก็ยังถือได้']},
-    {q:'ปี 2551 · วิกฤตแฮมเบอร์เกอร์ — เงินลงทุน 1,000,000 บาท เหลือ 430,000 บาท (ลดลง 57.00%) คุณจะทำอะไร?',locked:true,sub:'ตอนนั้นยังไม่มีใครรู้ว่าตลาดจะฟื้นเมื่อไหร่ ตอบตามที่ใจคุณคิดจริงๆ',
+    {icon:'lc-zap',q:'ปี 2551 วิกฤตแฮมเบอร์เกอร์ เงินลงทุน 1,000,000 บาท เหลือ 430,000 บาท (ลดลง 57.00%) คุณจะทำอะไร?',locked:true,sub:'ตอนนั้นยังไม่มีใครรู้ว่าตลาดจะฟื้นเมื่อไหร่ ตอบตามที่ใจคุณคิดจริงๆ',
      opts:['ขายทั้งหมด หนีก่อนจะเสียมากกว่านี้','ถือไว้ตามแผนเดิม ไม่แตะ','ซื้อเพิ่ม ของถูกมาก']},
-    {q:'ก.พ.–มี.ค. 2563 · วิกฤตโควิด — เงินลงทุนเหลือ 660,000 บาท (ลดลง 34.00% ในเดือนเดียว) รอบนี้จะทำอะไร?',locked:true,
+    {icon:'lc-hourglass',q:'ก.พ.–มี.ค. 2563 วิกฤตโควิด เงินลงทุนเหลือ 660,000 บาท (ลดลง 34.00% ในเดือนเดียว) รอบนี้จะทำอะไร?',locked:true,
      opts:['ขายทั้งหมด รอบนี้แรงกว่าเดิม','ถือตามแผน เคยผ่านปี 2551 มาแล้ว','ซื้อเพิ่มเลย จังหวะนี้แหละ']}
   ]},
   {questions:[
-    {q:'รอบแรก · หุ้นปริศนาที่กำลังเป็นที่พูดถึงในโซเชียล — ดูเท่าที่อยากดูแล้ว คุณจะ?',
+    {icon:'lc-message-circle',q:'รอบแรก หุ้นปริศนาที่กำลังเป็นที่พูดถึงในโซเชียล ดูเท่าที่อยากดูแล้ว คุณจะ?',
      opts:['ตัดสินใจจากที่ดูข้อมูลมาเอง','ขอกระจายผ่านกองทุน หรือทยอยซื้อทีละน้อยทุกเดือน (DCA) แทนการเลือกตัวเดียว','ซื้อตามกระแสข่าวเลย เดี๋ยวไม่ทัน'],
      insight:'ข่าวและกระแสเป็นสิ่งล่อ ไม่ใช่ข้อมูลที่ใช้ตัดสินใจ · งบการเงินบอกสุขภาพของธุรกิจ'},
-    {q:'รอบสอง · หุ้นปริศนาที่เงียบ ไม่มีใครพูดถึง — ดูแล้ว คุณจะ?',
+    {icon:'lc-file-text',q:'รอบสอง หุ้นปริศนาที่เงียบ ไม่มีใครพูดถึง ดูแล้ว คุณจะ?',
      opts:['สนใจ เลือกหุ้นตัวนี้ เพราะพื้นฐานและปันผลดี','ชอบแนวนี้ แต่ขอลงผ่านกองทุน หรือทยอยซื้อทีละน้อย กระจายหลายตัว','ข้ามไป ไม่มีกระแส ดูน่าเบื่อ'],
      insight:'ของที่พื้นฐานมั่นคงมักไม่หวือหวาและไม่เป็นข่าว · การซื้อผ่านกองทุนหรือทยอยซื้อ คือการกระจายแทนการเลือกตัวเดียว'}
   ]},
   {resultNote:'เขียนแบบให้กำลังใจ — คนที่พลาดในเกมวันนี้คือคนที่ได้กฎกลับบ้านไปใช้จริง',
    questions:[
-    {q:'ฉาก 1/3 — เหรียญชื่อ "MOON" ขึ้น 312.00% ในสัปดาห์เดียว คุณจะทำอะไร?',sub:'สถานการณ์สมมติ ไม่ใช่ของจริงในตลาด',timer:15,
+    {icon:'lc-zap',q:'ฉาก 1/3 เหรียญชื่อ "MOON" ขึ้น 312.00% ในสัปดาห์เดียว คุณจะทำอะไร?',sub:'สถานการณ์สมมติ ไม่ใช่ของจริงในตลาด',timer:15,
      opts:['ซื้อเลย เดี๋ยวไม่ทัน','ขอดูข้อมูลก่อน ว่ามันคืออะไร พื้นฐานเป็นยังไง','ไม่เอา ดูเร่งเร้าผิดปกติ'],
      insight:'ความกลัวตกขบวนทำให้เราซื้อเพราะ "คนอื่นซื้อ" ไม่ใช่เพราะเข้าใจของ'},
-    {q:'ฉาก 2/3 — มีคนทักมาบอกว่า "การันตีผลตอบแทน 30.00% ต่อเดือน ไม่มีขาดทุน วันนี้วันสุดท้าย รีบโอนเลย"',
+    {icon:'lc-alert-triangle',q:'ฉาก 2/3 มีคนทักมาบอกว่า "การันตีผลตอบแทน 30.00% ต่อเดือน ไม่มีขาดทุน วันนี้วันสุดท้าย รีบโอนเลย"',
      opts:['โอนเลย กลัวที่นั่งเต็ม','เช็กก่อน ว่าบริษัทมีใบอนุญาตจาก ก.ล.ต. ไหม','ปฏิเสธทันที และเตือนคนอื่นด้วย'],
      insight:'สัญญาณหลอกลงทุน 3 อย่าง: การันตีผลตอบแทน · เร่งให้รีบตัดสินใจ · ไม่มีใบอนุญาต'},
-    {q:'ฉาก 3/3 — เลือกกฎที่คุณจะพกติดตัวไว้เตือนตัวเอง',
-     opts:['กฎ 24 ชั่วโมง — หยุดคิด 1 วันก่อนตัดสินใจ','ถ้ามีใครเร่งให้รีบ ให้ถือว่าอันตราย','เช็กใบอนุญาตจาก ก.ล.ต. ก่อนเสมอ']}
+    {icon:'lc-check-circle',q:'ฉาก 3/3 เลือกกฎที่คุณจะพกติดตัวไว้เตือนตัวเอง',
+     opts:['กฎ 24 ชั่วโมง หยุดคิด 1 วันก่อนตัดสินใจ','ถ้ามีใครเร่งให้รีบ ให้ถือว่าอันตราย','เช็กใบอนุญาตจาก ก.ล.ต. ก่อนเสมอ']}
   ]},
   {resultNote:'บอกตรงๆ ว่าเป้าหมายของคุณ "เปลี่ยนไปตามวัย" หรือ "เหมือนเดิมตลอด 40 ปี" — ทั้งสองแบบเป็นข้อเท็จจริง ไม่ใช่ข้อผิดพลาด',
    questions:[
-    {q:'บทที่ 1 · สมมติว่าคุณอายุ 25 เหลือเวลาก่อนเกษียณราว 40 ปี เงินลงทุนก้อนแรก คุณตั้งเป้าแบบไหน?',
+    {icon:'lc-target',q:'บทที่ 1 สมมติว่าคุณอายุ 25 เหลือเวลาก่อนเกษียณราว 40 ปี เงินลงทุนก้อนแรก คุณตั้งเป้าแบบไหน?',
      opts:['เน้นให้โตมากที่สุด ขึ้นลงแรงก็รับได้','ค่อยๆ โต ขอสบายใจระหว่างทาง','เน้นปลอดภัยไว้ก่อน ไม่อยากขาดทุน'],
      insight:'ยิ่งมีเวลานาน ยิ่งมีเวลารอให้ของฟื้นตัว'},
-    {q:'บทที่ 2 · สมมติว่าคุณอายุ 35 มีเป้าหมายใหญ่ 2 อย่างพร้อมกัน: ต้องใช้เงินก้อนในอีก 3 ปี และเก็บเพื่อเกษียณอีก 30 ปี คุณจะจัดการยังไง?',
-     opts:['แยกเป็น 2 กระเป๋า — เงินที่จะใช้เร็วเก็บแบบปลอดภัย เงินเกษียณเน้นให้โต','รวมเป็นก้อนเดียว ลงแบบเสี่ยงทั้งหมดให้โตเร็ว','รวมเป็นก้อนเดียว เก็บแบบปลอดภัยทั้งหมด'],
+    {icon:'lc-pie-chart',q:'บทที่ 2 สมมติว่าคุณอายุ 35 มีเป้าหมายใหญ่ 2 อย่างพร้อมกัน: ต้องใช้เงินก้อนในอีก 3 ปี และเก็บเพื่อเกษียณอีก 30 ปี คุณจะจัดการยังไง?',
+     opts:['แยกเป็น 2 กระเป๋า เงินที่จะใช้เร็วเก็บแบบปลอดภัย เงินเกษียณเน้นให้โต','รวมเป็นก้อนเดียว ลงแบบเสี่ยงทั้งหมดให้โตเร็ว','รวมเป็นก้อนเดียว เก็บแบบปลอดภัยทั้งหมด'],
      insight:'เงินที่จะใช้เร็วกับเงินที่ใช้อีกนาน ควรเก็บคนละแบบ'},
-    {q:'บทที่ 3 · สมมติว่าคุณอายุ 50 เหลือเวลาถึงเกษียณราว 15 ปี เงินลงทุนโตมาดี ควรปรับอะไรไหม?',
+    {icon:'lc-refresh-cw',q:'บทที่ 3 สมมติว่าคุณอายุ 50 เหลือเวลาถึงเกษียณราว 15 ปี เงินลงทุนโตมาดี ควรปรับอะไรไหม?',
      opts:['ค่อยๆ ลดส่วนที่เสี่ยงลง เพิ่มส่วนที่มั่นคง','คงไว้แบบเดิม เสี่ยงเท่าเดิม','ขายออกเป็นเงินสดทั้งหมด'],
      insight:'ยิ่งใกล้วันที่ต้องใช้เงิน ยิ่งเหลือเวลารอให้ฟื้นน้อยลง'},
-    {q:'บทที่ 4 · สมมติว่าคุณอายุ 65 เกษียณแล้ว มีเงินเก็บอยู่ก้อนหนึ่ง เป้าหมายของเงินก้อนนี้คืออะไร?',
+    {icon:'lc-gift',q:'บทที่ 4 สมมติว่าคุณอายุ 65 เกษียณแล้ว มีเงินเก็บอยู่ก้อนหนึ่ง เป้าหมายของเงินก้อนนี้คืออะไร?',
      opts:['ให้มีเงินใช้ทุกเดือนอย่างสม่ำเสมอ','รักษาเงินต้นให้อยู่ครบ','เก็บส่งต่อให้ลูกหลาน หรือทำประโยชน์ให้สังคม'],
      insight:'วิธีถอนเงินมาใช้หลังเกษียณ สำคัญไม่แพ้วิธีเก็บ'}
   ]},
   {noType:true,resultNote:'เกมนี้ไม่สรุปว่าคุณเป็นคนประเภทไหน — ปิดท้ายด้วยสิ่งที่ได้เรียนรู้ และ "ก้าวแรก" ที่คุณเลือกเอง',
    questions:[
-    {q:'ฉาก 1 · สมมติว่าคุณเพิ่งเก็บเงินก้อนแรกได้ 100,000 บาท แล้วมีคนชวนลงทุน บอกว่า "น่าจะได้กำไรดี"',
+    {icon:'lc-coins',q:'ฉาก 1 สมมติว่าคุณเพิ่งเก็บเงินก้อนแรกได้ 100,000 บาท แล้วมีคนชวนลงทุน บอกว่า "น่าจะได้กำไรดี"',
      opts:['ลงทั้ง 100,000 บาท ไปเลย','แบ่งครึ่ง ลง 50,000 บาท เก็บไว้ 50,000 บาท','ยังไม่ลง เก็บไว้ก่อนทั้งหมด'],
      insight:'ก่อนลงทุน ควรมีเงินสำรองเผื่อฉุกเฉินก่อน · แต่ถ้าเก็บเงินสดไว้เฉยๆ นานๆ ค่าของเงินก็ลดลงจากเงินเฟ้อ'},
-    {q:'ฉาก 2 · มีสองคนลงทุนเดือนละ 2,000 บาท เท่ากัน แต่เริ่มไม่พร้อมกัน — คุณคิดว่าใครได้เปรียบ?',
+    {icon:'lc-calendar',q:'ฉาก 2 มีสองคนลงทุนเดือนละ 2,000 บาท เท่ากัน แต่เริ่มไม่พร้อมกัน คุณคิดว่าใครได้เปรียบ?',
      opts:['คนที่เริ่มตอนอายุ 25 แล้วลง 10 ปีจากนั้นหยุด','คนที่เริ่มตอนอายุ 35 แล้วลงต่อเนื่อง 30 ปี','พอๆ กัน เพราะลงเดือนละเท่ากัน'],
      insight:'เวลาช่วยให้ดอกเบี้ยทบต้นทำงาน — เริ่มเร็วมักได้เปรียบกว่าลงเยอะแต่เริ่มช้า'},
-    {q:'ฉาก 3 · เงินส่วนที่จะลงทุน คุณเลือกเส้นทางไหน?',
+    {icon:'lc-route',q:'ฉาก 3 เงินส่วนที่จะลงทุน คุณเลือกเส้นทางไหน?',
      opts:['เส้นทางสบายใจ ขึ้นลงน้อย','เส้นทางสมดุล','เส้นทางท้าทาย ขึ้นลงแรง'],
      insight:'ผลตอบแทนที่หวังได้มาก มักมาพร้อมการขึ้นลงที่แรงขึ้น'},
-    {q:'ก้าวแรก ตอนที่ 1 · อะไรที่ทำให้คุณยังไม่ได้เริ่มลงทุนสักที?',sub:'ตอบตามจริงได้เลย ทุกข้อเป็นเรื่องปกติที่หลายคนเจอ',
+    {icon:'lc-lock',q:'ก้าวแรก ตอนที่ 1 อะไรที่ทำให้คุณยังไม่ได้เริ่มลงทุนสักที?',sub:'ตอบตามจริงได้เลย ทุกข้อเป็นเรื่องปกติที่หลายคนเจอ',
      opts:['เงินยังน้อย รอมีเงินก้อนก่อน','กลัวขาดทุน ยังไม่กล้า','ยุ่ง ไม่มีเวลา ค่อยทำทีหลัง','ไม่รู้จะเริ่มยังไง งงไปหมด']},
-    {q:'ก้าวแรก ตอนที่ 2 · ก้าวที่เล็กที่สุดที่คุณทำได้ภายในสัปดาห์นี้คืออะไร?',multi:true,skippable:true,skipLabel:'ยังไม่พร้อมเลือก ข้ามก่อน',
+    {icon:'lc-play-circle',q:'ก้าวแรก ตอนที่ 2 ก้าวที่เล็กที่สุดที่คุณทำได้ภายในสัปดาห์นี้คืออะไร?',multi:true,skippable:true,skipLabel:'ยังไม่พร้อมเลือก ข้ามก่อน',
      opts:['เปิดบัญชีหรือแอปลงทุน','ตั้งลงทุนอัตโนมัติรายเดือน','ลองของจริงด้วยเงิน 100 บาท วันนี้','เลือกกองทุน 1 กองมาศึกษา','กำหนดงบลงทุนต่อเดือนที่ไหว','จดรายรับ-รายจ่าย 7 วัน','เริ่มแยกเงินสำรองเผื่อฉุกเฉินก้อนแรก','นัดคุยกับผู้แนะนำการลงทุนที่มีใบอนุญาต']}
   ]},
   {questions:[
-    {q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บไว้ วันนี้อันไหนซื้อของได้มากกว่ากัน?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้เลย',
+    {icon:'lc-trending-up',q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บไว้ วันนี้อันไหนซื้อของได้มากกว่ากัน?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้เลย',
      opts:['เงินสด เพราะยังเป็น 100,000 บาท เท่าเดิม','ทอง น่าจะซื้อของได้มากกว่า','น่าจะพอๆ กัน'],
      insight:'เงินสดตัวเลขเท่าเดิม แต่ซื้อของได้น้อยลงเพราะเงินเฟ้อ ส่วนทองมักขยับตามค่าของเงิน'},
-    {q:'สมมติว่าเกิดวิกฤตเศรษฐกิจ หุ้นทั่วโลกร่วง 40.00% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่าทองจะเป็นยังไง?',
+    {icon:'lc-shield',q:'สมมติว่าเกิดวิกฤตเศรษฐกิจ หุ้นทั่วโลกร่วง 40.00% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่าทองจะเป็นยังไง?',
      opts:['ร่วงตามหุ้นไปด้วย','ทรงตัวหรือขึ้นสวนทางกับหุ้น','ราคาไม่ขยับ แต่ขายไม่ออก'],
      insight:'ในหลายวิกฤต ทองมักไม่ไปทางเดียวกับหุ้น จึงช่วยพยุงภาพรวมได้'},
-    {q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินที่จะลงทุนทั้งหมดซื้อทองเลยดีไหม?',
+    {icon:'lc-pie-chart',q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินที่จะลงทุนทั้งหมดซื้อทองเลยดีไหม?',
      opts:['ใช่ ซื้อทองทั้งหมด ปลอดภัยที่สุด','ไม่ แบ่งไว้ส่วนหนึ่งพอ ที่เหลือไปอย่างอื่น','ไม่ซื้อเลย ชอบของที่งอกเงยกว่า'],
      insight:'ทองไม่สร้างรายได้ระหว่างถือ จึงมักใช้เป็นส่วนหนึ่งของภาพรวม ไม่ใช่ทั้งหมด'}
   ]}
@@ -6709,14 +6817,14 @@ function renderGames(){
        "ขั้นต่อไป" card — was ic(ns.icon), the per-side icon SIDES itself still uses elsewhere (e.g.
        sidesHTML's "เส้นทาง" rows), so SIDES' own data is untouched; only this render site changed. */
     nextCard='<section class="next-step"><div class="ns-ic"><img src="'+ICON_JOYSTICK_PNG+'" alt=""></div><div class="ns-tx"><div class="ns-ey">เล่นเกมนี้ต่อ'+(nextIdx===0?' · เกมสำคัญที่สุด':'')+'</div><div class="ns-t">'+ns.title+'</div></div><div class="ns-cta-slot" id="ng-cta-slot"></div><div class="ns-body"><div class="ns-b">'+ns.measures+'</div></div></section>'+
-      '<div class="gh-restlbl">ด้านอื่นในคู่มือ</div>';
+      '<div class="gh-restlbl">ด้านอื่นใน Playbook</div>';
   }
   var listIdx=nextIdx>=0?restIdx:[0,1,2,3,4,5];
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
     (pre
       ? '<section class="home-card scroll-reveal">'+
-          '<div class="s-h">คู่มือ 6 ด้านของคุณ</div><div class="gh-sub">เล่นเกมแล้วเติมทีละด้าน</div>'+
+          '<div class="s-h">Playbook 6 ด้านของคุณ</div><div class="gh-sub">เล่นเกมแล้วเติมทีละด้าน</div>'+
           /* Split into heading + 3 separate paragraphs (2026-08-28, per direction — was one run-on
              .ev-empty-s) — "6 เกม 6 มุมมอง" reuses .ev-empty-t (already weight:var(--w-label), 700)
              as its own heading line under "Coming soon" (tinted var(--violet), matching the active-
@@ -6756,11 +6864,11 @@ function renderGames(){
             '<div class="ev-empty-s ast-block" style="max-width:44ch;display:inline-block;font-weight:700;font-size:20px;color:var(--violet);background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)">ร่วมสนุกและปลดล็อกได้<span style="white-space:nowrap">วันงาน</span>เท่านั้น</div>'+
           '</div></section>'
       : '<section class="home-card scroll-reveal">'+
-      '<div class="s-h">คู่มือ 6 ด้านของคุณ</div><div class="gh-sub">เล่นเกมแล้วเติมทีละด้าน</div>'+
+      '<div class="s-h">Playbook 6 ด้านของคุณ</div><div class="gh-sub">เล่นเกมแล้วเติมทีละด้าน</div>'+
       /* Same .pass-card as Home's "บัตรของคุณ" — plain icon+eyebrow+value text, no chart. Replaces
          the old dark donut ring, which crammed "X/6" into a 66px circle hard to read at a glance
          when the surrounding text already says the same thing. */
-      '<div class="pass-card" style="margin-top:var(--sp-stack);cursor:default"><div class="pass-top"><div class="pass-hd"><div class="pass-ey"><img class="pass-ey-ic" src="'+ICON_BOOK_PNG+'" alt="">ความคืบหน้าของคู่มือ</div><div class="pass-name pn-indent">เปิดแล้ว '+filled+' จาก 6 ด้าน</div></div></div></div>'+
+      '<div class="pass-card" style="margin-top:var(--sp-stack);cursor:default"><div class="pass-top"><div class="pass-hd"><div class="pass-ey"><img class="pass-ey-ic" src="'+ICON_BOOK_PNG+'" alt="">ความคืบหน้าของ Playbook</div><div class="pass-name pn-indent">เปิดแล้ว '+filled+' จาก 6 ด้าน</div></div></div></div>'+
       '<div style="margin-top:var(--sp-stack)">'+nextCard+'<div class="game-list">'+listIdx.map(gameRow).join('')+'</div></div>'+
       '<div class="games-note">'+ic('lc-info')+'ผลมาจากสิ่งที่คุณเลือกในเกม ไม่ใช่คะแนนสูงต่ำ</div>'+
     '</section>')+
@@ -6776,66 +6884,143 @@ function renderGames(){
   if(!pre)mountNgCta(nextIdx);
 }
 
-/* ══ MINI-GAME PLAY MODAL (logic) ══ (2026-09-09) real question-and-answer flow shared by the
-   Games tab (kind='game', MINIGAME_Q) and the Booth tab (kind='booth', BOOTH_Q) — see the CSS
-   block above (.play-modal) and each data array's own comment for the full field reference.
-   Markup built once by buildPlayModal() and appended to <body>, same pattern as buildScanModal().
-   Deliberate Phase-1 scope (per direct user decision, 2026-09-09): this only replaces HOW a game
-   is "played" — real questions instead of an instant toggle. RESULT scoring is UNCHANGED (sideResult()
-   still reads persona hero.skills, not these answers) — GAME_ANSWERS/BOOTH_ANSWERS are captured and
-   stored purely so a future pass can switch scoring to real answers without touching this UI again. */
-var PLAY=null; // {kind:'game'|'booth', idx, qi, sel:[per-question answer or [] if multi], lockedBack} while a mini-game is open; null when closed
+/* ══ MINI-GAME PLAY — FULL PAGE (2026-09-10, converted from a floating modal to a real page, per
+   direction, matching the DNA quiz's own renderQuiz() layout DNA) ══ shared by the Games tab
+   (kind='game', MINIGAME_Q) and the Booth tab (kind='booth', BOOTH_Q). PLAY.step
+   ('brief'|'question'|'summary') decides which of the 3 render*() functions below builds
+   root.innerHTML — the SAME full-page-replace idiom every other screen in this app uses, reached
+   via the top-level render()'s st.phase==='play' branch. PLAY.returnPhase remembers which tab
+   (games/passport) launched this, so exiting via closePlay() lands back there — same role as the
+   quiz's own idx-0 back button returning to splash.
+   Deliberate Phase-1 scope (per direct user decision, 2026-09-09, unaffected by this conversion):
+   only replaces HOW a game is "played" — RESULT scoring stays on sideResultFromAnswers()/the old
+   persona fallback; GAME_ANSWERS/BOOTH_ANSWERS are still just captured for that future pass. */
+var PLAY=null; // {kind:'game'|'booth', idx, step:'brief'|'question'|'summary', qi, sel, lockedBack, timerQi, returnPhase} while a mini-game is active; null otherwise
 var PLAY_TIMER=null,PLAY_TIMELEFT=0;
 function playSet(kind,idx){return kind==='game'?MINIGAME_Q[idx]:BOOTH_Q[idx];}
 function playLabel(kind,idx){return kind==='game'?SIDES[idx].title:BOOTHS[idx].game;}
+/* learnedInsights — every distinct question insight the player has picked up so far this session,
+   derived from GAME_PLAYED/BOOTH_ACT (the real committed-completion flags) rather than a separate
+   mutable log, same "derive from real state" convention sideResult()/boothPointsTotal() already use.
+   `inProgress` ({kind,idx}) lets a game/booth still on its OWN result screen count immediately —
+   completePlay() (which flips GAME_PLAYED/BOOTH_ACT true) only runs once the player taps the CTA to
+   leave that screen, but the running total should already reflect what they just saw, not lag one
+   screen behind. Text-deduped (a repeated insight across games only counts once), matching how the
+   knowledge ledger below also only lists each concept the first time it's learned. */
+function learnedInsights(inProgress){
+  var seen={},out=[];
+  function add(kind,idx){
+    playSet(kind,idx).questions.forEach(function(q){
+      if(q.insight&&!seen[q.insight]){seen[q.insight]=true;out.push({text:q.insight,kind:kind,idx:idx});}
+    });
+  }
+  for(var gi=0;gi<MINIGAME_Q.length;gi++)if(GAME_PLAYED[gi])add('game',gi);
+  for(var bi=0;bi<BOOTH_Q.length;bi++)if(BOOTH_ACT[bi])add('booth',bi);
+  if(inProgress&&!(inProgress.kind==='game'?GAME_PLAYED[inProgress.idx]:BOOTH_ACT[inProgress.idx]))add(inProgress.kind,inProgress.idx);
+  return out;
+}
+/* learnedLedgerHTML — "เรื่องที่คุณเข้าใจแล้ว" card for the Playbook's เส้นทาง (journey) tab: a
+   personal, dynamic recap of every distinct insight learnedInsights() has captured from mini-games
+   actually played, tagged by source game — NOT the same thing as คลังความรู้ (renderLibrary), which
+   is a static 41-article/8-category reference shelf (this card sits directly above that shelf in
+   renderBook, specific-before-general). Reuses ticketHistoryHTML's exact .card/.sides-hd/.s-ey/.s-h/
+   .s-sub header + .side-item/.list-row.side-row/.side-num/.side-cx/.side-t/.side-s row shape (2026-09-10)
+   rather than inventing a new list recipe — .side-num carries the source game/booth's own icon (done-
+   filled, same "this is settled" language .side-num.done already means everywhere else) instead of a
+   step number, .side-t is the insight text itself, .side-s names which game it came from. Empty state
+   (nothing played yet) mirrors ticketHistoryHTML's own row-less-section absence — this whole card is
+   simply omitted by its one call site (renderBook's journey panel) rather than rendering a hollow
+   card, so a visitor who hasn't reached the games yet sees no half-empty ledger. */
+function learnedLedgerHTML(){
+  var items=learnedInsights();
+  if(!items.length)return '';
+  var rows=items.map(function(l,i){
+    var icon=l.kind==='game'?ic(SIDES[l.idx].icon):ic(BOOTHS[l.idx].icon);
+    return '<article class="side-item"'+(i===items.length-1?' style="border-bottom:none"':'')+'>'+
+      '<div class="list-row side-row" style="cursor:default"><div class="side-num done">'+icon+'</div>'+
+      '<div class="side-cx"><div class="side-t">'+l.text+'</div><div class="side-s">จากเกม '+playLabel(l.kind,l.idx)+'</div></div></div></article>';
+  }).join('');
+  return '<section class="card scroll-reveal"><div class="sides-hd"><div class="s-ey">สะสมจากการเล่นเกมวันนี้</div><h2 class="s-h">เรื่องที่คุณเข้าใจแล้ว</h2>'+
+    '<p class="s-sub" style="margin-bottom:2px">'+items.length+' เรื่อง · อัปเดตอัตโนมัติทุกครั้งที่เล่นเกมจบ</p></div>'+rows+'</section>';
+}
 function openPlay(kind,idx){
   var set=playSet(kind,idx);
-  PLAY={kind:kind,idx:idx,qi:0,sel:set.questions.map(function(q){return q.multi?[]:null;}),lockedBack:false,timerQi:null};
-  document.getElementById('playModal').classList.add('show');
-  renderPlayBrief(); // pre-game briefing screen first (2026-09-10); its CTA → renderPlayBody() (question 1)
+  PLAY={kind:kind,idx:idx,step:'brief',qi:0,sel:set.questions.map(function(q){return q.multi?[]:null;}),lockedBack:false,timerQi:null,returnPhase:st.phase};
+  st.phase='play';
+  render();
 }
-/* renderPlayBrief (2026-09-10, per direction) — the "here's the game + how to play" opener shown
-   before question 1, for both games and booths. Echoes the consent screen (หน้าที่ 2) DNA: a
-   two-tone .consent-h heading (reused verbatim, just re-sized via .play-brief-h), a muted lead
-   paragraph, two .round-cards, and a primary CTA. Its purpose is purely orientation — it captures
-   no answer and mutates no state; the CTA just hands off to renderPlayBody(). */
+/* renderPlay — the st.phase==='play' dispatcher render() calls; picks the step's own render
+   function. The `!PLAY` guard is just a safety net (shouldn't be reachable — nothing sets
+   st.phase='play' without first setting PLAY). */
+function renderPlay(){
+  if(!PLAY){st.phase='home';render();return;}
+  if(PLAY.step==='question')renderPlayBody();
+  else if(PLAY.step==='summary')renderPlaySummary();
+  else renderPlayBrief();
+}
 function briefCard(dot,kicker,title,meta){
   return '<div class="round-card"><div class="rc-top"><span class="rc-dot" style="background:'+dot+'"></span><span class="rc-kicker">'+kicker+'</span></div><div class="rc-title">'+title+'</div><div class="rc-meta">'+meta+'</div></div>';
 }
+/* renderPlayBrief — the "here's the game + how to play" opener shown before question 1. Rebuilt
+   2026-09-10 (per direction "หน้าคั่น ของแต่ละเกมส์ทั้งหมด...ใช้ design dna ทั้งหมด เดียวกับ หน้าที่ 2")
+   to reuse the consent screen's (หน้าที่ 2, renderConsent) OWN structure verbatim — the .consent
+   container + room1 photo backdrop, .content > .consent-body (centered) + .consent-btn (bottom-pinned)
+   layout, full-size two-tone .consent-h heading, .consent-p lead, and .round-cards — rather than the
+   earlier ".play-brief" echo that only borrowed the heading (re-sized) inside a .q-scroll page. The
+   one addition the consent screen itself lacks is a .tb-ic back arrow in the topbar (the same control
+   renderLibrary uses): the game flow needs an exit back to the games/booth list, whereas the consent
+   screen is forward-only. Purely orientation — captures no answer, only ever mutates PLAY.step.
+   .play-brief-h is re-applied alongside .consent-h (2026-09-10, per direction — see its own CSS
+   comment) to size this heading down to var(--fs-title)/36px instead of .consent-h's own hero-specific
+   64px. (.play-brief/.play-brief-badge/.play-brief-p/.play-brief-note CSS still unused — kept for
+   history, nothing renders them anymore.) */
 function renderPlayBrief(){
   var kind=PLAY.kind,idx=PLAY.idx,set=playSet(kind,idx),n=set.questions.length;
-  var badge,headA,headB,lead,cards;
+  var headA,headB,lead,cards;
   if(kind==='game'){
     var s=SIDES[idx];
-    badge='เปิดด้าน <span class="pb-emoji">'+s.emoji+'</span> '+s.side;
     headA='เกม';headB=s.title.replace(/^เกม/,''); // every game title is "เกม…"; split so ch-1="เกม" (muted) + ch-2=rest (ink), matching consent-h's two-tone
     lead=s.intro;
-    cards=briefCard('var(--violet)','จำนวนข้อ',n+' ข้อ','ตอบทีละข้อ')+briefCard('var(--amber-text)','กติกา',s.rule,'อ่านก่อนเริ่ม');
+    cards=briefCard('var(--violet)','จำนวนข้อ',n+' ข้อ','ตอบทีละข้อ')+briefCard('var(--yellow)','กติกา',s.rule,'อ่านก่อนเริ่ม');
   }else{
     var b=BOOTHS[idx];
-    badge='บูธ '+(idx+1)+' · '+b.asset;
     headA='';headB=b.game; // booth names aren't "เกม…" prefixed — whole name in ch-2 (ink)
     lead=BOOTH_BRIEF[idx];
     cards=briefCard('var(--violet)','จำนวนข้อ',n+' ข้อ','ตอบทีละข้อ')+briefCard('var(--amber-text)','รางวัล','+'+set.points+' แต้ม','สะสมลุ้นรางวัลใหญ่');
   }
   var head='<div class="consent-h play-brief-h">'+(headA?'<span class="ch-1">'+headA+'</span> ':'')+'<span class="ch-2">'+headB+'</span></div>';
-  var body=document.getElementById('playBody');
-  body.innerHTML=
-    '<div class="play-brief">'+
-      '<div class="play-brief-badge">'+badge+'</div>'+
-      head+
-      '<div class="play-brief-p">'+lead+'</div>'+
-      '<div class="round-cards">'+cards+'</div>'+
-      '<div class="play-brief-note">'+ic('lc-info')+'<span>ทุกคำตอบมีความรู้ให้เสมอ · ไม่มีคำตอบผิด</span></div>'+
-      '<button class="btn btn-primary play-brief-cta" type="button" id="playStartBtn">'+ic('lc-play-circle')+'เริ่มเล่นเกม</button>'+
+  root.innerHTML=
+    /* align-self:center override (2026-09-10, per direction "header ไอคอนให้ alignment center กับ
+       text") — .tb-ic's own align-self:flex-start (see its CSS comment) exists for renderLibrary's
+       2-line tb-title/tb-sub stack, top-aligning the icon to just the FIRST line there. This header's
+       title is a single line, so that same flex-start left the icon sitting near the top of the 54px
+       bar instead of centered against it — inline override, scoped to this one header only, since
+       Library's own 2-line case still needs the base flex-start behavior untouched. */
+    '<header class="topbar"><button class="tb-ic" id="playBackBtn" type="button" aria-label="ย้อนกลับ" style="align-self:center">'+ic('lc-arrow-left')+'</button><span class="tb-title">'+playLabel(kind,idx)+'</span></header>'+
+    '<div class="consent fade" style="background-image:url(\''+BG_IMG.room1+'\')">'+
+      '<div class="content">'+
+        '<div class="consent-body scroll-reveal">'+
+          head+
+          '<div class="consent-p">'+lead+'</div>'+
+          '<div class="round-cards">'+cards+'</div>'+
+        '</div>'+
+        '<div class="consent-btn"><button class="btn btn-primary" type="button" id="playStartBtn">เริ่มเล่นเกม '+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
+      '</div>'+
     '</div>';
-  body.querySelector('#playStartBtn').onclick=function(){renderPlayBody();};
+  root.querySelector('#playBackBtn').onclick=closePlay;
+  root.querySelector('#playStartBtn').onclick=function(){PLAY.step='question';render();};
 }
 function clearPlayTimer(){if(PLAY_TIMER){clearInterval(PLAY_TIMER);PLAY_TIMER=null;}}
+/* closePlay — exits the whole mini-game flow back to whichever tab launched it (PLAY.returnPhase),
+   the same role as the DNA quiz's own "back from question 1 → splash". Bound only to the brief
+   screen's "ย้อนกลับ" — mid-question, playGoBack() steps back INTO the brief screen instead (see
+   below), so there's one single linear back-chain, same shape as the quiz's own. */
 function closePlay(){
-  var m=document.getElementById('playModal');if(m)m.classList.remove('show');
   clearPlayTimer();
+  var back=(PLAY&&PLAY.returnPhase)||'home';
   PLAY=null;
+  st.phase=back;
+  render();
 }
 /* Countdown is atmospheric pressure ONLY (per เกมทนกระแส ฉาก 1's on-screen timer) — the source docx
    never specifies what happens at 0 (an open item, see [[games-questions-dna]] #5), so this
@@ -6851,13 +7036,22 @@ function startPlayTimer(seconds){
   },1000);
 }
 function completePlay(){
-  var kind=PLAY.kind,idx=PLAY.idx;
+  var kind=PLAY.kind,idx=PLAY.idx,back=PLAY.returnPhase;
   if(kind==='game'){GAME_ANSWERS[idx]=PLAY.sel;GAME_PLAYED[idx]=true;}
   else{BOOTH_ANSWERS[idx]=PLAY.sel;BOOTH_ACT[idx]=true;}
-  closePlay();
-  if(kind==='game'){GAME_OPEN=idx;renderGames();}
-  else renderBooth();
+  clearPlayTimer();
+  PLAY=null;
+  st.phase=back;
+  if(kind==='game')GAME_OPEN=idx; // auto-expand the just-finished row once we land back on the Games tab
+  render();
 }
+/* selectPlayAnswer — a tap on an option. Deliberately does NOT call render()/renderPlayBody(): this
+   page's .q-scroll carries the same .fade entrance animation the DNA quiz's own question screen
+   uses, and the quiz already established the rule that a mere answer-tap must never replay it (see
+   renderQuiz's own comment: full re-render "read as constant jerky flicker"). paintPlayQuestion()
+   below does the same local class/text patch renderQuiz's own optBtns/paintInterests handlers do,
+   instead of rebuilding the page — this is also why it no longer needs a repaint-vs-real-question
+   distinction the old modal version's full-body-rebuild approach didn't have to make. */
 function selectPlayAnswer(qi,oi){
   var q=playSet(PLAY.kind,PLAY.idx).questions[qi];
   if(q.multi){
@@ -6866,32 +7060,62 @@ function selectPlayAnswer(qi,oi){
   }else{
     PLAY.sel[qi]=oi;
   }
-  renderPlayBody();
+  if(qi===PLAY.qi)paintPlayQuestion();
+}
+/* paintPlayQuestion — local DOM sync after a tap, no re-render. Toggles .q-opt .sel state, updates
+   the multi-select counter, enables the next button once answered, and reveals the insight box the
+   first time an answer lands (unhides it + double-rAF-adds .show so the delayed fade transition
+   actually plays — same "let the browser paint the hidden state before flipping" pattern the timer
+   fix in renderPlayBody relies on). */
+function paintPlayQuestion(){
+  var kind=PLAY.kind,idx=PLAY.idx,qi=PLAY.qi;
+  var q=playSet(kind,idx).questions[qi],sel=PLAY.sel[qi];
+  var answered=q.multi?(sel.length>0):(sel!==null);
+  root.querySelectorAll('.q-opt').forEach(function(b){
+    var oi=+b.dataset.oi;
+    b.classList.toggle('sel',q.multi?(sel.indexOf(oi)>-1):(sel===oi));
+  });
+  var countEl=root.querySelector('.int-count b');
+  if(countEl)countEl.textContent=sel.length;
+  var nextBtn=root.querySelector('#playNextBtn');
+  if(nextBtn)nextBtn.disabled=!answered;
+  if(answered&&!q.multi&&q.insight){
+    var insEl=root.querySelector('.play-insight');
+    if(insEl&&insEl.style.display==='none'){
+      insEl.style.display='';
+      requestAnimationFrame(function(){requestAnimationFrame(function(){insEl.classList.add('show');});});
+    }
+  }
 }
 function playGoNext(){
   var set=playSet(PLAY.kind,PLAY.idx);
   if(set.questions[PLAY.qi].locked)PLAY.lockedBack=true;
-  if(PLAY.qi>=set.questions.length-1){renderPlaySummary();return;}
+  if(PLAY.qi>=set.questions.length-1){PLAY.step='summary';render();return;}
   PLAY.qi++;
-  renderPlayBody();
+  render();
 }
+/* playGoBack — one question back, or (from question 1) back OUT to the brief screen — mirrors the
+   DNA quiz's own idx-based back chain, just one level deeper (brief sits "before" question 1 the
+   way splash sits before quiz question 1). `set.noBack` (M1 only) blocks this at every question
+   including question 1 → brief: that game intentionally has no way back once started, full stop. */
 function playGoBack(){
-  if(PLAY.qi<=0||PLAY.lockedBack)return;
+  var set=playSet(PLAY.kind,PLAY.idx);
+  if(PLAY.lockedBack||set.noBack)return;
+  if(PLAY.qi<=0){PLAY.step='brief';render();return;}
   PLAY.qi--;
-  renderPlayBody();
+  render();
 }
 function renderPlayBody(){
   var kind=PLAY.kind,idx=PLAY.idx,qi=PLAY.qi;
   var set=playSet(kind,idx),q=set.questions[qi],total=set.questions.length;
   var sel=PLAY.sel[qi];
   var answered=q.multi?(sel.length>0):(sel!==null);
-  var canBack=qi>0&&!PLAY.lockedBack&&!set.noBack;
-  var dots='';for(var d=0;d<total;d++)dots+='<span class="play-dot'+(d===qi?' on':'')+'"></span>';
+  var canBack=!PLAY.lockedBack&&!set.noBack;
   var timerHTML=q.timer?'<span class="play-timer">'+ic('lc-hourglass')+'<span id="playTimerVal">'+q.timer+'</span>s</span>':'';
   // Points badge (2026-09-10) — booth questions only; never coexists with timerHTML in practice
-  // (only a GAME question — M3's ฉาก 1 — ever sets q.timer), so sharing the eyebrow's one right-hand
-  // slot is safe.
+  // (only a GAME question — M3's ฉาก 1 — ever sets q.timer), so sharing this one badge row is safe.
   var ptsBadgeHTML=(kind==='booth'&&set.points)?'<span class="play-pts-badge">'+ic('lc-gift')+'+'+set.points+' แต้ม</span>':'';
+  var badgesHTML=(timerHTML||ptsBadgeHTML)?'<div class="play-eyebrow">'+timerHTML+ptsBadgeHTML+'</div>':'';
   // Multi-select counter (2026-09-10) — borrows the DNA quiz's own S3 interest-picker pattern
   // (.int-count "เลือกแล้ว X/3") so a multi-choice question reads visibly differently from a
   // single-choice one, not just via the (easy to miss) absence of radio-style exclusivity.
@@ -6902,82 +7126,153 @@ function renderPlayBody(){
     optsHTML+='<button class="q-opt'+(isSel?' sel':'')+'" type="button" data-oi="'+oi+'"><span class="opt-key">'+(oi+1)+'</span><span class="opt-text">'+t+'</span></button>';
   });
   optsHTML+='</div></div>';
-  var insightHTML=(answered&&!q.multi&&q.insight)?'<div class="play-insight">'+ic('lc-sparkles')+'<span>'+q.insight+'</span></div>':'';
-  var skipHTML=q.skippable?'<button class="play-skip" type="button" id="playSkipBtn">'+(q.skipLabel||'ข้ามข้อนี้')+'</button>':'';
+  // Insight markup is always emitted (once per question) but hidden via inline display:none until
+  // answered — paintPlayQuestion() (the tap handler) unhides + fades it in the first time; if this
+  // question was already answered before (stepped back into it via playGoBack), it renders directly
+  // visible with the `show` class already on, no replayed animation.
+  var insightHTML=(!q.multi&&q.insight)?'<div class="play-insight'+(answered?' show':'')+'"'+(answered?'':' style="display:none"')+'>'+ic('lc-sparkles')+'<span>'+q.insight+'</span></div>':'';
+  // .ag-more reused verbatim (2026-09-10, per direction "button dna ใช้แบบเดียวกับ ปุ่ม
+  // ดูกำหนดการทั้งวัน 11 รายการ (หน้าหลัก)") — was a plain underlined text link (.play-skip, now
+  // unused), now the same bordered/full-width button as Home's agenda "ดูกำหนดการทั้งวัน" toggle.
+  // Icon moved AFTER the label (2026-09-10 follow-up, per direction "เอาไอคอนมาไว้ด้านหลัง ข้อความ") —
+  // .ag-more's OWN source instance (agMore on Home) leads with its icon since that one's a
+  // toggle whose icon literally flips open/closed; this skip button is a plain forward action, so
+  // trailing the icon reads as "skip →" instead of borrowing that toggle's chevron-first convention.
+  var skipHTML=q.skippable?'<button class="ag-more" type="button" id="playSkipBtn">'+(q.skipLabel||'ข้ามข้อนี้')+ic('lc-chevron-right')+'</button>':'';
   var isLast=qi>=total-1;
   var nextLabel=isLast?('เสร็จสิ้น '+ic('lc-check','ic-fwd')):('ถัดไป '+ic('lc-arrow-right','ic-fwd'));
-  var body=document.getElementById('playBody');
-  body.innerHTML=
-    '<div class="play-eyebrow"><span>ข้อ '+(qi+1)+'/'+total+' · '+playLabel(kind,idx)+'</span>'+timerHTML+ptsBadgeHTML+'</div>'+
-    '<div class="play-dots">'+dots+'</div>'+
-    '<div class="play-q">'+emphasizeQ(q.q)+'</div>'+
-    (q.sub?'<div class="play-sub">'+q.sub+'</div>':'')+
-    multiCountHTML+
-    optsHTML+
-    skipHTML+
-    insightHTML+
-    '<div class="play-nav">'+
-      (canBack?'<button class="btn btn-tertiary" type="button" id="playBackBtn">'+ic('lc-arrow-left','ic-back')+'ย้อนกลับ</button>':'<span></span>')+
-      '<button class="btn btn-primary" type="button" id="playNextBtn"'+(answered?'':' disabled')+'>'+nextLabel+'</button>'+
+  // Focal question icon (2026-09-10, per direction "หน้าคำถามทั้งหมด...ใช้ design dna...เดียวกับ
+  // หน้าคำถาม+คำตอบของ quiz dna") — the quiz's own .q-head/.q-icon-bare anchor.
+  // Per-question icon (2026-09-10 follow-up, per direction "ไอคอนที่ใช้เป็นมอคอัพทั้งหมด เลือกใช้
+  // รูปแบบที่ตรงความหมายของคำถามจริง...แบบส่วน dna quiz") — every MINIGAME_Q/BOOTH_Q question now
+  // carries its own `icon` (a Lucide id picked to match THAT question's specific content, same idea
+  // as the DNA quiz's per-question q.icon/q.img), instead of one game/booth icon repeating identically
+  // across every question in that set. These are still placeholder Lucide glyphs, not final art — per
+  // direction, real custom icons of the same meaning will replace them later, same as the DNA quiz's
+  // own icons started as Lucide placeholders. Falls back to the old per-game/booth icon (Lucide for a
+  // main game, the booth's PNG asset art via BOOTH_ICON_PNG for a booth game) only if a question ever
+  // ships without its own `icon`.
+  var qIcon;
+  if(q.icon)qIcon=ic(q.icon);
+  else if(kind==='game'){qIcon=ic(SIDES[idx].icon);}
+  else{var bArt=BOOTH_ICON_PNG[BOOTHS[idx].asset];qIcon=bArt?'<img src="'+bArt+'" alt="">':ic(BOOTHS[idx].icon);}
+  root.innerHTML=
+    '<header class="topbar"><div class="tb-title">'+playLabel(kind,idx)+'</div>'+
+      '<div class="tb-sub tb-sub--strong"><span class="tb-dot" style="background:var(--violet)"></span>'+(qi+1)+'/'+total+'</div>'+
+    '</header>'+
+    '<div class="q-scroll fade">'+
+      badgesHTML+
+      '<div class="q-head scroll-reveal" style="--qc:var(--violet)"><div class="q-icon-bare">'+qIcon+'</div>'+
+        '<div class="q-title">'+emphasizeQ(q.q)+'</div>'+(q.sub?'<div class="q-sub">'+q.sub+'</div>':'')+'</div>'+
+      multiCountHTML+
+      optsHTML+
+      skipHTML+
+      insightHTML+
+      '<div class="q-nav">'+
+        (canBack?'<button class="btn btn-tertiary" type="button" id="playBackBtn">'+ic('lc-arrow-left','ic-back')+'ย้อนกลับ</button>':'<span></span>')+
+        '<button class="btn btn-primary" type="button" id="playNextBtn"'+(answered?'':' disabled')+'>'+nextLabel+'</button>'+
+      '</div>'+
     '</div>';
-  body.querySelectorAll('.q-opt').forEach(function(b){b.onclick=function(){selectPlayAnswer(qi,+b.dataset.oi);};});
-  var backBtn=body.querySelector('#playBackBtn');if(backBtn)backBtn.onclick=playGoBack;
-  body.querySelector('#playNextBtn').onclick=playGoNext;
-  var skipBtn=body.querySelector('#playSkipBtn');if(skipBtn)skipBtn.onclick=playGoNext;
-  // Bug fix (2026-09-09, found while demoing M3 live): renderPlayBody() re-runs on every option
-  // tap (selectPlayAnswer calls it again to repaint the selection + insight), not just on an actual
-  // question change — a naive "if(q.timer)startPlayTimer(...)" here restarted the countdown from
-  // full every single tap, which defeats the whole point of a time-pressure timer. Only (re)start it
-  // when we've genuinely landed on a NEW timed question (tracked via PLAY.timerQi); re-renders of
-  // the SAME question just leave the already-running interval alone.
+  root.querySelectorAll('.q-opt').forEach(function(b){b.onclick=function(){selectPlayAnswer(qi,+b.dataset.oi);};});
+  var backBtn=root.querySelector('#playBackBtn');if(backBtn)backBtn.onclick=playGoBack;
+  root.querySelector('#playNextBtn').onclick=playGoNext;
+  var skipBtn=root.querySelector('#playSkipBtn');if(skipBtn)skipBtn.onclick=playGoNext;
+  // Bug fix (2026-09-09, still relevant post full-page conversion): only (re)start the timer when
+  // this is genuinely a NEW timed question (tracked via PLAY.timerQi) — renderPlayBody() can still
+  // be re-invoked for the SAME question by an unrelated global render() elsewhere in the app (e.g.
+  // the demo panel toggling something), and a naive restart-on-every-render would keep resetting it.
   if(q.timer&&PLAY.timerQi!==qi){PLAY.timerQi=qi;startPlayTimer(q.timer);}
   else if(!q.timer)clearPlayTimer();
-  // Delayed reveal (2026-09-10) — insight starts hidden (base .play-insight rule) and gets `.show`
-  // added a tick later so the opacity/transform transition (with its own .15s delay) actually plays
-  // instead of the class landing in the same paint as the innerHTML write (which would just skip
-  // straight to the end state, same "read the computed style before flipping" gotcha as the M3 timer
-  // fix above). Double rAF, not a fixed setTimeout, so it's tied to real paint frames not a guessed ms.
-  var insEl=body.querySelector('.play-insight');
-  if(insEl)requestAnimationFrame(function(){requestAnimationFrame(function(){insEl.classList.add('show');});});
 }
+/* renderPlaySummary — the game's result/payoff screen. Rebuilt 2026-09-10 (per direction "หน้า result
+   อยากให้ใช้ dna เดียวกับ หน้าคู่มือ แท่ป ตัวตน") onto the Playbook identity (ตัวตน) tab's own DNA: the
+   result sits inside the SAME .hero-sec > .hero-gw (Full Glow Frame) > .hero-in card that centers the
+   persona identity, with a centered .fam-badge naming the game.
+   Split into two separate, visually distinct boxes (2026-09-10 follow-up, per direction "หน้า result
+   อยากให้แยกข้อมูลออกมาจัดเป็นข้อมูล card ข้อมูลใคร ข้อมูลมัน...และให้ดูเรื่อง visual heirachy") — an
+   earlier pass merged both into one plain .hero-sig-c line + one .str-box, losing the hierarchy; now:
+     - resultCard ("ข้อมูลใคร" — the verdict ABOUT the player, only some games/booths have one): its
+       own .ast-block callout, reusing the same tinted-surface idiom ความแข็งแกร่ง's sibling
+       "สินทรัพย์ที่ถนัด" card uses elsewhere in this exact DNA — violet-tinted for a real verdict,
+       a muted dashed variant (borrowing .pe-locked's "informational, not a verdict" language) for
+       `noType` games that explicitly never classify the player.
+     - insights ("ข้อมูลมัน" — general/factual takeaways from the questions, not about the player) stay
+       their own .str-box of .str-li rows, the same block idiom as ความแข็งแกร่ง/สิ่งที่ต้องระวัง there.
+   Either box is omitted when its data is empty (most booths + 2 of 6 games carry no resultNote) rather
+   than padding it with filler text. sizeHeroGlow() is called after mount exactly as renderBook does.
+   (.play-q/.play-result-card/.play-result-ey/.play-result-t/.play-sum-list/.play-sum-item CSS now
+   unused — kept for history.) The old "ดูผลในคู่มือ" CTA is gone (2026-09-10, per direction "ปุ่ม
+   ดูผลในคู่มือ เอาออก (ไม่มี flow การใช้งานนี้)...ให้เป็นปุ่ม กลับหน้า เกมส์หลัก , กลับหน้า เดินบูธ แทน") —
+   completePlay() already returns to whichever tab launched the game (PLAY.returnPhase), so the button
+   just names that destination now: main games vs. booth walk.
+   Two additions (2026-09-10, from analyzing a reference booth-game prototype's own result screen —
+   same source content as MINIGAME_Q's S03 insurance game, built on a non-DNA generic UI): that
+   prototype always shows (1) a running cross-game "cumulative knowledge" count and (2) an explicit
+   line confirming what just got saved. Both were genuinely missing here, not just re-skinned — see
+   knowCount/insHd (the .sc pill reused from skillCardHTML's own "คำประจำตัว" chip, right-aligned in
+   .str-hd) and saveNoteHTML (.pf-note reused from Profile's footer) below. Deliberately NOT ported:
+   that prototype's separate "Ark Hero" persona computed live from mini-game mindset points — this app
+   already anchors identity on RESULT.hero from the upfront DNA quiz, so a second emergent persona
+   would compete with it rather than extend it; the mindset signal only feeds the existing Playbook via
+   learnedInsights()/learnedLedgerHTML() (journey tab) instead. */
 function renderPlaySummary(){
   clearPlayTimer();
   var kind=PLAY.kind,idx=PLAY.idx,set=playSet(kind,idx);
   var insights=set.questions.map(function(q){return q.insight;}).filter(Boolean);
-  var ptsHTML=(kind==='booth'&&set.points)?'<div class="play-sum-pts">'+ic('lc-gift')+'<span>+'+set.points+' แต้ม</span></div>':'';
-  // Result card (2026-09-10) — split out of the plain insight list into its own higher-hierarchy
-  // card (see .play-result-card's own comment above). `noType` (M5 only) swaps the spectrum "this is
-  // YOUR result" treatment for a dashed/muted "informational, not a verdict" one — this game
-  // explicitly never classifies the player, so the CARD itself should look different, not just the
-  // words inside it.
-  var resultHTML='';
+  var badgeIcon=kind==='game'?ic(SIDES[idx].icon):ic(BOOTHS[idx].icon); // Lucide only — .fam-badge sizes svg, not img
+  // "ข้อมูลใคร" — the verdict about the player. .ast-block reused verbatim (radius/padding/margin,
+  // .ast-lbl header row) from the identity tab's "สินทรัพย์ที่ถนัด" card; only the background/border
+  // tint + label swap between the two states, same recipe .redeem-card.on/.locked already uses for
+  // an on/off tint pair. Omitted entirely when the game has no resultNote (M2/M6 + every booth).
+  var resultCard='';
   if(set.resultNote){
     var noType=!!set.noType;
-    resultHTML='<div class="play-result-card'+(noType?' notype':'')+'"><div class="pr-ic">'+ic(noType?'lc-info':'lc-sparkles')+'</div><div class="pr-tx"><div class="play-result-ey">'+(noType?'หมายเหตุ':'ผลจากเกมนี้')+'</div><div class="play-result-t">'+set.resultNote+'</div></div></div>';
+    // Description now aligns under the ast-lbl TITLE text, not the icon (2026-09-10, per direction
+    // "ให้ text description alignment กับ text title") — dropped the `margin-left:0` override that
+    // used to pull .str-li flush left under the icon; .str-li's own default margin-left
+    // (calc(var(--ic-lg) + var(--sp-inline))) already exists for exactly this — it's the same value
+    // insBox's str-hd/str-li pairing below relies on, and ast-lbl uses the identical icon-size+gap
+    // recipe, so the unmodified default lines the description up under "หมายเหตุ"/"ผลจากเกมนี้" for free.
+    resultCard=noType
+      ? '<div class="ast-block" style="background:var(--paper);border:1px dashed var(--line-strong)"><div class="ast-lbl">'+ic('lc-info')+'หมายเหตุ</div><div class="str-li">'+set.resultNote+'</div></div>'
+      : '<div class="ast-block" style="background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)"><div class="ast-lbl">'+ic('lc-sparkles')+'ผลจากเกมนี้</div><div class="str-li">'+set.resultNote+'</div></div>';
   }
-  var body=document.getElementById('playBody');
-  body.innerHTML=
-    '<div class="play-eyebrow"><span>เล่นจบแล้ว</span></div>'+
-    '<div class="play-q">'+playLabel(kind,idx)+'</div>'+
-    resultHTML+
-    '<div class="play-sum-list">'+insights.map(function(t){return '<div class="play-sum-item">'+ic('lc-sparkles')+'<span>'+t+'</span></div>';}).join('')+'</div>'+
-    ptsHTML+
-    '<button class="btn btn-primary" type="button" id="playDoneBtn" style="width:100%">'+ic('lc-check-circle')+(kind==='game'?'ดูผลในคู่มือ':'เสร็จสิ้น')+'</button>';
-  body.querySelector('#playDoneBtn').onclick=completePlay;
-}
-function buildPlayModal(){
-  var wrap=document.createElement('div');
-  wrap.className='play-modal';
-  wrap.id='playModal';
-  wrap.innerHTML=
-    '<div class="play-scrim" id="playScrim"></div>'+
-    '<div class="play-card">'+
-      '<button class="play-x" type="button" id="playClose">'+ic('lc-x')+'</button>'+
-      '<div id="playBody"></div>'+
+  // "ข้อมูลมัน" — factual/educational takeaways from the questions, not about the player specifically.
+  // Cumulative badge (2026-09-10) — .sc reused verbatim (the same pill skillCardHTML's "คำประจำตัว"
+  // chip and every side-item's "เสร็จ/รอทำ" status use), right-aligned in str-hd via margin-left:auto
+  // since .str-hd is already a flex row. counts THIS game's own insights immediately (see
+  // learnedInsights' `inProgress` param) so the number visible here always matches what the ledger
+  // card on the Playbook identity tab will show once the player leaves this screen.
+  var knowCount=learnedInsights({kind:kind,idx:idx}).length;
+  var insHd='<div class="str-hd">'+ic('lc-check-circle')+'สิ่งที่ได้เรียนรู้จากเกมนี้'+(knowCount?'<span class="sc" style="margin-left:auto">สะสม '+knowCount+' เรื่อง</span>':'')+'</div>';
+  var insBox=insights.length?'<div class="str-box">'+insHd+insights.map(function(t){return '<div class="str-li">'+t+'</div>';}).join('')+'</div>':'';
+  var ptsHTML=(kind==='booth'&&set.points)?'<div class="play-sum-pts">'+ic('lc-gift')+'<span>+'+set.points+' แต้ม</span></div>':'';
+  // Save confirmation (2026-09-10) — .pf-note reused verbatim (Profile footer's own muted icon+text
+  // line) as a plain-language stand-in for a "signal recorded" trust cue: names WHAT got saved
+  // (the insights above) instead of an opaque internal code, then sits as the last line inside the
+  // card — same position a closing stat/note occupies in every other .hero-in result card here.
+  var saveNoteHTML=insights.length?'<div class="pf-note" style="margin-top:var(--sp-stack)">'+ic('lc-check-circle')+'บันทึกเรื่องที่เรียนรู้จากเกมนี้เข้า Playbook ของคุณแล้ว</div>':'';
+  var backLabel=kind==='game'?'กลับหน้าเกมหลัก':'กลับหน้าเดินบูธ';
+  root.innerHTML=
+    '<header class="topbar"><span class="tb-title">เล่นจบแล้ว</span></header>'+
+    '<div class="q-scroll fade">'+
+      '<section class="hero-sec"><div class="hero-gw">'+heroGlowMarkup()+'<div class="hero-in scroll-reveal">'+
+        '<div class="fam-badge" style="'+famBadgeStyle()+'">'+badgeIcon+'<span>'+playLabel(kind,idx)+'</span></div>'+
+        resultCard+
+        insBox+
+        ptsHTML+
+        saveNoteHTML+
+      '</div></div></section>'+
+      /* Icon moved AFTER the label AND flipped to a right-pointing arrow (2026-09-10, per direction
+         "ให้ไอคอนสลับมาไว้ด้านหลังข้อความ" then follow-up "ให้เปลี่ยนไอคอนเป็นลูกศรหันขวาแทน") — was a
+         LEADING left arrow (matching renderPlayBody's own "ย้อนกลับ" back-button); this CTA isn't a
+         step-back action though (it exits the whole mini-game flow forward to the games/booth list),
+         so trailing + right-pointing now matches "เริ่มเล่นเกม →"/"ถัดไป →" elsewhere in this same flow
+         (ic-fwd, not ic-back, for the same hover-nudge-right micro-motion those share). */
+      '<div class="q-nav"><span></span><button class="btn btn-primary" type="button" id="playDoneBtn">'+backLabel+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
     '</div>';
-  document.body.appendChild(wrap);
-  document.getElementById('playScrim').onclick=closePlay;
-  document.getElementById('playClose').onclick=closePlay;
+  sizeHeroGlow();
+  root.querySelector('#playDoneBtn').onclick=completePlay;
 }
 
 /* ══ PROFILE TAB ══ content ported from Playbook Final's Profile screen — userName/userOrg/
@@ -7036,7 +7331,7 @@ function renderProfile(){
     '<section class="prof-rows scroll-reveal">'+rows.map(function(r){return '<div class="pr-row"><span class="pr-k">'+r.k+'</span><span class="pr-v">'+r.v+'</span></div>';}).join('')+'</section>'+
     '<div class="prof-foot scroll-reveal"><div class="pf-brand">efin × BetterTrade · New World, New Playbook</div>'+
       '<div class="pf-note">'+ic('lc-info')+'เราแค่ "จด" ไม่ "ชี้" · แต้ม ≠ ตัวตน · เพื่อการวางแผนและการศึกษา ไม่ใช่คำชี้ชวนลงทุน</div>'+
-      '<div class="pf-note">'+ic('lc-lock')+'เปิดคู่มือด้วย OTP/QR ตาม PDPA · ตัวเลข/สิทธิเป็นข้อมูลเบื้องต้น (MOCK) ต้องเคาะกับทีมจัดงานก่อนใช้จริง</div>'+
+      '<div class="pf-note">'+ic('lc-lock')+'เปิด Playbook ด้วย OTP/QR ตาม PDPA · ตัวเลข/สิทธิเป็นข้อมูลเบื้องต้น (MOCK) ต้องเคาะกับทีมจัดงานก่อนใช้จริง</div>'+
     '</div>'+
   '</main>'+
   appTabbar('profile');
@@ -7148,14 +7443,14 @@ function buildDemo(){
        result / a random one) so the reveal always has a real card. */
     '<div class="demo-lbl">Character Animation — Case 01 (After Analysis)</div>'+
     '<div class="demo-row-btns"><button class="btn btn-secondary" id="demoCardPlay">'+ic('lc-play-circle')+'เล่นอนิเมชัน</button><button class="btn btn-secondary" id="demoCardReplay">'+ic('lc-refresh-cw')+'เล่นซ้ำ</button></div>'+
-    '<div class="demo-stub">* เล่นครั้งเดียวใน flow จริง (หลังวิเคราะห์ → การ์ด → คู่มือ) — ปุ่ม "เล่นซ้ำ" สำหรับเดโมเท่านั้น</div>'+
+    '<div class="demo-stub">* เล่นครั้งเดียวใน flow จริง (หลังวิเคราะห์ → การ์ด → Playbook) — ปุ่ม "เล่นซ้ำ" สำหรับเดโมเท่านั้น</div>'+
     '<div class="demo-lbl">สถานะ</div><div class="demo-row"><span class="rl">'+ic('lc-book-open')+'ทำแบบทดสอบตัวตนแล้ว</span><span class="sw'+(DEMO.quizDone?' on':'')+'" id="demoQuiz"></span></div>'+
     /* การลงทะเบียน (2026-09-04) — separate preview toggle for a quiz-taker who never went through the
        registration site (see DEMO.registered / renderBook's `unreg` branches). 'ยังไม่ได้ลงทะเบียน'
        only changes what คู่มือ/ตัวตน renders — it doesn't touch RESULT/quizDone above, so pick a
        persona first (or leave the seeded default) to actually see the locked tab. */
     '<div class="demo-lbl">การลงทะเบียน</div>'+seg('segRegistered',[{v:'yes',t:'ลงทะเบียนแล้ว'},{v:'no',t:'ยังไม่ได้ลงทะเบียน'}],DEMO.registered?'yes':'no')+
-    '<div class="demo-stub">* ยังไม่ได้ลงทะเบียน = คู่มือเห็นแค่ tab ตัวตน ตัดจบที่จุดแข็ง/จุดที่ต้องระวัง + CTA ชวนลงทะเบียน ไม่มี bottom nav</div>'+
+    '<div class="demo-stub">* ยังไม่ได้ลงทะเบียน = Playbook เห็นแค่ tab ตัวตน ตัดจบที่จุดแข็ง/จุดที่ต้องระวัง + CTA ชวนลงทะเบียน (bottom nav ยังกดออกไปหน้าอื่นได้ตามปกติ)</div>'+
     /* Force the "เดินบูธ ✦ ลุ้นรางวัล" draw-status card's eligible/not-eligible state for preview
        (2026-08-26, per direction "อยากให้จำลองเคส...ไว้ด้วย กรณีครบเงื่อนไขแล้ว และกรณียังขาด") —
        'auto' keeps the real boothCheckinCount()/boothActivityCount() math; see renderBooth. */
@@ -7180,6 +7475,16 @@ function buildDemo(){
     '<div class="demo-lbl">วิกฤตรอบที่ 2 (สวนขั้วกัน = ยังไม่นิ่ง)</div><select class="demo-sel" id="demoCrisis2"><option>เหมือนรอบแรก</option><option>สวนทางรอบแรก</option></select>'+
     '<div class="demo-stub">* เกมในงานยังไม่ออกแบบ — 2 ช่องนี้เป็น stub</div>'+
     '<button class="btn btn-secondary demo-reset" id="demoReset">'+ic('lc-refresh-cw')+'รีเซ็ตเกมหลักที่เล่น</button>'+
+    /* เช็คอินครบทุกบูธ (2026-09-10, per direction "หน้าเดินบูธ ต้องการทดสอบเล่นเกมส์แต่ละสินทรัพย์ได้") —
+       the real check-in flow (openScan/confirmScan, per BOOTHS[i]'s own ZONE_BOOTHS partner list) is
+       already fully functional, but testing all 10 booth games means clicking through 10 separate
+       QR-simulate modals first, one per booth, before a single "เล่นเกม" button unlocks — a real
+       tester's actual blocker. Checks in partner index 0 (every ZONE_BOOTHS[i] has at least one) for
+       all 10 booths at once so every booth's "เล่นเกม" unlocks immediately; does NOT touch BOOTH_ACT
+       (playing/completing each game still has to happen for real, same as production) or weaken the
+       real gate itself — this is a demo-panel-only shortcut around the check-in step, not a change to
+       renderBooth's own checkedIn logic. */
+    '<button class="btn btn-secondary demo-reset" id="demoChkAll">'+ic('lc-qr-code')+'เช็คอินครบทุกบูธ (ทดสอบเล่นเกม)</button>'+
   '</div>';
   document.body.appendChild(wrap);
   var panel=document.getElementById('demoPanel');
@@ -7208,14 +7513,28 @@ function buildDemo(){
   document.getElementById('demoCardPlay').onclick=function(){panel.classList.remove('open');demoPlayCardReveal();};
   document.getElementById('demoCardReplay').onclick=function(){panel.classList.remove('open');demoPlayCardReveal();};
   document.getElementById('demoQuiz').onclick=function(){DEMO.quizDone=!DEMO.quizDone;this.classList.toggle('on',DEMO.quizDone);};
-  document.getElementById('demoReset').onclick=function(){DEMO.quizDone=false;document.getElementById('demoQuiz').classList.remove('on');document.getElementById('demoPersona').value='';DEMO.draw='auto';document.getElementById('segDraw').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='auto');});DEMO.multiTicket=false;document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='1');});
+  document.getElementById('demoReset').onclick=function(){
     // Bug fix (2026-09-09, found while setting up a clean way to test-play every one of the 16
     // real mini-games added in Phase 1) — this button's own label ("รีเซ็ตเกมหลักที่เล่น") already
     // promised a played-state reset, but the code never actually touched GAME_PLAYED/BOOTH_ACT (only
     // resetQuiz()'s quiz-taking state st/RESULT). Now genuinely clears every game/booth back to
     // unplayed so all 6 เกมหลัก + 10 บูธ can be replayed from scratch for testing.
     GAME_PLAYED={};GAME_ANSWERS={};BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};DRAW_JOINED=false;
-    panel.classList.remove('open');resetQuiz();};
+    // Bug fix (2026-09-10, reported: "กด รีเซ็ตเกมหลักที่เล่น แล้วกดเข้าคู่มือไม่ได้") — this handler
+    // used to ALSO reset the quiz identity (DEMO.quizDone=false + cleared demoPersona + resetQuiz(),
+    // which sets RESULT=null), even though the label/comment above only ever promised a games/booths
+    // reset. With RESULT null, renderBook()'s own `if(!RESULT)` guard bounces to 'splash', and
+    // render()'s own eventPhase==='on' guard then bounces splash straight to 'home' (RESULT?'book':
+    // 'home') — so the คู่มือ tab silently did nothing, defeating the very replay-testing this button
+    // exists for (you'd have to retake the whole 10-question quiz, or repick a demo persona, just to
+    // get back into Book/Games after "resetting the games"). Dropped resetQuiz() and the quizDone/
+    // demoPersona/draw/multiTicket resets entirely — those reset a DIFFERENT thing (the persona/
+    // ticket demo state, still doable via their own controls above) and don't belong to a "games
+    // played" reset; RESULT now stays untouched so คู่มือ/เกมหลัก stay reachable straight after reset.
+    panel.classList.remove('open');render();};
+  document.getElementById('demoChkAll').onclick=function(){
+    for(var bi=0;bi<BOOTHS.length;bi++){if(!BOOTH_CHK[bi])BOOTH_CHK[bi]=new Set();BOOTH_CHK[bi].add(0);}
+    panel.classList.remove('open');render();};
 }
 
 /* Go-to-top FAB (system-wide, all view modes incl. desktop/tablet). The page itself is what
@@ -7268,6 +7587,6 @@ function buildGoTop(){
    seedPersonaResult's own baseline (booth 0 only) — below CHECKIN_NEED/ACTIVITY_NEED — so the
    Booth tab's draw-status card genuinely (not forced) reads "ยังขาด" by default too. */
 seedPersonaResult('planner');
-applyView();buildDemo();buildScanModal();buildPlayModal();buildShareModal();buildGoTop();
+applyView();buildDemo();buildScanModal();buildShareModal();buildGoTop();
 render();
 </script>
