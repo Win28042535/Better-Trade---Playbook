@@ -7363,13 +7363,18 @@ function renderProfile(){
    direction restored). Switching the ช่วงงาน segment to Pre-Event is the one way back to the
    splash/quiz flow (RESULT/quizDone/boothVer aren't touched by that switch, same as before). */
 var DEMO={view:'auto',quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,boothVer:'v2',splashVer:'v1',registered:true}; // draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. splashVer (2026-09-04, per direction "เพิ่ม preview splash scene เป็น 2 กรณี...ให้ default เป็นเวอร์ชันนี้ [v1] เสมอ"): 'v1' = the shipped fan-carousel of card fronts (unchanged, ALWAYS the default); 'v3' = a 3D field of drifting character-card streams (spv3Build/initSpv3). Gated on this flag so v1 stays byte-identical. (v2 "Card Back Reveal" and v4 "Living Card"/Case-02 preview modes existed briefly and were removed 2026-09-08, per direction "เอา v2, v4 ออก (ลบโค๊ด)" — their DEMO fields/handlers/CSS/JS are gone too.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
-/* 'auto' now always resolves to mobile (2026-08-26, per direction "อัตโนมัติ default ไว้ที่ mobile
-   size") — was real window.innerWidth-based detection (w<768→mobile/w<1440→tablet/else pc); PC/
-   แท็บเล็ต/มือถือ stay available as explicit manual overrides, 'อัตโนมัติ' just no longer reacts to
-   actual viewport width. */
+/* 'auto' resolves from real window.innerWidth again (2026-09-10 responsive audit — the 2026-08-26
+   "always resolve to mobile" change meant a real event-tablet visitor (768–1024px wide) never got
+   data-view="tablet": the .shell/topbar/book-tabbar all clamped to the 400px phone-frame width,
+   leaving the header/content/bottom-nav stranded in a narrow centered column with huge side margins
+   on an actual iPad — see DESIGN-DNA.md §"Device reality first: attendees use whatever phone/
+   event-tablet is in hand". Restored w<768→mobile/w<1440→tablet/else pc so real devices get their
+   matching layout; PC/แท็บเล็ต/มือถือ stay available as explicit demo-panel overrides for previewing
+   other sizes regardless of the actual window. */
 function applyView(){
   var m=DEMO.view,v;
-  if(m==='pc')v='pc';else if(m==='tablet')v='tablet';else v='mobile';
+  if(m==='pc')v='pc';else if(m==='tablet')v='tablet';else if(m==='mobile')v='mobile';
+  else v=window.innerWidth<768?'mobile':(window.innerWidth<1440?'tablet':'pc');
   document.documentElement.setAttribute('data-view',v);
 }
 window.addEventListener('resize',function(){if(DEMO.view==='auto')applyView();});

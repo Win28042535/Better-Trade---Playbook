@@ -321,6 +321,24 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-09-10 — responsive audit: real tablets stuck rendering the mobile phone-frame, header/content/
+bottom-nav not filling the screen.** Per direction "responsive audit" with device screenshots (real
+iPad Safari + Android Chrome, portrait, ~768–874px wide) showing the header, `.book-tabbar`, and card
+content all clamped into a narrow centered column with large empty margins on both sides — matches
+the `.shell{max-width:400px}` "phone-frame preview" look, not the tablet layout. Root cause: the
+2026-08-26 change ("`อัตโนมัติ` default ไว้ที่ mobile size") made `applyView()`'s `'auto'` branch
+resolve to `'mobile'` unconditionally, dropping the old `window.innerWidth` check entirely — so ANY
+real visitor who never touches the demo panel's `มุมมอง` segmented control (i.e. everyone) got
+`data-view="mobile"` regardless of actual device width, contradicting this doc's own "Device reality
+first" principle (§ above: attendees use whatever phone/event-tablet is in hand) and silently
+undoing the 2026-09-02/09-03 tablet-width audits' premise that `data-view` tracks the real viewport.
+Fixed by restoring real-width detection inside the `'auto'` branch only (`w<768→mobile /
+w<1440→tablet / else pc`) while leaving the demo panel's explicit PC/แท็บเล็ต/มือถือ overrides
+untouched — so a genuine tablet auto-resolves to `data-view="tablet"` (verified via
+`getBoundingClientRect()`, not just a screenshot: at 768px, `.shell`/`.topbar`/`.book-tabbar` went
+from 400px to 753px) while the demo panel can still force any of the three states for previewing off
+real hardware. See `applyView()` in dna-quiz-flow.html.
+
 **2026-09-03 — scroll motion bug: `revealTick()`'s "กิจกรรมประจำโซน" card arriving nearly a full page
 late on tall phones (iPhone 15 Pro/Pro Max reported).** Root cause wasn't a device- or width-specific
 breakpoint — it was `revealTick()` (§ "CONTAINER SCROLL ANIMATION DNA") reading `el.getBoundingClientRect()`
