@@ -2141,26 +2141,84 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .play-eyebrow{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline);font-size:var(--fs-eyebrow);color:var(--muted);margin-bottom:var(--sp-list);padding-right:30px;}
 .play-timer{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--white);background:var(--pink);padding:2px var(--sp-list);border-radius:var(--rpill);flex:0 0 auto;}
 .play-timer svg{width:13px;height:13px;}
+/* Booth points badge (2026-09-10, per direction "badge แต้มค้างอยู่ระหว่างตอบคำถาม") — sits in the
+   same right-hand eyebrow slot .play-timer uses; mutually exclusive with it in practice (only M3's
+   game-side ฉาก 1 has a timer, only booth questions have points), so sharing the slot never collides. */
+.play-pts-badge{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--amber-text);background:var(--amber-bg);border:1px solid var(--amber-border);padding:2px var(--sp-list);border-radius:var(--rpill);flex:0 0 auto;}
+.play-pts-badge svg{width:13px;height:13px;}
 .play-dots{display:flex;gap:5px;justify-content:center;margin-bottom:var(--sp-stack);}
 .play-dot{width:6px;height:6px;border-radius:50%;background:var(--line-strong);}
 .play-dot.on{background:var(--violet);}
-.play-intro{display:flex;gap:var(--sp-list);align-items:flex-start;padding:var(--sp-list) var(--sp-inline);border-radius:var(--r2);background:color-mix(in srgb,var(--violet) 8%,transparent);border:1px solid color-mix(in srgb,var(--violet) 25%,transparent);margin-bottom:var(--sp-stack);}
-.play-intro svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);flex:0 0 auto;margin-top:1px;}
-.play-intro span{font-size:var(--fs-label);color:var(--ink);line-height:1.5;}
-.play-q{font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--ink);line-height:1.5;margin-bottom:2px;}
+/* (.play-intro — the old per-question q1 intro banner — removed 2026-09-10 along with its markup;
+   the pre-game briefing screen (.play-brief, below the share-modal block) replaced it.) */
+/* Question text (2026-09-10, per direction) — was --fs-sub/22px; bumped to --fs-h2/24px to read as
+   a real question again (still short of the DNA quiz's own --fs-title/36px .q-title, a deliberate
+   size difference approved by direction — this sits inside a modal, not a full screen). `b` matches
+   .q-title b's own bold-tail treatment (emphasizeQ() wraps the trailing clause in <b> — see
+   renderPlayBody). */
+.play-q{font-size:var(--fs-h2);font-weight:var(--w-body);color:var(--ink);line-height:1.3;margin-bottom:2px;}
+.play-q b{font-weight:var(--w-label);}
 .play-sub{font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin-bottom:var(--sp-stack);}
 .play-opts .q-opts{margin-bottom:var(--sp-stack);}
 .play-skip{display:block;width:100%;text-align:center;background:none;border:none;font-family:var(--font);font-size:var(--fs-label);color:var(--muted);text-decoration:underline;cursor:pointer;padding:0 0 var(--sp-stack);}
-.play-insight{display:flex;gap:var(--sp-list);align-items:flex-start;padding:var(--sp-list) var(--sp-inline);border-radius:var(--r2);background:color-mix(in srgb,var(--cyan) 8%,transparent);border:1px solid color-mix(in srgb,var(--cyan) 25%,transparent);margin-bottom:var(--sp-stack);}
+/* Insight box (2026-09-10, per direction) — moved cyan→violet: per DESIGN-DNA.md §2.2's status-tone
+   ladder, cyan means "done/unlocked" (already the meaning of this SAME screen's "เล่นแล้ว" badge
+   elsewhere), while violet means "neutral info" — the correct semantic for a knowledge callout, and
+   it stops competing with cyan's one real job. Starts hidden + delayed fade/slide-in (`.show` added
+   via rAF in selectPlayAnswer/renderPlayBody), echoing `.radar-insight`'s own "insight worth a
+   beat" reveal timing (transition-delay baked into the .show rule, not a JS setTimeout, so it stays
+   declarative like the rest of this motion system) — makes the insight feel like a payoff for
+   answering, not a UI element that was just always there. */
+.play-insight{display:flex;gap:var(--sp-list);align-items:flex-start;padding:var(--sp-list) var(--sp-inline);border-radius:var(--r2);background:color-mix(in srgb,var(--violet) 8%,transparent);border:1px solid color-mix(in srgb,var(--violet) 25%,transparent);margin-bottom:var(--sp-stack);opacity:0;transform:translateY(4px);}
+.play-insight.show{opacity:1;transform:none;transition:opacity .4s var(--ease) .15s,transform .4s var(--ease) .15s;}
 .play-insight svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--ink);flex:0 0 auto;margin-top:1px;}
 .play-insight span{font-size:var(--fs-label);color:var(--ink);line-height:1.5;}
+@media(prefers-reduced-motion:reduce){.play-insight{opacity:1;transform:none;}.play-insight.show{transition:none;}}
 .play-nav{display:flex;gap:var(--sp-inline);align-items:center;justify-content:space-between;}
+/* Result card (2026-09-10, per direction) — the "สรุปว่าผู้เล่นเป็นคนประเภทไหน" payoff, split OUT of
+   the plain insight list (.play-sum-list below) into its own higher-hierarchy card, since it's the
+   whole game's conclusion, not one more bullet among the per-question insights. Spectrum border =
+   the SAME "this is special" language `.q-opt.sel` already uses for a chosen answer — reused here
+   to mark "this is YOUR result", not a new visual vocabulary. `.notype` (M5 only, MINIGAME_Q[4]
+   .noType — the one game that explicitly never classifies the player) swaps to a dashed/muted
+   treatment instead, borrowing `.pe-locked`'s "informational, not a verdict" dashed-border language
+   so the ABSENCE of a type reads as a deliberate design choice, not a missing feature. */
+.play-result-card{display:flex;gap:var(--sp-stack);align-items:flex-start;padding:var(--sp-stack);border-radius:var(--r2);margin-bottom:var(--sp-stack);border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,var(--spectrum) border-box;}
+.play-result-card.notype{border:1px dashed var(--line-strong);background:var(--paper);}
+.play-result-card .pr-ic{flex:0 0 auto;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--ink);}
+.play-result-card .pr-ic svg{width:var(--ic-md);height:var(--ic-md);}
+.play-result-card .pr-tx{min-width:0;}
+.play-result-ey{font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:2px;}
+.play-result-t{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.5;}
 .play-sum-list{display:flex;flex-direction:column;gap:var(--sp-list);margin-bottom:var(--sp-stack);}
 .play-sum-item{display:flex;gap:var(--sp-list);align-items:flex-start;padding:var(--sp-list) var(--sp-inline);border-radius:var(--r1);background:var(--paper);}
 .play-sum-item svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--cyan);flex:0 0 auto;margin-top:1px;}
 .play-sum-item span{font-size:var(--fs-label);color:var(--ink);line-height:1.5;}
-.play-sum-pts{display:flex;align-items:center;gap:var(--sp-list);justify-content:center;font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);background:color-mix(in srgb,var(--amber-text) 10%,transparent);border:1px solid color-mix(in srgb,var(--amber-text) 28%,transparent);border-radius:var(--r2);padding:var(--sp-stack);margin-bottom:var(--sp-stack);}
+/* Points pop (2026-09-10, per direction "pulse animation ตอนตอบจบ") — a one-shot scale+ring-flash
+   that autoplays the instant this card mounts on the summary screen (no JS trigger needed — CSS
+   animations run on insertion), same expanding-ring technique as the booth map's own `bmkFlash`
+   marker-tap acknowledgment, retimed/retoned here for a "you just earned this" reward beat. */
+.play-sum-pts{display:flex;align-items:center;gap:var(--sp-list);justify-content:center;font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);background:color-mix(in srgb,var(--amber-text) 10%,transparent);border:1px solid color-mix(in srgb,var(--amber-text) 28%,transparent);border-radius:var(--r2);padding:var(--sp-stack);margin-bottom:var(--sp-stack);animation:ptsPop .6s var(--ease) 1;}
 .play-sum-pts svg{width:var(--ic-md);height:var(--ic-md);color:var(--amber-text);flex:0 0 auto;}
+@keyframes ptsPop{0%{transform:scale(.92);box-shadow:0 0 0 2px color-mix(in srgb,var(--amber-text) 45%,transparent);}60%{transform:scale(1.04);}100%{transform:scale(1);box-shadow:0 0 0 14px color-mix(in srgb,var(--amber-text) 0%,transparent);}}
+@media(prefers-reduced-motion:reduce){.play-sum-pts{animation:none;}}
+/* Mini-game briefing / intro screen (2026-09-10, per direction) — a "here's the game + how to play"
+   opener shown before a game's first question, for BOTH the 6 main games and the 10 booth games.
+   Echoes the consent screen's (หน้าที่ 2) DNA: the two-tone .consent-h heading (REUSED verbatim via
+   the .consent-h class, just re-sized for the modal), a muted lead paragraph, .round-cards, and a
+   primary CTA. See renderPlayBrief(). */
+.play-brief{text-align:center;padding-top:2px;}
+.play-brief-badge{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--accent);border-radius:var(--rpill);padding:5px var(--sp-list);margin-bottom:var(--sp-stack);line-height:1.3;}
+.play-brief-badge .pb-emoji{font-size:16px;line-height:1;}
+/* overrides .consent-h's own 64px for the cramped modal; the .consent-h .ch-1/.ch-2 static two-tone
+   (muted + ink) still applies since the element keeps the .consent-h class (and no .reveal-h, so the
+   shimmer sweep stays off, exactly as on the real consent screen). */
+.play-brief-h{font-size:32px;margin-bottom:var(--sp-stack);}
+.play-brief-p{font-size:var(--fs-body);color:var(--muted);line-height:1.6;max-width:300px;margin:0 auto var(--sp-block);}
+.play-brief .round-cards{margin:0 0 var(--sp-stack);text-align:left;}
+.play-brief-note{display:flex;gap:var(--sp-list);align-items:flex-start;justify-content:center;font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin-bottom:var(--sp-block);}
+.play-brief-note svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;margin-top:1px;color:var(--ink);}
+.play-brief-cta{width:100%;}
 /* ══ SHARE MODAL ══ social-share sheet for the persona card (opened by the Book page's share
    buttons). Restyled to match the OTHER system modals (.scan-modal/.scan-card) — centered card,
    close X inset in the card's own top-right corner, title+subtitle header — instead of the earlier
@@ -5967,6 +6025,23 @@ var ZONE_BOOTHS=[
   ['Art Auction','Rare Collectibles'],
   ['BDMS Wellness']
 ];
+/* BOOTH_BRIEF (2026-09-10, per direction) — one-line "what this booth is about" lead for each
+   booth's pre-game briefing screen (renderPlayBrief), index i matching BOOTHS[i]/BOOTH_Q[i] 1:1.
+   The booth number, asset name, game name and points already come from BOOTHS[i]/BOOTH_Q[i]; this
+   just adds the short topical description. Kept as its own array (not folded into the big BOOTH_Q
+   literal) so the question data stays untouched. */
+var BOOTH_BRIEF=[
+  'ลองเลือกหุ้นแบบนักลงทุน — ดูว่าคุณตัดสินใจซื้อจากอะไรเป็นหลัก',
+  'ก้าวออกไปไกลกว่าหุ้นไทย พร้อมรู้จักความเสี่ยงใหม่ที่ตามมา',
+  'เทียบกองทุนแบบเจาะลึก — ผลตอบแทนกับค่าธรรมเนียม อันไหนสำคัญกว่า',
+  'วางตาข่ายเงินสำรองให้ดี ก่อนออกไปลงสนามลงทุน',
+  'ทำความรู้จักทองคำ ในฐานะเพื่อนยามวิกฤตของพอร์ต',
+  'ไล่หาผลตอบแทนจากอสังหาฯ — ดูตัวเลขจริงหลังหักค่าใช้จ่าย',
+  'สแกนหาความเสี่ยงที่รับเองไม่ไหว และเครื่องมือที่ช่วยรับแทน',
+  'ลองโต้คลื่นของที่ขึ้นลงแรง ด้วยแผนที่ตั้งไว้ล่วงหน้า',
+  'ตีราคาของสะสม ระหว่างของที่รักกับการลงทุนจริง',
+  'เช็กว่าสุขภาพเกี่ยวกับเรื่องเงินยังไง — สินทรัพย์ที่คนมักลืมนับ'
+];
 /* ══ BOOTH_Q (2026-09-09) ══ real question content for the 10 asset-booth mini-games (เกมประจำ
    Asset 10 เกม), sourced verbatim from GAMES-QUESTIONS-DNA.md Part B (itself from "คำถาม 6 ด้าน
    กับ คำถาม 10 สินทรัพย์ 8-9-69.docx"). Index i matches BOOTHS[i] 1:1. Each question:
@@ -6224,11 +6299,14 @@ function renderBooth(){
   var chk=boothCheckinCount(),act=boothActivityCount(),pts=boothPointsTotal();
   var chkOK=chk>=CHECKIN_NEED,actOK=act>=ACTIVITY_NEED;
   /* DEMO.draw force (2026-08-26, per direction "อยากให้จำลองเคส...ไว้ด้วย กรณีครบเงื่อนไขแล้ว และ
-     กรณียังขาด") — lets the demo panel preview both draw-status states without having to actually
-     check in/activity-toggle 5 real booths first. 'auto' (default, per follow-up direction "อยากให้
-     default ที่กรณีครบเงื่อนไขแล้ว เสมอ") now always resolves to eligible too, ignoring the real
-     chk/act counts — 'need' is the only way left to preview the not-yet-eligible state. */
-  var eligible=DEMO.draw!=='need';
+     กรณียังขาด") — 'ok'/'need' let the demo panel force-preview either draw-status state without
+     actually check-in/activity-toggling 5 real booths first. 'auto' (default) is back to the real
+     boothCheckinCount()/boothActivityCount() math (chkOK&&actOK) — reverted 2026-09-10, per
+     direction, from a 2026-08-26 change that had made 'auto' always resolve to eligible regardless
+     of real progress; that stopped the card from genuinely reflecting the games/booths the player
+     has actually completed, which is the whole point now that Phase 1's real Q&A flow drives
+     BOOTH_CHK/BOOTH_ACT for real (see [[games-questions-dna]] memory). */
+  var eligible=DEMO.draw==='ok'?true:(DEMO.draw==='need'?false:(chkOK&&actOK));
   var route=buildRoute();
   var visited=route.filter(function(r){return r.status.indexOf('แวะแล้ว')>-1;}).length;
   var need=[];if(!chkOK)need.push('เช็คอินอีก '+(CHECKIN_NEED-chk)+' บูธ');if(!actOK)need.push('ร่วมกิจกรรมอีก '+(ACTIVITY_NEED-act)+' บูธ');
@@ -6413,26 +6491,47 @@ function renderBooth(){
 
 /* ══ GAMES TAB ══ content ported from Playbook Final: SIDES (6 mini-games) + sideResult() narratives.
    Games are playable here (toggle); playing fills a Playbook "side" and reveals its result. Started
-   with 2/6 played to stay consistent with the Book/Home "2/6 ด้าน" example state. */
+   with 2/6 played to stay consistent with the Book/Home "2/6 ด้าน" example state.
+   `title` fields renamed to the real GAME names (2026-09-10, per direction "ใช้ชื่อเกมส์ตามเอกสาร")
+   — verbatim from GAMES-QUESTIONS-DNA.md Part A ("เกมย้อนเวลาพอร์ต", "เกมเลือกเครื่องมือ", etc.);
+   this is now the primary heading everywhere SIDES[i].title is read (gameRow, the "เล่นเกมนี้ต่อ"
+   next-step card, and playLabel() — so the play-modal header + completion summary now read "ข้อ
+   1/3 · เกมย้อนเวลาพอร์ต" instead of the ด้าน name). M6's game name was previously the ด้าน name
+   verbatim ("เกมทองคำในพอร์ต") — corrected to the actual game name from the doc. The unlocked
+   "ด้าน" name (this app's own, unchanged — see PLAYBOOK-2026-DATA-BASELINE.md §8-C, only M6's ด้าน
+   name here doesn't match the newer doc's "มุมมองต่อที่หลบภัย", left as-is since only the GAME
+   names were asked for) moved to its own `side` field, shown in gameRow's fine print ("ปลดล็อกด้าน
+   X") instead of duplicating the game name right under the game name. Icons picked fresh to fit
+   each GAME's own meaning rather than the abstract ด้าน concept — see per-line notes. */
+/* `emoji`/`intro`/`rule` (2026-09-10, per direction) feed the new pre-game briefing screen
+   (renderPlayBrief) shown before each game's first question. `emoji` = the side's emoji from
+   GAMES-QUESTIONS-DNA.md Part A's "เปิดด้าน 🎭 …" headers (M6 has none in the doc — 🛡️ picked to
+   match its shield icon + "เพื่อนยามวิกฤต" refuge idea). `intro` = a one-line "what this game is
+   about / how to play" lead (M1's is the doc's own verbatim on-screen intro copy; the rest
+   paraphrase each game's stated mechanic). `rule` = the single standout house rule shown as the
+   briefing's 2nd info card. These REPLACE the old per-question q1 intro banner (MINIGAME_Q.intro,
+   now removed) — one intro surface, not two. */
 var SIDES=[
-  {icon:'lc-hourglass',title:'ความเสี่ยงแท้จริง',from:'เกมย้อนเวลาพอร์ต',measures:'เทียบความเสี่ยงที่ "บอก" กับที่ "ทำจริง" ตอนวิกฤต'},
-  {icon:'lc-sliders',title:'สิ่งที่คุณดูก่อนตัดสินใจ',from:'เกมเลือกเครื่องมือ',measures:'ลำดับเครื่องมือวิเคราะห์ที่คุณเปิดจริง'},
-  {icon:'lc-shield',title:'ภูมิคุ้มกันความกลัวตกขบวน',from:'เกมทนกระแส',measures:'วินัยภายใต้แรงกดดันจากกระแส'},
-  {icon:'lc-target',title:'เป้าหมายตามวัย',from:'เกมเป้าหมายแต่ละวัย',measures:'เป้าหมายเงินตั้งแต่วัย 25 ถึง 65'},
-  {icon:'lc-route',title:'ก้าวแรก',from:'เกมก้าวแรก',measures:'กำแพงที่ทำให้ยังไม่เริ่ม + ก้าวเล็กที่สุด'},
-  {icon:'lc-coins',title:'ทองคำในพอร์ต',from:'เกมทองคำในพอร์ต',measures:'บทบาทของทองคำสำหรับคุณ — ตัวถ่วงความเสี่ยง หรือตัวทำกำไร'}
+  {icon:'lc-refresh-cw',title:'เกมย้อนเวลาพอร์ต',side:'ความเสี่ยงแท้จริง',emoji:'🎭',intro:'เรากำลังพาคุณย้อนไปเจอเหตุการณ์จริงที่เคยเกิดขึ้น · ตอนนั้นไม่มีใครรู้ว่าพรุ่งนี้จะเป็นยังไง',rule:'ตอบแล้วไปต่อ ย้อนกลับไม่ได้',measures:'เทียบความเสี่ยงที่ "บอก" กับที่ "ทำจริง" ตอนวิกฤต'}, // refresh-cw = rewinding back through past crises
+  {icon:'lc-file-text',title:'เกมเลือกเครื่องมือ',side:'สิ่งที่คุณดูก่อนตัดสินใจ',emoji:'🔍',intro:'ก่อนตัดสินใจ คุณจะเลือกดูข้อมูลแบบไหน — เราดูจากสิ่งที่คุณเลือกดูจริง ไม่ใช่แค่คำตอบสุดท้าย',rule:'เลือกจากสิ่งที่คุณดูจริง',measures:'ลำดับเครื่องมือวิเคราะห์ที่คุณเปิดจริง'}, // file-text = the business/financial-statement tool you choose to open
+  {icon:'lc-alert-triangle',title:'เกมทนกระแส',side:'ภูมิคุ้มกันความกลัวตกขบวน',emoji:'🔥',intro:'เจอสถานการณ์ที่ยั่วให้รีบตัดสินใจ ลองดูว่าคุณจะทนกระแสและกับดักได้แค่ไหน',rule:'บางฉากมีเวลาจำกัด',measures:'วินัยภายใต้แรงกดดันจากกระแส'}, // alert-triangle = the FOMO/scam traps this game tests resistance to
+  {icon:'lc-calendar',title:'เกมเป้าหมายแต่ละวัย',side:'เป้าหมายตามวัย',emoji:'🗺️',intro:'สวมบทบาทในแต่ละช่วงวัย ตั้งแต่ 25 ถึง 65 ปี แล้วดูว่าเป้าหมายเงินของคุณเปลี่ยนไปไหม',rule:'ย้อนกลับแก้ไขได้ทุกข้อ',measures:'เป้าหมายเงินตั้งแต่วัย 25 ถึง 65'}, // calendar = goals across different ages/life-stages (25→65)
+  {icon:'lc-compass',title:'เกมก้าวแรก',side:'ก้าวแรก',emoji:'🚀',intro:'เกมนี้ไม่ตัดสินว่าคุณเป็นคนแบบไหน — ปิดท้ายด้วย "ก้าวแรก" เล็กๆ ที่คุณเลือกเอง',rule:'เลือกก้าวแรกได้หลายข้อ',measures:'กำแพงที่ทำให้ยังไม่เริ่ม + ก้าวเล็กที่สุด'}, // compass = finding your direction/first step as a new investor
+  {icon:'lc-shield',title:'เกมทองคำ เพื่อนยามวิกฤต',side:'ทองคำในพอร์ต',emoji:'🛡️',intro:'ไม่ต้องทายราคาทอง · เป้าหมายคือเข้าใจว่าทองคำมีไว้ทำอะไรในพอร์ตของคุณ',rule:'เดาจากความรู้สึกได้เลย',measures:'บทบาทของทองคำสำหรับคุณ — ตัวถ่วงความเสี่ยง หรือตัวทำกำไร'} // shield = "เพื่อนยามวิกฤต" — gold as a protective refuge during a crisis
 ];
 /* ══ MINIGAME_Q (2026-09-09) ══ real question content for the 6 main games, index i matching
    SIDES[i] 1:1 — sourced verbatim from GAMES-QUESTIONS-DNA.md Part A. Same shape as BOOTH_Q (see
    its own comment above renderBooth's BOOTH_Q for the full field-by-field explanation). Game-level
    `noBack:true` (M1 only) disables back-navigation for the WHOLE game from question 1 — "ปุ่ม
-   ย้อนกลับปิดโดยตั้งใจ เพื่อเก็บความรู้สึกแรก" in the source; `intro` is the one-time banner shown
-   on question 1; `resultNote` is a closing note shown on the summary screen (some games' insight
+   ย้อนกลับปิดโดยตั้งใจ เพื่อเก็บความรู้สึกแรก" in the source. (A per-game `intro` field used to
+   render a one-time banner on question 1; removed 2026-09-10 — the intro copy now lives on the
+   dedicated pre-game briefing screen, SIDES[i].intro, see renderPlayBrief.) `resultNote` is a
+   closing note shown on the summary screen (some games' insight
    is written at the whole-game level in the source, not per-question — M1's 4-type/M3's 3-type
    result-page categories and M4/M5's closing narratives all landed here, since the actual
    answer→category mapping rule is still an open decision, see [[games-questions-dna]] item #1). */
 var MINIGAME_Q=[
-  {noBack:true,intro:'เรากำลังพาคุณย้อนไปเจอเหตุการณ์จริงที่เคยเกิดขึ้น · ตอนนั้นไม่มีใครรู้ว่าพรุ่งนี้จะเป็นยังไง',
+  {noBack:true,
    resultNote:'ทั้ง 4 แบบไม่มีแบบที่ผิด — สอดคล้อง (Aligned) / ใจไม่ถึงอย่างที่คิด / ใจถึงกว่าที่คิด / ยังค้นหาสไตล์ตัวเอง (ผลแบบเต็มดูได้ในคู่มือของคุณ)',
    questions:[
     {q:'คุณคิดว่าตัวเองรับ "เงินลงทุนติดลบ" ได้แค่ไหน?',sub:'ข้ามได้ถ้าตอบไว้แล้วตอนลงทะเบียน',
@@ -6442,8 +6541,7 @@ var MINIGAME_Q=[
     {q:'ก.พ.–มี.ค. 2563 · วิกฤตโควิด — เงินลงทุนเหลือ 660,000 บาท (ลดลง 34.00% ในเดือนเดียว) รอบนี้จะทำอะไร?',locked:true,
      opts:['ขายทั้งหมด รอบนี้แรงกว่าเดิม','ถือตามแผน เคยผ่านปี 2551 มาแล้ว','ซื้อเพิ่มเลย จังหวะนี้แหละ']}
   ]},
-  {intro:'หน้าจอมีเครื่องมือให้กดเปิดเอง: ข้อมูลธุรกิจและงบการเงิน · กราฟราคาย้อนหลัง · ประวัติการจ่ายปันผล · ข่าวและกระแสในโซเชียล — ของจริงจะดูจากลำดับที่คุณกดเปิด เวอร์ชันนี้ถามตรงๆ แทน',
-   questions:[
+  {questions:[
     {q:'รอบแรก · หุ้นปริศนาที่กำลังเป็นที่พูดถึงในโซเชียล — ดูเท่าที่อยากดูแล้ว คุณจะ?',
      opts:['ตัดสินใจจากที่ดูข้อมูลมาเอง','ขอกระจายผ่านกองทุน หรือทยอยซื้อทีละน้อยทุกเดือน (DCA) แทนการเลือกตัวเดียว','ซื้อตามกระแสข่าวเลย เดี๋ยวไม่ทัน'],
      insight:'ข่าวและกระแสเป็นสิ่งล่อ ไม่ใช่ข้อมูลที่ใช้ตัดสินใจ · งบการเงินบอกสุขภาพของธุรกิจ'},
@@ -6477,7 +6575,7 @@ var MINIGAME_Q=[
      opts:['ให้มีเงินใช้ทุกเดือนอย่างสม่ำเสมอ','รักษาเงินต้นให้อยู่ครบ','เก็บส่งต่อให้ลูกหลาน หรือทำประโยชน์ให้สังคม'],
      insight:'วิธีถอนเงินมาใช้หลังเกษียณ สำคัญไม่แพ้วิธีเก็บ'}
   ]},
-  {resultNote:'เกมนี้ไม่สรุปว่าคุณเป็นคนประเภทไหน — ปิดท้ายด้วยสิ่งที่ได้เรียนรู้ และ "ก้าวแรก" ที่คุณเลือกเอง',
+  {noType:true,resultNote:'เกมนี้ไม่สรุปว่าคุณเป็นคนประเภทไหน — ปิดท้ายด้วยสิ่งที่ได้เรียนรู้ และ "ก้าวแรก" ที่คุณเลือกเอง',
    questions:[
     {q:'ฉาก 1 · สมมติว่าคุณเพิ่งเก็บเงินก้อนแรกได้ 100,000 บาท แล้วมีคนชวนลงทุน บอกว่า "น่าจะได้กำไรดี"',
      opts:['ลงทั้ง 100,000 บาท ไปเลย','แบ่งครึ่ง ลง 50,000 บาท เก็บไว้ 50,000 บาท','ยังไม่ลง เก็บไว้ก่อนทั้งหมด'],
@@ -6493,8 +6591,7 @@ var MINIGAME_Q=[
     {q:'ก้าวแรก ตอนที่ 2 · ก้าวที่เล็กที่สุดที่คุณทำได้ภายในสัปดาห์นี้คืออะไร?',multi:true,skippable:true,skipLabel:'ยังไม่พร้อมเลือก ข้ามก่อน',
      opts:['เปิดบัญชีหรือแอปลงทุน','ตั้งลงทุนอัตโนมัติรายเดือน','ลองของจริงด้วยเงิน 100 บาท วันนี้','เลือกกองทุน 1 กองมาศึกษา','กำหนดงบลงทุนต่อเดือนที่ไหว','จดรายรับ-รายจ่าย 7 วัน','เริ่มแยกเงินสำรองเผื่อฉุกเฉินก้อนแรก','นัดคุยกับผู้แนะนำการลงทุนที่มีใบอนุญาต']}
   ]},
-  {intro:'ไม่ให้ทายราคาทอง · เป้าหมายคือให้เข้าใจว่าทองมีไว้ทำอะไร',
-   questions:[
+  {questions:[
     {q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บไว้ วันนี้อันไหนซื้อของได้มากกว่ากัน?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้เลย',
      opts:['เงินสด เพราะยังเป็น 100,000 บาท เท่าเดิม','ทอง น่าจะซื้อของได้มากกว่า','น่าจะพอๆ กัน'],
      insight:'เงินสดตัวเลขเท่าเดิม แต่ซื้อของได้น้อยลงเพราะเงินเฟ้อ ส่วนทองมักขยับตามค่าของเงิน'},
@@ -6577,7 +6674,7 @@ function gameRow(i){
   var right=played
     ? '<span class="gr-chev-wrap" data-open="'+i+'">'+ic('lc-chevron-down','gr-chev'+(open?' open':''))+'</span>'
     : '<button class="btn btn-primary gr-play" data-play="'+i+'">'+ic('lc-play-circle')+'เล่นเกม</button>';
-  var body=played?'<div class="gr-body'+(open?' show':'')+'"><div class="gr-bin"><div class="gr-from">วัดจาก '+s.from+' · '+s.measures+'</div><div class="gr-result">'+sideResult(i,RESULT&&RESULT.hero,RESULT&&RESULT.heroKey)+'</div></div></div>':'';
+  var body=played?'<div class="gr-body'+(open?' show':'')+'"><div class="gr-bin"><div class="gr-from">ปลดล็อกด้าน '+s.side+' · '+s.measures+'</div><div class="gr-result">'+sideResult(i,RESULT&&RESULT.hero,RESULT&&RESULT.heroKey)+'</div></div></div>':'';
   return '<div class="game-row'+(played?' played':'')+'"><div class="gr-hd"><div class="gr-ic">'+ic(s.icon)+'</div><div class="gr-tx" data-open="'+i+'"><div class="gr-title">'+s.title+(played?'<span class="gr-played">'+ic('lc-check')+'เล่นแล้ว</span>':'')+'</div>'+(status?'<div class="gr-status">'+status+'</div>':'')+'</div>'+right+'</div>'+body+'</div>';
 }
 /* Direct-DOM toggle for an already-played game row's result panel — mirrors togSide() so
@@ -6695,7 +6792,44 @@ function openPlay(kind,idx){
   var set=playSet(kind,idx);
   PLAY={kind:kind,idx:idx,qi:0,sel:set.questions.map(function(q){return q.multi?[]:null;}),lockedBack:false,timerQi:null};
   document.getElementById('playModal').classList.add('show');
-  renderPlayBody();
+  renderPlayBrief(); // pre-game briefing screen first (2026-09-10); its CTA → renderPlayBody() (question 1)
+}
+/* renderPlayBrief (2026-09-10, per direction) — the "here's the game + how to play" opener shown
+   before question 1, for both games and booths. Echoes the consent screen (หน้าที่ 2) DNA: a
+   two-tone .consent-h heading (reused verbatim, just re-sized via .play-brief-h), a muted lead
+   paragraph, two .round-cards, and a primary CTA. Its purpose is purely orientation — it captures
+   no answer and mutates no state; the CTA just hands off to renderPlayBody(). */
+function briefCard(dot,kicker,title,meta){
+  return '<div class="round-card"><div class="rc-top"><span class="rc-dot" style="background:'+dot+'"></span><span class="rc-kicker">'+kicker+'</span></div><div class="rc-title">'+title+'</div><div class="rc-meta">'+meta+'</div></div>';
+}
+function renderPlayBrief(){
+  var kind=PLAY.kind,idx=PLAY.idx,set=playSet(kind,idx),n=set.questions.length;
+  var badge,headA,headB,lead,cards;
+  if(kind==='game'){
+    var s=SIDES[idx];
+    badge='เปิดด้าน <span class="pb-emoji">'+s.emoji+'</span> '+s.side;
+    headA='เกม';headB=s.title.replace(/^เกม/,''); // every game title is "เกม…"; split so ch-1="เกม" (muted) + ch-2=rest (ink), matching consent-h's two-tone
+    lead=s.intro;
+    cards=briefCard('var(--violet)','จำนวนข้อ',n+' ข้อ','ตอบทีละข้อ')+briefCard('var(--amber-text)','กติกา',s.rule,'อ่านก่อนเริ่ม');
+  }else{
+    var b=BOOTHS[idx];
+    badge='บูธ '+(idx+1)+' · '+b.asset;
+    headA='';headB=b.game; // booth names aren't "เกม…" prefixed — whole name in ch-2 (ink)
+    lead=BOOTH_BRIEF[idx];
+    cards=briefCard('var(--violet)','จำนวนข้อ',n+' ข้อ','ตอบทีละข้อ')+briefCard('var(--amber-text)','รางวัล','+'+set.points+' แต้ม','สะสมลุ้นรางวัลใหญ่');
+  }
+  var head='<div class="consent-h play-brief-h">'+(headA?'<span class="ch-1">'+headA+'</span> ':'')+'<span class="ch-2">'+headB+'</span></div>';
+  var body=document.getElementById('playBody');
+  body.innerHTML=
+    '<div class="play-brief">'+
+      '<div class="play-brief-badge">'+badge+'</div>'+
+      head+
+      '<div class="play-brief-p">'+lead+'</div>'+
+      '<div class="round-cards">'+cards+'</div>'+
+      '<div class="play-brief-note">'+ic('lc-info')+'<span>ทุกคำตอบมีความรู้ให้เสมอ · ไม่มีคำตอบผิด</span></div>'+
+      '<button class="btn btn-primary play-brief-cta" type="button" id="playStartBtn">'+ic('lc-play-circle')+'เริ่มเล่นเกม</button>'+
+    '</div>';
+  body.querySelector('#playStartBtn').onclick=function(){renderPlayBody();};
 }
 function clearPlayTimer(){if(PLAY_TIMER){clearInterval(PLAY_TIMER);PLAY_TIMER=null;}}
 function closePlay(){
@@ -6754,7 +6888,14 @@ function renderPlayBody(){
   var canBack=qi>0&&!PLAY.lockedBack&&!set.noBack;
   var dots='';for(var d=0;d<total;d++)dots+='<span class="play-dot'+(d===qi?' on':'')+'"></span>';
   var timerHTML=q.timer?'<span class="play-timer">'+ic('lc-hourglass')+'<span id="playTimerVal">'+q.timer+'</span>s</span>':'';
-  var introHTML=(qi===0&&set.intro)?'<div class="play-intro">'+ic('lc-info')+'<span>'+set.intro+'</span></div>':'';
+  // Points badge (2026-09-10) — booth questions only; never coexists with timerHTML in practice
+  // (only a GAME question — M3's ฉาก 1 — ever sets q.timer), so sharing the eyebrow's one right-hand
+  // slot is safe.
+  var ptsBadgeHTML=(kind==='booth'&&set.points)?'<span class="play-pts-badge">'+ic('lc-gift')+'+'+set.points+' แต้ม</span>':'';
+  // Multi-select counter (2026-09-10) — borrows the DNA quiz's own S3 interest-picker pattern
+  // (.int-count "เลือกแล้ว X/3") so a multi-choice question reads visibly differently from a
+  // single-choice one, not just via the (easy to miss) absence of radio-style exclusivity.
+  var multiCountHTML=q.multi?'<div class="int-count">เลือกแล้ว <b>'+sel.length+'</b> ข้อ</div>':'';
   var optsHTML='<div class="play-opts"><div class="q-opts">';
   q.opts.forEach(function(t,oi){
     var isSel=q.multi?(sel.indexOf(oi)>-1):(sel===oi);
@@ -6767,11 +6908,11 @@ function renderPlayBody(){
   var nextLabel=isLast?('เสร็จสิ้น '+ic('lc-check','ic-fwd')):('ถัดไป '+ic('lc-arrow-right','ic-fwd'));
   var body=document.getElementById('playBody');
   body.innerHTML=
-    '<div class="play-eyebrow"><span>ข้อ '+(qi+1)+'/'+total+' · '+playLabel(kind,idx)+'</span>'+timerHTML+'</div>'+
+    '<div class="play-eyebrow"><span>ข้อ '+(qi+1)+'/'+total+' · '+playLabel(kind,idx)+'</span>'+timerHTML+ptsBadgeHTML+'</div>'+
     '<div class="play-dots">'+dots+'</div>'+
-    introHTML+
-    '<div class="play-q">'+q.q+'</div>'+
+    '<div class="play-q">'+emphasizeQ(q.q)+'</div>'+
     (q.sub?'<div class="play-sub">'+q.sub+'</div>':'')+
+    multiCountHTML+
     optsHTML+
     skipHTML+
     insightHTML+
@@ -6791,17 +6932,34 @@ function renderPlayBody(){
   // the SAME question just leave the already-running interval alone.
   if(q.timer&&PLAY.timerQi!==qi){PLAY.timerQi=qi;startPlayTimer(q.timer);}
   else if(!q.timer)clearPlayTimer();
+  // Delayed reveal (2026-09-10) — insight starts hidden (base .play-insight rule) and gets `.show`
+  // added a tick later so the opacity/transform transition (with its own .15s delay) actually plays
+  // instead of the class landing in the same paint as the innerHTML write (which would just skip
+  // straight to the end state, same "read the computed style before flipping" gotcha as the M3 timer
+  // fix above). Double rAF, not a fixed setTimeout, so it's tied to real paint frames not a guessed ms.
+  var insEl=body.querySelector('.play-insight');
+  if(insEl)requestAnimationFrame(function(){requestAnimationFrame(function(){insEl.classList.add('show');});});
 }
 function renderPlaySummary(){
   clearPlayTimer();
   var kind=PLAY.kind,idx=PLAY.idx,set=playSet(kind,idx);
   var insights=set.questions.map(function(q){return q.insight;}).filter(Boolean);
   var ptsHTML=(kind==='booth'&&set.points)?'<div class="play-sum-pts">'+ic('lc-gift')+'<span>+'+set.points+' แต้ม</span></div>':'';
+  // Result card (2026-09-10) — split out of the plain insight list into its own higher-hierarchy
+  // card (see .play-result-card's own comment above). `noType` (M5 only) swaps the spectrum "this is
+  // YOUR result" treatment for a dashed/muted "informational, not a verdict" one — this game
+  // explicitly never classifies the player, so the CARD itself should look different, not just the
+  // words inside it.
+  var resultHTML='';
+  if(set.resultNote){
+    var noType=!!set.noType;
+    resultHTML='<div class="play-result-card'+(noType?' notype':'')+'"><div class="pr-ic">'+ic(noType?'lc-info':'lc-sparkles')+'</div><div class="pr-tx"><div class="play-result-ey">'+(noType?'หมายเหตุ':'ผลจากเกมนี้')+'</div><div class="play-result-t">'+set.resultNote+'</div></div></div>';
+  }
   var body=document.getElementById('playBody');
   body.innerHTML=
     '<div class="play-eyebrow"><span>เล่นจบแล้ว</span></div>'+
     '<div class="play-q">'+playLabel(kind,idx)+'</div>'+
-    (set.resultNote?'<div class="play-sub" style="margin-bottom:var(--sp-stack)">'+set.resultNote+'</div>':'')+
+    resultHTML+
     '<div class="play-sum-list">'+insights.map(function(t){return '<div class="play-sum-item">'+ic('lc-sparkles')+'<span>'+t+'</span></div>';}).join('')+'</div>'+
     ptsHTML+
     '<button class="btn btn-primary" type="button" id="playDoneBtn" style="width:100%">'+ic('lc-check-circle')+(kind==='game'?'ดูผลในคู่มือ':'เสร็จสิ้น')+'</button>';
@@ -6902,7 +7060,14 @@ function renderProfile(){
    "already done" mock defaults. Switching to 'pre' does NOT touch RESULT/quizDone — a pre-event
    visitor may already have taken the quiz online, so identity content stays independently gated on
    RESULT alone (see renderBook's empty state, buildRoute's personalized flag). */
-var DEMO={view:'auto',quizDone:false,draw:'auto',eventPhase:'pre',multiTicket:false,boothVer:'v1',splashVer:'v1',registered:true}; // draw: 'auto' (default, resolves to eligible) | 'ok' | 'need' — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. splashVer (2026-09-04, per direction "เพิ่ม preview splash scene เป็น 2 กรณี...ให้ default เป็นเวอร์ชันนี้ [v1] เสมอ"): 'v1' = the shipped fan-carousel of card fronts (unchanged, ALWAYS the default); 'v3' = a 3D field of drifting character-card streams (spv3Build/initSpv3). Gated on this flag so v1 stays byte-identical. (v2 "Card Back Reveal" and v4 "Living Card"/Case-02 preview modes existed briefly and were removed 2026-09-08, per direction "เอา v2, v4 ออก (ลบโค๊ด)" — their DEMO fields/handlers/CSS/JS are gone too.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
+/* Defaults flipped 2026-09-10, per direction — On-Event is now the default preview (eventPhase),
+   with an identity already on file (quizDone, seeded at bootstrap via seedPersonaResult — see the
+   bottom of this file), the Booth Journey v2 map (boothVer), and the draw-status card genuinely
+   computed from that seeded state's real chk/act counts (which start below CHECKIN_NEED/
+   ACTIVITY_NEED, so it reads "ยังขาด" out of the box — see the 'auto' branch in renderBooth this
+   direction restored). Switching the ช่วงงาน segment to Pre-Event is the one way back to the
+   splash/quiz flow (RESULT/quizDone/boothVer aren't touched by that switch, same as before). */
+var DEMO={view:'auto',quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,boothVer:'v2',splashVer:'v1',registered:true}; // draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. splashVer (2026-09-04, per direction "เพิ่ม preview splash scene เป็น 2 กรณี...ให้ default เป็นเวอร์ชันนี้ [v1] เสมอ"): 'v1' = the shipped fan-carousel of card fronts (unchanged, ALWAYS the default); 'v3' = a 3D field of drifting character-card streams (spv3Build/initSpv3). Gated on this flag so v1 stays byte-identical. (v2 "Card Back Reveal" and v4 "Living Card"/Case-02 preview modes existed briefly and were removed 2026-09-08, per direction "เอา v2, v4 ออก (ลบโค๊ด)" — their DEMO fields/handlers/CSS/JS are gone too.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
 /* 'auto' now always resolves to mobile (2026-08-26, per direction "อัตโนมัติ default ไว้ที่ mobile
    size") — was real window.innerWidth-based detection (w<768→mobile/w<1440→tablet/else pc); PC/
    แท็บเล็ต/มือถือ stay available as explicit manual overrides, 'อัตโนมัติ' just no longer reacts to
@@ -6951,7 +7116,7 @@ function demoPlayCardReveal(){
 function buildDemo(){
   var wrap=document.createElement('div');
   var seg=function(id,opts,cur){return '<div class="seg" id="'+id+'">'+opts.map(function(o){return '<button data-v="'+o.v+'"'+(o.v===cur?' class="on"':'')+'>'+o.t+'</button>';}).join('')+'</div>';};
-  var personaOpts=PORDER.map(function(k){return '<option value="'+k+'">'+roman(pnum(k))+' ✦ '+HEROES[k].th+' ✦ '+HEROES[k].en+'</option>';}).join('');
+  var personaOpts=PORDER.map(function(k){return '<option value="'+k+'"'+(RESULT&&RESULT.heroKey===k?' selected':'')+'>'+roman(pnum(k))+' ✦ '+HEROES[k].th+' ✦ '+HEROES[k].en+'</option>';}).join('');
   wrap.innerHTML=
   '<button class="demo-fab" id="demoFab" aria-label="เปิดแผงจำลองเคส">'+ic('lc-sliders')+'</button>'+
   '<div class="demo-panel" id="demoPanel">'+
@@ -7025,6 +7190,12 @@ function buildDemo(){
     DEMO.eventPhase=v;
     document.querySelectorAll('#segPhase button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
     if(v==='on'){BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};GAME_PLAYED={};GAME_ANSWERS={};DRAW_JOINED=false;} // fresh arrival — see DEMO.eventPhase comment above
+    // Switching to Pre-Event goes back to Splash (2026-09-10, per direction) — the symmetric
+    // counterpart of On-Event's "fresh arrival" reset above: Pre-Event is where the quiz-taking
+    // flow (splash → consent → quiz → reveal → cardreveal) actually lives, so picking it in the
+    // demo panel should land you at its real starting point, not leave you stranded on whatever
+    // On-Event tab happened to be open. Doesn't touch RESULT/quizDone (same as before).
+    if(v==='pre')st.phase='splash';
     render();
   };});
   document.getElementById('segView').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.view=b.dataset.v;document.querySelectorAll('#segView button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');applyView();};});
@@ -7090,6 +7261,13 @@ function buildGoTop(){
   btn.onclick=function(){window.scrollTo({top:0,behavior:'smooth'});root.scrollTo({top:0,behavior:'smooth'});};
 }
 
+/* Default demo state (2026-09-10, per direction): "ทำแบบทดสอบตัวตนแล้ว" out of the box — seed a
+   RESULT before the very first render/buildDemo so DEMO.eventPhase:'on''s render() gate (which
+   redirects splash/quiz/etc. to 'book' once RESULT exists, else 'home') lands on the Book page
+   immediately instead of the empty "no identity yet" state. Booth check-in/activity start at
+   seedPersonaResult's own baseline (booth 0 only) — below CHECKIN_NEED/ACTIVITY_NEED — so the
+   Booth tab's draw-status card genuinely (not forced) reads "ยังขาด" by default too. */
+seedPersonaResult('planner');
 applyView();buildDemo();buildScanModal();buildPlayModal();buildShareModal();buildGoTop();
 render();
 </script>
