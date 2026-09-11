@@ -2293,6 +2293,90 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    two-tone (muted+ink) still applies unchanged since the element keeps the .consent-h class (and no
    .reveal-h, so the shimmer sweep stays off, same as the real consent screen). */
 .play-brief-h{font-size:48px;margin-bottom:var(--sp-stack);}
+/* .play-brief-art — test wiring only, see renderPlayBrief's own comment + BOOTH_ART_PNG
+   (2026-09-11). Illustration sits above .play-brief-h; drop-shadow matches the splash scatter art's
+   own grounding shadow (.sp-el) rather than inventing a new elevation recipe. .consent-body already
+   stretches + self-centers its children in the space above the sticky-pinned CTA (:root
+   [data-view="mobile"] .consent-body{flex:1;justify-content:center}), so the extra art block re-
+   centers the whole group — but that self-centering assumes the group's natural height fits the
+   available space; it does not shrink content that doesn't. Two follow-up fixes (2026-09-11, per
+   direction "เหลือที่ห่างกันเยอะ" on a big-screen phone + a report of the CTA overlapping the cards
+   on a short/wide viewport):
+   1) margin-bottom pulled from --sp-block(22px) to --sp-stack(16px), and the cap shrunk 200→156px→
+      172px (2026-09-11, per direction; the 152→156px step was an earlier same-day tweak), so the
+      title/cards sit closer under the art and the group is shorter overall.
+   2) a max-height:24vh safety cap on the img was tried for short/landscape-ish viewports, then
+      REMOVED the same day once .overflow-fix (see .consent.pb-consent below) proved it reliably
+      catches genuine overflow on its own — a fixed max-width is simpler and the art no longer needs
+      to defend against short screens itself.
+   See .consent.pb-consent{overflow-y:auto} + .overflow-fix below for the short-viewport case this
+   doesn't shrink its way out of. */
+.play-brief-art{width:100%;text-align:center;margin:0 auto var(--sp-stack);}
+.play-brief-art img{display:inline-block;width:auto;height:auto;max-width:172px;filter:drop-shadow(0 10px 22px rgba(17,19,24,.16));}
+/* .bg-room2 — room2-1.png (the booth-brief backdrop, see renderPlayBrief's bgImg comment) is a wide
+   interior photo with a horizontal wall-molding line sitting ~35% down its OWN height. On a portrait
+   screen the base .consent{background-size:cover} rule has to scale the photo up until its height
+   exactly fills the viewport (a portrait box is far taller-relative-to-width than this photo), which
+   leaves zero vertical slack — so that molding line always lands ~35% down THIS screen too, right
+   behind the art image, reading as a stray cut/seam line under it (reported 2026-09-11, screenshots
+   showing it under 5 different booths' art — same line, same relative position, every time, which is
+   what gave away that it's the backdrop photo and not the art crops themselves).
+   Fix: zoom in past plain cover far enough that only the band ABOVE the molding is ever visible, on
+   any viewport. background-size's height percentage is the fraction of the CONTAINER the photo's own
+   height is stretched to — the fraction of the PHOTO actually visible in one screen is the inverse
+   (100/percentage), independent of the viewport's actual pixel size. 320% → 100/320≈31% of the
+   photo's height visible, safely inside the ~35% ceiling/light-rays band above the molding, on every
+   screen (width coverage is never in danger: even a 320%-tall zoom's auto-computed width covers any
+   realistic viewport aspect ratio many times over). Longhand background-position-y (not the
+   background-position shorthand) so the existing per-data-view X position two rules up
+   (:root[data-view="tablet"/"pc"] .consent{background-position:...}) is left alone — only Y changes,
+   and only for room2. */
+.consent.bg-room2{background-size:auto 320%;background-position-y:top;}
+/* room2's X position, per data-view — needed because the 320% zoom above changes what a given
+   background-position-x percentage actually shows far more than it would at plain cover (a much
+   narrower slice of the photo's width is visible now, so the same 48/30/16% used elsewhere reveal
+   very different amounts of the left wall panel). Went through a few rounds 2026-09-11 (pc 16→34→32;
+   tablet 30→12→64→48) before landing on the actual ask — pc and tablet showing the SAME PROPORTION
+   of the left wall, not just "some". pc and tablet crop very different fractions of the photo's own
+   width at this zoom (~30% of it on pc's wider/shorter box vs ~14% on tablet's narrower/taller one —
+   fraction ∝ (container width/height), independent of the container's actual pixel size), so equal
+   percentages never show equal amounts of wall — matching the PROPORTION means matching where the
+   visible window's LEFT EDGE falls in the photo's own pixels, not the position-x number itself: pc's
+   32% starts its window ~460px into the 2048px-wide photo (just past the wall panels, a thin sliver
+   showing); solving the same "window starts ~460px in" for tablet's narrower window gave 26% (not
+   48, which sat well past the wall entirely — none showing, which is what prompted this recheck — or
+   64, further still) — then nudged to 30 same day ("เห็นกำแพงฝั่งซ้ายออกไปอีกหน่อย ตอนนี้เข้ามาเยอะไป
+   นิด"): the math target a hair too generous next to pc's own sliver, not a re-derivation. Mobile
+   keeps the base rule's 48% untouched — not part of this direction. Higher
+   specificity than the shared :root[data-view="tablet"/"pc"] .consent{background-position:...}
+   rules (one extra class), so these longhand X-only overrides win without touching those rules' Y or
+   other screens' X. */
+:root[data-view="tablet"] .consent.bg-room2{background-position-x:30%;}
+:root[data-view="pc"] .consent.bg-room2{background-position-x:32%;}
+/* .pb-consent — EVERY renderPlayBrief screen carries this (game brief or booth brief, art or not;
+   see its own comment), unconditionally, for one reason: .consent's base overflow:clip means it is
+   NOT a scroll container, so position:sticky on .consent-btn resolves against the outer PAGE's
+   viewport instead of .consent — sticky then pins the button to the raw screen edge regardless of
+   .consent's own content height, overlapping the cards whenever that content doesn't fit. Confirmed
+   as the actual root cause 2026-09-11 ("ปุ่ม/การ์ดทับกันอีก") on a plain GAME brief — no art image
+   at all — at landscape-phone width (667×375): .consent's own rendered height (425px) already
+   exceeded the 375px viewport before the button entered into it. overflow-y:auto turns .consent
+   into a real scroll container, which both (a) gives sticky the right element to stick within, and
+   (b) makes scrollHeight>clientHeight a RELIABLE overflow signal for syncBriefOverflow() to read —
+   with clip, scrollHeight silently reports back equal to clientHeight even when content visibly
+   overflows, so the JS below can't detect the very case it exists to fix without this. Always-on
+   (not conditional) because the unreliable-measurement half of that problem exists regardless of
+   whether overflow turns out to be real — has no visible effect when content fits (auto shows no
+   scrollbar/behaves like clip until there's something to scroll). */
+.consent.pb-consent{overflow-y:auto;}
+/* .overflow-fix — see syncBriefOverflow()'s own comment for how this gets applied (measured, only
+   when content truly doesn't fit — the overwhelming majority of real screens keep the nicer sticky-
+   bottom CTA untouched). Falls back to the exact base (non-mobile) .consent-btn recipe — plain in-
+   flow, full-width, no gradient/sticky/negative-margin bleed — so it just sits under the cards like
+   any other block and scrolls into view (via .pb-consent's overflow-y:auto above) instead of either
+   overlapping the cards (sticky) or being clipped off entirely (had .pb-consent not made this
+   scrollable). */
+:root[data-view="mobile"] .consent.overflow-fix .consent-btn{position:static;width:100%;margin:var(--sp-block) 0 0;padding:0;background:none;}
 .play-brief-p{font-size:var(--fs-body);color:var(--muted);line-height:1.6;max-width:300px;margin:0 auto var(--sp-block);}
 .play-brief .round-cards{margin:0 0 var(--sp-stack);text-align:left;}
 .play-brief-note{display:flex;gap:var(--sp-list);align-items:flex-start;justify-content:center;font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin-bottom:var(--sp-block);}
@@ -2495,14 +2579,15 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    lines (e.g. "ภูมิคุ้มกันความกลัวตกขบวน") or a status line sits under it, the icon/play-button
    floated in the row's vertical middle instead of lining up with the title's own first line. */
 .gr-hd{display:flex;align-items:flex-start;gap:var(--sp-inline);padding:var(--sp-card-pad-sm);}
-/* Reverted back to a badged icon (2026-09-11, follow-up direction "ด้านอื่นใน Playbook...ให้ icon
-   dna เหมือนกับ section เล่นเกมนี้ต่อ") — the bare/no-backdrop treatment above (matched to
-   .pass-ey-ic instead) didn't last: now matches .next-step's own .ns-ic badge (48px, var(--r2)
-   rounded, bordered tint) one section up on this same page instead. Same 48px/var(--r2)/border
-   recipe as .ns-ic, just inverted for a WHITE card instead of .next-step's dark one — var(--cloud)
-   + var(--line-soft) is this file's own light-surface-tint/border pair, playing the same role here
-   that rgba(255,255,255,.1)/rgba(255,255,255,.16) plays on .ns-ic's dark background. */
-.gr-ic{width:48px;height:48px;border-radius:var(--r2);background:var(--cloud);border:1px solid var(--line-soft);flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:var(--muted);}
+/* Badged icon (2026-09-11, follow-up direction "ด้านอื่นใน Playbook...ให้ icon dna เหมือนกับ section
+   เล่นเกมนี้ต่อ") — the bare/no-backdrop treatment above (matched to .pass-ey-ic instead) didn't
+   last: matched .next-step's own .ns-ic badge (48px, var(--r2) rounded, bordered tint) one section
+   up on this same page instead, var(--cloud)+var(--line-soft) standing in for .ns-ic's dark-card
+   rgba(255,255,255,.1)/.16 pair. Then (same day, follow-up direction "background icon dna ไม่ต้องมี
+   สีพื้นเทา (ให้มีแต่ border)") the var(--cloud) fill itself came back OFF — the custom holographic
+   art (see SIDES[i].img) reads better against the page's own paper background than boxed into a
+   flat grey tile; var(--line-soft) border kept alone, same 48px/var(--r2) footprint. */
+.gr-ic{width:48px;height:48px;border-radius:var(--r2);border:1px solid var(--line-soft);flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:var(--muted);}
 .gr-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
 .gr-ic img{width:var(--ic-lg);height:var(--ic-lg);object-fit:contain;}
 .gr-tx{flex:1;min-width:0;cursor:pointer;}
@@ -3531,6 +3616,32 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 </script>
 
 <script>
+/* Icon asset audit (2026-09-11, per direction "ไอคอน spectrum ทั้งหมดในระบบ audit เรื่อง size, item
+   type"): ~60 spectrum-style PNGs referenced across the app total ~2MB — reasonable, all correctly
+   PNG (not JPEG, needed for alpha transparency). The one real finding: 14 of these predated the
+   160x160/trim-to-content-bbox/~82%-fill convention every other icon in the file follows and were
+   still sitting at a legacy 96x96 canvas with the glyph filling ~94-96% of it — same root cause as
+   the ICON_COMPASS_PNG/ICON_GOLD_PNG mismatch fixed earlier this session (see SIDES' own comment),
+   just not yet caught for the rest of this older batch. At the shared 24px display size (.gr-ic/
+   .ns-ic/.pass-ey-ic/.bc-asset-ic all use object-fit:contain within a fixed box), a 96x96-canvas/96%-
+   fill glyph renders visibly LARGER than a 160x160/82%-fill one, even though both are "one icon in
+   one same-size slot" — the mismatch is in the source canvas, not the CSS. Re-cropped 11 of the 14
+   from their original ~1920px source art in Icon/ (ICON_BOND/COLLECTIBLE/CROWN/CRYPTO/DIAMOND/GIFT/
+   INSURANCE/JOYSTICK/REALESTATE/STOCK_INTL/STOCK_TH_PNG) to the same 160x160/~82%-fill recipe.
+   ICON_CARD_PNG/ICON_FUND_PNG/ICON_HEALTH_PNG have no matching high-res source found in Icon/ (a
+   plain-card search only turned up an unrelated trading-card mockup) — left at their existing 96px
+   art rather than guess at a replacement; flagged here for whenever real source art turns up.
+   Follow-up same day ("ไอคอนที่เพิ่งแก้...ยังทับกันอยู่" / bond icon spotted with a ₿ on it): the
+   re-crop made ICON_BOND_PNG's own source problem impossible to miss — Icon/ตราสารหนี้.png draws a
+   bank building with a currency note (stamped with a bitcoin glyph, of all things) overlapping its
+   base, present since before this session touched it, just easy to miss at the old tiny/96px size.
+   Briefly re-cropped to just the bank pediment (roof + columns only, dropping the note+₿ entirely —
+   the note visually overlaps the building's own right column in the source art, confirmed by
+   sampling its alpha channel, so there was no rectangle that kept "building + note minus just the
+   ₿" cleanly), then reverted the SAME day ("ใช้รูปแบบเดิม" → "ภาพเต็ม ตึก+ธนบัตร+₿ ตามต้นฉบับ") back
+   to the full original artwork through the same plain trim+~82%-fill recipe as the other 11 — the
+   mismatched ₿ stays, matching the source verbatim; only the canvas/proportion got fixed here, not
+   the content. */
 var ICON_BOOK_PNG='assets/ICON_BOOK_PNG.png';var SVGFONT="'FC Minimal','Noto Sans Thai','Thonburi',system-ui,sans-serif";
 var ICON_GIFT_PNG='assets/ICON_GIFT_PNG.png';
 var ICON_CARD_PNG='assets/ICON_CARD_PNG.png';
@@ -3583,10 +3694,15 @@ var ICON_IMG={s1q2:'assets/s1q2.png',s2q6:'assets/s2q6.png',s2q7:'assets/s2q7.pn
   // BOOTH_Q per-question custom icons, batch 2 (2026-09-11, per direction) — bank/house/
   // buildingcity are new; lightning/refresharrow/coinbaht/checkcircle above are reused (same
   // source art already registered for the MINIGAME_Q batch).
-  bank:'assets/bank.png',house:'assets/house.png',buildingcity:'assets/buildingcity.png'};
+  bank:'assets/bank.png',house:'assets/house.png',buildingcity:'assets/buildingcity.png',
+  // MINIGAME_Q per-question custom icons, batch 3 (2026-09-11, per direction "เกมเลือกเครื่องมือ...
+  // เกมก้าวแรก") — same 1920→160px trim+fit treatment, run on Icon/On-Event เพิ่มเติม/*.png.
+  // 'document' also doubles as SIDES[1] (เกมเลือกเครื่องมือ)'s own game-list icon (see SIDES' own
+  // comment on .img) — one file, two call sites, same reuse pattern as compass/gold above.
+  document:'assets/document.png',route:'assets/route.png',playcircle:'assets/playcircle.png'};
 /* Brand asset elements (efin/BetterTrade KV), compressed + base64-embedded so the
    splash scatter renders inside the sandboxed Artifact (no external requests). */
-var BG_IMG={nightSky:'assets/nightSky.jpg',room1:'assets/room1.jpg'};
+var BG_IMG={nightSky:'assets/nightSky.jpg',room1:'assets/room1.jpg',room2:'assets/room2-1.png'};
 var BG_VIDEO={sky:'assets/sky.mp4'};
 var ASSET_IMG=/*__ASSET_IMG__*/{candle:'assets/candle.png',gold:'assets/gold.png',bitcoin:'assets/bitcoin.png',card:'assets/card.png',heart:'assets/heart.png',efin:'assets/efin-2.png'};
 /* 2026-09-04: all 12 personas now have approved final photographed card art (replaces the earlier
@@ -6185,6 +6301,24 @@ var BOOTH_ICON_PNG={
   'ตราสารหนี้':ICON_BOND_PNG,'อสังหา/REIT':ICON_REALESTATE_PNG,'ทองคำ':ICON_GOLD_PNG,'สุขภาพ':ICON_HEALTH_PNG,
   'ประกัน':ICON_INSURANCE_PNG,'คริปโต':ICON_CRYPTO_PNG,'ของสะสม':ICON_COLLECTIBLE_PNG
 };
+/* BOOTH_ART_PNG — the big per-booth illustration set cropped from the 10-panel collage (see
+   assets/booths/). Started as a test wiring for 'หุ้นไทย' only (2026-09-11, per direction
+   "ทดสอบนำไปใช้จริง กับหน้าคั่น (สังเวียนเลือกหุ้นอย่างเดียว)") — that test passed (see
+   renderPlayBrief's own comment) and this was then extended to all 10 booths (same-day follow-up,
+   "ขยาย BOOTH_ART_PNG ให้ครบทั้ง 10 บูธ"). Keys verbatim from BOOTHS[i].asset, same convention as
+   BOOTH_ICON_PNG above. */
+var BOOTH_ART_PNG={
+  'หุ้นไทย':'assets/booths/booth-01-stock-arena.png',
+  'หุ้นต่างประเทศ':'assets/booths/booth-02-passport-global.png',
+  'กองทุนรวม':'assets/booths/booth-03-fund-duel.png',
+  'ตราสารหนี้':'assets/booths/booth-04-safety-net.png',
+  'ทองคำ':'assets/booths/booth-05-gold-crisis.png',
+  'อสังหา/REIT':'assets/booths/booth-06-rental-yield.png',
+  'ประกัน':'assets/booths/booth-07-life-scan.png',
+  'คริปโต':'assets/booths/booth-08-volatility-wave.png',
+  'ของสะสม':'assets/booths/booth-09-collectible-appraiser.png',
+  'สุขภาพ':'assets/booths/booth-10-money-wellness.png'
+};
 /* partner companies per asset — verbatim from ZONE_BOOTHS (the real check-in points).
    3 assets (หุ้นไทย/กองทุนรวม/คริปโต) padded to the 12-booth max with sample/placeholder partner
    names (2026-09-10, per direction "แต่ละสินทรัพย์ มีบูธ ได้มากสุด 12 บูธ...ลองวางบางสินทรัพย์ให้ได้
@@ -6715,7 +6849,7 @@ function renderBooth(){
    now removed) — one intro surface, not two. */
 var SIDES=[
   {icon:'lc-refresh-cw',img:'portfolio',title:'เกมย้อนเวลาพอร์ต',side:'ความเสี่ยงแท้จริง',emoji:'🎭',intro:'เรากำลังพาคุณย้อนไปเจอเหตุการณ์จริงที่เคยเกิดขึ้น ตอนนั้นไม่มีใครรู้ว่าพรุ่งนี้จะเป็นยังไง',rule:'ตอบแล้วไปต่อ ย้อนกลับไม่ได้',measures:'เทียบความเสี่ยงที่ "บอก" กับที่ "ทำจริง" ตอนวิกฤต'}, // refresh-cw = rewinding back through past crises
-  {icon:'lc-file-text',title:'เกมเลือกเครื่องมือ',side:'สิ่งที่คุณดูก่อนตัดสินใจ',emoji:'🔍',intro:'ก่อนตัดสินใจ คุณจะเลือกดูข้อมูลแบบไหน เราดูจากสิ่งที่คุณเลือกดูจริง ไม่ใช่แค่คำตอบสุดท้าย',rule:'เลือกจากสิ่งที่คุณดูจริง',measures:'ลำดับเครื่องมือวิเคราะห์ที่คุณเปิดจริง'}, // file-text = the business/financial-statement tool you choose to open
+  {icon:'lc-file-text',img:'document',title:'เกมเลือกเครื่องมือ',side:'สิ่งที่คุณดูก่อนตัดสินใจ',emoji:'🔍',intro:'ก่อนตัดสินใจ คุณจะเลือกดูข้อมูลแบบไหน เราดูจากสิ่งที่คุณเลือกดูจริง ไม่ใช่แค่คำตอบสุดท้าย',rule:'เลือกจากสิ่งที่คุณดูจริง',measures:'ลำดับเครื่องมือวิเคราะห์ที่คุณเปิดจริง'}, // file-text = the business/financial-statement tool you choose to open
   {icon:'lc-alert-triangle',img:'warning',title:'เกมทนกระแส',side:'ภูมิคุ้มกันความกลัวตกขบวน',emoji:'🔥',intro:'เจอสถานการณ์ที่ยั่วให้รีบตัดสินใจ ลองดูว่าคุณจะทนกระแสและกับดักได้แค่ไหน',rule:'บางฉากมีเวลาจำกัด',measures:'วินัยภายใต้แรงกดดันจากกระแส'}, // alert-triangle = the FOMO/scam traps this game tests resistance to
   {icon:'lc-calendar',img:'s1q2',title:'เกมเป้าหมายแต่ละวัย',side:'เป้าหมายตามวัย',emoji:'🗺️',intro:'สวมบทบาทในแต่ละช่วงวัย ตั้งแต่ 25 ถึง 65 ปี แล้วดูว่าเป้าหมายเงินของคุณเปลี่ยนไปไหม',rule:'ย้อนกลับแก้ไขได้ทุกข้อ',measures:'เป้าหมายเงินตั้งแต่วัย 25 ถึง 65'}, // calendar = goals across different ages/life-stages (25→65)
   {icon:'lc-compass',img:'compass',title:'เกมก้าวแรก',side:'ก้าวแรก',emoji:'🚀',intro:'เกมนี้ไม่ตัดสินว่าคุณเป็นคนแบบไหน ปิดท้ายด้วย "ก้าวแรก" เล็กๆ ที่คุณเลือกเอง',rule:'เลือกก้าวแรกได้หลายข้อ',measures:'กำแพงที่ทำให้ยังไม่เริ่ม + ก้าวเล็กที่สุด'}, // compass = finding your direction/first step as a new investor
@@ -6723,10 +6857,11 @@ var SIDES=[
 ];
 /* SIDES[i].img (2026-09-11, per direction "หน้า เกมหลัก - การใช้ไอคอน...ด้านอื่นใน Playbook") — real
    custom art for the เกมหลัก page's game-list icons (gameRow's .gr-ic + renderGames' nextCard .ns-ic
-   below), same q.img→ICON_IMG idea as MINIGAME_Q's per-question icons. Only these 5 of 6 sides carry
-   one (เกมเลือกเครื่องมือ wasn't part of this direction, still Lucide-only) — scoped to just this
-   page's two call sites per the same "Scoped to just this Games-page card" precedent already noted
-   on nextCard below; other SIDES[i].icon call sites (result-screen badge, pre-game briefing, journey
+   below), same q.img→ICON_IMG idea as MINIGAME_Q's per-question icons. First shipped 5 of 6 (เกม
+   เลือกเครื่องมือ wasn't part of that direction, still Lucide-only); completed same-day follow-up
+   direction added its own 'document' art, so all 6 now carry one — scoped to just this page's two
+   call sites per the same "Scoped to just this Games-page card" precedent already noted on nextCard
+   below; other SIDES[i].icon call sites (result-screen badge, pre-game briefing, journey
    ledger) are untouched and still render the Lucide glyph. */
 /* ══ MINIGAME_Q (2026-09-09) ══ real question content for the 6 main games, index i matching
    SIDES[i] 1:1 — sourced verbatim from GAMES-QUESTIONS-DNA.md Part A. Same shape as BOOTH_Q (see
@@ -6754,7 +6889,7 @@ var MINIGAME_Q=[
     {icon:'lc-message-circle',img:'s2q7',q:'รอบแรก หุ้นปริศนาที่กำลัง**เป็นที่พูดถึงในโซเชียล** ดูเท่าที่อยากดูแล้ว คุณจะ?',
      opts:['ตัดสินใจจากที่ดูข้อมูลมาเอง','ขอกระจายผ่านกองทุน หรือทยอยซื้อทีละน้อยทุกเดือน (DCA) แทนการเลือกตัวเดียว','ซื้อตามกระแสข่าวเลย เดี๋ยวไม่ทัน'],
      insight:'ข่าวและกระแสเป็นสิ่งล่อ ไม่ใช่ข้อมูลที่ใช้ตัดสินใจ · งบการเงินบอกสุขภาพของธุรกิจ'},
-    {icon:'lc-file-text',q:'รอบสอง หุ้นปริศนาที่เงียบ **ไม่มีใครพูดถึง** ดูแล้ว คุณจะ?',
+    {icon:'lc-file-text',img:'document',q:'รอบสอง หุ้นปริศนาที่เงียบ **ไม่มีใครพูดถึง** ดูแล้ว คุณจะ?',
      opts:['สนใจ เลือกหุ้นตัวนี้ เพราะพื้นฐานและปันผลดี','ชอบแนวนี้ แต่ขอลงผ่านกองทุน หรือทยอยซื้อทีละน้อย กระจายหลายตัว','ข้ามไป ไม่มีกระแส ดูน่าเบื่อ'],
      insight:'ของที่พื้นฐานมั่นคงมักไม่หวือหวาและไม่เป็นข่าว · การซื้อผ่านกองทุนหรือทยอยซื้อ คือการกระจายแทนการเลือกตัวเดียว'}
   ]},
@@ -6792,12 +6927,12 @@ var MINIGAME_Q=[
     {icon:'lc-calendar',img:'s1q2',q:'ฉาก 2 มีสองคนลงทุนเดือนละ 2,000 บาท เท่ากัน แต่**เริ่มไม่พร้อมกัน** คุณคิดว่าใครได้เปรียบ?',
      opts:['คนที่เริ่มตอนอายุ 25 แล้วลง 10 ปีจากนั้นหยุด','คนที่เริ่มตอนอายุ 35 แล้วลงต่อเนื่อง 30 ปี','พอๆ กัน เพราะลงเดือนละเท่ากัน'],
      insight:'เวลาช่วยให้ดอกเบี้ยทบต้นทำงาน — เริ่มเร็วมักได้เปรียบกว่าลงเยอะแต่เริ่มช้า'},
-    {icon:'lc-route',q:'ฉาก 3 เงินส่วนที่จะลงทุน **คุณเลือกเส้นทางไหน**?',
+    {icon:'lc-route',img:'route',q:'ฉาก 3 เงินส่วนที่จะลงทุน **คุณเลือกเส้นทางไหน**?',
      opts:['เส้นทางสบายใจ ขึ้นลงน้อย','เส้นทางสมดุล','เส้นทางท้าทาย ขึ้นลงแรง'],
      insight:'ผลตอบแทนที่หวังได้มาก มักมาพร้อมการขึ้นลงที่แรงขึ้น'},
     {icon:'lc-lock',img:'padlock',q:'ก้าวแรก ตอนที่ 1 อะไรที่ทำให้คุณ**ยังไม่ได้เริ่มลงทุนสักที**?',sub:'ตอบตามจริงได้เลย ทุกข้อเป็นเรื่องปกติที่หลายคนเจอ',
      opts:['เงินยังน้อย รอมีเงินก้อนก่อน','กลัวขาดทุน ยังไม่กล้า','ยุ่ง ไม่มีเวลา ค่อยทำทีหลัง','ไม่รู้จะเริ่มยังไง งงไปหมด']},
-    {icon:'lc-play-circle',q:'ก้าวแรก ตอนที่ 2 **ก้าวที่เล็กที่สุด**ที่คุณทำได้ภายในสัปดาห์นี้คืออะไร?',multi:true,skippable:true,skipLabel:'ยังไม่พร้อมเลือก ข้ามก่อน',
+    {icon:'lc-play-circle',img:'playcircle',q:'ก้าวแรก ตอนที่ 2 **ก้าวที่เล็กที่สุด**ที่คุณทำได้ภายในสัปดาห์นี้คืออะไร?',multi:true,skippable:true,skipLabel:'ยังไม่พร้อมเลือก ข้ามก่อน',
      opts:['เปิดบัญชีหรือแอปลงทุน','ตั้งลงทุนอัตโนมัติรายเดือน','ลองของจริงด้วยเงิน 100 บาท วันนี้','เลือกกองทุน 1 กองมาศึกษา','กำหนดงบลงทุนต่อเดือนที่ไหว','จดรายรับ-รายจ่าย 7 วัน','เริ่มแยกเงินสำรองเผื่อฉุกเฉินก้อนแรก','นัดคุยกับผู้แนะนำการลงทุนที่มีใบอนุญาต']}
   ]},
   {questions:[
@@ -7103,7 +7238,21 @@ function renderPlayBrief(){
     lead=BOOTH_BRIEF[idx];
     cards=briefCard('var(--violet)','จำนวนข้อ',n+' ข้อ','ตอบทีละข้อ')+briefCard('var(--amber-text)','รางวัล','+'+set.points+' แต้ม','สะสมลุ้นรางวัลใหญ่','rc-title-pts');
   }
+  /* art — renders above the title for every BOOTH brief (see BOOTH_ART_PNG; games/SIDES have no
+     entry there so `art` stays '' for kind==='game', unchanged). The CTA stays pinned to the bottom
+     either way (:root[data-view="mobile"] .consent-btn's own position:sticky+margin-top:auto —
+     deliberate, unrelated to this); .consent-body already self-centers art+title+lead+cards WITHIN
+     the space above that pinned button (:root[data-view="mobile"] .consent-body{flex:1;justify-
+     content:center}), so simply adding the taller art block re-centers the group lower on screen for
+     free — no extra override needed (verified 2026-09-11 on the 'หุ้นไทย' booth before extending to
+     all 10). */
+  var artSrc=BOOTH_ART_PNG[b&&b.asset];
+  var art=artSrc?'<div class="play-brief-art"><img src="'+artSrc+'" alt=""></div>':'';
   var head='<div class="consent-h play-brief-h">'+(headA?'<span class="ch-1">'+headA+'</span> ':'')+'<span class="ch-2">'+headB+'</span></div>';
+  // bg — booth briefs get their own backdrop (room2-1.png, 2026-09-11 direction "background ส่วนของ
+  // หน้าคั่น (เกมส์เดินบูธทั้งหมด) ใช้ภาพนี้แทน"); the 6 main-game briefs (kind==='game') keep room1
+  // unchanged. Same .consent background-size/position rule either way — only the url() swaps.
+  var bgImg=kind==='booth'?BG_IMG.room2:BG_IMG.room1;
   root.innerHTML=
     /* align-self:center override (2026-09-10, per direction "header ไอคอนให้ alignment center กับ
        text") — .tb-ic's own align-self:flex-start (see its CSS comment) exists for renderLibrary's
@@ -7112,10 +7261,10 @@ function renderPlayBrief(){
        bar instead of centered against it — inline override, scoped to this one header only, since
        Library's own 2-line case still needs the base flex-start behavior untouched. */
     '<header class="topbar"><button class="tb-ic" id="playBackBtn" type="button" aria-label="ย้อนกลับ" style="align-self:center">'+ic('lc-arrow-left')+'</button><span class="tb-title">'+playLabel(kind,idx)+'</span></header>'+
-    '<div class="consent fade" style="background-image:url(\''+BG_IMG.room1+'\')">'+
+    '<div class="consent fade pb-consent'+(art?' has-art':'')+(kind==='booth'?' bg-room2':'')+'" style="background-image:url(\''+bgImg+'\')">'+
       '<div class="content">'+
         '<div class="consent-body scroll-reveal">'+
-          head+
+          art+head+
           '<div class="consent-p">'+lead+'</div>'+
           '<div class="round-cards">'+cards+'</div>'+
         '</div>'+
@@ -7124,6 +7273,37 @@ function renderPlayBrief(){
     '</div>';
   root.querySelector('#playBackBtn').onclick=closePlay;
   root.querySelector('#playStartBtn').onclick=function(){PLAY.step='question';render();};
+  // Deferred via double rAF (not called bare): right after innerHTML is set, the browser hasn't
+  // done a layout pass yet, so scrollHeight/clientHeight can still read pre-reflow (often equal,
+  // masking real overflow) — bit us on the GAME briefs specifically (no art, so no onload re-check
+  // to catch it second-hand): landscape-phone width (667×375) overlapped every game brief even
+  // though syncBriefOverflow() ran, because that bare synchronous call measured too early. Same
+  // "let the browser paint before reading layout" pattern paintPlayQuestion's insight-reveal uses.
+  requestAnimationFrame(function(){requestAnimationFrame(syncBriefOverflow);});
+  var artImgEl=root.querySelector('.play-brief-art img');
+  if(artImgEl&&!artImgEl.complete)artImgEl.addEventListener('load',syncBriefOverflow);
+  window.addEventListener('resize',syncBriefOverflow);
+}
+/* syncBriefOverflow — the CTA on this screen is normally position:sticky;bottom:0 (mobile only,
+   see .consent-btn's own comment) so it hugs the bottom of the screen with a nice gradient fade
+   even when the body above it doesn't fill the space. That trick breaks down the moment the body's
+   OWN content (title+lead+cards, +art on a booth brief) is taller than the screen: sticky still
+   pins the button's bottom to the viewport's bottom edge even at scrollTop 0, which then visually
+   overlaps whatever of the cards doesn't fit above the fold — reported 2026-09-11 ("ปุ่ม/การ์ด
+   ทับกันอีก") on a short/wide window even after the art image was shrunk to fit typical screens.
+   Scrolling doesn't help: the button is the LAST element, so there's nothing below it to reveal —
+   only turning sticky off prevents the overlap. This measures the actual rendered height against
+   the viewport (called post-layout — see the double-rAF at its call site — plus again once any art
+   image loads, since that's what most often pushes it over later) and, only when content truly
+   doesn't fit, adds .overflow-fix (see its CSS) to fall the CTA back to a plain in-flow button below
+   the cards — scrollable to reach, never overlapping. Applies to game briefs too, not just booths
+   with art — a landscape-phone width (667×375) alone was enough to overlap every GAME brief's cards,
+   no image involved. Re-checked on resize/rotate too. A no-op once PLAY has moved past the brief
+   step (the querySelector finds nothing). */
+function syncBriefOverflow(){
+  var c=root.querySelector('.consent');
+  if(!c)return;
+  c.classList.toggle('overflow-fix',c.scrollHeight>c.clientHeight+1);
 }
 function clearPlayTimer(){if(PLAY_TIMER){clearInterval(PLAY_TIMER);PLAY_TIMER=null;}}
 /* closePlay — exits the whole mini-game flow back to whichever tab launched it (PLAY.returnPhase),
