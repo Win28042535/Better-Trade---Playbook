@@ -3041,9 +3041,21 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 :root[data-view="pc"] main.scroll,:root[data-view="tablet"] main.scroll{max-width:760px;margin-left:auto;margin-right:auto;width:100%;}
 /* full-width sticky topbar bar, but its inner icons/title align to the same 760 reading column */
 :root[data-view="pc"] .topbar,:root[data-view="tablet"] .topbar{padding-left:max(var(--sp-stack),calc((100% - 760px)/2));padding-right:max(var(--sp-stack),calc((100% - 760px)/2));}
-/* Tablet's tabbar stays exactly as it was — a 760-wide bar, same as .topbar/.q-scroll/main.scroll's
-   own reading column, inside a shell only slightly wider (820) so the gap either side is minor. */
-:root[data-view="tablet"] .book-tabbar{max-width:760px;}
+/* Bug fix (2026-09-11, ipad/tablet breakpoint audit, per direction "navigation bottom ของ ipad,
+   tablet size...เหลือ spacing ซ้าย-ขวา ห่างจากของจอเยอะ") — the "gap either side is minor" comment
+   this replaced was only ever true right at the bottom of the tablet range (~768-820px, where .shell's
+   own 820px cap already ties the real viewport down close to 760). data-view="tablet" actually covers
+   EVERY width up to 1440px though (see applyView()), and .book-tabbar is position:fixed — centered via
+   left:50%/translateX(-50%) against the TRUE viewport, not against .shell's 820px-capped box (.shell
+   has no transform, so it doesn't become the containing block for a fixed descendant). So on any real
+   tablet wider than ~820 — a landscape iPad (1024px+), most Android tablets in landscape, anything
+   toward the top of the tablet band — the bar's own max-width:760px hard-capped its white/blur
+   background too, leaving it floating mid-screen with a (viewport-760)/2 gap of empty page background
+   on each side (132px+ at 1024px wide) instead of reaching the real screen edges. Exactly the same bug
+   pc already had and already fixed below (see that comment) — ported the identical fix to tablet:
+   drop the max-width cap so the background spans the full real viewport edge-to-edge, and hold the tab
+   items inside the same 760px reading column with the (100% - 760px)/2 padding formula instead. */
+:root[data-view="tablet"] .book-tabbar{max-width:none;padding-left:max(var(--sp-stack),calc((100% - 760px)/2));padding-right:max(var(--sp-stack),calc((100% - 760px)/2));}
 /* pc's tabbar background used to inherit this same max-width:760px cap, but pc's .shell is uncapped
    (full-bleed, see above) — a fixed-width 760px bar centered via left:50%/translateX(-50%) inside a
    much wider viewport left the page's own background showing on both sides of the white/blur band,
@@ -3927,7 +3939,7 @@ function renderSplash(){
      already does this correctly (pause+remove) for every other path (center change, tap-flip, leaving
      v4 via stopSpv3's sibling); this was the one spot that skipped it. */
   fanVideoTeardown();
-  /* Splash preview version (DEMO.splashVer, demo-panel toggle — default 'v1' ALWAYS). v1 = the
+  /* Splash preview version (DEMO.splashVer, demo-panel toggle — default 'v4' since 2026-09-11). v1 = the
      shipped fan carousel of card fronts; v3 = the 3D Character Card Flow field; v4 = "การ์ดมีชีวิต" —
      v1's EXACT same fan carousel (v4 shares its whole markup/paintFan/bindFanFlip/auto-advance path
      below, see fanVideoSync near paintFan), just with the CENTER card's own living-card clip
@@ -4478,15 +4490,22 @@ function toggleInterest(oi){var pos=st.s3.indexOf(oi);if(pos>-1){st.s3.splice(po
    actual crux of the question: "...คุณรับได้แค่ไหน?") without any hand-authored markup per question.
    A question with no space at all (a handful of the shorter ones) just renders as one plain weight —
    graceful fallback, not an error case. */
-/* emphasizeQ — bolds everything after the LAST space in a question. Since Thai is normally written
-   with no space inside one clause, that one manual space is how every q string in MINIGAME_Q/BOOTH_Q
-   marks where the "setup" ends and the actual bolded question begins (e.g. "...(ลดลง 57.00%) คุณจะทำ
-   อะไร?" bolds the whole "คุณจะทำอะไร?" clause). A question written as ONE continuous run with no
-   space at all silently gets NO bold (i<0 falls through unchanged) — bug fix 2026-09-10 (reported:
-   two questions had no trailing bold — "ประกัน คือการลงทุนที่ดีไหม?"/"สุขภาพ เกี่ยวกับเรื่องเงินยังไง?"
-   in BOOTH_Q, both originally one unspaced clause): a manual space was inserted before the clause
-   that should carry the emphasis, same convention as every other question in these two arrays. */
-function emphasizeQ(s){var i=s.lastIndexOf(' ');return i<0?s:s.slice(0,i+1)+'<b>'+s.slice(i+1)+'</b>';}
+/* emphasizeQ — bolds a question's own KEYWORD, marked inline with **double-asterisks** right in the
+   `q` string (e.g. "...(ลดลง 57.00%) **คุณจะทำอะไร**?"), same lightweight convention as everywhere
+   else "hand-authored per question" markup was avoided in this file. Every MINIGAME_Q/BOOTH_Q
+   question now carries its own **marker** (2026-09-11, per direction "text weight 700...ให้ใช้กับ
+   keyword สำคัญของคำถาม" — replacing the old rule below, which just bolded whatever fell after the
+   LAST space, i.e. wherever a question happened to end rather than its actual point) — see each
+   array's own per-question comments for why that particular phrase, not just the trailing clause,
+   was picked. Falls back to the OLD trailing-space rule when no **marker** is present at all (kept
+   for the DNA quiz's own q-title, which still wants this fully automatic per its own comment above —
+   not hand-marked — and for any question added later without a marker, so it degrades gracefully
+   instead of rendering with zero emphasis). */
+function emphasizeQ(s){
+  var m=/\*\*(.+?)\*\*/.exec(s);
+  if(m)return s.slice(0,m.index)+'<b>'+m[1]+'</b>'+s.slice(m.index+m[0].length);
+  var i=s.lastIndexOf(' ');return i<0?s:s.slice(0,i+1)+'<b>'+s.slice(i+1)+'</b>';
+}
 function renderQuiz(){
   var idx=st.idx,q=getQ(idx),isInterests=(idx===10);
   var sec=idx<3?1:(idx<10?2:3);
@@ -6143,94 +6162,94 @@ var BOOTH_BRIEF=[
    doc's own cross-reference note. */
 var BOOTH_Q=[
   {points:12,questions:[
-    {icon:'lc-file-text',q:'มีหุ้นตัวหนึ่งกำลังเป็นที่พูดถึง คุณจะตัดสินใจซื้อจากอะไรเป็นหลัก?',locked:true,
+    {icon:'lc-file-text',q:'มีหุ้นตัวหนึ่งกำลังเป็นที่พูดถึง คุณจะ**ตัดสินใจซื้อจากอะไรเป็นหลัก**?',locked:true,
      opts:['ดูว่าธุรกิจทำอะไร และงบการเงินเป็นยังไง','ดูกราฟราคาและจังหวะซื้อ','เพื่อนหรือข่าวในกลุ่มบอกว่าน่าสนใจ'],
      insight:'ตัดสินใจจากข้อมูลของธุรกิจ ไม่ใช่จากคำบอกเล่า'},
-    {icon:'lc-pie-chart',q:'ถ้ามีเงินก้อนหนึ่งจะลงทุน คุณจะ...',
+    {icon:'lc-pie-chart',q:'ถ้า**มีเงินก้อนหนึ่งจะลงทุน** คุณจะ...',
      opts:['ลงกับหุ้นตัวเดียวที่มั่นใจที่สุด','แบ่งลงหลายตัวหรือลงผ่านกองทุน 5-10 อย่าง','ทยอยซื้อทีละน้อยหลายงวด (DCA)'],
      insight:'การแบ่งเงินไปหลายที่ ช่วยลดผลกระทบเวลาที่ใดที่หนึ่งไม่เป็นไปตามคาด'}
   ]},
   {points:10,questions:[
-    {icon:'lc-globe',q:'ถ้าเงินลงทุนของคุณมีแต่ของไทย คุณคิดว่าเพียงพอไหม?',
+    {icon:'lc-globe',q:'ถ้าเงินลงทุนของคุณ**มีแต่ของไทย** คุณคิดว่าเพียงพอไหม?',
      opts:['พอแล้ว ลงในสิ่งที่เราคุ้นเคย','ควรแบ่งไปต่างประเทศบ้าง','ย้ายไปต่างประเทศเป็นหลักเลย'],
      insight:'คนส่วนใหญ่มักลงแต่ในประเทศที่คุ้นเคย ทั้งที่โลกมีตัวเลือกมากกว่านั้น'},
-    {icon:'lc-refresh-cw',q:'ลงทุนหุ้นต่างประเทศ มีความเสี่ยงอะไรเพิ่มขึ้นจากหุ้นไทย?',
+    {icon:'lc-refresh-cw',q:'ลงทุนหุ้นต่างประเทศ **มีความเสี่ยงอะไรเพิ่มขึ้นจากหุ้นไทย**?',
      opts:['ความเสี่ยงจากค่าเงิน เพราะต้องแลกเป็นเงินสกุลอื่น','ไม่มีอะไรต่างจากหุ้นไทย','เสี่ยงน้อยกว่า เพราะบริษัทใหญ่'],
      insight:'เวลาลงทุนข้ามประเทศ กำไรขาดทุนขึ้นกับค่าเงินด้วย ไม่ใช่แค่ราคาหุ้น'}
   ]},
   {points:11,questions:[
-    {icon:'lc-coins',q:'กอง A ผลตอบแทนเด่น ค่าธรรมเนียม 2.00% ต่อปี กอง B ผลตอบแทนใกล้กัน ค่าธรรมเนียม 0.50% ต่อปี คุณเลือกกองไหน?',
+    {icon:'lc-coins',q:'กอง A ผลตอบแทนเด่น ค่าธรรมเนียม 2.00% ต่อปี กอง B ผลตอบแทนใกล้กัน **ค่าธรรมเนียม 0.50% ต่อปี** คุณเลือกกองไหน?',
      opts:['กอง A เพราะผลงานดูดีกว่า','กอง B เพราะค่าธรรมเนียมถูกกว่า','ขอดูข้อมูลมากกว่านี้ก่อน'],
      insight:'ค่าธรรมเนียมถูกหักทุกปี ระยะยาวส่วนต่างเล็กๆ กลายเป็นเงินก้อนใหญ่ได้'},
-    {icon:'lc-target',q:'กองที่มีผู้จัดการคอยเลือกหุ้นให้ เทียบกับกองที่ลงตามดัชนีตลาดซึ่งค่าธรรมเนียมถูกกว่า ระยะยาวต่างกันแค่ไหน?',
+    {icon:'lc-target',q:'กองที่มีผู้จัดการคอยเลือกหุ้นให้ เทียบกับกองที่ลงตามดัชนีตลาดซึ่งค่าธรรมเนียมถูกกว่า **ระยะยาวต่างกันแค่ไหน**?',
      opts:['กองที่มีคนเลือกให้ เพราะมีมืออาชีพดูแล','กองที่ลงตามดัชนีตลาด เพราะถูกและไปตามตลาด','ผสมทั้งสองแบบ'],
      insight:'ทั้งสองแบบมีที่ใช้ ต่างกันที่ค่าธรรมเนียมและวิธีทำงาน'}
   ]},
   {points:9,questions:[
-    {icon:'lc-shield',q:'สมมติว่ามีรายได้เข้ามาก้อนหนึ่ง ก่อนเอาไปลงทุน คุณจะกันไว้เป็นเงินสำรองเผื่อฉุกเฉินแค่ไหน?',
+    {icon:'lc-shield',q:'สมมติว่ามีรายได้เข้ามาก้อนหนึ่ง ก่อนเอาไปลงทุน คุณจะกันไว้เป็น**เงินสำรองเผื่อฉุกเฉินแค่ไหน**?',
      opts:['กันให้ครบเท่ารายจ่าย 6 เดือนก่อน','กันไว้ราว 3 เดือน แล้วเริ่มลงทุนคู่กันไป','ไม่กัน เอาไปลงทุนให้เต็มที่'],
      insight:'เงินสำรองเผื่อฉุกเฉินคือตาข่ายที่ทำให้เราไม่ต้องขายของตอนราคาแย่'},
-    {icon:'lc-landmark',q:'เงินสำรองก้อนนี้ ควรเก็บไว้ที่ไหน?',
+    {icon:'lc-landmark',q:'เงินสำรองก้อนนี้ **ควรเก็บไว้ที่ไหน**?',
      opts:['บัญชีออมทรัพย์หรือกองทุนตลาดเงิน ถอนได้ทันที','ฝากประจำล็อก 2 ปี ได้ดอกเบี้ยสูงกว่า','เอาไปลงหุ้นปันผล ได้ทั้งปันผลและโต'],
      insight:'เงินสำรองต้องถอนออกมาใช้ได้เร็วเมื่อจำเป็น (สภาพคล่อง) สำคัญกว่าได้ผลตอบแทนสูง'}
   ]},
   {points:13,questions:[
-    {icon:'lc-trending-up',q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บ วันนี้อันไหนซื้อของได้มากกว่ากัน?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้',
+    {icon:'lc-trending-up',q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บ วันนี้อันไหน**ซื้อของได้มากกว่ากัน**?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้',
      opts:['เงินสด เพราะยังเป็น 100,000 บาท เท่าเดิม','ทอง น่าจะซื้อของได้มากกว่า','น่าจะพอๆ กัน'],
      insight:'เงินสดตัวเลขเท่าเดิม แต่ซื้อของได้น้อยลงเพราะเงินเฟ้อ ส่วนทองมักขยับตามค่าของเงิน'},
-    {icon:'lc-shield',q:'สมมติว่าเกิดวิกฤต หุ้นทั่วโลกร่วง 40% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่าทองจะเป็นยังไง?',
+    {icon:'lc-shield',q:'สมมติว่าเกิดวิกฤต หุ้นทั่วโลกร่วง 40% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่า**ทองจะเป็นยังไง**?',
      opts:['ร่วงตามหุ้นไปด้วย','ทรงตัวหรือขึ้นสวนทางกับหุ้น','ราคาไม่ขยับ แต่ขายไม่ออก'],
      insight:'ในหลายวิกฤต ทองมักไม่ไปทางเดียวกับหุ้น จึงช่วยพยุงภาพรวมได้'},
-    {icon:'lc-pie-chart',q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินลงทุนทั้งหมดซื้อทองเลยดีไหม?',
+    {icon:'lc-pie-chart',q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินลงทุน**ทั้งหมดซื้อทองเลยดีไหม**?',
      opts:['ใช่ ซื้อทองทั้งหมด ปลอดภัยที่สุด','ไม่ แบ่งไว้ส่วนหนึ่งพอ ที่เหลือไปอย่างอื่น','ไม่ซื้อเลย ชอบของที่งอกเงยกว่า'],
      insight:'ทองไม่สร้างรายได้ระหว่างถือ จึงมักใช้เป็นส่วนหนึ่ง ไม่ใช่ทั้งหมด'}
   ]},
   {points:8,questions:[
-    {icon:'lc-building-2',q:'ห้องเช่าโฆษณาว่า "ผลตอบแทน 8% ต่อปี" หลังหักค่าใช้จ่ายจริง คุณคิดว่าเหลือเท่าไร?',
+    {icon:'lc-building-2',q:'ห้องเช่าโฆษณาว่า "ผลตอบแทน 8% ต่อปี" **หลังหักค่าใช้จ่ายจริง** คุณคิดว่าเหลือเท่าไร?',
      opts:['น่าจะเหลือราว 3-5%','ก็ 8% ตามที่โฆษณา','ต้องขอดูตัวเลขค่าใช้จ่ายก่อน'],
      insight:'ตัวเลขที่โฆษณามักยังไม่หักค่าส่วนกลาง ค่าซ่อม ภาษี และช่วงที่ไม่มีคนเช่า'},
-    {icon:'lc-home',q:'ถ้าอยากมีรายได้จากอสังหาฯ จะซื้อห้องเองตรงๆ หรือซื้อกองทุนอสังหาฯ (REIT)?',
+    {icon:'lc-home',q:'ถ้าอยากมีรายได้จากอสังหาฯ **จะซื้อห้องเองตรงๆ หรือซื้อกองทุนอสังหาฯ (REIT)**?',
      opts:['ซื้อห้องเอง เพราะจับต้องได้','ซื้อกองทุนอสังหาฯ เพราะเริ่มด้วยเงินน้อยและขายง่ายกว่า','ยังไม่แน่ใจ ขอเข้าใจก่อน'],
      insight:'ซื้อเองต้องดูแลเองและขายยากกว่า · กองทุนอสังหาฯ เริ่มเงินน้อยกว่าและซื้อขายง่ายกว่า'}
   ]},
   {points:10,questions:[
-    {icon:'lc-heart',q:'สมมติว่าคนที่หาเลี้ยงครอบครัวต้องหยุดทำงานไปกะทันหัน ครอบครัวจะมีเงินใช้ได้นานแค่ไหน?',sub:'คำถามนี้ไม่ต้องกังวล เราถามเพื่อให้เห็นภาพเท่านั้น',
+    {icon:'lc-heart',q:'สมมติว่าคนที่หาเลี้ยงครอบครัวต้องหยุดทำงานไปกะทันหัน ครอบครัว**จะมีเงินใช้ได้นานแค่ไหน**?',sub:'คำถามนี้ไม่ต้องกังวล เราถามเพื่อให้เห็นภาพเท่านั้น',
      opts:['ยังไม่เคยคิดเรื่องนี้เลย','พอมีเก็บไว้ราว 1-2 ปี','เตรียมไว้แล้ว หรือมีประกันอยู่'],
      insight:'ความเสี่ยงบางอย่างรับเองไม่ไหว จึงมีเครื่องมือช่วยรับความเสี่ยงนั้นแทน'},
-    {icon:'lc-shield',q:'"ประกัน คือการลงทุนที่ดีไหม?"',
+    {icon:'lc-shield',q:'"ประกัน **คือการลงทุนที่ดีไหม**?"',
      opts:['ใช่ ควรซื้อแบบที่ได้เงินคืนเยอะๆ','ไม่ ประกันมีไว้คุ้มครอง ส่วนการลงทุนแยกกัน','ยังไม่แน่ใจ'],
      insight:'ประกันมีหน้าที่คุ้มครองเวลาเกิดเรื่อง ไม่ใช่เครื่องมือหลักในการทำให้เงินโต'}
   ]},
   {points:9,questions:[
-    {icon:'lc-bitcoin',q:'ถ้าคุณอยากลองของที่ขึ้นลงแรง เช่น คริปโต จะแบ่งเงินไปเท่าไรของเงินลงทุนทั้งหมด?',locked:true,
+    {icon:'lc-bitcoin',q:'ถ้าคุณอยากลองของที่ขึ้นลงแรง เช่น คริปโต **จะแบ่งเงินไปเท่าไร**ของเงินลงทุนทั้งหมด?',locked:true,
      opts:['ราว 5% ถือว่าเป็นเงินที่เสียได้','ราว 15-20%','ครึ่งหนึ่งขึ้นไป ของมันต้องลอง'],
      insight:'หลักง่ายๆ คือแบ่งเท่าที่เสียได้โดยไม่กระทบชีวิต'},
-    {icon:'lc-zap',q:'สมมติว่าลงไปแล้ว คืนเดียวราคาร่วง 40% คุณจะทำอะไร?',
+    {icon:'lc-zap',q:'สมมติว่าลงไปแล้ว **คืนเดียวราคาร่วง 40%** คุณจะทำอะไร?',
      opts:['ขายหนีทันที กลัวลงต่อ','ถือตามแผนเดิม ไม่แตะ','ซื้อเพิ่มเลย ของถูก'],
      insight:'ของที่ขึ้นลงแรงต้องมาพร้อมแผนที่ตั้งไว้ก่อน ไม่ใช่ตัดสินใจตอนใจสั่น'}
   ]},
   {points:8,questions:[
-    {icon:'lc-gem',q:'พระเครื่อง นาฬิกา หรืองานศิลป์ เป็นการลงทุนที่ดีไหม?',
+    {icon:'lc-gem',q:'พระเครื่อง นาฬิกา หรืองานศิลป์ **เป็นการลงทุนที่ดีไหม**?',
      opts:['ดีมาก ราคาขึ้นได้เยอะ','เป็นของที่รักและสะสม มากกว่าจะเป็นการลงทุนหลัก','เสี่ยง ขอเข้าใจก่อน'],
      insight:'ของสะสมขึ้นกับคนที่อยากได้ต่อ และเวลาจะขายอาจใช้เวลานาน'},
-    {icon:'lc-target',q:'ถ้าจะมีของสะสมรวมอยู่ในเงินลงทุน ควรเป็นสัดส่วนเท่าไร?',
+    {icon:'lc-target',q:'ถ้าจะมีของสะสมรวมอยู่ในเงินลงทุน **ควรเป็นสัดส่วนเท่าไร**?',
      opts:['ส่วนเล็กๆ เท่าที่เสียได้','ปานกลาง ถ้าเรารู้จริงในเรื่องนั้น','เยอะเลย เพราะของมันมีค่า'],
      insight:'ยิ่งเป็นของที่ขายยาก ยิ่งควรเป็นส่วนเล็กของภาพรวม'}
   ]},
   {points:10,questions:[
-    {icon:'lc-heart',q:'สุขภาพ เกี่ยวกับเรื่องเงินยังไง?',
+    {icon:'lc-heart',q:'สุขภาพ **เกี่ยวกับเรื่องเงินยังไง**?',
      opts:['ไม่ค่อยเกี่ยว เป็นคนละเรื่อง','เกี่ยวมาก ป่วยครั้งเดียวเงินหายเป็นก้อน','สุขภาพคือฐานของทุกอย่าง'],
      insight:'สุขภาพเป็นสินทรัพย์ที่คนมักลืมนับ แต่เป็นตัวที่ปกป้องสินทรัพย์อื่นไว้'},
-    {icon:'lc-target',q:'ลงทุนกับสุขภาพวันนี้ แบบไหนคุ้มที่สุด?',
+    {icon:'lc-target',q:'ลงทุนกับสุขภาพวันนี้ **แบบไหนคุ้มที่สุด**?',
      opts:['ออกกำลังกาย กินให้ดี ตรวจสุขภาพประจำ','ทำประกันสุขภาพไว้','ค่อยคิดตอนป่วย'],
      insight:'ค่าดูแลตัวเองวันนี้มักถูกกว่าค่ารักษาในวันที่สายไปแล้ว'},
-    {icon:'lc-shield',q:'ตอนนี้คุณมีประกันสุขภาพหรือประกันค่ารักษาไหม?',sub:'ถามข้อเท็จจริง ไม่มีคำตอบผิด',
+    {icon:'lc-shield',q:'ตอนนี้คุณ**มีประกันสุขภาพหรือประกันค่ารักษาไหม**?',sub:'ถามข้อเท็จจริง ไม่มีคำตอบผิด',
      opts:['มี และรู้วงเงินคุ้มครองคร่าวๆ','มี แต่ไม่แน่ใจว่าคุ้มครองแค่ไหน','ยังไม่มี'],
      insight:'การรู้ว่าเรามีวงเงินคุ้มครองเท่าไร สำคัญเท่ากับการมีประกัน'},
-    {icon:'lc-coins',q:'สมมติว่าพรุ่งนี้ต้องจ่ายค่ารักษา 100,000 บาท คุณจะเอามาจากไหน?',
+    {icon:'lc-coins',q:'สมมติว่าพรุ่งนี้ต้องจ่ายค่ารักษา 100,000 บาท **คุณจะเอามาจากไหน**?',
      opts:['เงินเก็บหรือเงินสำรองที่มีอยู่','ประกันจ่ายให้','ต้องกู้ ขายของ หรือยืมคนอื่น'],
      insight:'ค่ารักษาที่มาแบบไม่ทันตั้งตัว คือเหตุผลที่ควรมีเงินสำรองและความคุ้มครอง'},
-    {icon:'lc-check-circle',q:'ปีที่ผ่านมา คุณดูแลสุขภาพเชิงป้องกันแค่ไหน?',
+    {icon:'lc-check-circle',q:'ปีที่ผ่านมา **คุณดูแลสุขภาพเชิงป้องกันแค่ไหน**?',
      opts:['ทำสม่ำเสมอ','ทำบ้าง ไม่สม่ำเสมอ','แทบไม่ได้ทำ'],
      insight:'ตรวจสุขภาพประจำปี ก็เหมือนการเปิดดูภาพรวมเงินลงทุนของเรา'}
   ]}
@@ -6642,71 +6661,71 @@ var MINIGAME_Q=[
   {noBack:true,
    resultNote:'ทั้ง 4 แบบไม่มีแบบที่ผิด — สอดคล้อง (Aligned) / ใจไม่ถึงอย่างที่คิด / ใจถึงกว่าที่คิด / ยังค้นหาสไตล์ตัวเอง (ผลแบบเต็มดูได้ใน Playbook ของคุณ)',
    questions:[
-    {icon:'lc-alert-triangle',q:'คุณคิดว่าตัวเองรับ "เงินลงทุนติดลบ" ได้แค่ไหน?',sub:'ข้ามได้ถ้าตอบไว้แล้วตอนลงทะเบียน',
+    {icon:'lc-alert-triangle',q:'คุณคิดว่าตัวเองรับ "**เงินลงทุนติดลบ**" ได้แค่ไหน?',sub:'ข้ามได้ถ้าตอบไว้แล้วตอนลงทะเบียน',
      opts:['ขอไม่เห็นติดลบเกินราว 10% (ทุก 100 บาท เหลือราว 90 บาท)','ติดลบราว 30% ยังพอไหว','ติดลบเกิน 50% ก็ยังถือได้']},
-    {icon:'lc-zap',q:'ปี 2551 วิกฤตแฮมเบอร์เกอร์ เงินลงทุน 1,000,000 บาท เหลือ 430,000 บาท (ลดลง 57.00%) คุณจะทำอะไร?',locked:true,sub:'ตอนนั้นยังไม่มีใครรู้ว่าตลาดจะฟื้นเมื่อไหร่ ตอบตามที่ใจคุณคิดจริงๆ',
+    {icon:'lc-zap',q:'ปี 2551 วิกฤตแฮมเบอร์เกอร์ เงินลงทุน 1,000,000 บาท เหลือ 430,000 บาท (**ลดลง 57.00%**) คุณจะทำอะไร?',locked:true,sub:'ตอนนั้นยังไม่มีใครรู้ว่าตลาดจะฟื้นเมื่อไหร่ ตอบตามที่ใจคุณคิดจริงๆ',
      opts:['ขายทั้งหมด หนีก่อนจะเสียมากกว่านี้','ถือไว้ตามแผนเดิม ไม่แตะ','ซื้อเพิ่ม ของถูกมาก']},
-    {icon:'lc-hourglass',q:'ก.พ.–มี.ค. 2563 วิกฤตโควิด เงินลงทุนเหลือ 660,000 บาท (ลดลง 34.00% ในเดือนเดียว) รอบนี้จะทำอะไร?',locked:true,
+    {icon:'lc-hourglass',q:'ก.พ.–มี.ค. 2563 วิกฤตโควิด เงินลงทุนเหลือ 660,000 บาท (**ลดลง 34.00% ในเดือนเดียว**) รอบนี้จะทำอะไร?',locked:true,
      opts:['ขายทั้งหมด รอบนี้แรงกว่าเดิม','ถือตามแผน เคยผ่านปี 2551 มาแล้ว','ซื้อเพิ่มเลย จังหวะนี้แหละ']}
   ]},
   {questions:[
-    {icon:'lc-message-circle',q:'รอบแรก หุ้นปริศนาที่กำลังเป็นที่พูดถึงในโซเชียล ดูเท่าที่อยากดูแล้ว คุณจะ?',
+    {icon:'lc-message-circle',q:'รอบแรก หุ้นปริศนาที่กำลัง**เป็นที่พูดถึงในโซเชียล** ดูเท่าที่อยากดูแล้ว คุณจะ?',
      opts:['ตัดสินใจจากที่ดูข้อมูลมาเอง','ขอกระจายผ่านกองทุน หรือทยอยซื้อทีละน้อยทุกเดือน (DCA) แทนการเลือกตัวเดียว','ซื้อตามกระแสข่าวเลย เดี๋ยวไม่ทัน'],
      insight:'ข่าวและกระแสเป็นสิ่งล่อ ไม่ใช่ข้อมูลที่ใช้ตัดสินใจ · งบการเงินบอกสุขภาพของธุรกิจ'},
-    {icon:'lc-file-text',q:'รอบสอง หุ้นปริศนาที่เงียบ ไม่มีใครพูดถึง ดูแล้ว คุณจะ?',
+    {icon:'lc-file-text',q:'รอบสอง หุ้นปริศนาที่เงียบ **ไม่มีใครพูดถึง** ดูแล้ว คุณจะ?',
      opts:['สนใจ เลือกหุ้นตัวนี้ เพราะพื้นฐานและปันผลดี','ชอบแนวนี้ แต่ขอลงผ่านกองทุน หรือทยอยซื้อทีละน้อย กระจายหลายตัว','ข้ามไป ไม่มีกระแส ดูน่าเบื่อ'],
      insight:'ของที่พื้นฐานมั่นคงมักไม่หวือหวาและไม่เป็นข่าว · การซื้อผ่านกองทุนหรือทยอยซื้อ คือการกระจายแทนการเลือกตัวเดียว'}
   ]},
   {resultNote:'เขียนแบบให้กำลังใจ — คนที่พลาดในเกมวันนี้คือคนที่ได้กฎกลับบ้านไปใช้จริง',
    questions:[
-    {icon:'lc-zap',q:'ฉาก 1/3 เหรียญชื่อ "MOON" ขึ้น 312.00% ในสัปดาห์เดียว คุณจะทำอะไร?',sub:'สถานการณ์สมมติ ไม่ใช่ของจริงในตลาด',timer:15,
+    {icon:'lc-zap',q:'ฉาก 1/3 เหรียญชื่อ "MOON" **ขึ้น 312.00% ในสัปดาห์เดียว** คุณจะทำอะไร?',sub:'สถานการณ์สมมติ ไม่ใช่ของจริงในตลาด',timer:15,
      opts:['ซื้อเลย เดี๋ยวไม่ทัน','ขอดูข้อมูลก่อน ว่ามันคืออะไร พื้นฐานเป็นยังไง','ไม่เอา ดูเร่งเร้าผิดปกติ'],
      insight:'ความกลัวตกขบวนทำให้เราซื้อเพราะ "คนอื่นซื้อ" ไม่ใช่เพราะเข้าใจของ'},
-    {icon:'lc-alert-triangle',q:'ฉาก 2/3 มีคนทักมาบอกว่า "การันตีผลตอบแทน 30.00% ต่อเดือน ไม่มีขาดทุน วันนี้วันสุดท้าย รีบโอนเลย"',
+    {icon:'lc-alert-triangle',q:'ฉาก 2/3 มีคนทักมาบอกว่า "**การันตีผลตอบแทน 30.00% ต่อเดือน** ไม่มีขาดทุน วันนี้วันสุดท้าย รีบโอนเลย"',
      opts:['โอนเลย กลัวที่นั่งเต็ม','เช็กก่อน ว่าบริษัทมีใบอนุญาตจาก ก.ล.ต. ไหม','ปฏิเสธทันที และเตือนคนอื่นด้วย'],
      insight:'สัญญาณหลอกลงทุน 3 อย่าง: การันตีผลตอบแทน · เร่งให้รีบตัดสินใจ · ไม่มีใบอนุญาต'},
-    {icon:'lc-check-circle',q:'ฉาก 3/3 เลือกกฎที่คุณจะพกติดตัวไว้เตือนตัวเอง',
+    {icon:'lc-check-circle',q:'ฉาก 3/3 เลือกกฎที่คุณจะ**พกติดตัวไว้เตือนตัวเอง**',
      opts:['กฎ 24 ชั่วโมง หยุดคิด 1 วันก่อนตัดสินใจ','ถ้ามีใครเร่งให้รีบ ให้ถือว่าอันตราย','เช็กใบอนุญาตจาก ก.ล.ต. ก่อนเสมอ']}
   ]},
   {resultNote:'บอกตรงๆ ว่าเป้าหมายของคุณ "เปลี่ยนไปตามวัย" หรือ "เหมือนเดิมตลอด 40 ปี" — ทั้งสองแบบเป็นข้อเท็จจริง ไม่ใช่ข้อผิดพลาด',
    questions:[
-    {icon:'lc-target',q:'บทที่ 1 สมมติว่าคุณอายุ 25 เหลือเวลาก่อนเกษียณราว 40 ปี เงินลงทุนก้อนแรก คุณตั้งเป้าแบบไหน?',
+    {icon:'lc-target',q:'บทที่ 1 สมมติว่าคุณอายุ 25 เหลือเวลาก่อนเกษียณราว 40 ปี เงินลงทุนก้อนแรก **คุณตั้งเป้าแบบไหน**?',
      opts:['เน้นให้โตมากที่สุด ขึ้นลงแรงก็รับได้','ค่อยๆ โต ขอสบายใจระหว่างทาง','เน้นปลอดภัยไว้ก่อน ไม่อยากขาดทุน'],
      insight:'ยิ่งมีเวลานาน ยิ่งมีเวลารอให้ของฟื้นตัว'},
-    {icon:'lc-pie-chart',q:'บทที่ 2 สมมติว่าคุณอายุ 35 มีเป้าหมายใหญ่ 2 อย่างพร้อมกัน: ต้องใช้เงินก้อนในอีก 3 ปี และเก็บเพื่อเกษียณอีก 30 ปี คุณจะจัดการยังไง?',
+    {icon:'lc-pie-chart',q:'บทที่ 2 สมมติว่าคุณอายุ 35 มี**เป้าหมายใหญ่ 2 อย่างพร้อมกัน**: ต้องใช้เงินก้อนในอีก 3 ปี และเก็บเพื่อเกษียณอีก 30 ปี คุณจะจัดการยังไง?',
      opts:['แยกเป็น 2 กระเป๋า เงินที่จะใช้เร็วเก็บแบบปลอดภัย เงินเกษียณเน้นให้โต','รวมเป็นก้อนเดียว ลงแบบเสี่ยงทั้งหมดให้โตเร็ว','รวมเป็นก้อนเดียว เก็บแบบปลอดภัยทั้งหมด'],
      insight:'เงินที่จะใช้เร็วกับเงินที่ใช้อีกนาน ควรเก็บคนละแบบ'},
-    {icon:'lc-refresh-cw',q:'บทที่ 3 สมมติว่าคุณอายุ 50 เหลือเวลาถึงเกษียณราว 15 ปี เงินลงทุนโตมาดี ควรปรับอะไรไหม?',
+    {icon:'lc-refresh-cw',q:'บทที่ 3 สมมติว่าคุณอายุ 50 เหลือเวลาถึงเกษียณราว 15 ปี เงินลงทุนโตมาดี **ควรปรับอะไรไหม**?',
      opts:['ค่อยๆ ลดส่วนที่เสี่ยงลง เพิ่มส่วนที่มั่นคง','คงไว้แบบเดิม เสี่ยงเท่าเดิม','ขายออกเป็นเงินสดทั้งหมด'],
      insight:'ยิ่งใกล้วันที่ต้องใช้เงิน ยิ่งเหลือเวลารอให้ฟื้นน้อยลง'},
-    {icon:'lc-gift',q:'บทที่ 4 สมมติว่าคุณอายุ 65 เกษียณแล้ว มีเงินเก็บอยู่ก้อนหนึ่ง เป้าหมายของเงินก้อนนี้คืออะไร?',
+    {icon:'lc-gift',q:'บทที่ 4 สมมติว่าคุณอายุ 65 เกษียณแล้ว มีเงินเก็บอยู่ก้อนหนึ่ง **เป้าหมายของเงินก้อนนี้**คืออะไร?',
      opts:['ให้มีเงินใช้ทุกเดือนอย่างสม่ำเสมอ','รักษาเงินต้นให้อยู่ครบ','เก็บส่งต่อให้ลูกหลาน หรือทำประโยชน์ให้สังคม'],
      insight:'วิธีถอนเงินมาใช้หลังเกษียณ สำคัญไม่แพ้วิธีเก็บ'}
   ]},
   {noType:true,resultNote:'เกมนี้ไม่สรุปว่าคุณเป็นคนประเภทไหน — ปิดท้ายด้วยสิ่งที่ได้เรียนรู้ และ "ก้าวแรก" ที่คุณเลือกเอง',
    questions:[
-    {icon:'lc-coins',q:'ฉาก 1 สมมติว่าคุณเพิ่งเก็บเงินก้อนแรกได้ 100,000 บาท แล้วมีคนชวนลงทุน บอกว่า "น่าจะได้กำไรดี"',
+    {icon:'lc-coins',q:'ฉาก 1 สมมติว่าคุณเพิ่งเก็บเงินก้อนแรกได้ 100,000 บาท แล้วมีคนชวนลงทุน บอกว่า "**น่าจะได้กำไรดี**"',
      opts:['ลงทั้ง 100,000 บาท ไปเลย','แบ่งครึ่ง ลง 50,000 บาท เก็บไว้ 50,000 บาท','ยังไม่ลง เก็บไว้ก่อนทั้งหมด'],
      insight:'ก่อนลงทุน ควรมีเงินสำรองเผื่อฉุกเฉินก่อน · แต่ถ้าเก็บเงินสดไว้เฉยๆ นานๆ ค่าของเงินก็ลดลงจากเงินเฟ้อ'},
-    {icon:'lc-calendar',q:'ฉาก 2 มีสองคนลงทุนเดือนละ 2,000 บาท เท่ากัน แต่เริ่มไม่พร้อมกัน คุณคิดว่าใครได้เปรียบ?',
+    {icon:'lc-calendar',q:'ฉาก 2 มีสองคนลงทุนเดือนละ 2,000 บาท เท่ากัน แต่**เริ่มไม่พร้อมกัน** คุณคิดว่าใครได้เปรียบ?',
      opts:['คนที่เริ่มตอนอายุ 25 แล้วลง 10 ปีจากนั้นหยุด','คนที่เริ่มตอนอายุ 35 แล้วลงต่อเนื่อง 30 ปี','พอๆ กัน เพราะลงเดือนละเท่ากัน'],
      insight:'เวลาช่วยให้ดอกเบี้ยทบต้นทำงาน — เริ่มเร็วมักได้เปรียบกว่าลงเยอะแต่เริ่มช้า'},
-    {icon:'lc-route',q:'ฉาก 3 เงินส่วนที่จะลงทุน คุณเลือกเส้นทางไหน?',
+    {icon:'lc-route',q:'ฉาก 3 เงินส่วนที่จะลงทุน **คุณเลือกเส้นทางไหน**?',
      opts:['เส้นทางสบายใจ ขึ้นลงน้อย','เส้นทางสมดุล','เส้นทางท้าทาย ขึ้นลงแรง'],
      insight:'ผลตอบแทนที่หวังได้มาก มักมาพร้อมการขึ้นลงที่แรงขึ้น'},
-    {icon:'lc-lock',q:'ก้าวแรก ตอนที่ 1 อะไรที่ทำให้คุณยังไม่ได้เริ่มลงทุนสักที?',sub:'ตอบตามจริงได้เลย ทุกข้อเป็นเรื่องปกติที่หลายคนเจอ',
+    {icon:'lc-lock',q:'ก้าวแรก ตอนที่ 1 อะไรที่ทำให้คุณ**ยังไม่ได้เริ่มลงทุนสักที**?',sub:'ตอบตามจริงได้เลย ทุกข้อเป็นเรื่องปกติที่หลายคนเจอ',
      opts:['เงินยังน้อย รอมีเงินก้อนก่อน','กลัวขาดทุน ยังไม่กล้า','ยุ่ง ไม่มีเวลา ค่อยทำทีหลัง','ไม่รู้จะเริ่มยังไง งงไปหมด']},
-    {icon:'lc-play-circle',q:'ก้าวแรก ตอนที่ 2 ก้าวที่เล็กที่สุดที่คุณทำได้ภายในสัปดาห์นี้คืออะไร?',multi:true,skippable:true,skipLabel:'ยังไม่พร้อมเลือก ข้ามก่อน',
+    {icon:'lc-play-circle',q:'ก้าวแรก ตอนที่ 2 **ก้าวที่เล็กที่สุด**ที่คุณทำได้ภายในสัปดาห์นี้คืออะไร?',multi:true,skippable:true,skipLabel:'ยังไม่พร้อมเลือก ข้ามก่อน',
      opts:['เปิดบัญชีหรือแอปลงทุน','ตั้งลงทุนอัตโนมัติรายเดือน','ลองของจริงด้วยเงิน 100 บาท วันนี้','เลือกกองทุน 1 กองมาศึกษา','กำหนดงบลงทุนต่อเดือนที่ไหว','จดรายรับ-รายจ่าย 7 วัน','เริ่มแยกเงินสำรองเผื่อฉุกเฉินก้อนแรก','นัดคุยกับผู้แนะนำการลงทุนที่มีใบอนุญาต']}
   ]},
   {questions:[
-    {icon:'lc-trending-up',q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บไว้ วันนี้อันไหนซื้อของได้มากกว่ากัน?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้เลย',
+    {icon:'lc-trending-up',q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บไว้ วันนี้อันไหน**ซื้อของได้มากกว่ากัน**?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้เลย',
      opts:['เงินสด เพราะยังเป็น 100,000 บาท เท่าเดิม','ทอง น่าจะซื้อของได้มากกว่า','น่าจะพอๆ กัน'],
      insight:'เงินสดตัวเลขเท่าเดิม แต่ซื้อของได้น้อยลงเพราะเงินเฟ้อ ส่วนทองมักขยับตามค่าของเงิน'},
-    {icon:'lc-shield',q:'สมมติว่าเกิดวิกฤตเศรษฐกิจ หุ้นทั่วโลกร่วง 40.00% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่าทองจะเป็นยังไง?',
+    {icon:'lc-shield',q:'สมมติว่าเกิดวิกฤตเศรษฐกิจ หุ้นทั่วโลกร่วง 40.00% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่า**ทองจะเป็นยังไง**?',
      opts:['ร่วงตามหุ้นไปด้วย','ทรงตัวหรือขึ้นสวนทางกับหุ้น','ราคาไม่ขยับ แต่ขายไม่ออก'],
      insight:'ในหลายวิกฤต ทองมักไม่ไปทางเดียวกับหุ้น จึงช่วยพยุงภาพรวมได้'},
-    {icon:'lc-pie-chart',q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินที่จะลงทุนทั้งหมดซื้อทองเลยดีไหม?',
+    {icon:'lc-pie-chart',q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินที่จะลงทุน**ทั้งหมดซื้อทองเลยดีไหม**?',
      opts:['ใช่ ซื้อทองทั้งหมด ปลอดภัยที่สุด','ไม่ แบ่งไว้ส่วนหนึ่งพอ ที่เหลือไปอย่างอื่น','ไม่ซื้อเลย ชอบของที่งอกเงยกว่า'],
      insight:'ทองไม่สร้างรายได้ระหว่างถือ จึงมักใช้เป็นส่วนหนึ่งของภาพรวม ไม่ใช่ทั้งหมด'}
   ]}
@@ -6813,10 +6832,17 @@ function renderGames(){
   if(!pre&&nextIdx>=0){var ns=SIDES[nextIdx];
     /* Same .next-step card as Home's "ขั้นต่อไป" — one shared component for "the one next action",
        not a bespoke spectrum-border card, per direction. */
-    /* Icon swapped to the joystick.png icon-set art (2026-08-26, per direction), same as Home's
-       "ขั้นต่อไป" card — was ic(ns.icon), the per-side icon SIDES itself still uses elsewhere (e.g.
-       sidesHTML's "เส้นทาง" rows), so SIDES' own data is untouched; only this render site changed. */
-    nextCard='<section class="next-step"><div class="ns-ic"><img src="'+ICON_JOYSTICK_PNG+'" alt=""></div><div class="ns-tx"><div class="ns-ey">เล่นเกมนี้ต่อ'+(nextIdx===0?' · เกมสำคัญที่สุด':'')+'</div><div class="ns-t">'+ns.title+'</div></div><div class="ns-cta-slot" id="ng-cta-slot"></div><div class="ns-body"><div class="ns-b">'+ns.measures+'</div></div></section>'+
+    /* Icon reverted to ic(ns.icon) — the per-game meaningful icon (2026-09-11, per direction "ด้านอื่น
+       ใน Playbook แต่ละด้าน ต้องการให้ไอคอนรูปแบบสื่อสารตรงกับความหมายของชื่อรายการ") — was the generic
+       joystick.png icon-set art (2026-08-26 per direction, same swap Home's "ขั้นต่อไป" card still
+       uses), which showed the exact same joystick regardless of which specific game was up next
+       (compass for เกมก้าวแรก, shield for เกมทองคำ, etc. — see SIDES' own per-icon rationale comments),
+       the one item in this list that DIDN'T communicate its own meaning while every row below it in
+       "ด้านอื่นใน Playbook" (gameRow, unchanged) already does via this same ic(s.icon) call. Scoped to
+       just this Games-page card per direction; Home's "ขั้นต่อไป" is a generic "go play games" CTA (no
+       specific next game backing its own icon slot the way this card's `ns` does), so it keeps the
+       joystick untouched. */
+    nextCard='<section class="next-step"><div class="ns-ic">'+ic(ns.icon)+'</div><div class="ns-tx"><div class="ns-ey">เล่นเกมนี้ต่อ'+(nextIdx===0?' · เกมสำคัญที่สุด':'')+'</div><div class="ns-t">'+ns.title+'</div></div><div class="ns-cta-slot" id="ng-cta-slot"></div><div class="ns-body"><div class="ns-b">'+ns.measures+'</div></div></section>'+
       '<div class="gh-restlbl">ด้านอื่นใน Playbook</div>';
   }
   var listIdx=nextIdx>=0?restIdx:[0,1,2,3,4,5];
@@ -7187,7 +7213,13 @@ function renderPlayBody(){
 /* renderPlaySummary — the game's result/payoff screen. Rebuilt 2026-09-10 (per direction "หน้า result
    อยากให้ใช้ dna เดียวกับ หน้าคู่มือ แท่ป ตัวตน") onto the Playbook identity (ตัวตน) tab's own DNA: the
    result sits inside the SAME .hero-sec > .hero-gw (Full Glow Frame) > .hero-in card that centers the
-   persona identity, with a centered .fam-badge naming the game.
+   persona identity, with a centered .fam-badge naming the game (title treatment swapped to the DNA
+   quiz's own .q-icon-bare + .q-title header, 2026-09-11, per direction "หน้าเล่นจบแล้ว...ต้องการให้ใช้
+   design dna เดียวกับ...ตั้งแต่ส่วนไอคอน (size เดียวกัน) ถึงส่วนคำถาม" — the small .fam-badge pill read
+   as a minor label, not the game's own name; this is the exact same icon-circle-above-bold-title block
+   renderPlayBody already uses for each question, at the same --fs-title size the 6 main games' own
+   questions render at, so the result screen's game name gets the same visual weight as a question
+   header instead of a pill).
    Split into two separate, visually distinct boxes (2026-09-10 follow-up, per direction "หน้า result
    อยากให้แยกข้อมูลออกมาจัดเป็นข้อมูล card ข้อมูลใคร ข้อมูลมัน...และให้ดูเรื่อง visual heirachy") — an
    earlier pass merged both into one plain .hero-sig-c line + one .str-box, losing the hierarchy; now:
@@ -7219,7 +7251,7 @@ function renderPlaySummary(){
   clearPlayTimer();
   var kind=PLAY.kind,idx=PLAY.idx,set=playSet(kind,idx);
   var insights=set.questions.map(function(q){return q.insight;}).filter(Boolean);
-  var badgeIcon=kind==='game'?ic(SIDES[idx].icon):ic(BOOTHS[idx].icon); // Lucide only — .fam-badge sizes svg, not img
+  var badgeIcon=kind==='game'?ic(SIDES[idx].icon):ic(BOOTHS[idx].icon); // Lucide only — .q-icon-bare sizes svg, not img
   // "ข้อมูลใคร" — the verdict about the player. .ast-block reused verbatim (radius/padding/margin,
   // .ast-lbl header row) from the identity tab's "สินทรัพย์ที่ถนัด" card; only the background/border
   // tint + label swap between the two states, same recipe .redeem-card.on/.locked already uses for
@@ -7257,7 +7289,7 @@ function renderPlaySummary(){
     '<header class="topbar"><span class="tb-title">เล่นจบแล้ว</span></header>'+
     '<div class="q-scroll fade">'+
       '<section class="hero-sec"><div class="hero-gw">'+heroGlowMarkup()+'<div class="hero-in scroll-reveal">'+
-        '<div class="fam-badge" style="'+famBadgeStyle()+'">'+badgeIcon+'<span>'+playLabel(kind,idx)+'</span></div>'+
+        '<div class="q-head" style="margin:0 0 var(--sp-block);--qc:var(--violet)"><div class="q-icon-bare">'+badgeIcon+'</div><div class="q-title" style="margin-bottom:0">'+playLabel(kind,idx)+'</div></div>'+
         resultCard+
         insBox+
         ptsHTML+
@@ -7362,7 +7394,7 @@ function renderProfile(){
    ACTIVITY_NEED, so it reads "ยังขาด" out of the box — see the 'auto' branch in renderBooth this
    direction restored). Switching the ช่วงงาน segment to Pre-Event is the one way back to the
    splash/quiz flow (RESULT/quizDone/boothVer aren't touched by that switch, same as before). */
-var DEMO={view:'auto',quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,boothVer:'v2',splashVer:'v1',registered:true}; // draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. splashVer (2026-09-04, per direction "เพิ่ม preview splash scene เป็น 2 กรณี...ให้ default เป็นเวอร์ชันนี้ [v1] เสมอ"): 'v1' = the shipped fan-carousel of card fronts (unchanged, ALWAYS the default); 'v3' = a 3D field of drifting character-card streams (spv3Build/initSpv3). Gated on this flag so v1 stays byte-identical. (v2 "Card Back Reveal" and v4 "Living Card"/Case-02 preview modes existed briefly and were removed 2026-09-08, per direction "เอา v2, v4 ออก (ลบโค๊ด)" — their DEMO fields/handlers/CSS/JS are gone too.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
+var DEMO={view:'auto',quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,boothVer:'v2',splashVer:'v4',registered:true}; // draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. splashVer default flipped 'v1'->'v4' (2026-09-11, per direction "หน้า Splash...ให้ default ที่ v4") — v4 "การ์ดมีชีวิต" (a fresh, unrelated build added 2026-09-09 reusing the version slot freed by the ORIGINAL, unrelated v4 removed 2026-09-08 — see renderSplash's own comment for that history) is now the shipped default; v1 = the plain fan-carousel of static card fronts, v3 = the 3D field of drifting character-card streams (spv3Build/initSpv3), v5 = v3's field with the same living-card treatment v4 applies to v1's carousel. All four stay reachable via the demo panel's มุมมอง Splash toggle. eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO.
 /* 'auto' resolves from real window.innerWidth again (2026-09-10 responsive audit — the 2026-08-26
    "always resolve to mobile" change meant a real event-tablet visitor (768–1024px wide) never got
    data-view="tablet": the .shell/topbar/book-tabbar all clamped to the 400px phone-frame width,
