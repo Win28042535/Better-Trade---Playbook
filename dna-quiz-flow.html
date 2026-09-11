@@ -637,6 +637,15 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* weight bumped w-head->w-label (2026-08-28, per direction "card ข้อมูล ส่วนที่ 1,2,3...text weight
    700") — was 500. */
 .rc-title{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);margin-bottom:4px;}
+/* .rc-title-pts (2026-09-11, per direction "dna ของการแสดงข้อมูลนี้...ใหญ่...เด่นกว่านี้ — คนแก่มอง
+   ไม่ค่อยเห็น") — the pre-game briefing's "รางวัล +N แต้ม" card only, sized up a tier from its
+   "จำนวนข้อ"/"กติกา" siblings' shared fs-sub/22px onto fs-heading/28px + the same amber tone the
+   other 3 "+N แต้ม" call sites use, so this is visibly the standout card of the row, not just
+   another equal-weight stat. Bumped again to 32px same day, then dialed back down to fs-sub/22px
+   (2026-09-11, two follow-up directions with exact target sizes for all 4 spots) — back to the exact
+   same size as its "จำนวนข้อ"/"กติกา" siblings; the amber color is the only remaining differentiator
+   now, size no longer is. */
+.rc-title-pts{font-size:var(--fs-sub);color:var(--amber-text);}
 .rc-meta{font-family:var(--font);font-size:var(--fs-meta);color:var(--muted);}
 /* .consent-check-row/.cc-box/.consent-check/.cc-text (the PDPA data-consent checkbox) and
    .consent-caption removed entirely 2026-08-15, per direction ("เอาส่วนยอมรับให้เก็บคำตอบออก",
@@ -2040,6 +2049,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    the same icon+title/subtitle row on var(--done-wash) as the post-event report card. .bp-pts only
    owns the trailing margin the standalone .pe-report doesn't need here. */
 .bp-pts{margin-bottom:var(--sp-stack);}
+/* .bp-pts's point count was sized up off the shared .pe-report-t/.pe-report svg base then bumped
+   again (2026-09-11, two direction rounds — the low-vision-accessibility pass, then exact target
+   sizes for all 4 "+N แต้ม" spots), then dialed back down to 18px the same day (a follow-up
+   direction) — that's exactly .pe-report-t's own default fs-bodysm/18px + w-label weight, so the
+   size override is gone; only the icon (lc-sparkles->lc-gift, see this row's own markup) is still a
+   deliberate change from where this row started. */
 /* draw-status (เดินบูธ ✦ ลุ้นรางวัล's "ยังขาด"/"ครบเงื่อนไขแล้ว" card) reskinned onto the shared
    .next-step DNA (2026-08-26, per direction "อยากให้ทั้ง 2 กรณี ใช้ design dna เดียวกับ [เล่นเกมนี้
    ต่อ]...แต่ยังคงการใช้สีทั้ง 2 กรณีเหมือนเดิม") — same icon-badge + eyebrow/title/body + cta-slot
@@ -2171,9 +2186,14 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .play-timer svg{width:13px;height:13px;}
 /* Booth points badge (2026-09-10, per direction "badge แต้มค้างอยู่ระหว่างตอบคำถาม") — sits in the
    same right-hand eyebrow slot .play-timer uses; mutually exclusive with it in practice (only M3's
-   game-side ฉาก 1 has a timer, only booth questions have points), so sharing the slot never collides. */
-.play-pts-badge{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--amber-text);background:var(--amber-bg);border:1px solid var(--amber-border);padding:2px var(--sp-list);border-radius:var(--rpill);flex:0 0 auto;}
-.play-pts-badge svg{width:13px;height:13px;}
+   game-side ฉาก 1 has a timer, only booth questions have points), so sharing the slot never collides.
+   Sized up (2026-09-11, per direction "dna ของการแสดงข้อมูลนี้...ใหญ่...เด่นกว่านี้ — คนแก่มองไม่ค่อย
+   เห็น") from fs-label/13px-icon to fs-sub/20px-icon + thicker pill + bolder border, matching the
+   same low-vision-accessibility pass applied to .bp-pts/.rc-title-pts/.play-sum-pts below — this was
+   the smallest of the app's 4 "+N แต้ม" call sites, so gets the biggest jump. Bumped again to
+   fs-h2/24px + 22px icon (2026-09-11, follow-up direction with exact target sizes for all 4 spots). */
+.play-pts-badge{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--amber-text);background:var(--amber-bg);border:2px solid var(--amber-border);padding:6px 14px;border-radius:var(--rpill);flex:0 0 auto;}
+.play-pts-badge svg{width:22px;height:22px;}
 /* (.play-dots/.play-dot — the per-question step-dot row under the eyebrow — removed 2026-09-10 per
    direction; the "ข้อ N/M" text in .play-eyebrow already carries that progress info on its own.)
    (.play-intro — the old per-question q1 intro banner — removed 2026-09-10 along with its markup;
@@ -2245,8 +2265,14 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    จากเกมนี้" above it with no breathing room at all); --sp-block is this file's own "one labeled
    sub-section to the next INSIDE the same card" token (see its :root definition near the top), which
    is exactly the relationship these two boxes have — both live inside the same .hero-in frame. */
-.play-sum-pts{display:flex;align-items:center;gap:var(--sp-list);justify-content:center;font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--amber-text);background:color-mix(in srgb,var(--amber-text) 10%,transparent);border:1px solid color-mix(in srgb,var(--amber-text) 28%,transparent);border-radius:var(--r2);padding:var(--sp-stack);margin-top:var(--sp-block);margin-bottom:var(--sp-stack);animation:ptsPop .6s var(--ease) 1;}
-.play-sum-pts svg{width:var(--ic-md);height:var(--ic-md);color:var(--amber-text);flex:0 0 auto;}
+/* .play-sum-pts/@keyframes ptsPop — the "เล่นจบแล้ว" screen's own "+N แต้ม" reward card — REMOVED
+   (2026-09-11, per direction "เล่นจบแล้ว (ทุกเกมส์ ทุกด้าน ทุกบูธ)...กรณีมี — ให้เอาออกทั้งหมด") from
+   renderPlaySummary's markup (see ptsHTML's own removal note there); this CSS is unused now, kept
+   only for history same as .play-brief/etc. elsewhere in this file — nothing renders .play-sum-pts
+   any more. (ptsCountUp() itself, added the same day this card got its number-counting motion, is
+   NOT dead — .play-pts-badge during play still uses it.) */
+.play-sum-pts{display:flex;align-items:center;gap:var(--sp-list);justify-content:center;font-size:var(--fs-title);font-weight:var(--w-label);color:var(--amber-text);background:color-mix(in srgb,var(--amber-text) 10%,transparent);border:2px solid color-mix(in srgb,var(--amber-text) 28%,transparent);border-radius:var(--r2);padding:var(--sp-stack);margin-top:var(--sp-block);margin-bottom:var(--sp-stack);animation:ptsPop .6s var(--ease) 1;}
+.play-sum-pts svg{width:36px;height:36px;color:var(--amber-text);flex:0 0 auto;}
 @keyframes ptsPop{0%{transform:scale(.92);box-shadow:0 0 0 2px color-mix(in srgb,var(--amber-text) 45%,transparent);}60%{transform:scale(1.04);}100%{transform:scale(1);box-shadow:0 0 0 14px color-mix(in srgb,var(--amber-text) 0%,transparent);}}
 @media(prefers-reduced-motion:reduce){.play-sum-pts{animation:none;}}
 /* Mini-game briefing / intro screen (2026-09-10, per direction) — a "here's the game + how to play"
@@ -2469,9 +2495,15 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    lines (e.g. "ภูมิคุ้มกันความกลัวตกขบวน") or a status line sits under it, the icon/play-button
    floated in the row's vertical middle instead of lining up with the title's own first line. */
 .gr-hd{display:flex;align-items:flex-start;gap:var(--sp-inline);padding:var(--sp-card-pad-sm);}
-.gr-ic{width:38px;height:38px;flex:0 0 auto;border-radius:var(--r1);background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--muted);}
-.game-row.played .gr-ic{background:var(--done-fill);color:var(--ink);}
-.gr-ic svg{width:var(--ic-md);height:var(--ic-md);}
+/* Bare icon — no colored square backdrop (2026-09-11, per direction "icon ไม่ต้องอยู่ใน background
+   สี่เหลี่ยมด้านหลัง...ใช้ icon dna เดียวกับ section ความคืบหน้าของ Playbook") — dropped the
+   background/border-radius/played-state color swap this box used to carry (the ✓ เล่นแล้ว badge on
+   the title already signals played state, so the icon itself no longer needs to). Same "plain icon,
+   no box" idiom .pass-ey-ic (the "ความคืบหน้าของ Playbook" eyebrow icon) already uses; icon bumped
+   ic-md→ic-lg since a bare icon needs a bit more presence than one sitting inside a filled box. */
+.gr-ic{width:38px;height:38px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:var(--muted);}
+.gr-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
+.gr-ic img{width:var(--ic-lg);height:var(--ic-lg);object-fit:contain;}
 .gr-tx{flex:1;min-width:0;cursor:pointer;}
 /* .gr-play is .btn.btn-primary now (was .howto-btn) — a real primary action, not a quiet ghost
    button, per direction. .btn-primary's own flex:1 is for CTAs that stand alone on their own row
@@ -3525,7 +3557,23 @@ var MAP_IMG="assets/MAP_IMG.webp";
 var RADAR_AXES=['หุ้นไทย','ต่างปท.','กองทุน','คริปโต','ทอง','สุขภาพ'];
 /* Custom illustrated question/analyzing icons — replaces specific Lucide icons per direction; each compressed via in-browser canvas (no local image tool available) from a 1920x1920 source PNG down to 160x160, kept as PNG (not JPEG) to preserve alpha transparency. */
 var ICON_HOURGLASS_PNG='assets/ICON_HOURGLASS_PNG.png';
-var ICON_IMG={s1q2:'assets/s1q2.png',s2q6:'assets/s2q6.png',s2q7:'assets/s2q7.png',hourglass:'assets/hourglass.png',s1q1:'assets/s1q1.png',s1q3:'assets/s1q3.png',s2q1:'assets/s2q1.png',s2q2:'assets/s2q2.png',s2q3:'assets/s2q3.png',s2q4:'assets/s2q4.png',s2q5:'assets/s2q5.png',s3q1:'assets/s3q1.png'};
+var ICON_IMG={s1q2:'assets/s1q2.png',s2q6:'assets/s2q6.png',s2q7:'assets/s2q7.png',hourglass:'assets/hourglass.png',s1q1:'assets/s1q1.png',s1q3:'assets/s1q3.png',s2q1:'assets/s2q1.png',s2q2:'assets/s2q2.png',s2q3:'assets/s2q3.png',s2q4:'assets/s2q4.png',s2q5:'assets/s2q5.png',s3q1:'assets/s3q1.png',
+  // Mini-game (MINIGAME_Q) custom icons (2026-09-11, per direction) — same 1920→160px compression
+  // treatment as the DNA-quiz set above; some questions reuse the DNA-quiz's own art (s1q2/s2q1/s2q5/
+  // hourglass, already registered above) rather than duplicate the file under a second key.
+  warning:'assets/warning.png',shieldcheck:'assets/shieldcheck.png',portfolio:'assets/portfolio.png',giftbox:'assets/giftbox.png',
+  // เกมหลัก game-list icons (2026-09-11, per direction) — เข็มทิศ/ทอง reuse the SAME optimized art
+  // already shipped for the tier badges (TIER_ICON_PNG) / booth asset icons (BOOTH_ICON_PNG) rather
+  // than duplicate the file under a new one; the source PNGs are identical.
+  compass:ICON_COMPASS_PNG,gold:ICON_GOLD_PNG,
+  // BOOTH_Q per-question custom icons (2026-09-11, per direction "กิจกรรมประจำโซน - การใช้ไอคอน") —
+  // same trim+fit-to-80%-fill treatment as the fix above, run on the raw Icon/*.png source art (not
+  // BOOTH_ICON_PNG — those are a different aspect/size, sized for the booth-list row, not this
+  // 80x80 .q-icon-bare slot). stockintl/heartplain/crypto/diamond are new; the other BOOTH_Q
+  // questions below reuse s2q1/s2q5/shieldcheck/portfolio already registered above (same source
+  // art). Named 'heartplain' (Icon/หัวใจ.png, plain heart) rather than 'heart' — that key is already
+  // taken by ASSET_IMG's unrelated splash-scatter heart-with-pulse-line art (assets/heart.png).
+  stockintl:'assets/stockintl.png',heartplain:'assets/heartplain.png',crypto:'assets/crypto.png',diamond:'assets/diamond.png'};
 /* Brand asset elements (efin/BetterTrade KV), compressed + base64-embedded so the
    splash scatter renders inside the sandboxed Artifact (no external requests). */
 var BG_IMG={nightSky:'assets/nightSky.jpg',room1:'assets/room1.jpg'};
@@ -4434,6 +4482,19 @@ function revealTick(){
     if(rect.width===0&&rect.height===0)return; // display:none (e.g. an inactive book2 tab panel)
     var start=vh*0.92,end=vh*0.42; // enters the reveal ~92% down the viewport, settles flat by ~42%
     var p=atBottom?1:Math.max(0,Math.min(1,(start-rect.top)/(start-end)));
+    // Bug fix (2026-09-11 responsive audit): a fully-settled element (p>=1) used to still get an
+    // explicit 'perspective(Npx) rotateX(0deg) translateY(0px) scale(1.000)' string — numerically a
+    // no-op (0deg/0px/1.000 render identically to no transform at all), but NOT the same as actually
+    // having no transform: the browser still resolves it to a matrix3d(...) with a live perspective
+    // (m34) term and keeps the element in its own 3D/will-change compositing layer. Reproduced this
+    // rendering an ENTIRE settled .scroll-reveal section (the home stat-tile row; separately the
+    // เดินบูธ route/map card) fully invisible — content present in the DOM with opacity:1 and a
+    // "no-op" matrix3d, painting nothing, confirmed fixed instantly by clearing the transform. Since
+    // "content is never hidden" is this system's own explicit contract (see the CONTAINER SCROLL
+    // ANIMATION DNA comment above), a settled element now drops the transform entirely instead of
+    // carrying a numerically-equivalent 3D matrix — same flat result, no lingering perspective
+    // context once there's nothing left to animate.
+    if(p>=1){el.style.transform='';return;}
     var persp=Math.max(1000,rect.height*2.2);
     el.style.transform='perspective('+Math.round(persp)+'px) rotateX('+((1-p)*12).toFixed(2)+'deg) translateY('+((1-p)*26).toFixed(1)+'px) scale('+(0.95+p*0.05).toFixed(3)+')';
   });
@@ -6170,7 +6231,7 @@ var BOOTH_Q=[
      insight:'การแบ่งเงินไปหลายที่ ช่วยลดผลกระทบเวลาที่ใดที่หนึ่งไม่เป็นไปตามคาด'}
   ]},
   {points:10,questions:[
-    {icon:'lc-globe',q:'ถ้าเงินลงทุนของคุณ**มีแต่ของไทย** คุณคิดว่าเพียงพอไหม?',
+    {icon:'lc-globe',img:'stockintl',q:'ถ้าเงินลงทุนของคุณ**มีแต่ของไทย** คุณคิดว่าเพียงพอไหม?',
      opts:['พอแล้ว ลงในสิ่งที่เราคุ้นเคย','ควรแบ่งไปต่างประเทศบ้าง','ย้ายไปต่างประเทศเป็นหลักเลย'],
      insight:'คนส่วนใหญ่มักลงแต่ในประเทศที่คุ้นเคย ทั้งที่โลกมีตัวเลือกมากกว่านั้น'},
     {icon:'lc-refresh-cw',q:'ลงทุนหุ้นต่างประเทศ **มีความเสี่ยงอะไรเพิ่มขึ้นจากหุ้นไทย**?',
@@ -6181,12 +6242,12 @@ var BOOTH_Q=[
     {icon:'lc-coins',q:'กอง A ผลตอบแทนเด่น ค่าธรรมเนียม 2.00% ต่อปี กอง B ผลตอบแทนใกล้กัน **ค่าธรรมเนียม 0.50% ต่อปี** คุณเลือกกองไหน?',
      opts:['กอง A เพราะผลงานดูดีกว่า','กอง B เพราะค่าธรรมเนียมถูกกว่า','ขอดูข้อมูลมากกว่านี้ก่อน'],
      insight:'ค่าธรรมเนียมถูกหักทุกปี ระยะยาวส่วนต่างเล็กๆ กลายเป็นเงินก้อนใหญ่ได้'},
-    {icon:'lc-target',q:'กองที่มีผู้จัดการคอยเลือกหุ้นให้ เทียบกับกองที่ลงตามดัชนีตลาดซึ่งค่าธรรมเนียมถูกกว่า **ระยะยาวต่างกันแค่ไหน**?',
+    {icon:'lc-target',img:'s2q1',q:'กองที่มีผู้จัดการคอยเลือกหุ้นให้ เทียบกับกองที่ลงตามดัชนีตลาดซึ่งค่าธรรมเนียมถูกกว่า **ระยะยาวต่างกันแค่ไหน**?',
      opts:['กองที่มีคนเลือกให้ เพราะมีมืออาชีพดูแล','กองที่ลงตามดัชนีตลาด เพราะถูกและไปตามตลาด','ผสมทั้งสองแบบ'],
      insight:'ทั้งสองแบบมีที่ใช้ ต่างกันที่ค่าธรรมเนียมและวิธีทำงาน'}
   ]},
   {points:9,questions:[
-    {icon:'lc-shield',q:'สมมติว่ามีรายได้เข้ามาก้อนหนึ่ง ก่อนเอาไปลงทุน คุณจะกันไว้เป็น**เงินสำรองเผื่อฉุกเฉินแค่ไหน**?',
+    {icon:'lc-shield',img:'shieldcheck',q:'สมมติว่ามีรายได้เข้ามาก้อนหนึ่ง ก่อนเอาไปลงทุน คุณจะกันไว้เป็น**เงินสำรองเผื่อฉุกเฉินแค่ไหน**?',
      opts:['กันให้ครบเท่ารายจ่าย 6 เดือนก่อน','กันไว้ราว 3 เดือน แล้วเริ่มลงทุนคู่กันไป','ไม่กัน เอาไปลงทุนให้เต็มที่'],
      insight:'เงินสำรองเผื่อฉุกเฉินคือตาข่ายที่ทำให้เราไม่ต้องขายของตอนราคาแย่'},
     {icon:'lc-landmark',q:'เงินสำรองก้อนนี้ **ควรเก็บไว้ที่ไหน**?',
@@ -6194,13 +6255,13 @@ var BOOTH_Q=[
      insight:'เงินสำรองต้องถอนออกมาใช้ได้เร็วเมื่อจำเป็น (สภาพคล่อง) สำคัญกว่าได้ผลตอบแทนสูง'}
   ]},
   {points:13,questions:[
-    {icon:'lc-trending-up',q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บ วันนี้อันไหน**ซื้อของได้มากกว่ากัน**?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้',
+    {icon:'lc-trending-up',img:'s2q5',q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บ วันนี้อันไหน**ซื้อของได้มากกว่ากัน**?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้',
      opts:['เงินสด เพราะยังเป็น 100,000 บาท เท่าเดิม','ทอง น่าจะซื้อของได้มากกว่า','น่าจะพอๆ กัน'],
      insight:'เงินสดตัวเลขเท่าเดิม แต่ซื้อของได้น้อยลงเพราะเงินเฟ้อ ส่วนทองมักขยับตามค่าของเงิน'},
-    {icon:'lc-shield',q:'สมมติว่าเกิดวิกฤต หุ้นทั่วโลกร่วง 40% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่า**ทองจะเป็นยังไง**?',
+    {icon:'lc-shield',img:'shieldcheck',q:'สมมติว่าเกิดวิกฤต หุ้นทั่วโลกร่วง 40% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่า**ทองจะเป็นยังไง**?',
      opts:['ร่วงตามหุ้นไปด้วย','ทรงตัวหรือขึ้นสวนทางกับหุ้น','ราคาไม่ขยับ แต่ขายไม่ออก'],
      insight:'ในหลายวิกฤต ทองมักไม่ไปทางเดียวกับหุ้น จึงช่วยพยุงภาพรวมได้'},
-    {icon:'lc-pie-chart',q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินลงทุน**ทั้งหมดซื้อทองเลยดีไหม**?',
+    {icon:'lc-pie-chart',img:'portfolio',q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินลงทุน**ทั้งหมดซื้อทองเลยดีไหม**?',
      opts:['ใช่ ซื้อทองทั้งหมด ปลอดภัยที่สุด','ไม่ แบ่งไว้ส่วนหนึ่งพอ ที่เหลือไปอย่างอื่น','ไม่ซื้อเลย ชอบของที่งอกเงยกว่า'],
      insight:'ทองไม่สร้างรายได้ระหว่างถือ จึงมักใช้เป็นส่วนหนึ่ง ไม่ใช่ทั้งหมด'}
   ]},
@@ -6213,15 +6274,15 @@ var BOOTH_Q=[
      insight:'ซื้อเองต้องดูแลเองและขายยากกว่า · กองทุนอสังหาฯ เริ่มเงินน้อยกว่าและซื้อขายง่ายกว่า'}
   ]},
   {points:10,questions:[
-    {icon:'lc-heart',q:'สมมติว่าคนที่หาเลี้ยงครอบครัวต้องหยุดทำงานไปกะทันหัน ครอบครัว**จะมีเงินใช้ได้นานแค่ไหน**?',sub:'คำถามนี้ไม่ต้องกังวล เราถามเพื่อให้เห็นภาพเท่านั้น',
+    {icon:'lc-heart',img:'heartplain',q:'สมมติว่าคนที่หาเลี้ยงครอบครัวต้องหยุดทำงานไปกะทันหัน ครอบครัว**จะมีเงินใช้ได้นานแค่ไหน**?',sub:'คำถามนี้ไม่ต้องกังวล เราถามเพื่อให้เห็นภาพเท่านั้น',
      opts:['ยังไม่เคยคิดเรื่องนี้เลย','พอมีเก็บไว้ราว 1-2 ปี','เตรียมไว้แล้ว หรือมีประกันอยู่'],
      insight:'ความเสี่ยงบางอย่างรับเองไม่ไหว จึงมีเครื่องมือช่วยรับความเสี่ยงนั้นแทน'},
-    {icon:'lc-shield',q:'"ประกัน **คือการลงทุนที่ดีไหม**?"',
+    {icon:'lc-shield',img:'shieldcheck',q:'"ประกัน **คือการลงทุนที่ดีไหม**?"',
      opts:['ใช่ ควรซื้อแบบที่ได้เงินคืนเยอะๆ','ไม่ ประกันมีไว้คุ้มครอง ส่วนการลงทุนแยกกัน','ยังไม่แน่ใจ'],
      insight:'ประกันมีหน้าที่คุ้มครองเวลาเกิดเรื่อง ไม่ใช่เครื่องมือหลักในการทำให้เงินโต'}
   ]},
   {points:9,questions:[
-    {icon:'lc-bitcoin',q:'ถ้าคุณอยากลองของที่ขึ้นลงแรง เช่น คริปโต **จะแบ่งเงินไปเท่าไร**ของเงินลงทุนทั้งหมด?',locked:true,
+    {icon:'lc-bitcoin',img:'crypto',q:'ถ้าคุณอยากลองของที่ขึ้นลงแรง เช่น คริปโต **จะแบ่งเงินไปเท่าไร**ของเงินลงทุนทั้งหมด?',locked:true,
      opts:['ราว 5% ถือว่าเป็นเงินที่เสียได้','ราว 15-20%','ครึ่งหนึ่งขึ้นไป ของมันต้องลอง'],
      insight:'หลักง่ายๆ คือแบ่งเท่าที่เสียได้โดยไม่กระทบชีวิต'},
     {icon:'lc-zap',q:'สมมติว่าลงไปแล้ว **คืนเดียวราคาร่วง 40%** คุณจะทำอะไร?',
@@ -6229,21 +6290,21 @@ var BOOTH_Q=[
      insight:'ของที่ขึ้นลงแรงต้องมาพร้อมแผนที่ตั้งไว้ก่อน ไม่ใช่ตัดสินใจตอนใจสั่น'}
   ]},
   {points:8,questions:[
-    {icon:'lc-gem',q:'พระเครื่อง นาฬิกา หรืองานศิลป์ **เป็นการลงทุนที่ดีไหม**?',
+    {icon:'lc-gem',img:'diamond',q:'พระเครื่อง นาฬิกา หรืองานศิลป์ **เป็นการลงทุนที่ดีไหม**?',
      opts:['ดีมาก ราคาขึ้นได้เยอะ','เป็นของที่รักและสะสม มากกว่าจะเป็นการลงทุนหลัก','เสี่ยง ขอเข้าใจก่อน'],
      insight:'ของสะสมขึ้นกับคนที่อยากได้ต่อ และเวลาจะขายอาจใช้เวลานาน'},
-    {icon:'lc-target',q:'ถ้าจะมีของสะสมรวมอยู่ในเงินลงทุน **ควรเป็นสัดส่วนเท่าไร**?',
+    {icon:'lc-target',img:'s2q1',q:'ถ้าจะมีของสะสมรวมอยู่ในเงินลงทุน **ควรเป็นสัดส่วนเท่าไร**?',
      opts:['ส่วนเล็กๆ เท่าที่เสียได้','ปานกลาง ถ้าเรารู้จริงในเรื่องนั้น','เยอะเลย เพราะของมันมีค่า'],
      insight:'ยิ่งเป็นของที่ขายยาก ยิ่งควรเป็นส่วนเล็กของภาพรวม'}
   ]},
   {points:10,questions:[
-    {icon:'lc-heart',q:'สุขภาพ **เกี่ยวกับเรื่องเงินยังไง**?',
+    {icon:'lc-heart',img:'heartplain',q:'สุขภาพ **เกี่ยวกับเรื่องเงินยังไง**?',
      opts:['ไม่ค่อยเกี่ยว เป็นคนละเรื่อง','เกี่ยวมาก ป่วยครั้งเดียวเงินหายเป็นก้อน','สุขภาพคือฐานของทุกอย่าง'],
      insight:'สุขภาพเป็นสินทรัพย์ที่คนมักลืมนับ แต่เป็นตัวที่ปกป้องสินทรัพย์อื่นไว้'},
-    {icon:'lc-target',q:'ลงทุนกับสุขภาพวันนี้ **แบบไหนคุ้มที่สุด**?',
+    {icon:'lc-target',img:'s2q1',q:'ลงทุนกับสุขภาพวันนี้ **แบบไหนคุ้มที่สุด**?',
      opts:['ออกกำลังกาย กินให้ดี ตรวจสุขภาพประจำ','ทำประกันสุขภาพไว้','ค่อยคิดตอนป่วย'],
      insight:'ค่าดูแลตัวเองวันนี้มักถูกกว่าค่ารักษาในวันที่สายไปแล้ว'},
-    {icon:'lc-shield',q:'ตอนนี้คุณ**มีประกันสุขภาพหรือประกันค่ารักษาไหม**?',sub:'ถามข้อเท็จจริง ไม่มีคำตอบผิด',
+    {icon:'lc-shield',img:'shieldcheck',q:'ตอนนี้คุณ**มีประกันสุขภาพหรือประกันค่ารักษาไหม**?',sub:'ถามข้อเท็จจริง ไม่มีคำตอบผิด',
      opts:['มี และรู้วงเงินคุ้มครองคร่าวๆ','มี แต่ไม่แน่ใจว่าคุ้มครองแค่ไหน','ยังไม่มี'],
      insight:'การรู้ว่าเรามีวงเงินคุ้มครองเท่าไร สำคัญเท่ากับการมีประกัน'},
     {icon:'lc-coins',q:'สมมติว่าพรุ่งนี้ต้องจ่ายค่ารักษา 100,000 บาท **คุณจะเอามาจากไหน**?',
@@ -6483,7 +6544,11 @@ function renderBooth(){
       '</div>'+
       /* Points total (Phase 4, 2026-09-09) — display-only, see boothPointsTotal()'s own comment for
          why this doesn't gate anything yet (no real prize-tier numbers exist in any source doc). */
-      (pts>0?'<div class="pe-report on bp-pts">'+ic('lc-sparkles')+'<div><div class="pe-report-t">สะสมแล้ว '+pts+' แต้ม</div><div class="pe-report-s">จากกิจกรรมประจำบูธ</div></div></div>':'')+
+      // Icon lc-sparkles->lc-gift (2026-09-11, per direction "สะสมแล้ว N แต้ม...ใช้เป็น ไอคอน
+      // กล่องของขวัญ") — matches play-pts-badge's own icon (the only other remaining "+N แต้ม" call
+      // site that carries one; the briefing's รางวัล card is icon-less, just a colored dot) instead
+      // of a generic sparkle.
+      (pts>0?'<div class="pe-report on bp-pts">'+ic('lc-gift')+'<div><div class="pe-report-t">สะสมแล้ว '+pts+' แต้ม</div><div class="pe-report-s">จากกิจกรรมประจำบูธ</div></div></div>':'')+
       (eligible
         ? '<div class="next-step ds-ok"><div class="ns-ic"><img src="'+ICON_GIFT_PNG+'" alt=""></div><div class="ns-tx"><div class="ns-ey">ลุ้นรางวัลใหญ่</div><div class="ns-t">ครบเงื่อนไขแล้ว ร่วมลุ้นรางวัลได้เลย</div></div>'+
             (DRAW_JOINED
@@ -6639,13 +6704,20 @@ function renderBooth(){
    briefing's 2nd info card. These REPLACE the old per-question q1 intro banner (MINIGAME_Q.intro,
    now removed) — one intro surface, not two. */
 var SIDES=[
-  {icon:'lc-refresh-cw',title:'เกมย้อนเวลาพอร์ต',side:'ความเสี่ยงแท้จริง',emoji:'🎭',intro:'เรากำลังพาคุณย้อนไปเจอเหตุการณ์จริงที่เคยเกิดขึ้น ตอนนั้นไม่มีใครรู้ว่าพรุ่งนี้จะเป็นยังไง',rule:'ตอบแล้วไปต่อ ย้อนกลับไม่ได้',measures:'เทียบความเสี่ยงที่ "บอก" กับที่ "ทำจริง" ตอนวิกฤต'}, // refresh-cw = rewinding back through past crises
+  {icon:'lc-refresh-cw',img:'portfolio',title:'เกมย้อนเวลาพอร์ต',side:'ความเสี่ยงแท้จริง',emoji:'🎭',intro:'เรากำลังพาคุณย้อนไปเจอเหตุการณ์จริงที่เคยเกิดขึ้น ตอนนั้นไม่มีใครรู้ว่าพรุ่งนี้จะเป็นยังไง',rule:'ตอบแล้วไปต่อ ย้อนกลับไม่ได้',measures:'เทียบความเสี่ยงที่ "บอก" กับที่ "ทำจริง" ตอนวิกฤต'}, // refresh-cw = rewinding back through past crises
   {icon:'lc-file-text',title:'เกมเลือกเครื่องมือ',side:'สิ่งที่คุณดูก่อนตัดสินใจ',emoji:'🔍',intro:'ก่อนตัดสินใจ คุณจะเลือกดูข้อมูลแบบไหน เราดูจากสิ่งที่คุณเลือกดูจริง ไม่ใช่แค่คำตอบสุดท้าย',rule:'เลือกจากสิ่งที่คุณดูจริง',measures:'ลำดับเครื่องมือวิเคราะห์ที่คุณเปิดจริง'}, // file-text = the business/financial-statement tool you choose to open
-  {icon:'lc-alert-triangle',title:'เกมทนกระแส',side:'ภูมิคุ้มกันความกลัวตกขบวน',emoji:'🔥',intro:'เจอสถานการณ์ที่ยั่วให้รีบตัดสินใจ ลองดูว่าคุณจะทนกระแสและกับดักได้แค่ไหน',rule:'บางฉากมีเวลาจำกัด',measures:'วินัยภายใต้แรงกดดันจากกระแส'}, // alert-triangle = the FOMO/scam traps this game tests resistance to
-  {icon:'lc-calendar',title:'เกมเป้าหมายแต่ละวัย',side:'เป้าหมายตามวัย',emoji:'🗺️',intro:'สวมบทบาทในแต่ละช่วงวัย ตั้งแต่ 25 ถึง 65 ปี แล้วดูว่าเป้าหมายเงินของคุณเปลี่ยนไปไหม',rule:'ย้อนกลับแก้ไขได้ทุกข้อ',measures:'เป้าหมายเงินตั้งแต่วัย 25 ถึง 65'}, // calendar = goals across different ages/life-stages (25→65)
-  {icon:'lc-compass',title:'เกมก้าวแรก',side:'ก้าวแรก',emoji:'🚀',intro:'เกมนี้ไม่ตัดสินว่าคุณเป็นคนแบบไหน ปิดท้ายด้วย "ก้าวแรก" เล็กๆ ที่คุณเลือกเอง',rule:'เลือกก้าวแรกได้หลายข้อ',measures:'กำแพงที่ทำให้ยังไม่เริ่ม + ก้าวเล็กที่สุด'}, // compass = finding your direction/first step as a new investor
-  {icon:'lc-shield',title:'เกมทองคำ เพื่อนยามวิกฤต',side:'ทองคำในพอร์ต',emoji:'🛡️',intro:'ไม่ต้องทายราคาทอง เป้าหมายคือเข้าใจว่าทองคำมีไว้ทำอะไรในพอร์ตของคุณ',rule:'เดาจากความรู้สึกได้เลย',measures:'บทบาทของทองคำสำหรับคุณ — ตัวถ่วงความเสี่ยง หรือตัวทำกำไร'} // shield = "เพื่อนยามวิกฤต" — gold as a protective refuge during a crisis
+  {icon:'lc-alert-triangle',img:'warning',title:'เกมทนกระแส',side:'ภูมิคุ้มกันความกลัวตกขบวน',emoji:'🔥',intro:'เจอสถานการณ์ที่ยั่วให้รีบตัดสินใจ ลองดูว่าคุณจะทนกระแสและกับดักได้แค่ไหน',rule:'บางฉากมีเวลาจำกัด',measures:'วินัยภายใต้แรงกดดันจากกระแส'}, // alert-triangle = the FOMO/scam traps this game tests resistance to
+  {icon:'lc-calendar',img:'s1q2',title:'เกมเป้าหมายแต่ละวัย',side:'เป้าหมายตามวัย',emoji:'🗺️',intro:'สวมบทบาทในแต่ละช่วงวัย ตั้งแต่ 25 ถึง 65 ปี แล้วดูว่าเป้าหมายเงินของคุณเปลี่ยนไปไหม',rule:'ย้อนกลับแก้ไขได้ทุกข้อ',measures:'เป้าหมายเงินตั้งแต่วัย 25 ถึง 65'}, // calendar = goals across different ages/life-stages (25→65)
+  {icon:'lc-compass',img:'compass',title:'เกมก้าวแรก',side:'ก้าวแรก',emoji:'🚀',intro:'เกมนี้ไม่ตัดสินว่าคุณเป็นคนแบบไหน ปิดท้ายด้วย "ก้าวแรก" เล็กๆ ที่คุณเลือกเอง',rule:'เลือกก้าวแรกได้หลายข้อ',measures:'กำแพงที่ทำให้ยังไม่เริ่ม + ก้าวเล็กที่สุด'}, // compass = finding your direction/first step as a new investor
+  {icon:'lc-shield',img:'gold',title:'เกมทองคำ เพื่อนยามวิกฤต',side:'ทองคำในพอร์ต',emoji:'🛡️',intro:'ไม่ต้องทายราคาทอง เป้าหมายคือเข้าใจว่าทองคำมีไว้ทำอะไรในพอร์ตของคุณ',rule:'เดาจากความรู้สึกได้เลย',measures:'บทบาทของทองคำสำหรับคุณ — ตัวถ่วงความเสี่ยง หรือตัวทำกำไร'} // shield = "เพื่อนยามวิกฤต" — gold as a protective refuge during a crisis
 ];
+/* SIDES[i].img (2026-09-11, per direction "หน้า เกมหลัก - การใช้ไอคอน...ด้านอื่นใน Playbook") — real
+   custom art for the เกมหลัก page's game-list icons (gameRow's .gr-ic + renderGames' nextCard .ns-ic
+   below), same q.img→ICON_IMG idea as MINIGAME_Q's per-question icons. Only these 5 of 6 sides carry
+   one (เกมเลือกเครื่องมือ wasn't part of this direction, still Lucide-only) — scoped to just this
+   page's two call sites per the same "Scoped to just this Games-page card" precedent already noted
+   on nextCard below; other SIDES[i].icon call sites (result-screen badge, pre-game briefing, journey
+   ledger) are untouched and still render the Lucide glyph. */
 /* ══ MINIGAME_Q (2026-09-09) ══ real question content for the 6 main games, index i matching
    SIDES[i] 1:1 — sourced verbatim from GAMES-QUESTIONS-DNA.md Part A. Same shape as BOOTH_Q (see
    its own comment above renderBooth's BOOTH_Q for the full field-by-field explanation). Game-level
@@ -6661,11 +6733,11 @@ var MINIGAME_Q=[
   {noBack:true,
    resultNote:'ทั้ง 4 แบบไม่มีแบบที่ผิด — สอดคล้อง (Aligned) / ใจไม่ถึงอย่างที่คิด / ใจถึงกว่าที่คิด / ยังค้นหาสไตล์ตัวเอง (ผลแบบเต็มดูได้ใน Playbook ของคุณ)',
    questions:[
-    {icon:'lc-alert-triangle',q:'คุณคิดว่าตัวเองรับ "**เงินลงทุนติดลบ**" ได้แค่ไหน?',sub:'ข้ามได้ถ้าตอบไว้แล้วตอนลงทะเบียน',
+    {icon:'lc-alert-triangle',img:'warning',q:'คุณคิดว่าตัวเองรับ "**เงินลงทุนติดลบ**" ได้แค่ไหน?',sub:'ข้ามได้ถ้าตอบไว้แล้วตอนลงทะเบียน',
      opts:['ขอไม่เห็นติดลบเกินราว 10% (ทุก 100 บาท เหลือราว 90 บาท)','ติดลบราว 30% ยังพอไหว','ติดลบเกิน 50% ก็ยังถือได้']},
     {icon:'lc-zap',q:'ปี 2551 วิกฤตแฮมเบอร์เกอร์ เงินลงทุน 1,000,000 บาท เหลือ 430,000 บาท (**ลดลง 57.00%**) คุณจะทำอะไร?',locked:true,sub:'ตอนนั้นยังไม่มีใครรู้ว่าตลาดจะฟื้นเมื่อไหร่ ตอบตามที่ใจคุณคิดจริงๆ',
      opts:['ขายทั้งหมด หนีก่อนจะเสียมากกว่านี้','ถือไว้ตามแผนเดิม ไม่แตะ','ซื้อเพิ่ม ของถูกมาก']},
-    {icon:'lc-hourglass',q:'ก.พ.–มี.ค. 2563 วิกฤตโควิด เงินลงทุนเหลือ 660,000 บาท (**ลดลง 34.00% ในเดือนเดียว**) รอบนี้จะทำอะไร?',locked:true,
+    {icon:'lc-hourglass',img:'hourglass',q:'ก.พ.–มี.ค. 2563 วิกฤตโควิด เงินลงทุนเหลือ 660,000 บาท (**ลดลง 34.00% ในเดือนเดียว**) รอบนี้จะทำอะไร?',locked:true,
      opts:['ขายทั้งหมด รอบนี้แรงกว่าเดิม','ถือตามแผน เคยผ่านปี 2551 มาแล้ว','ซื้อเพิ่มเลย จังหวะนี้แหละ']}
   ]},
   {questions:[
@@ -6681,7 +6753,7 @@ var MINIGAME_Q=[
     {icon:'lc-zap',q:'ฉาก 1/3 เหรียญชื่อ "MOON" **ขึ้น 312.00% ในสัปดาห์เดียว** คุณจะทำอะไร?',sub:'สถานการณ์สมมติ ไม่ใช่ของจริงในตลาด',timer:15,
      opts:['ซื้อเลย เดี๋ยวไม่ทัน','ขอดูข้อมูลก่อน ว่ามันคืออะไร พื้นฐานเป็นยังไง','ไม่เอา ดูเร่งเร้าผิดปกติ'],
      insight:'ความกลัวตกขบวนทำให้เราซื้อเพราะ "คนอื่นซื้อ" ไม่ใช่เพราะเข้าใจของ'},
-    {icon:'lc-alert-triangle',q:'ฉาก 2/3 มีคนทักมาบอกว่า "**การันตีผลตอบแทน 30.00% ต่อเดือน** ไม่มีขาดทุน วันนี้วันสุดท้าย รีบโอนเลย"',
+    {icon:'lc-alert-triangle',img:'warning',q:'ฉาก 2/3 มีคนทักมาบอกว่า "**การันตีผลตอบแทน 30.00% ต่อเดือน** ไม่มีขาดทุน วันนี้วันสุดท้าย รีบโอนเลย"',
      opts:['โอนเลย กลัวที่นั่งเต็ม','เช็กก่อน ว่าบริษัทมีใบอนุญาตจาก ก.ล.ต. ไหม','ปฏิเสธทันที และเตือนคนอื่นด้วย'],
      insight:'สัญญาณหลอกลงทุน 3 อย่าง: การันตีผลตอบแทน · เร่งให้รีบตัดสินใจ · ไม่มีใบอนุญาต'},
     {icon:'lc-check-circle',q:'ฉาก 3/3 เลือกกฎที่คุณจะ**พกติดตัวไว้เตือนตัวเอง**',
@@ -6689,16 +6761,16 @@ var MINIGAME_Q=[
   ]},
   {resultNote:'บอกตรงๆ ว่าเป้าหมายของคุณ "เปลี่ยนไปตามวัย" หรือ "เหมือนเดิมตลอด 40 ปี" — ทั้งสองแบบเป็นข้อเท็จจริง ไม่ใช่ข้อผิดพลาด',
    questions:[
-    {icon:'lc-target',q:'บทที่ 1 สมมติว่าคุณอายุ 25 เหลือเวลาก่อนเกษียณราว 40 ปี เงินลงทุนก้อนแรก **คุณตั้งเป้าแบบไหน**?',
+    {icon:'lc-target',img:'s2q1',q:'บทที่ 1 สมมติว่าคุณอายุ 25 เหลือเวลาก่อนเกษียณราว 40 ปี เงินลงทุนก้อนแรก **คุณตั้งเป้าแบบไหน**?',
      opts:['เน้นให้โตมากที่สุด ขึ้นลงแรงก็รับได้','ค่อยๆ โต ขอสบายใจระหว่างทาง','เน้นปลอดภัยไว้ก่อน ไม่อยากขาดทุน'],
      insight:'ยิ่งมีเวลานาน ยิ่งมีเวลารอให้ของฟื้นตัว'},
-    {icon:'lc-pie-chart',q:'บทที่ 2 สมมติว่าคุณอายุ 35 มี**เป้าหมายใหญ่ 2 อย่างพร้อมกัน**: ต้องใช้เงินก้อนในอีก 3 ปี และเก็บเพื่อเกษียณอีก 30 ปี คุณจะจัดการยังไง?',
+    {icon:'lc-pie-chart',img:'portfolio',q:'บทที่ 2 สมมติว่าคุณอายุ 35 มี**เป้าหมายใหญ่ 2 อย่างพร้อมกัน**: ต้องใช้เงินก้อนในอีก 3 ปี และเก็บเพื่อเกษียณอีก 30 ปี คุณจะจัดการยังไง?',
      opts:['แยกเป็น 2 กระเป๋า เงินที่จะใช้เร็วเก็บแบบปลอดภัย เงินเกษียณเน้นให้โต','รวมเป็นก้อนเดียว ลงแบบเสี่ยงทั้งหมดให้โตเร็ว','รวมเป็นก้อนเดียว เก็บแบบปลอดภัยทั้งหมด'],
      insight:'เงินที่จะใช้เร็วกับเงินที่ใช้อีกนาน ควรเก็บคนละแบบ'},
     {icon:'lc-refresh-cw',q:'บทที่ 3 สมมติว่าคุณอายุ 50 เหลือเวลาถึงเกษียณราว 15 ปี เงินลงทุนโตมาดี **ควรปรับอะไรไหม**?',
      opts:['ค่อยๆ ลดส่วนที่เสี่ยงลง เพิ่มส่วนที่มั่นคง','คงไว้แบบเดิม เสี่ยงเท่าเดิม','ขายออกเป็นเงินสดทั้งหมด'],
      insight:'ยิ่งใกล้วันที่ต้องใช้เงิน ยิ่งเหลือเวลารอให้ฟื้นน้อยลง'},
-    {icon:'lc-gift',q:'บทที่ 4 สมมติว่าคุณอายุ 65 เกษียณแล้ว มีเงินเก็บอยู่ก้อนหนึ่ง **เป้าหมายของเงินก้อนนี้**คืออะไร?',
+    {icon:'lc-gift',img:'giftbox',q:'บทที่ 4 สมมติว่าคุณอายุ 65 เกษียณแล้ว มีเงินเก็บอยู่ก้อนหนึ่ง **เป้าหมายของเงินก้อนนี้**คืออะไร?',
      opts:['ให้มีเงินใช้ทุกเดือนอย่างสม่ำเสมอ','รักษาเงินต้นให้อยู่ครบ','เก็บส่งต่อให้ลูกหลาน หรือทำประโยชน์ให้สังคม'],
      insight:'วิธีถอนเงินมาใช้หลังเกษียณ สำคัญไม่แพ้วิธีเก็บ'}
   ]},
@@ -6707,7 +6779,7 @@ var MINIGAME_Q=[
     {icon:'lc-coins',q:'ฉาก 1 สมมติว่าคุณเพิ่งเก็บเงินก้อนแรกได้ 100,000 บาท แล้วมีคนชวนลงทุน บอกว่า "**น่าจะได้กำไรดี**"',
      opts:['ลงทั้ง 100,000 บาท ไปเลย','แบ่งครึ่ง ลง 50,000 บาท เก็บไว้ 50,000 บาท','ยังไม่ลง เก็บไว้ก่อนทั้งหมด'],
      insight:'ก่อนลงทุน ควรมีเงินสำรองเผื่อฉุกเฉินก่อน · แต่ถ้าเก็บเงินสดไว้เฉยๆ นานๆ ค่าของเงินก็ลดลงจากเงินเฟ้อ'},
-    {icon:'lc-calendar',q:'ฉาก 2 มีสองคนลงทุนเดือนละ 2,000 บาท เท่ากัน แต่**เริ่มไม่พร้อมกัน** คุณคิดว่าใครได้เปรียบ?',
+    {icon:'lc-calendar',img:'s1q2',q:'ฉาก 2 มีสองคนลงทุนเดือนละ 2,000 บาท เท่ากัน แต่**เริ่มไม่พร้อมกัน** คุณคิดว่าใครได้เปรียบ?',
      opts:['คนที่เริ่มตอนอายุ 25 แล้วลง 10 ปีจากนั้นหยุด','คนที่เริ่มตอนอายุ 35 แล้วลงต่อเนื่อง 30 ปี','พอๆ กัน เพราะลงเดือนละเท่ากัน'],
      insight:'เวลาช่วยให้ดอกเบี้ยทบต้นทำงาน — เริ่มเร็วมักได้เปรียบกว่าลงเยอะแต่เริ่มช้า'},
     {icon:'lc-route',q:'ฉาก 3 เงินส่วนที่จะลงทุน **คุณเลือกเส้นทางไหน**?',
@@ -6719,13 +6791,13 @@ var MINIGAME_Q=[
      opts:['เปิดบัญชีหรือแอปลงทุน','ตั้งลงทุนอัตโนมัติรายเดือน','ลองของจริงด้วยเงิน 100 บาท วันนี้','เลือกกองทุน 1 กองมาศึกษา','กำหนดงบลงทุนต่อเดือนที่ไหว','จดรายรับ-รายจ่าย 7 วัน','เริ่มแยกเงินสำรองเผื่อฉุกเฉินก้อนแรก','นัดคุยกับผู้แนะนำการลงทุนที่มีใบอนุญาต']}
   ]},
   {questions:[
-    {icon:'lc-trending-up',q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บไว้ วันนี้อันไหน**ซื้อของได้มากกว่ากัน**?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้เลย',
+    {icon:'lc-trending-up',img:'s2q5',q:'สมมติว่า 20 ปีก่อนคุณมีเงิน 100,000 บาท เก็บเป็นเงินสดไว้ในตู้ เทียบกับเอาไปซื้อทองเก็บไว้ วันนี้อันไหน**ซื้อของได้มากกว่ากัน**?',sub:'ไม่ต้องทายราคา เดาตามความรู้สึกได้เลย',
      opts:['เงินสด เพราะยังเป็น 100,000 บาท เท่าเดิม','ทอง น่าจะซื้อของได้มากกว่า','น่าจะพอๆ กัน'],
      insight:'เงินสดตัวเลขเท่าเดิม แต่ซื้อของได้น้อยลงเพราะเงินเฟ้อ ส่วนทองมักขยับตามค่าของเงิน'},
-    {icon:'lc-shield',q:'สมมติว่าเกิดวิกฤตเศรษฐกิจ หุ้นทั่วโลกร่วง 40.00% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่า**ทองจะเป็นยังไง**?',
+    {icon:'lc-shield',img:'shieldcheck',q:'สมมติว่าเกิดวิกฤตเศรษฐกิจ หุ้นทั่วโลกร่วง 40.00% เงินลงทุนในหุ้นหายไปเกือบครึ่ง คุณคิดว่า**ทองจะเป็นยังไง**?',
      opts:['ร่วงตามหุ้นไปด้วย','ทรงตัวหรือขึ้นสวนทางกับหุ้น','ราคาไม่ขยับ แต่ขายไม่ออก'],
      insight:'ในหลายวิกฤต ทองมักไม่ไปทางเดียวกับหุ้น จึงช่วยพยุงภาพรวมได้'},
-    {icon:'lc-pie-chart',q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินที่จะลงทุน**ทั้งหมดซื้อทองเลยดีไหม**?',
+    {icon:'lc-pie-chart',img:'portfolio',q:'ทองสู้เงินเฟ้อได้ และช่วยพยุงตอนวิกฤต งั้นเอาเงินที่จะลงทุน**ทั้งหมดซื้อทองเลยดีไหม**?',
      opts:['ใช่ ซื้อทองทั้งหมด ปลอดภัยที่สุด','ไม่ แบ่งไว้ส่วนหนึ่งพอ ที่เหลือไปอย่างอื่น','ไม่ซื้อเลย ชอบของที่งอกเงยกว่า'],
      insight:'ทองไม่สร้างรายได้ระหว่างถือ จึงมักใช้เป็นส่วนหนึ่งของภาพรวม ไม่ใช่ทั้งหมด'}
   ]}
@@ -6802,7 +6874,8 @@ function gameRow(i){
     ? '<span class="gr-chev-wrap" data-open="'+i+'">'+ic('lc-chevron-down','gr-chev'+(open?' open':''))+'</span>'
     : '<button class="btn btn-primary gr-play" data-play="'+i+'">'+ic('lc-play-circle')+'เล่นเกม</button>';
   var body=played?'<div class="gr-body'+(open?' show':'')+'"><div class="gr-bin"><div class="gr-from">ปลดล็อกด้าน '+s.side+' · '+s.measures+'</div><div class="gr-result">'+sideResult(i,RESULT&&RESULT.hero,RESULT&&RESULT.heroKey)+'</div></div></div>':'';
-  return '<div class="game-row'+(played?' played':'')+'"><div class="gr-hd"><div class="gr-ic">'+ic(s.icon)+'</div><div class="gr-tx" data-open="'+i+'"><div class="gr-title">'+s.title+(played?'<span class="gr-played">'+ic('lc-check')+'เล่นแล้ว</span>':'')+'</div>'+(status?'<div class="gr-status">'+status+'</div>':'')+'</div>'+right+'</div>'+body+'</div>';
+  var sIcon=s.img?'<img src="'+ICON_IMG[s.img]+'" alt="">':ic(s.icon);
+  return '<div class="game-row'+(played?' played':'')+'"><div class="gr-hd"><div class="gr-ic">'+sIcon+'</div><div class="gr-tx" data-open="'+i+'"><div class="gr-title">'+s.title+(played?'<span class="gr-played">'+ic('lc-check')+'เล่นแล้ว</span>':'')+'</div>'+(status?'<div class="gr-status">'+status+'</div>':'')+'</div>'+right+'</div>'+body+'</div>';
 }
 /* Direct-DOM toggle for an already-played game row's result panel — mirrors togSide() so
    .game-row now animates the same smooth way .side-row does, instead of a jarring full
@@ -6832,17 +6905,19 @@ function renderGames(){
   if(!pre&&nextIdx>=0){var ns=SIDES[nextIdx];
     /* Same .next-step card as Home's "ขั้นต่อไป" — one shared component for "the one next action",
        not a bespoke spectrum-border card, per direction. */
-    /* Icon reverted to ic(ns.icon) — the per-game meaningful icon (2026-09-11, per direction "ด้านอื่น
+    /* Icon reverted to the per-game meaningful icon (2026-09-11, per direction "ด้านอื่น
        ใน Playbook แต่ละด้าน ต้องการให้ไอคอนรูปแบบสื่อสารตรงกับความหมายของชื่อรายการ") — was the generic
        joystick.png icon-set art (2026-08-26 per direction, same swap Home's "ขั้นต่อไป" card still
        uses), which showed the exact same joystick regardless of which specific game was up next
        (compass for เกมก้าวแรก, shield for เกมทองคำ, etc. — see SIDES' own per-icon rationale comments),
        the one item in this list that DIDN'T communicate its own meaning while every row below it in
-       "ด้านอื่นใน Playbook" (gameRow, unchanged) already does via this same ic(s.icon) call. Scoped to
+       "ด้านอื่นใน Playbook" (gameRow, unchanged) already does via this same SIDES[i].icon/img. Scoped to
        just this Games-page card per direction; Home's "ขั้นต่อไป" is a generic "go play games" CTA (no
        specific next game backing its own icon slot the way this card's `ns` does), so it keeps the
-       joystick untouched. */
-    nextCard='<section class="next-step"><div class="ns-ic">'+ic(ns.icon)+'</div><div class="ns-tx"><div class="ns-ey">เล่นเกมนี้ต่อ'+(nextIdx===0?' · เกมสำคัญที่สุด':'')+'</div><div class="ns-t">'+ns.title+'</div></div><div class="ns-cta-slot" id="ng-cta-slot"></div><div class="ns-body"><div class="ns-b">'+ns.measures+'</div></div></section>'+
+       joystick untouched. Real custom art (same session, follow-up direction, see SIDES[i].img above)
+       now takes over from the Lucide glyph for 5 of the 6 sides here and in gameRow below. */
+    var nsIcon=ns.img?'<img src="'+ICON_IMG[ns.img]+'" alt="">':ic(ns.icon);
+    nextCard='<section class="next-step"><div class="ns-ic">'+nsIcon+'</div><div class="ns-tx"><div class="ns-ey">เล่นเกมนี้ต่อ'+(nextIdx===0?' · เกมสำคัญที่สุด':'')+'</div><div class="ns-t">'+ns.title+'</div></div><div class="ns-cta-slot" id="ng-cta-slot"></div><div class="ns-body"><div class="ns-b">'+ns.measures+'</div></div></section>'+
       '<div class="gh-restlbl">ด้านอื่นใน Playbook</div>';
   }
   var listIdx=nextIdx>=0?restIdx:[0,1,2,3,4,5];
@@ -6971,7 +7046,7 @@ function learnedLedgerHTML(){
 }
 function openPlay(kind,idx){
   var set=playSet(kind,idx);
-  PLAY={kind:kind,idx:idx,step:'brief',qi:0,sel:set.questions.map(function(q){return q.multi?[]:null;}),lockedBack:false,timerQi:null,returnPhase:st.phase};
+  PLAY={kind:kind,idx:idx,step:'brief',qi:0,sel:set.questions.map(function(q){return q.multi?[]:null;}),lockedBack:false,timerQi:null,ptsQi:null,returnPhase:st.phase};
   st.phase='play';
   render();
 }
@@ -6984,8 +7059,12 @@ function renderPlay(){
   else if(PLAY.step==='summary')renderPlaySummary();
   else renderPlayBrief();
 }
-function briefCard(dot,kicker,title,meta){
-  return '<div class="round-card"><div class="rc-top"><span class="rc-dot" style="background:'+dot+'"></span><span class="rc-kicker">'+kicker+'</span></div><div class="rc-title">'+title+'</div><div class="rc-meta">'+meta+'</div></div>';
+function briefCard(dot,kicker,title,meta,titleCls){
+  // titleCls (2026-09-11, per direction "dna ของการแสดงข้อมูลนี้...ใหญ่...เด่นกว่านี้ — คนแก่มองไม่
+  // ค่อยเห็น") — optional extra class on .rc-title so ONE card (the "รางวัล"/+N แต้ม one, see its
+  // call site) can size up without touching the shared .rc-title rule its "จำนวนข้อ"/"กติกา" siblings
+  // also use.
+  return '<div class="round-card"><div class="rc-top"><span class="rc-dot" style="background:'+dot+'"></span><span class="rc-kicker">'+kicker+'</span></div><div class="rc-title'+(titleCls?' '+titleCls:'')+'">'+title+'</div><div class="rc-meta">'+meta+'</div></div>';
 }
 /* renderPlayBrief — the "here's the game + how to play" opener shown before question 1. Rebuilt
    2026-09-10 (per direction "หน้าคั่น ของแต่ละเกมส์ทั้งหมด...ใช้ design dna ทั้งหมด เดียวกับ หน้าที่ 2")
@@ -7012,7 +7091,7 @@ function renderPlayBrief(){
     var b=BOOTHS[idx];
     headA='';headB=b.game; // booth names aren't "เกม…" prefixed — whole name in ch-2 (ink)
     lead=BOOTH_BRIEF[idx];
-    cards=briefCard('var(--violet)','จำนวนข้อ',n+' ข้อ','ตอบทีละข้อ')+briefCard('var(--amber-text)','รางวัล','+'+set.points+' แต้ม','สะสมลุ้นรางวัลใหญ่');
+    cards=briefCard('var(--violet)','จำนวนข้อ',n+' ข้อ','ตอบทีละข้อ')+briefCard('var(--amber-text)','รางวัล','+'+set.points+' แต้ม','สะสมลุ้นรางวัลใหญ่','rc-title-pts');
   }
   var head='<div class="consent-h play-brief-h">'+(headA?'<span class="ch-1">'+headA+'</span> ':'')+'<span class="ch-2">'+headB+'</span></div>';
   root.innerHTML=
@@ -7140,7 +7219,11 @@ function renderPlayBody(){
   var timerHTML=q.timer?'<span class="play-timer">'+ic('lc-hourglass')+'<span id="playTimerVal">'+q.timer+'</span>s</span>':'';
   // Points badge (2026-09-10) — booth questions only; never coexists with timerHTML in practice
   // (only a GAME question — M3's ฉาก 1 — ever sets q.timer), so sharing this one badge row is safe.
-  var ptsBadgeHTML=(kind==='booth'&&set.points)?'<span class="play-pts-badge">'+ic('lc-gift')+'+'+set.points+' แต้ม</span>':'';
+  // #playPtsNum starts at "+0 แต้ม" and counts up via ptsCountUp() below (2026-09-11, per direction
+  // "Badge ระหว่างเล่นคำถาม...เพิ่ม motion นับเลขวิ่งขึ้น") — same treatment/helper as the summary
+  // screen's #sumPtsNum (see renderPlaySummary/ptsCountUp's own comment), replayed on every question
+  // since this whole badge markup is rebuilt fresh each renderPlayBody() call.
+  var ptsBadgeHTML=(kind==='booth'&&set.points)?'<span class="play-pts-badge">'+ic('lc-gift')+'<span id="playPtsNum">+0 แต้ม</span></span>':'';
   var badgesHTML=(timerHTML||ptsBadgeHTML)?'<div class="play-eyebrow">'+timerHTML+ptsBadgeHTML+'</div>':'';
   // Multi-select counter (2026-09-10) — borrows the DNA quiz's own S3 interest-picker pattern
   // (.int-count "เลือกแล้ว X/3") so a multi-choice question reads visibly differently from a
@@ -7178,8 +7261,12 @@ function renderPlayBody(){
   // own icons started as Lucide placeholders. Falls back to the old per-game/booth icon (Lucide for a
   // main game, the booth's PNG asset art via BOOTH_ICON_PNG for a booth game) only if a question ever
   // ships without its own `icon`.
+  // Real custom art (2026-09-11, per direction) — same q.img→ICON_IMG idea as the DNA quiz's own
+  // per-question icons (see .q-icon-bare above); takes over from the Lucide placeholder wherever a
+  // question now carries its own `img`, same priority order the DNA quiz already uses.
   var qIcon;
-  if(q.icon)qIcon=ic(q.icon);
+  if(q.img)qIcon='<img src="'+ICON_IMG[q.img]+'" alt="">';
+  else if(q.icon)qIcon=ic(q.icon);
   else if(kind==='game'){qIcon=ic(SIDES[idx].icon);}
   else{var bArt=BOOTH_ICON_PNG[BOOTHS[idx].asset];qIcon=bArt?'<img src="'+bArt+'" alt="">':ic(BOOTHS[idx].icon);}
   root.innerHTML=
@@ -7209,6 +7296,15 @@ function renderPlayBody(){
   // the demo panel toggling something), and a naive restart-on-every-render would keep resetting it.
   if(q.timer&&PLAY.timerQi!==qi){PLAY.timerQi=qi;startPlayTimer(q.timer);}
   else if(!q.timer)clearPlayTimer();
+  // #playPtsNum count-up (2026-09-11) — same PLAY.xxxQi-tracked "only on a genuinely new question"
+  // guard as the timer fix just above, for the exact same reason: an unrelated global render() can
+  // re-invoke renderPlayBody() for the SAME question, and without this the badge would keep
+  // restarting its count-up from 0 instead of just sitting at the final value.
+  if(kind==='booth'&&set.points){
+    var ptsNumEl=root.querySelector('#playPtsNum');
+    if(PLAY.ptsQi!==qi){PLAY.ptsQi=qi;ptsCountUp(ptsNumEl,set.points);}
+    else if(ptsNumEl)ptsNumEl.textContent='+'+set.points+' แต้ม';
+  }
 }
 /* renderPlaySummary — the game's result/payoff screen. Rebuilt 2026-09-10 (per direction "หน้า result
    อยากให้ใช้ dna เดียวกับ หน้าคู่มือ แท่ป ตัวตน") onto the Playbook identity (ตัวตน) tab's own DNA: the
@@ -7278,7 +7374,15 @@ function renderPlaySummary(){
   var knowCount=learnedInsights({kind:kind,idx:idx}).length;
   var insHd='<div class="str-hd">'+ic('lc-check-circle')+'สิ่งที่ได้เรียนรู้จากเกมนี้'+(knowCount?'<span class="sc" style="margin-left:auto">สะสม '+knowCount+' เรื่อง</span>':'')+'</div>';
   var insBox=insights.length?'<div class="str-box">'+insHd+insights.map(function(t){return '<div class="str-li">'+t+'</div>';}).join('')+'</div>':'';
-  var ptsHTML=(kind==='booth'&&set.points)?'<div class="play-sum-pts">'+ic('lc-gift')+'<span>+'+set.points+' แต้ม</span></div>':'';
+  // ptsHTML (the "+N แต้ม" reward card on this "เล่นจบแล้ว" screen — .play-sum-pts, its ptsPop entrance
+  // + ptsCountUp() number animation) removed entirely (2026-09-11, per direction "เล่นจบแล้ว (ทุกเกมส์
+  // ทุกด้าน ทุกบูธ)...กรณีมี — ให้เอาออกทั้งหมด") — was only ever shown for booth games (kind==='booth'
+  // &&set.points; the 6 main games never carried a `points` field), so this one removal already covers
+  // every game/side/booth's end screen. The other 3 "+N แต้ม" call sites (play-pts-badge during play,
+  // the briefing's รางวัล card, .bp-pts's "สะสมแล้ว" running total) are untouched — this was only ever
+  // about the end-screen card. CSS (.play-sum-pts/@keyframes ptsPop) and ptsCountUp() kept: the
+  // function is still used by play-pts-badge, and the CSS stays commented-as-unused for history, same
+  // precedent as .play-brief/etc. above.
   // Save confirmation (2026-09-10) — .pf-note reused verbatim (Profile footer's own muted icon+text
   // line) as a plain-language stand-in for a "signal recorded" trust cue: names WHAT got saved
   // (the insights above) instead of an opaque internal code, then sits as the last line inside the
@@ -7297,7 +7401,6 @@ function renderPlaySummary(){
         titleHTML+
         resultCard+
         insBox+
-        ptsHTML+
         saveNoteHTML+
       '</div></div></section>'+
       /* Icon moved AFTER the label AND flipped to a right-pointing arrow (2026-09-10, per direction
@@ -7310,6 +7413,25 @@ function renderPlaySummary(){
     '</div>';
   sizeHeroGlow();
   root.querySelector('#playDoneBtn').onclick=completePlay;
+}
+/* ptsCountUp (2026-09-11, per direction "ต้องการเพิ่ม motion ที่ทำให้ตัวเลขขยับ...เหมือนการรันเลข
+   counting...เพื่อให้ user ลุ้นแต้มสรุป") — animates #sumPtsNum from 0 up to the real point total on
+   an ease-out curve (fast start, settles into place) instead of just popping in as a static number.
+   Respects prefers-reduced-motion (jumps straight to the final value, same guard .play-sum-pts'
+   own ptsPop keyframe already uses) since a running counter is exactly the kind of motion that
+   setting exists to suppress. */
+function ptsCountUp(el,target){
+  if(!el)return;
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent='+'+target+' แต้ม';return;}
+  var dur=900,start=null;
+  function step(ts){
+    if(start===null)start=ts;
+    var p=Math.min(1,(ts-start)/dur);
+    var eased=1-Math.pow(1-p,3);
+    el.textContent='+'+Math.round(eased*target)+' แต้ม';
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
 }
 
 /* ══ PROFILE TAB ══ content ported from Playbook Final's Profile screen — userName/userOrg/
