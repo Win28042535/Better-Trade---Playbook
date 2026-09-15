@@ -99,11 +99,11 @@ to be meaningful:
 สแกนช่องโหว่ชีวิต (ประกัน) · โต้คลื่นความผันผวน (คริปโต) · นักตีราคาของสะสม (ของสะสม) ·
 เช็กสุขภาพกับเงิน (สุขภาพ)
 
-**✅ Full question content added 2026-09-08** — see [`GAMES-QUESTIONS-DNA.md`](GAMES-QUESTIONS-DNA.md)
-Part B for every booth's actual questions/options/insight-lines + point values, sourced from
-`คำถาม 6 ด้าน กับ คำถาม 10 สินทรัพย์ 8-9-69.docx`. This table above only ever had booth *names* —
-that file is now the canonical question-bank source for whenever a Passport/booth-game tab gets
-built.
+**✅ Full question content added 2026-09-08, ✅ wired into the live app 2026-09-09** — see
+[`GAMES-QUESTIONS-DNA.md`](GAMES-QUESTIONS-DNA.md) Part B for every booth's actual questions/
+options/insight-lines + point values, sourced from `คำถาม 6 ด้าน กับ คำถาม 10 สินทรัพย์ 8-9-69.docx`.
+`BOOTH_Q` in `dna-quiz-flow.html` now holds this content verbatim and drives the real Q&A flow
+(check-in→play gate, points counter) on the เดินบูธ/Passport tab — see [[games-questions-dna]].
 
 ---
 
@@ -170,12 +170,15 @@ Investment Zone · Health Zone.
 "6 ด้าน" accordion content is original to this prototype and NOT yet reskinned to match these
 6 topics — flagged as the most likely next content-parity gap if the book page gets a deeper pass.
 
-**✅ Full question content added 2026-09-08** — see [`GAMES-QUESTIONS-DNA.md`](GAMES-QUESTIONS-DNA.md)
-Part A for the actual game-by-game questions/options/insight-lines/result-page rules behind each
-of these 6 sides (internal codes M1–M6), sourced from `คำถาม 6 ด้าน กับ คำถาม 10 สินทรัพย์
-8-9-69.docx`. Core mechanic confirmed by that doc: **เกมหลัก 6 เกม · เล่น 1 เกม เปิดคู่มือ 1 ด้าน**
-— each game unlock gates exactly one accordion side. This closes the content-parity gap flagged
-above (data now exists; the accordion still needs the actual reskin/wiring).
+**✅ Full question content added 2026-09-08, ✅ wired into the live app 2026-09-09** — see
+[`GAMES-QUESTIONS-DNA.md`](GAMES-QUESTIONS-DNA.md) Part A for the actual game-by-game questions/
+options/insight-lines/result-page rules behind each of these 6 sides (internal codes M1–M6),
+sourced from `คำถาม 6 ด้าน กับ คำถาม 10 สินทรัพย์ 8-9-69.docx`. Core mechanic confirmed by that doc:
+**เกมหลัก 6 เกม · เล่น 1 เกม เปิดคู่มือ 1 ด้าน** — each game unlock gates exactly one accordion side.
+`MINIGAME_Q` in `dna-quiz-flow.html` now holds this content verbatim and drives the real full-page
+Q&A flow on the เกมหลัก/Games tab, with `sideResultFromAnswers()` scoring real answers — see
+[[games-questions-dna]] for the full phase-by-phase build log. Remaining open items are product
+decisions, not missing wiring: booth prize-point thresholds, M2's 2nd question unused in scoring.
 
 ---
 

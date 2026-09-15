@@ -1,12 +1,14 @@
 # Games & Questions DNA — เกมหลัก 6 เกม + เกมประจำ Asset 10 เกม
 
-**Status: reference data baseline, added 2026-09-08.** Source: `คำถาม 6 ด้าน กับ คำถาม 10
-สินทรัพย์ 8-9-69.docx` (project root). This is the full, verbatim question/copy content for the
-two game systems flagged as reference-only gaps in [`PLAYBOOK-2026-DATA-BASELINE.md`](PLAYBOOK-2026-DATA-BASELINE.md)
+**Status: ✅ wired into `dna-quiz-flow.html` (shipped 2026-09-09/10).** Source: `คำถาม 6 ด้าน กับ
+คำถาม 10 สินทรัพย์ 8-9-69.docx` (project root). This is the full, verbatim question/copy content for
+the two game systems flagged as reference-only gaps in [`PLAYBOOK-2026-DATA-BASELINE.md`](PLAYBOOK-2026-DATA-BASELINE.md)
 §4 (BOOTHS taxonomy) and §8-C ("6 ด้านของคุณ" mini-games) — those sections only had booth/side
-*names*, not actual question content. This doc supplies the content; it is **not yet wired into
-`dna-quiz-flow.html`** — treat it as the data source for whenever the Games/Passport tabs (or a
-richer "6 ด้าน" accordion) get built.
+*names*, not actual question content. This doc supplied the content, and it is now live: Part A →
+`MINIGAME_Q` (Games tab, full-page play flow with brief→questions→summary, real-answer scoring via
+`sideResultFromAnswers()`), Part B → `BOOTH_Q` (Passport/booth tab, check-in-gated play flow +
+points counter). See [[games-questions-dna]] memory for the full build log and the still-open
+product decisions (booth prize-point thresholds, M2's 2nd question unused in scoring).
 
 Core mechanic, stated once at the top of the source doc:
 **เกมหลัก 6 เกม · เล่น 1 เกม เปิดคู่มือ 1 ด้าน** — each of the 6 main games, once played, unlocks

@@ -621,6 +621,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    this screen's plain heading reverts to flat, static color (falls back to the .ch-1/.ch-2 `color`
    declared above, same as before the shimmer treatment existed). */
 .consent-h:not(.reveal-h) .ch-1,.consent-h:not(.reveal-h) .ch-2{animation:none;background-image:none;-webkit-background-clip:initial;background-clip:initial;-webkit-text-fill-color:initial;}
+/* Shimmer on .play-brief-h: restored 2026-09-14 ("title text ใส่ shimmer อิง shimmer dna ตามหน้ากำลัง
+   วิเคราะห์"), then removed again the next day per direct follow-up on the game-brief screens
+   ("text title ทั้งหมด เอา shimer text ออก") — kept as a no-op comment (not a rule) so the on/off
+   history stays visible without a live selector to trip over. Removing it needs no replacement rule:
+   .play-brief-h still matches the `:not(.reveal-h)` disable rule several lines up, which reverts it to
+   flat/static color the same as the plain consent screen's heading. */
 .consent-p{position:relative;z-index:2;font-size:var(--fs-body);font-weight:var(--w-body);color:var(--muted);line-height:1.65;max-width:280px;margin:0 auto;}
 /* "คู่มือลงทุนของคุณ" emphasis (2026-08-15, per direction) — ink/700 against the paragraph's own
    muted/500 base, same two-weight device used elsewhere in the file rather than a new pattern. */
@@ -2313,7 +2319,17 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    doesn't shrink its way out of. */
 .play-brief-art{width:100%;text-align:center;margin:0 auto var(--sp-stack);}
 .play-brief-art img{display:inline-block;width:auto;height:auto;max-width:172px;filter:drop-shadow(0 10px 22px rgba(17,19,24,.16));}
-/* .bg-room2 — room2-1.png (the booth-brief backdrop, see renderPlayBrief's bgImg comment) is a wide
+/* .play-result-art (2026-09-14) — same art, same treatment, on renderPlaySummary's "เล่นจบแล้ว"
+   screen instead: positioned as .hero-in's first child, the same slot the Playbook identity tab's
+   character card (compareBlock) occupies before its own detail content — see renderPlaySummary's
+   own comment for why this is a second, deliberate placement rather than a duplicate of the brief. */
+.play-result-art{width:100%;text-align:center;margin:0 auto var(--sp-stack);}
+.play-result-art img{display:inline-block;width:auto;height:auto;max-width:172px;filter:drop-shadow(0 10px 22px rgba(17,19,24,.16));}
+/* .bg-room2 — NO LONGER APPLIED (2026-09-14, per direction "หน้าคั่น ใช้ภาพพื้นหลังเดียวกับ ของหน้าคั่น
+   เกมส์หลัก"): the booth briefs dropped their own room2-1.png backdrop and now share room1 with the
+   main-game briefs, so nothing adds this class anymore (BG_IMG.room2 is likewise unread now). Kept for
+   history — same precedent as the other retired brief CSS above. Original rationale below:
+   .bg-room2 — room2-1.png (the booth-brief backdrop, see renderPlayBrief's bgImg comment) is a wide
    interior photo with a horizontal wall-molding line sitting ~35% down its OWN height. On a portrait
    screen the base .consent{background-size:cover} rule has to scale the photo up until its height
    exactly fills the viewport (a portrait box is far taller-relative-to-width than this photo), which
@@ -2353,6 +2369,170 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    other screens' X. */
 :root[data-view="tablet"] .consent.bg-room2{background-position-x:30%;}
 :root[data-view="pc"] .consent.bg-room2{background-position-x:32%;}
+/* .bg-boothart (2026-09-14, per direction "ต้องการใช้รูปเหล่านี้...เป็นภาพพื้นหลังของหน้าคั่น...
+   คำนึงถึงการ responsive ด้วย") — the 10 booth-brief backdrops (BOOTH_BG_IMG). Unlike room1's ONE
+   fixed photo (needing a hand-tuned per-device X position above because its door sits well off-
+   center) or room2's zoom hack (fixing a specific seam line), all 10 of THESE images have their
+   subject already roughly centered on both axes — measured per-panel while cropping (see
+   BOOTH_BG_IMG's own comment) — so one shared position covers every device without a per-image or
+   per-view split. 42% (not 50%) on the Y axis: most subjects' visual "center of interest" (a face,
+   the handshake, a building's upper third, the road's vanishing point) sits slightly ABOVE true
+   center in a 307:512 portrait crop, so pinning slightly high keeps that region on-screen even under
+   pc's aggressive cover-crop (a 900px-wide image covering a ~1440×900 box only shows roughly the
+   middle 37% of the image's height — see BOOTH_BG_IMG's comment for the math). Same specificity (2
+   classes) as the tablet/pc rules above + later in source order, so this cleanly overrides their
+   room1-tuned X position rather than needing `!important`. Verified live across mobile/tablet/pc for
+   the most vertically-extended compositions (skyscraper/stairs/road) — subject stays in frame at all
+   3 widths. */
+.consent.bg-boothart{background-position:50% 42%;}
+:root[data-view="tablet"] .consent.bg-boothart{background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-boothart{background-position:50% 42%;}
+/* Stronger white-wash for booth-art backdrops specifically (2026-09-14, per direction "ต้องการให้ภาพ
+   พื้นหลังดูสว่าง หรือกลมกลืนกับสีภาพพื้นหลังกว่านี้...ภาพสีเข้ม ชัด ทำให้เนื้อหาที่วางทับอยู่ มองไม่
+   เห็น") — the base `.consent::before` wash (64% white, tuned for room1's real PHOTO backdrop) reads
+   too weak on these monochrome ILLUSTRATIONS, which carry much deeper true-black regions (a suit
+   sleeve, a building's shadow side) than a lit photograph ever does, so the overlaid title/lead/cards
+   stayed low-contrast against them. Bumped to 80% specifically for `.bg-boothart` (extra class over
+   the base rule = higher specificity, wins outright, no source-order dependency needed), then to 87%
+   same day (2nd follow-up, per direction "เพิ่มความสว่าง white-wash ขึ้นอีกหน่อย") — verified live both
+   times against the two darkest compositions (booth 7 ประกัน's handshake sleeves, near-black) and the
+   lightest (booth 2's door/sky) side by side: at 87% the art still reads as a soft pale-gray texture
+   with title/cards clearly legible, and the already-light door art still doesn't wash out to invisible. */
+.consent.bg-boothart::before{background:rgba(255,255,255,.87);}
+/* mobile-only per-booth size/position overrides (2026-09-15; revised same day after a real-device
+   follow-up round — the first pass below sized every booth off a shared `auto 65%` HEIGHT, which
+   under-filled the box for the 7 images whose own alpha-trimmed crop sits at the narrower ~0.6
+   width:height ratio (personcap/doorlight/womanprofile/roadhorizon/skyscraper/stairsclimb/womantablet
+   only reached ~79% of the box's own width at that height, reading as small/washed-out floating in a
+   sea of white-wash — "ต้องการให้มองโดยรวมแล้ว balance กว่านี้"), while the 3 wider-ratio images
+   (globenetwork .74/handshake .762/plantsprout .785) landed at 97-103% width at that SAME height —
+   plantsprout was actually cropped left/right and handshake sat right at the edge, its own already-
+   edge-touching sleeve triangles (see BOOTH_BG_IMG's own bleed-detection comment) now reading as if
+   torn off / bleeding from an adjacent panel ("ไม่ให้มีติดขอบหรือเกินไปเห็นส่วนของภาพอื่นติดมา").
+   Switched the axis: every rule now sizes off WIDTH instead of height (`90% auto`), which — since the
+   mobile `.consent` box (375×758, ratio ~0.494) is narrower than EVERY one of these 10 crops (0.6-0.785)
+   — guarantees the same ~5% breathing margin on both left/right edges for all 10 alike (no per-image
+   variance, actual "balance") while the auto height (562-563px for the .6-ratio images, up to 430px for
+   plantsprout's .785) always clears the 758px box with real vertical slack to spare — verified against
+   each image's own real aspect ratio (see the dimension table in BOOTH_BG_POS_CLS's own comment) that
+   NONE crop at 90% width, unlike the old height-based scheme. This is also close to the mathematical
+   ceiling for a fully uncropped image here (pure `contain` in this narrower-than-image box is exactly
+   100% width — i.e. touching both edges — so 90% is "as large as possible while still visibly inset",
+   not an arbitrary shrink). Position then only needed the Y adjusted for each image's own NEW vertical
+   slack at this size (X unchanged at 50%, all 10 already centered per BOOTH_BG_IMG's own comment): 30%
+   for the 4 "สูงขึ้น" reports (all .6-ratio, so identical slack → identical Y works), 65% for ดวลกองทุน's
+   "ต่ำลง" (bumped further than the first pass's 55% now that its own slack at this size is larger, for a
+   more clearly visible shift), and the base 42% (no position change, matching `.bg-boothart` itself) for
+   the 5 that only asked for smaller/no-crop, not repositioned. Same 2-class-specificity mobile-only +
+   explicit tablet/pc cover/42% reset pattern as before — the shared `.bg-boothart` rule never sets
+   background-size, so a mobile-only size override needs its own tablet/pc reset or it would leak
+   through at those widths too. */
+.consent.bg-boothart-personcap{background-size:90% auto;background-position:50% 30%;}
+:root[data-view="tablet"] .consent.bg-boothart-personcap{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-boothart-personcap{background-size:cover;background-position:50% 42%;}
+.consent.bg-boothart-doorlight{background-size:90% auto;background-position:50% 30%;}
+:root[data-view="tablet"] .consent.bg-boothart-doorlight{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-boothart-doorlight{background-size:cover;background-position:50% 42%;}
+.consent.bg-boothart-globenetwork{background-size:90% auto;background-position:50% 65%;}
+:root[data-view="tablet"] .consent.bg-boothart-globenetwork{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-boothart-globenetwork{background-size:cover;background-position:50% 42%;}
+/* .bg-boothart-womanprofile revised again same day (2nd real-device round, per "การวางตำแหน่งรูปยังสื่อสาร
+   ไม่ชัดเจน...ให้เหมาะสม และ balance") — at the first pass's 30% Y (grouped with the other 3 "สูงขึ้น"
+   booths on the assumption its slack behaved the same), this image's own subject sits much lower in its
+   own alpha-trimmed crop than personcap/doorlight/roadhorizon (bust starts ~60% down the source), so
+   raising Y that far pushed the woman's head/face up behind the จำนวนข้อ/รางวัล cards — leaving only the
+   suit torso and the plain building panel visible below, unclear/no legible face. Bumped Y to 60% (well
+   past this booth's own base-42% neighbors, since her face needs to clear the cards' bottom edge, not
+   just sit off from true-center) so the head+shoulders land in the open gap between the cards and the
+   CTA button, and nudged size up (90%→95%) per the same direction's "สามารถแสดงได้มากกว่านี้มั๊ย" — this
+   aspect ratio (.6) still clears the box with real slack to spare even at 95% (see the block comment
+   above for the math), so the extra size is free presence, not a cropping risk. */
+.consent.bg-boothart-womanprofile{background-size:95% auto;background-position:50% 60%;}
+:root[data-view="tablet"] .consent.bg-boothart-womanprofile{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-boothart-womanprofile{background-size:cover;background-position:50% 42%;}
+.consent.bg-boothart-plantsprout{background-size:90% auto;background-position:50% 42%;}
+:root[data-view="tablet"] .consent.bg-boothart-plantsprout{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-boothart-plantsprout{background-size:cover;background-position:50% 42%;}
+.consent.bg-boothart-skyscraper{background-size:90% auto;background-position:50% 42%;}
+:root[data-view="tablet"] .consent.bg-boothart-skyscraper{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-boothart-skyscraper{background-size:cover;background-position:50% 42%;}
+.consent.bg-boothart-handshake{background-size:90% auto;background-position:50% 42%;}
+:root[data-view="tablet"] .consent.bg-boothart-handshake{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-boothart-handshake{background-size:cover;background-position:50% 42%;}
+.consent.bg-boothart-stairsclimb{background-size:90% auto;background-position:50% 42%;}
+:root[data-view="tablet"] .consent.bg-boothart-stairsclimb{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-boothart-stairsclimb{background-size:cover;background-position:50% 42%;}
+.consent.bg-boothart-roadhorizon{background-size:90% auto;background-position:50% 30%;}
+:root[data-view="tablet"] .consent.bg-boothart-roadhorizon{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-boothart-roadhorizon{background-size:cover;background-position:50% 42%;}
+.consent.bg-boothart-womantablet{background-size:90% auto;background-position:50% 42%;}
+:root[data-view="tablet"] .consent.bg-boothart-womantablet{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-boothart-womantablet{background-size:cover;background-position:50% 42%;}
+/* .bg-gameart (2026-09-14) — same idea as .bg-boothart above, for the 6 main-game brief backdrops
+   (GAME_BG_IMG). Reuses the identical centered position + 87% white-wash rather than duplicating the
+   rules, since these panels were cropped/trimmed the same way (alpha bbox already centers each
+   subject) and read the same monochrome-illustration style as the booth set. */
+.consent.bg-gameart{background-position:50% 42%;}
+:root[data-view="tablet"] .consent.bg-gameart{background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-gameart{background-position:50% 42%;}
+.consent.bg-gameart::before{background:rgba(255,255,255,.87);}
+/* mobile-only per-image size/position overrides (see GAME_BG_POS_CLS's own JS comment for the full
+   why-per-image history across both tuning rounds). Plain 2-class selectors for background-position —
+   same specificity as `.bg-gameart` itself, so these win on mobile purely by being declared after it,
+   but stay overridden by the tablet/pc rules above (one extra attribute selector = higher specificity),
+   which keep the shared cover/50%/42% there untouched. Every rule that also sets background-size needs
+   its OWN tablet/pc reset immediately after it (attribute-selector specificity again), since the
+   tablet/pc `.bg-gameart` rules only ever re-declare position, never size — omitting the reset would
+   leak the mobile zoom through, the exact bug the first version of `.bg-gameart-firststep` had. */
+/* Round 3 (2026-09-15, per a full side-by-side comparison pass): เกมทนกระแส's look at auto 62%/50%
+   12% was called out as "ตำแหน่งที่ลงตัวที่สุด...เอาเป็นแบบในการวิเคราะห์ได้" — the reference every
+   other game's SIZE should match — so it's the only one of the 6 left untouched below; the rest were
+   brought to the same ~65%-height ballpark (mid-turn, superseding an earlier ask to make เกมทนกระแส
+   itself bigger) and then repositioned against that shared size. */
+.consent.bg-gameart-crisisrewind{background-size:auto 65%;background-position:50% 55%;}
+:root[data-view="tablet"] .consent.bg-gameart-crisisrewind{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-gameart-crisisrewind{background-size:cover;background-position:50% 42%;}
+/* .bg-gameart-crisisrewind's Y (2026-09-15, per "ตำแหน่งภาพต่ำลงมาหน่อย...ไม่เห็นฐานภูเขาชัด"): at this
+   size the image is SMALLER than the mobile box (scaledH 65%*758≈493px < 758px), so unlike the
+   `cover` cases there's real letterbox slack and Y shifts the WHOLE image (nothing is cropped) —
+   higher Y pushes the whole picture down, adding blank space above and sliding the mountain's base
+   further down past the cards/button instead of sitting in the open gap where it read too sharp;
+   40%→55% verified live against both asks together (mountain fades behind the lower chrome, person+
+   arrows settle a bit lower too, matching "ต่ำลง"). */
+.consent.bg-gameart-toolpicker{background-size:auto 65%;background-position:50% 50%;}
+:root[data-view="tablet"] .consent.bg-gameart-toolpicker{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-gameart-toolpicker{background-size:cover;background-position:50% 42%;}
+/* .bg-gameart-fomo — INTENTIONALLY UNCHANGED since round 2 (see the block comment above this rule
+   group): confirmed live 2026-09-15 as the reference size for the other 5, not to be enlarged despite
+   an earlier same-message ask to make it bigger — the user's mid-turn follow-up superseded that. */
+.consent.bg-gameart-fomo{background-size:auto 62%;background-position:50% 12%;}
+:root[data-view="tablet"] .consent.bg-gameart-fomo{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-gameart-fomo{background-size:cover;background-position:50% 42%;}
+/* .bg-gameart-lifestages (revised 2026-09-15, per "ให้สัดส่วนภาพใกล้เคียง 3 เกมส์แรก") — moved off
+   plain `cover` onto the same auto 65% as the reference size, which also makes the whole 3-figure
+   composition (previously too wide to fit under `cover`'s width-cropping) fit in frame at once —
+   60% 30% shows all three (child/adult/elder) plus the arrow, superseding round 1's cover-only 68%
+   X-only fix (which only fit 2 of the 3 at full `cover` zoom). */
+.consent.bg-gameart-lifestages{background-size:auto 65%;background-position:60% 30%;}
+:root[data-view="tablet"] .consent.bg-gameart-lifestages{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-gameart-lifestages{background-size:cover;background-position:50% 42%;}
+/* .bg-gameart-firststep (revised 2026-09-15, per "ให้สัดส่วนภาพใกล้เคียง 3 เกมส์แรก") — round 2's
+   auto 160%/20%/100% solved "head hidden"/"show the step" by zooming IN aggressively, at the cost of
+   looking much bigger than the other 5; dropping to the same auto 65% reference size turned out to
+   ALSO keep the whole figure (head-to-box) in frame at 35% 45%, so this round's ask fixed both the
+   consistency complaint and didn't regress the earlier framing fixes — no tension between them here,
+   unlike crisis-rewind/tool-picker where the position had to be re-derived for the new size. */
+.consent.bg-gameart-firststep{background-size:auto 65%;background-position:35% 45%;}
+:root[data-view="tablet"] .consent.bg-gameart-firststep{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-gameart-firststep{background-size:cover;background-position:50% 42%;}
+/* .bg-gameart-goldrefuge's Y (2026-09-15, per "ให้ตำแหน่งภาพลงมาด้านล่างหน่อย...กึ่งกลางจออีกนิด") —
+   same letterbox-slack mechanism as crisis-rewind above (image smaller than box at this size, so Y
+   moves the whole picture with nothing cropped): 30%→45% slides the circle/gold-bars composition down
+   toward center, bringing the gold bars up out of the very bottom edge into clearer view above the
+   button. */
+.consent.bg-gameart-goldrefuge{background-size:auto 65%;background-position:50% 45%;}
+:root[data-view="tablet"] .consent.bg-gameart-goldrefuge{background-size:cover;background-position:50% 42%;}
+:root[data-view="pc"] .consent.bg-gameart-goldrefuge{background-size:cover;background-position:50% 42%;}
 /* .pb-consent — EVERY renderPlayBrief screen carries this (game brief or booth brief, art or not;
    see its own comment), unconditionally, for one reason: .consent's base overflow:clip means it is
    NOT a scroll container, so position:sticky on .consent-btn resolves against the outer PAGE's
@@ -5484,7 +5664,7 @@ function renderBook(){
         '<div class="cr2-side cr2-before">'+pcStatic(r.heroKey)+'</div>'+
         '<span class="cr2-chip cr2-chip-b">ก่อนงาน</span><span class="cr2-chip cr2-chip-a">หลังงาน'+(realPost?'':' · ตัวอย่าง')+'</span>'+
         '<div class="cr2-divider"><button class="cr2-handle" type="button" aria-label="เลื่อนเทียบการ์ดก่อนงานและหลังงาน">'+arrows+'</button></div></div>'+
-        '<p class="cr2-cap">ลากเส้นแบ่งเพื่อเทียบการ์ดตัวตน <b>ก่อนงาน</b> ↔ <b>หลังงาน</b> — ข้อมูลด้านล่างจะเปลี่ยนตามฝั่งที่เห็นเต็ม'+(realPost?'':' (ฝั่งหลังงานเป็นตัวอย่าง จนกว่าจะมีข้อมูลกิจกรรมจริงในงาน)')+'</p>');
+        '<p class="cr2-cap">ลากเส้นแบ่งเพื่อเทียบการ์ดตัวตน <b>ก่อนงาน</b> ↔ <b>หลังงาน</b> ข้อมูลด้านล่างจะเปลี่ยนตามฝั่งที่เห็นเต็ม'+(realPost?'':' (ฝั่งหลังงานเป็นตัวอย่าง จนกว่าจะมีข้อมูลกิจกรรมจริงในงาน)')+'</p>');
   root.innerHTML=
   /* unreg drops REG_CTA_HTML too (2026-09-04, per direction "เอาปุ่มลงทะเบียนมุมขวาบนออก เพราะย้ายมา
      ไว้ด้านล่างแล้ว") — unregisteredCtaHTML()'s own CTA at the bottom is now the only register button
@@ -6286,7 +6466,7 @@ var BOOTHS=[
   {asset:'ประกัน',game:'สแกนช่องโหว่ชีวิต',icon:'lc-shield',zone:0},
   {asset:'คริปโต',game:'โต้คลื่นความผันผวน',icon:'lc-bitcoin',zone:1},
   {asset:'ของสะสม',game:'นักตีราคาของสะสม',icon:'lc-gem',zone:3},
-  {asset:'สุขภาพ',game:'เช็กสุขภาพกับเงิน',icon:'lc-heart',zone:4}
+  {asset:'สุขภาพ',game:'เช็คสุขภาพกับเงิน',icon:'lc-heart',zone:4}
 ];
 /* Icon-set PNG art per asset type (2026-08-26, per direction — "รายการโซน...ให้ใช้ icon ตามนี้"),
    keyed by BOOTHS' own `asset` string so bcIcHTML below can look each one up directly. 'ประกัน'
@@ -6301,23 +6481,128 @@ var BOOTH_ICON_PNG={
   'ตราสารหนี้':ICON_BOND_PNG,'อสังหา/REIT':ICON_REALESTATE_PNG,'ทองคำ':ICON_GOLD_PNG,'สุขภาพ':ICON_HEALTH_PNG,
   'ประกัน':ICON_INSURANCE_PNG,'คริปโต':ICON_CRYPTO_PNG,'ของสะสม':ICON_COLLECTIBLE_PNG
 };
-/* BOOTH_ART_PNG — the big per-booth illustration set cropped from the 10-panel collage (see
-   assets/booths/). Started as a test wiring for 'หุ้นไทย' only (2026-09-11, per direction
-   "ทดสอบนำไปใช้จริง กับหน้าคั่น (สังเวียนเลือกหุ้นอย่างเดียว)") — that test passed (see
-   renderPlayBrief's own comment) and this was then extended to all 10 booths (same-day follow-up,
-   "ขยาย BOOTH_ART_PNG ให้ครบทั้ง 10 บูธ"). Keys verbatim from BOOTHS[i].asset, same convention as
-   BOOTH_ICON_PNG above. */
+/* BOOTH_ART_PNG — the big per-booth illustration shown on the booth RESULT screen (renderPlaySummary).
+   Originally the assets/booths/ collage crop that rendered on the brief AND the result; the brief copy
+   was dropped 2026-09-14 (see renderPlayBrief) so this now only feeds the result screen, and the same
+   direction re-pointed every entry to the finished result artwork the user supplied (Result - 2/,
+   original filenames in Thai) — kept the var name (BOOTH_ART_PNG) despite the files now being .webp,
+   same precedent as GAME_ART_PNG below not being renamed either. Keys verbatim from BOOTHS[i].asset
+   (unchanged), same convention as BOOTH_ICON_PNG above; filenames mirror the booth-NN order 1:1.
+   Optimized the same way as GAME_ART_PNG's own art (see that var's comment for the full recipe):
+   source PNGs (~1.2-2MB each, 1157-1223px wide) resized to 360px width (System.Drawing/PowerShell,
+   ~2x retina headroom at the 172px .play-result-art display width) then re-encoded PNG→WebP via the
+   Browser pane's own canvas (toBlob('image/webp',0.8), alpha preserved — no lossy encoder exists in
+   this env otherwise, same recurring gap as [[investor-dna-score-matrix-xlsx]]). Net: ~1.2-2MB→~19-32KB
+   per file, ~98% smaller. To avoid round-tripping 10 giant base64 blobs through the chat, the browser
+   POSTed each converted WebP directly to a throwaway local Node helper (scratchpad `upload-server.js`,
+   port 8732, CORS-open `/upload/<name>` endpoint writing straight to assets/results/) instead of
+   returning base64 text — much cheaper than the base64-round-trip approach GAME_ART_PNG's own history
+   used, worth reusing for any future batch image conversion in this project. Verified live: all 10
+   files fetch 200 OK from the real dev server post-conversion, alpha round-trip confirmed (corner
+   alpha=0, center alpha~253) on one sample. */
 var BOOTH_ART_PNG={
-  'หุ้นไทย':'assets/booths/booth-01-stock-arena.png',
-  'หุ้นต่างประเทศ':'assets/booths/booth-02-passport-global.png',
-  'กองทุนรวม':'assets/booths/booth-03-fund-duel.png',
-  'ตราสารหนี้':'assets/booths/booth-04-safety-net.png',
-  'ทองคำ':'assets/booths/booth-05-gold-crisis.png',
-  'อสังหา/REIT':'assets/booths/booth-06-rental-yield.png',
-  'ประกัน':'assets/booths/booth-07-life-scan.png',
-  'คริปโต':'assets/booths/booth-08-volatility-wave.png',
-  'ของสะสม':'assets/booths/booth-09-collectible-appraiser.png',
-  'สุขภาพ':'assets/booths/booth-10-money-wellness.png'
+  'หุ้นไทย':'assets/results/result-01-stock-arena.webp',
+  'หุ้นต่างประเทศ':'assets/results/result-02-passport-global.webp',
+  'กองทุนรวม':'assets/results/result-03-fund-duel.webp',
+  'ตราสารหนี้':'assets/results/result-04-safety-net.webp',
+  'ทองคำ':'assets/results/result-05-gold-crisis.webp',
+  'อสังหา/REIT':'assets/results/result-06-rental-yield.webp',
+  'ประกัน':'assets/results/result-07-life-scan.webp',
+  'คริปโต':'assets/results/result-08-volatility-wave.webp',
+  'ของสะสม':'assets/results/result-09-collectible-appraiser.webp',
+  'สุขภาพ':'assets/results/result-10-money-wellness.webp'
+};
+/* BOOTH_BG_IMG (2026-09-14, per direction "ต้องการใช้รูปเหล่านี้...มาใช้เป็นภาพพื้นหลังของหน้าคั่น...
+   เรียงตามลำดับจากรูปที่แนบให้ 1-10") — per-booth PHOTO BACKDROP for the booth brief screen
+   (renderPlayBrief), replacing the shared BG_IMG.room1 backdrop that briefs used right up until this
+   direction (booth AND game briefs both sat on room1 as of the previous session — see that var's own
+   history). Games keep room1 unchanged; only booth briefs switch to one of these 10, keyed by
+   BOOTHS[i].asset same as BOOTH_ART_PNG/BOOTH_ICON_PNG above. Source: a single 5×2 collage the user
+   supplied (file_00000000213c8211a8eb601b1c3e336a.png, project root, 1536×1024, monochrome geometric
+   illustrations — kept at the project root, same "don't delete the user's source" precedent as the
+   GAME_ART_PNG/BOOTH_ART_PNG collages). Mapped verbatim to the reading order the direction specified
+   (panel 1→booth 1 หุ้นไทย, ... panel 10→booth 10 สุขภาพ) — confirmed with the user before cropping.
+   Cropped into 10 equal 307×512 cells (1536/5, 1024/2 — panel-01..10.png), one genuine bleed found+
+   fixed (panel-01's light triangle beam tip crossed the column boundary into panel-02's top-left
+   corner — confirmed via side-by-side corner comparison against panel-01's own matching edge, not
+   just eyeballing the thumbnail; patched with a small opaque-white rectangle over the bleed's exact
+   extent, x:0-28/y:0-105, verified clean after). 3 OTHER edges that looked suspicious in the small
+   thumbnail (panel-07/08's left edges, panel-09's right edge) turned out on the same close comparison
+   to be each panel's OWN composition independently touching its own frame edge (panel-06/07's dark
+   sleeve/building shapes, panel-08's own light pillar, panel-09's symmetric road-flank shapes) — NOT
+   cross-panel bleed — so those were correctly left untouched; trimming them would have cut into real
+   content for no reason. Worth remembering this exact failure mode for any FUTURE grid-collage crop:
+   two independently-edge-touching panels can look like one continuous bleed at thumbnail size purely
+   by coincidence of both being dark/light at the shared boundary — always verify by comparing the
+   SAME y-range from both panels' matching edges (do the shapes' position/color actually line up?)
+   before trimming, the same lesson GAME_ART_PNG's own bleed-detection history already applied once.
+   Responsive composition (per direction "อยากให้คำนึงถึงการ responsive ด้วย"): unlike BG_IMG.room1
+   (one fixed photo needing hand-tuned per-device background-position because its focal point, a door,
+   sits well off-center), all 10 of these panels have their subject roughly centered both axes — so a
+   SINGLE shared position works across mobile/tablet/pc without room1's per-device split. New
+   `.consent.bg-boothart` class (see its own CSS comment) pins `background-position:50% 42%` and
+   OVERRIDES the tablet/pc rules tuned for room1's off-center door, which would otherwise also apply
+   here (same .consent element) and needlessly shift these already-centered images left. Exported at
+   900px wide (2.9x the 307px source — a deliberate upscale since this is a full-bleed CSS background
+   that must hold up at real desktop widths, unlike BOOTH_ART_PNG's small inline-image case which only
+   needed ~2x a 172px display slot) via the same resize+WebP recipe as BOOTH_ART_PNG (System.Drawing
+   bicubic resize, canvas toBlob('image/webp',0.78), uploaded through a second throwaway helper server
+   on port 8733 straight to assets/booths-bg/ — same technique, separate port so it could run alongside
+   BOOTH_ART_PNG's own conversion pass earlier this session). Net ~50-100KB per file. Verified live:
+   all 10 fetch 200 OK; screenshotted a sample (skyscraper/stairs/road — the most vertically-extended
+   compositions, most at-risk of losing the subject under pc's aggressive cover-crop) at mobile/tablet/
+   pc widths, subject stayed visibly in-frame at all 3 with the shared 50%/42% position. */
+var BOOTH_BG_IMG={
+  'หุ้นไทย':'assets/booths-bg/booth-bg-01-person-cap.webp',
+  'หุ้นต่างประเทศ':'assets/booths-bg/booth-bg-02-door-light.webp',
+  'กองทุนรวม':'assets/booths-bg/booth-bg-03-globe-network.webp',
+  'ตราสารหนี้':'assets/booths-bg/booth-bg-04-woman-profile.webp',
+  'ทองคำ':'assets/booths-bg/booth-bg-05-plant-sprout.webp',
+  'อสังหา/REIT':'assets/booths-bg/booth-bg-06-skyscraper.webp',
+  'ประกัน':'assets/booths-bg/booth-bg-07-handshake.webp',
+  'คริปโต':'assets/booths-bg/booth-bg-08-stairs-climb.webp',
+  'ของสะสม':'assets/booths-bg/booth-bg-09-road-horizon.webp',
+  'สุขภาพ':'assets/booths-bg/booth-bg-10-woman-tablet.webp'
+};
+/* BOOTH_BG_POS_CLS (2026-09-15, per a full framing pass on all 10 booth brief backdrops, same request
+   shape as GAME_BG_POS_CLS's own — "สัดส่วนภาพโดยรวมเล็กลงกว่านี้อีกหน่อย (ให้เห็นภาพรวมมากขึ้น)" on
+   every one of them, 4 of the 10 also asking the subject sit higher and 1 (ดวลกองทุน) lower) — this is
+   the "unlike BOOTH_BG_IMG's 10, none of which got individual reports, so left alone" note on
+   GAME_BG_POS_CLS above no longer holding. First pass (same day) sized every booth off a shared
+   mobile-only `auto 65%` HEIGHT, matching GAME_BG_POS_CLS's own reference size; a same-day real-device
+   follow-up ("balance กว่านี้" + a specific edge/bleed complaint on ประกัน's handshake image) found that
+   height-based sizing let each image's own width:height ratio (0.6-0.785) drift its EFFECTIVE size
+   inconsistently — the .6-ratio images under-filled the box (looked small/washed-out) while the wider
+   .74-.785 ones sat at or past the box's own width (plantsprout actually cropped, handshake's already-
+   edge-touching sleeve triangles read as bleeding). Switched to WIDTH-based sizing instead (`90% auto`,
+   see the CSS rules' own comment for the full math) so all 10 get the identical ~5%-margin inset
+   regardless of their individual aspect ratio — genuinely balanced, and mathematically guaranteed not to
+   crop in this narrower-than-every-image mobile box. Position again only needed a Y nudge for each
+   image's own (now width-derived) vertical slack (X stays 50%, confirmed centered per-panel already,
+   see BOOTH_BG_IMG's own comment): 30% for the 4 "สูงขึ้น" reports (สังเวียนเลือกหุ้น/พาสปอร์ตนักลงทุนโลก/
+   สร้างตาข่ายกันตก/นักตีราคาของสะสม — person-cap/door-light/woman-profile/road-horizon all had their
+   subject sitting in the LOWER half of their own alpha-trimmed crop, so raising Y pulls it up toward
+   center), 65% for ดวลกองทุน's "ต่ำลง" (globe-network, whose globe sits centered-to-upper already, so
+   lowering Y moves it down into the newly-opened bottom slack — bumped from the first pass's 55% now that
+   width-based sizing opened up more slack to move within), and the base 42% (i.e. no position change,
+   matching `.bg-boothart` itself) for the remaining 5 which only asked for smaller, not repositioned
+   (ทองคำ/อสังหา-REIT/ประกัน/คริปโต/สุขภาพ — plant-sprout/skyscraper/handshake/stairs-climb/woman-tablet,
+   all already close to centered in their own crop). Same
+   2-class-specificity mobile-only + explicit tablet/pc cover/42% reset pattern as GAME_BG_POS_CLS's own
+   CSS (see `.bg-boothart-*` rules), for the identical reason: the shared `.bg-boothart` rule never sets
+   background-size, so a mobile-only size override needs its own tablet/pc reset or it would leak
+   through at those widths too. */
+var BOOTH_BG_POS_CLS={
+  'หุ้นไทย':'bg-boothart-personcap',
+  'หุ้นต่างประเทศ':'bg-boothart-doorlight',
+  'กองทุนรวม':'bg-boothart-globenetwork',
+  'ตราสารหนี้':'bg-boothart-womanprofile',
+  'ทองคำ':'bg-boothart-plantsprout',
+  'อสังหา/REIT':'bg-boothart-skyscraper',
+  'ประกัน':'bg-boothart-handshake',
+  'คริปโต':'bg-boothart-stairsclimb',
+  'ของสะสม':'bg-boothart-roadhorizon',
+  'สุขภาพ':'bg-boothart-womantablet'
 };
 /* partner companies per asset — verbatim from ZONE_BOOTHS (the real check-in points).
    3 assets (หุ้นไทย/กองทุนรวม/คริปโต) padded to the 12-booth max with sample/placeholder partner
@@ -6351,7 +6636,7 @@ var BOOTH_BRIEF=[
   'สแกนหาความเสี่ยงที่รับเองไม่ไหว และเครื่องมือที่ช่วยรับแทน',
   'ลองโต้คลื่นของที่ขึ้นลงแรง ด้วยแผนที่ตั้งไว้ล่วงหน้า',
   'ตีราคาของสะสม ระหว่างของที่รักกับการลงทุนจริง',
-  'เช็กว่าสุขภาพเกี่ยวกับเรื่องเงินยังไง สินทรัพย์ที่คนมักลืมนับ'
+  'เช็คว่าสุขภาพเกี่ยวกับเรื่องเงินยังไง สินทรัพย์ที่คนมักลืมนับ'
 ];
 /* ══ BOOTH_Q (2026-09-09) ══ real question content for the 10 asset-booth mini-games (เกมประจำ
    Asset 10 เกม), sourced verbatim from GAMES-QUESTIONS-DNA.md Part B (itself from "คำถาม 6 ด้าน
@@ -6367,10 +6652,10 @@ var BOOTH_BRIEF=[
    doc's own cross-reference note. */
 var BOOTH_Q=[
   {points:12,questions:[
-    {icon:'lc-file-text',q:'มีหุ้นตัวหนึ่งกำลังเป็นที่พูดถึง คุณจะ**ตัดสินใจซื้อจากอะไรเป็นหลัก**?',locked:true,
+    {icon:'lc-file-text',img:'document',q:'มีหุ้นตัวหนึ่งกำลังเป็นที่พูดถึง คุณจะ**ตัดสินใจซื้อจากอะไรเป็นหลัก**?',locked:true,
      opts:['ดูว่าธุรกิจทำอะไร และงบการเงินเป็นยังไง','ดูกราฟราคาและจังหวะซื้อ','เพื่อนหรือข่าวในกลุ่มบอกว่าน่าสนใจ'],
      insight:'ตัดสินใจจากข้อมูลของธุรกิจ ไม่ใช่จากคำบอกเล่า'},
-    {icon:'lc-pie-chart',q:'ถ้า**มีเงินก้อนหนึ่งจะลงทุน** คุณจะ...',
+    {icon:'lc-pie-chart',img:'portfolio',q:'ถ้า**มีเงินก้อนหนึ่งจะลงทุน** คุณจะ...',
      opts:['ลงกับหุ้นตัวเดียวที่มั่นใจที่สุด','แบ่งลงหลายตัวหรือลงผ่านกองทุน 5-10 อย่าง','ทยอยซื้อทีละน้อยหลายงวด (DCA)'],
      insight:'การแบ่งเงินไปหลายที่ ช่วยลดผลกระทบเวลาที่ใดที่หนึ่งไม่เป็นไปตามคาด'}
   ]},
@@ -6785,7 +7070,22 @@ function renderBooth(){
     root.querySelector('#howtoClose').onclick=closeHowto;
     root.querySelector('#howtoScrim').onclick=closeHowto;
     root.querySelectorAll('.bp-btn').forEach(function(btn){btn.onclick=function(){openScan(+btn.dataset.b,+btn.dataset.c);};});
-    root.querySelectorAll('.bc-play').forEach(function(btn){btn.onclick=function(){var bi=+btn.dataset.play;var checkedIn=!!(BOOTH_CHK[bi]&&BOOTH_CHK[bi].size>0);if(!BOOTH_ACT[bi]&&checkedIn)openPlay('booth',bi);};});
+    /* Played booths (2026-09-15, per direction — สังเวียนเลือกหุ้น, the DEMO-seeded already-played
+       booth, couldn't be tapped at all: this handler used to only call openPlay when NOT yet played,
+       so a "เล่นแล้ว" card was a dead end with no way back into what it showed. Main games' own
+       gameRow() already solved this for the 6 SIDES games — a played row turns into an inline
+       chevron-expand ("แตะอ่านผล") — but booths never got an equivalent, since .bc-play's only two
+       states were "locked" (เช็คอินก่อน) and "go play" (เล่นเกม). Rather than build a second inline-
+       expand mechanism, reopen the SAME renderPlaySummary screen the booth ended on: it renders purely
+       off the static question set (resultNote/insights) and BOOTH_ACT/learnedInsights, never off
+       PLAY.sel, so jumping straight to step:'summary' is safe to view repeatedly with no re-scoring
+       or replay risk. */
+    root.querySelectorAll('.bc-play').forEach(function(btn){btn.onclick=function(){
+      var bi=+btn.dataset.play;
+      if(BOOTH_ACT[bi]){PLAY={kind:'booth',idx:bi,step:'summary',qi:0,sel:null,lockedBack:false,timerQi:null,ptsQi:null,returnPhase:st.phase};st.phase='play';render();return;}
+      var checkedIn=!!(BOOTH_CHK[bi]&&BOOTH_CHK[bi].size>0);
+      if(checkedIn)openPlay('booth',bi);
+    };});
   }
   var mapLightbox=root.querySelector('#mapLightbox');
   var openMap=function(){mapLightbox.classList.add('show');};
@@ -6855,6 +7155,189 @@ var SIDES=[
   {icon:'lc-compass',img:'compass',title:'เกมก้าวแรก',side:'ก้าวแรก',emoji:'🚀',intro:'เกมนี้ไม่ตัดสินว่าคุณเป็นคนแบบไหน ปิดท้ายด้วย "ก้าวแรก" เล็กๆ ที่คุณเลือกเอง',rule:'เลือกก้าวแรกได้หลายข้อ',measures:'กำแพงที่ทำให้ยังไม่เริ่ม + ก้าวเล็กที่สุด'}, // compass = finding your direction/first step as a new investor
   {icon:'lc-shield',img:'gold',title:'เกมทองคำ เพื่อนยามวิกฤต',side:'ทองคำในพอร์ต',emoji:'🛡️',intro:'ไม่ต้องทายราคาทอง เป้าหมายคือเข้าใจว่าทองคำมีไว้ทำอะไรในพอร์ตของคุณ',rule:'เดาจากความรู้สึกได้เลย',measures:'บทบาทของทองคำสำหรับคุณ — ตัวถ่วงความเสี่ยง หรือตัวทำกำไร'} // shield = "เพื่อนยามวิกฤต" — gold as a protective refuge during a crisis
 ];
+/* GAME_ART_PNG (2026-09-14) — the big per-game illustration set, cropped from a 2x3 collage
+   (same treatment as BOOTH_ART_PNG's 10-panel crop above: transparent background preserved,
+   verified alpha=0 at the corners on both source and crop). Now shown on renderPlaySummary (the
+   "เล่นจบแล้ว" result screen), not the brief — see that function's own comment. Keyed by
+   SIDES[i].title, same "readable string key" convention BOOTH_ART_PNG uses (keyed by
+   BOOTHS[i].asset) rather than a bare index.
+   .webp not .png (2026-09-14, per direction "item type, size ถูกควบคุมให้ใช้เบาที่สุด") — re-encoded
+   via the browser's own canvas.toDataURL('image/webp',0.8) (no lossy encoder available in this
+   env otherwise — see [[investor-dna-score-matrix-xlsx]] for the same recurring env-tooling note).
+   At the .play-result-art display width (max-width:172px), 360px-wide source art is already ~2x
+   retina headroom, so each PNG was first downscaled 512px→360px (System.Drawing, PowerShell) THEN
+   re-encoded to WebP — quality 0.8 with alpha preserved (confirmed via a canvas round-trip: decoded
+   corner alpha=0, center alpha~252-253). Combined effect: ~1.79MB (original crops) → ~952KB (360px
+   PNG) → ~142KB (WebP) total across all 6, an ~92% reduction from where this started. _devserver.js
+   gained a '.webp':'image/webp' MIME entry to serve these correctly.
+   game-01 swapped 2026-09-15 (first pass) — user supplied a second 2x3 collage ("ChatGPT Image 15
+   ก.ย. 2569 12_06_38.png", project root, 1536×1024) whose top-middle panel re-does this same "คนดูกราฟ"
+   pose with a candlestick chart on the right screen instead of the jagged line chart the original
+   panel 1 had; the other 5 panels were duplicates of panels already live as game-02/03/04/05/06
+   (pixel-identical compositions, confirmed by inspection) so only panel 1 was reprocessed that pass.
+   Real per-pixel alpha was already baked into that source (corner alpha=0, content alpha~252,
+   confirmed via Node/sharp — GDI+ misreads this file's alpha per the GAME_BG_IMG comment below), so
+   no flood-fill was needed there.
+   game-01/02/03/04/05 re-swapped 2026-09-15 (second pass, per direction) — user supplied a THIRD
+   collage ("ChatGPT Image 15 ก.ย. 2569 13_16_43.png", project root, 1536×1024, same 6 compositions
+   again) confirmed via a full side-by-side as the "final" re-render of the whole set: same content as
+   above for 5 panels, plus the shield panel's push-back arrows now drawn as part of the generated art
+   instead of composited on afterward as flat shapes. This collage has NO alpha channel (solid flat
+   RGB, `sharp` metadata hasAlpha:false) — a flat black (0,0,0) backdrop instead, unlike every other
+   source collage in this file. Background removed via a border-seeded flood fill in Node (BFS from
+   the frame edge over pixels with max(R,G,B)≤14, connected region → alpha 0; threshold chosen tight
+   enough to leave black clothing/hair alone since those aren't reachable from the border through only
+   near-black pixels) — no external bg-removal tool available in this env. One genuine cross-panel
+   bleed found the same way the BOOTH_ART_PNG history warns to check for (compare the matching edge
+   pixels of two adjacent panels): game-04's cell picked up ~22px of the candlestick panel's frame
+   bleeding in from above and ~28px of the shield panel's background triangles bleeding in from the
+   left, both cleared with a hard per-cell inset before trim. Same trim→360px-wide→WebP q80 recipe as
+   above otherwise.
+   game-06 swapped 2026-09-15 (third pass, per direction) — initially left on the older gold/orange
+   crystal since this collage's version reads white/blue-orange (weaker fit for the "ทองคำ" theme,
+   flagged to the user first); swapped in anyway on request. Same flood-fill recipe as the second pass;
+   this cell had its own cross-panel bleed too (~22px of the dashboard panel's laptop bleeding down
+   from above, ~50px of the life-stages panel's cloud bleeding in from the left) cleared the same way.
+   game-03 bleed fix (2026-09-15, same day, caught after the fact) — the initial second-pass crop
+   MISSED its own top bleed (~18-20px of the step-cube panel's monolith edge bleeding down from
+   r0c0 above); the visual check that pass only eyeballed the 360px thumbnails and the artifact was
+   small enough to slip through there. User spotted it live on the result screen ("มีกราฟิกเกินจากด้านบน");
+   re-scanned that cell's raw pixels specifically (same border-adjacent-pixel-run method), confirmed a
+   real gap of background rows between the bleed blob and the shield's own top point, cleared with the
+   same per-cell top inset and re-verified. Lesson for any future crop off a collage like this: don't
+   trust a shrunk thumbnail to catch a small bleed — check top/left edge pixel rows directly per cell,
+   the way this file's own BOOTH_ART_PNG bleed-detection precedent already recommended.
+   Edge de-fringe pass (2026-09-15, same day, per "ยังมีเห็นเส้นดำๆ อยู่...ยังไม่เนียน" across all 6) —
+   the flood-fill above used one hard threshold (max(R,G,B)≤14 → alpha 0, else alpha 255), which left a
+   visible jagged dark stair-step rim on every curved/diagonal edge: anti-aliased source pixels just
+   above the threshold (e.g. a glass-panel edge blending toward the black backdrop) kept alpha=255 but
+   their own near-black color, so they read as a thin black fringe once composited on the app's white
+   cards — confirmed by pixel-zooming the same edge region before/after (see this comment's own
+   before/after crop method for anyone re-checking). Fix: added a 4px soft-edge band around the
+   flood-filled background (BFS distance transform, capped at 4px) — inside that band, alpha is
+   derived from the pixel's own brightness (max(R,G,B)×1.12, clamped) instead of a hard 0/255, AND the
+   color is unpremultiplied against that alpha (color×255/alpha) to cancel the black-blend tint, the
+   standard fix for mattes extracted off a black backdrop. Pixels beyond the band (solid interior,
+   including genuinely black hair/clothing) are untouched — still hard alpha=255 — so this doesn't
+   reopen the "black hair goes transparent" failure mode a naive global brightness-alpha would cause.
+   Re-verified the same way as the bleed fix (pixel-zoomed crops, before/after) rather than trusting
+   thumbnails again. All 6 files re-encoded with this recipe; sizes grew slightly (~17-23KB → ~19-28KB)
+   from the added semi-transparent edge pixels, still tiny.
+   Trapped-background-pocket fix (2026-09-15, same day, per "ยังดูแข็งๆ...สีขาวๆ ตรงช่องระหว่างแท่ง
+   คริสตัล" on game-04) — the border-seeded flood fill above only reaches background pixels connected
+   to the CELL EDGE; a background pocket fully enclosed by foreground silhouette (e.g. the gap between
+   a raised arm and a screen, or between a leg and a crystal) never touches that edge, so it stayed
+   solid opaque near-black — an ugly disconnected black patch. Can't fix generically by relaxing the
+   color threshold: sampled hair/clothing pixels are literally (0,0,0), pixel-identical to the true
+   backdrop, so color alone can never tell a trapped pocket from a black sleeve — same reason the
+   border-seed approach was chosen originally. Found real instances by connected-component-labeling
+   every opaque near-black blob per cell, sorting by size, and eyeballing a zoomed crop of each
+   candidate (most are legitimate hair/pants/shoes/arrows — see this comment's own before-crop history
+   for the pixel-identical-to-background problem this rules out any shortcut around): 3 confirmed
+   pockets, all in this third collage — game-02 had two (bbox ~207,299–330,468 behind the raised arm,
+   and ~132,314–194,401 behind the jaw), game-04 had one (bbox ~181,318–217,359 between the leg and
+   the nearest crystal). The other 4 cells checked clean. Fix: added a small hardcoded list of manual
+   interior seed points (one per confirmed pocket, in the raw 512×512 cell's own coordinates) that the
+   flood fill also starts from, in addition to the cell-edge seeds — since each seed point was picked
+   by hand after visual confirmation, the fill only eats that specific enclosed pocket (bounded by the
+   real silhouette edges around it) and can't spread into an unrelated black shape elsewhere in the
+   same cell. Only game-02/game-04 needed re-export.
+   All 6 GAME_ART_PNG entries now come from this third collage, with the de-fringe pass and (for
+   game-02/04) the pocket fix applied. */
+var GAME_ART_PNG={
+  'เกมย้อนเวลาพอร์ต':'assets/games/game-01-crisis-rewind.webp',
+  'เกมเลือกเครื่องมือ':'assets/games/game-02-tool-picker.webp',
+  'เกมทนกระแส':'assets/games/game-03-fomo-shield.webp',
+  'เกมเป้าหมายแต่ละวัย':'assets/games/game-04-life-stages.webp',
+  'เกมก้าวแรก':'assets/games/game-05-first-step.webp',
+  'เกมทองคำ เพื่อนยามวิกฤต':'assets/games/game-06-gold-refuge.webp'
+};
+/* GAME_BG_IMG (2026-09-14, per direction "ต้องการใช้รูป...ปรับเข้าใช้งานกับหน้าคั่น ของหน้าเกมส์หลัก
+   ตาม dna ที่ใช้กับหน้าคั่น ของหน้าเดินบูธ") — same treatment as BOOTH_BG_IMG above, applied to the
+   6 main-game briefs (renderPlayBrief), which had stayed on the shared BG_IMG.room1 backdrop up to
+   now. Source: a single 2×3 collage the user supplied (5D7A08BE-C749-4BCF-B264-6D20E44A199E.png,
+   project root, 1536×1024, same monochrome-illustration style/alpha-matted-background convention as
+   BOOTH_BG_IMG's own 5×2 source) — cropped into 6 equal 512×512 cells, matched to SIDES[i] by
+   judgment (the direction didn't specify a 1:1 reading-order mapping the way the booth one did):
+   panel 1 (คนก้าวขึ้นกล่องหน้ากำแพง)→เกมก้าวแรก, panel 2 (เลือกระหว่างกราฟขึ้น/กราฟสวิง)→เกมทนกระแส,
+   panel 3 (วิเคราะห์กราฟแท่ง/วงกลม/แว่นขยาย)→เกมเลือกเครื่องมือ, panel 4 (ยืนยอดเขา ลูกศรหลายทิศ)→
+   เกมย้อนเวลาพอร์ต, panel 5 (3 วัยไต่บันได)→เกมเป้าหมายแต่ละวัย (literal match), panel 6 (ทองคำ+วงกลม
+   กลางวัน/กลางคืน)→เกมทองคำ เพื่อนยามวิกฤต (literal match) — confirmed with the user before wiring.
+   Each panel crop already carried a real per-pixel alpha channel baked in from the source (verified
+   via canvas getImageData, corner alpha=0/content alpha~253 — same as BOOTH_BG_IMG's source; GDI+'s
+   own GetPixel misreports this file's alpha as always 0, a PowerShell/.NET quirk, NOT a property of
+   the file itself, worth remembering for any future crop off this same collage style), so no
+   flood-fill/background-removal step was needed.
+   First pass (same day) additionally trimmed each crop to its own alpha bounding box before upscaling
+   to 900px wide — reported back as "ภาพดูใหญ่เกินจอ...เบลอ แตก" (blurry/oversized on real screens).
+   Root cause: this source collage is a 3-col×2-row grid, so each cell is already SQUARE (512×512) —
+   unlike BOOTH_BG_IMG's 5-col×2-row grid, whose cells are naturally tall portrait (307×512, ratio
+   0.6, a good match for a phone viewport's own aspect). Bounding-box-trimming a square cell down to
+   just its visible content shrank it further toward landscape (e.g. 439×395), so `background-size:
+   cover` on a tall mobile .consent box had to blow the already-small export up ~1.4-1.9x past its
+   OWN resolution to satisfy the height — real, visible upscale blur, worse than BOOTH_BG_IMG ever
+   hit since that source's portrait cells need much less stretching to cover a portrait screen.
+   Fix: dropped the bbox trim entirely (kept the full 512×512 cell — every panel's composition uses
+   most of the cell's width anyway, e.g. the two-graph fork/3-generation ladder/mountain-arrows scenes,
+   so a portrait-ratio center-crop the way booth's is shaped would have clipped them), and upscaled to
+   1500×1500 instead of 900 — 2.93x off the 512px native cell, deliberately the SAME multiplier
+   BOOTH_BG_IMG used off ITS 307px cell (900/307≈2.93), so both sets get equivalent softening despite
+   the aspect mismatch. Verified against the actual rendered .consent box size (375×758 CSS/DPR2 on
+   mobile, 753×970 on tablet): 1500×1500 covers both at ≤1.3x physical-pixel upscale, at or under
+   BOOTH_BG_IMG's own ~1.7-1.9x on the same boxes. Re-encoded via canvas toBlob('image/webp',0.78),
+   same recipe as BOOTH_BG_IMG otherwise. Uploaded through the same kind of throwaway local Node
+   helper (scratchpad `upload-server.js`, port 8736 this pass, CORS-open `/upload/<name>`) straight to
+   assets/games-bg/. Filenames reuse GAME_ART_PNG's own slug words (crisis-rewind/tool-picker/etc) so
+   the two asset sets read as a matched pair per game. Keyed by SIDES[i].title, same convention as
+   GAME_ART_PNG/BOOTH_BG_IMG. */
+var GAME_BG_IMG={
+  'เกมย้อนเวลาพอร์ต':'assets/games-bg/game-bg-01-crisis-rewind.webp',
+  'เกมเลือกเครื่องมือ':'assets/games-bg/game-bg-02-tool-picker.webp',
+  'เกมทนกระแส':'assets/games-bg/game-bg-03-fomo-shield.webp',
+  'เกมเป้าหมายแต่ละวัย':'assets/games-bg/game-bg-04-life-stages.webp',
+  'เกมก้าวแรก':'assets/games-bg/game-bg-05-first-step.webp',
+  'เกมทองคำ เพื่อนยามวิกฤต':'assets/games-bg/game-bg-06-gold-refuge.webp'
+};
+/* GAME_BG_POS_CLS (2026-09-14, per user feedback on real mobile screens; extended 2026-09-15 with a
+   follow-up round of framing reports once all 6 were compared side by side) — every one of the 6
+   GAME_BG_IMG crops now carries a mobile-only background-size/-position tweak away from the shared
+   cover/50%/42% (unlike BOOTH_BG_IMG's 10, none of which got individual reports, so left alone).
+   Round 1 (position-only, still on `cover`): เกมทนกระแส's two-graph composition sat far enough right
+   that 50% only showed the smooth line, not the volatile one the game is actually about; เกมเป้าหมาย
+   แต่ละวัย's 3 figures spread wide enough that 50% framed just the middle (adult) one alone; เกมก้าวแรก's
+   figure turned out to be positioned LEFT of center in its cell, so 50% cropped the head out entirely
+   (confirmed live: background-position-Y has ZERO effect on a `cover`-sized square crop in a
+   height-bound mobile box — the full image height already shows regardless of Y — so that particular
+   fix was horizontal, not vertical, even though the report described it as "too low").
+   Round 2 (per "text title ทั้งหมด เอา shimer text ออก" + a full framing pass on all 6, per-game notes
+   below) added background-size to every one of them, since "เห็นภาพรวมกว้างกว่านี้"/"เห็นภาพเยอะกว่านี้"
+   /"สัดส่วนภาพเล็กกว่านี้" all ask for LESS zoom than `cover` (which, being height-bound, already crops
+   most of the width away) — auto <100%-height creates real letterboxing slack, which is also what
+   FINALLY makes Y meaningful again (opposite direction from round 1's dead-Y finding, which was
+   specific to plain `cover`): เกมย้อนเวลาพอร์ต zoomed out to show the mountain + both arrow clusters;
+   เกมเลือกเครื่องมือ zoomed out for the full bar/pie/magnifying-glass overview; เกมทนกระแส zoomed out
+   further AND shifted up per direct follow-up; เกมเป้าหมายแต่ละวัย only needed X nudged further right
+   (to 68%) to bring the arrow tip in while keeping the adult+elder pair — still plain `cover`, Y still
+   dead, same round-1 reasoning; เกมก้าวแรก's Y went from 82% to 100% once the ask became "show the step
+   clearly" (100% reveals the box the figure is stepping onto, at the cost of the CTA-adjacent crop
+   headroom 82% had bought — head still stays in frame at 100%, just closer to the cards); เกมทองคำ
+   เพื่อนยามวิกฤต zoomed out to fit the whole day/night circle + gold bars in one glance. All values
+   tuned live against the actual rendered .consent box, wash toggled off mid-tuning (`.consent::before`)
+   to see true placement before re-checking legibility with it back on. Classes carry only their OWN
+   2-class specificity (same as `.bg-gameart` itself) so they win on mobile by SOURCE ORDER (defined
+   after `.bg-gameart`) but stay overridden by the higher-specificity `:root[data-view="tablet"/"pc"]
+   .consent.bg-gameart` rules for background-POSITION; every class that also sets background-SIZE
+   additionally needs its own explicit tablet/pc reset (see each rule's own CSS comment) since the
+   tablet/pc `.bg-gameart` rules never touch that property — same leak `.bg-gameart-firststep` hit the
+   first time this pattern was used, now applied consistently to all 6. */
+var GAME_BG_POS_CLS={
+  'เกมย้อนเวลาพอร์ต':'bg-gameart-crisisrewind',
+  'เกมเลือกเครื่องมือ':'bg-gameart-toolpicker',
+  'เกมทนกระแส':'bg-gameart-fomo',
+  'เกมเป้าหมายแต่ละวัย':'bg-gameart-lifestages',
+  'เกมก้าวแรก':'bg-gameart-firststep',
+  'เกมทองคำ เพื่อนยามวิกฤต':'bg-gameart-goldrefuge'
+};
 /* SIDES[i].img (2026-09-11, per direction "หน้า เกมหลัก - การใช้ไอคอน...ด้านอื่นใน Playbook") — real
    custom art for the เกมหลัก page's game-list icons (gameRow's .gr-ic + renderGames' nextCard .ns-ic
    below), same q.img→ICON_IMG idea as MINIGAME_Q's per-question icons. First shipped 5 of 6 (เกม
@@ -6882,57 +7365,57 @@ var MINIGAME_Q=[
      opts:['ขอไม่เห็นติดลบเกินราว 10% (ทุก 100 บาท เหลือราว 90 บาท)','ติดลบราว 30% ยังพอไหว','ติดลบเกิน 50% ก็ยังถือได้']},
     {icon:'lc-zap',img:'lightning',q:'ปี 2551 วิกฤตแฮมเบอร์เกอร์ เงินลงทุน 1,000,000 บาท เหลือ 430,000 บาท (**ลดลง 57.00%**) คุณจะทำอะไร?',locked:true,sub:'ตอนนั้นยังไม่มีใครรู้ว่าตลาดจะฟื้นเมื่อไหร่ ตอบตามที่ใจคุณคิดจริงๆ',
      opts:['ขายทั้งหมด หนีก่อนจะเสียมากกว่านี้','ถือไว้ตามแผนเดิม ไม่แตะ','ซื้อเพิ่ม ของถูกมาก']},
-    {icon:'lc-hourglass',img:'hourglass',q:'ก.พ.–มี.ค. 2563 วิกฤตโควิด เงินลงทุนเหลือ 660,000 บาท (**ลดลง 34.00% ในเดือนเดียว**) รอบนี้จะทำอะไร?',locked:true,
+    {icon:'lc-hourglass',img:'s2q2',q:'ก.พ.–มี.ค. 2563 วิกฤตโควิด เงินลงทุนเหลือ 660,000 บาท (**ลดลง 34.00% ในเดือนเดียว**) รอบนี้จะทำอะไร?',locked:true,
      opts:['ขายทั้งหมด รอบนี้แรงกว่าเดิม','ถือตามแผน เคยผ่านปี 2551 มาแล้ว','ซื้อเพิ่มเลย จังหวะนี้แหละ']}
   ]},
   {questions:[
-    {icon:'lc-message-circle',img:'s2q7',q:'รอบแรก หุ้นปริศนาที่กำลัง**เป็นที่พูดถึงในโซเชียล** ดูเท่าที่อยากดูแล้ว คุณจะ?',
+    {icon:'lc-message-circle',img:'s2q7',q:'หุ้นปริศนาที่กำลัง**เป็นที่พูดถึงในโซเชียล** ดูเท่าที่อยากดูแล้ว คุณจะ?',
      opts:['ตัดสินใจจากที่ดูข้อมูลมาเอง','ขอกระจายผ่านกองทุน หรือทยอยซื้อทีละน้อยทุกเดือน (DCA) แทนการเลือกตัวเดียว','ซื้อตามกระแสข่าวเลย เดี๋ยวไม่ทัน'],
      insight:'ข่าวและกระแสเป็นสิ่งล่อ ไม่ใช่ข้อมูลที่ใช้ตัดสินใจ · งบการเงินบอกสุขภาพของธุรกิจ'},
-    {icon:'lc-file-text',img:'document',q:'รอบสอง หุ้นปริศนาที่เงียบ **ไม่มีใครพูดถึง** ดูแล้ว คุณจะ?',
+    {icon:'lc-file-text',img:'document',q:'หุ้นปริศนาที่เงียบ **ไม่มีใครพูดถึง** ดูแล้ว คุณจะ?',
      opts:['สนใจ เลือกหุ้นตัวนี้ เพราะพื้นฐานและปันผลดี','ชอบแนวนี้ แต่ขอลงผ่านกองทุน หรือทยอยซื้อทีละน้อย กระจายหลายตัว','ข้ามไป ไม่มีกระแส ดูน่าเบื่อ'],
      insight:'ของที่พื้นฐานมั่นคงมักไม่หวือหวาและไม่เป็นข่าว · การซื้อผ่านกองทุนหรือทยอยซื้อ คือการกระจายแทนการเลือกตัวเดียว'}
   ]},
   {resultNote:'เขียนแบบให้กำลังใจ — คนที่พลาดในเกมวันนี้คือคนที่ได้กฎกลับบ้านไปใช้จริง',
    questions:[
-    {icon:'lc-zap',img:'lightning',q:'ฉาก 1/3 เหรียญชื่อ "MOON" **ขึ้น 312.00% ในสัปดาห์เดียว** คุณจะทำอะไร?',sub:'สถานการณ์สมมติ ไม่ใช่ของจริงในตลาด',timer:15,
+    {icon:'lc-zap',img:'lightning',q:'เหรียญชื่อ "MOON" **ขึ้น 312.00% ในสัปดาห์เดียว** คุณจะทำอะไร?',sub:'สถานการณ์สมมติ ไม่ใช่ของจริงในตลาด',timer:15,
      opts:['ซื้อเลย เดี๋ยวไม่ทัน','ขอดูข้อมูลก่อน ว่ามันคืออะไร พื้นฐานเป็นยังไง','ไม่เอา ดูเร่งเร้าผิดปกติ'],
      insight:'ความกลัวตกขบวนทำให้เราซื้อเพราะ "คนอื่นซื้อ" ไม่ใช่เพราะเข้าใจของ'},
-    {icon:'lc-alert-triangle',img:'warning',q:'ฉาก 2/3 มีคนทักมาบอกว่า "**การันตีผลตอบแทน 30.00% ต่อเดือน** ไม่มีขาดทุน วันนี้วันสุดท้าย รีบโอนเลย"',
-     opts:['โอนเลย กลัวที่นั่งเต็ม','เช็กก่อน ว่าบริษัทมีใบอนุญาตจาก ก.ล.ต. ไหม','ปฏิเสธทันที และเตือนคนอื่นด้วย'],
+    {icon:'lc-alert-triangle',img:'warning',q:'มีคนทักมาบอกว่า "**การันตีผลตอบแทน 30.00% ต่อเดือน** ไม่มีขาดทุน วันนี้วันสุดท้าย รีบโอนเลย"',
+     opts:['โอนเลย กลัวที่นั่งเต็ม','เช็คก่อน ว่าบริษัทมีใบอนุญาตจาก ก.ล.ต. ไหม','ปฏิเสธทันที และเตือนคนอื่นด้วย'],
      insight:'สัญญาณหลอกลงทุน 3 อย่าง: การันตีผลตอบแทน · เร่งให้รีบตัดสินใจ · ไม่มีใบอนุญาต'},
-    {icon:'lc-check-circle',img:'checkcircle',q:'ฉาก 3/3 เลือกกฎที่คุณจะ**พกติดตัวไว้เตือนตัวเอง**',
-     opts:['กฎ 24 ชั่วโมง หยุดคิด 1 วันก่อนตัดสินใจ','ถ้ามีใครเร่งให้รีบ ให้ถือว่าอันตราย','เช็กใบอนุญาตจาก ก.ล.ต. ก่อนเสมอ']}
+    {icon:'lc-check-circle',img:'checkcircle',q:'เลือกกฎที่คุณจะ**พกติดตัวไว้เตือนตัวเอง**',
+     opts:['กฎ 24 ชั่วโมง หยุดคิด 1 วันก่อนตัดสินใจ','ถ้ามีใครเร่งให้รีบ ให้ถือว่าอันตราย','เช็คใบอนุญาตจาก ก.ล.ต. ก่อนเสมอ']}
   ]},
   {resultNote:'บอกตรงๆ ว่าเป้าหมายของคุณ "เปลี่ยนไปตามวัย" หรือ "เหมือนเดิมตลอด 40 ปี" — ทั้งสองแบบเป็นข้อเท็จจริง ไม่ใช่ข้อผิดพลาด',
    questions:[
-    {icon:'lc-target',img:'s2q1',q:'บทที่ 1 สมมติว่าคุณอายุ 25 เหลือเวลาก่อนเกษียณราว 40 ปี เงินลงทุนก้อนแรก **คุณตั้งเป้าแบบไหน**?',
+    {icon:'lc-target',img:'s2q1',q:'สมมติว่าคุณอายุ 25 เหลือเวลาก่อนเกษียณราว 40 ปี เงินลงทุนก้อนแรก **คุณตั้งเป้าแบบไหน**?',
      opts:['เน้นให้โตมากที่สุด ขึ้นลงแรงก็รับได้','ค่อยๆ โต ขอสบายใจระหว่างทาง','เน้นปลอดภัยไว้ก่อน ไม่อยากขาดทุน'],
      insight:'ยิ่งมีเวลานาน ยิ่งมีเวลารอให้ของฟื้นตัว'},
-    {icon:'lc-pie-chart',img:'portfolio',q:'บทที่ 2 สมมติว่าคุณอายุ 35 มี**เป้าหมายใหญ่ 2 อย่างพร้อมกัน**: ต้องใช้เงินก้อนในอีก 3 ปี และเก็บเพื่อเกษียณอีก 30 ปี คุณจะจัดการยังไง?',
+    {icon:'lc-pie-chart',img:'portfolio',q:'สมมติว่าคุณอายุ 35 มี**เป้าหมายใหญ่ 2 อย่างพร้อมกัน**: ต้องใช้เงินก้อนในอีก 3 ปี และเก็บเพื่อเกษียณอีก 30 ปี คุณจะจัดการยังไง?',
      opts:['แยกเป็น 2 กระเป๋า เงินที่จะใช้เร็วเก็บแบบปลอดภัย เงินเกษียณเน้นให้โต','รวมเป็นก้อนเดียว ลงแบบเสี่ยงทั้งหมดให้โตเร็ว','รวมเป็นก้อนเดียว เก็บแบบปลอดภัยทั้งหมด'],
      insight:'เงินที่จะใช้เร็วกับเงินที่ใช้อีกนาน ควรเก็บคนละแบบ'},
-    {icon:'lc-refresh-cw',img:'refresharrow',q:'บทที่ 3 สมมติว่าคุณอายุ 50 เหลือเวลาถึงเกษียณราว 15 ปี เงินลงทุนโตมาดี **ควรปรับอะไรไหม**?',
+    {icon:'lc-refresh-cw',img:'refresharrow',q:'สมมติว่าคุณอายุ 50 เหลือเวลาถึงเกษียณราว 15 ปี เงินลงทุนโตมาดี **ควรปรับอะไรไหม**?',
      opts:['ค่อยๆ ลดส่วนที่เสี่ยงลง เพิ่มส่วนที่มั่นคง','คงไว้แบบเดิม เสี่ยงเท่าเดิม','ขายออกเป็นเงินสดทั้งหมด'],
      insight:'ยิ่งใกล้วันที่ต้องใช้เงิน ยิ่งเหลือเวลารอให้ฟื้นน้อยลง'},
-    {icon:'lc-gift',img:'giftbox',q:'บทที่ 4 สมมติว่าคุณอายุ 65 เกษียณแล้ว มีเงินเก็บอยู่ก้อนหนึ่ง **เป้าหมายของเงินก้อนนี้**คืออะไร?',
+    {icon:'lc-gift',img:'giftbox',q:'สมมติว่าคุณอายุ 65 เกษียณแล้ว มีเงินเก็บอยู่ก้อนหนึ่ง **เป้าหมายของเงินก้อนนี้**คืออะไร?',
      opts:['ให้มีเงินใช้ทุกเดือนอย่างสม่ำเสมอ','รักษาเงินต้นให้อยู่ครบ','เก็บส่งต่อให้ลูกหลาน หรือทำประโยชน์ให้สังคม'],
      insight:'วิธีถอนเงินมาใช้หลังเกษียณ สำคัญไม่แพ้วิธีเก็บ'}
   ]},
   {noType:true,resultNote:'เกมนี้ไม่สรุปว่าคุณเป็นคนประเภทไหน — ปิดท้ายด้วยสิ่งที่ได้เรียนรู้ และ "ก้าวแรก" ที่คุณเลือกเอง',
    questions:[
-    {icon:'lc-coins',img:'coinbaht',q:'ฉาก 1 สมมติว่าคุณเพิ่งเก็บเงินก้อนแรกได้ 100,000 บาท แล้วมีคนชวนลงทุน บอกว่า "**น่าจะได้กำไรดี**"',
+    {icon:'lc-coins',img:'coinbaht',q:'สมมติว่าคุณเพิ่งเก็บเงินก้อนแรกได้ 100,000 บาท แล้วมีคนชวนลงทุน บอกว่า "**น่าจะได้กำไรดี**"',
      opts:['ลงทั้ง 100,000 บาท ไปเลย','แบ่งครึ่ง ลง 50,000 บาท เก็บไว้ 50,000 บาท','ยังไม่ลง เก็บไว้ก่อนทั้งหมด'],
      insight:'ก่อนลงทุน ควรมีเงินสำรองเผื่อฉุกเฉินก่อน · แต่ถ้าเก็บเงินสดไว้เฉยๆ นานๆ ค่าของเงินก็ลดลงจากเงินเฟ้อ'},
-    {icon:'lc-calendar',img:'s1q2',q:'ฉาก 2 มีสองคนลงทุนเดือนละ 2,000 บาท เท่ากัน แต่**เริ่มไม่พร้อมกัน** คุณคิดว่าใครได้เปรียบ?',
+    {icon:'lc-calendar',img:'s1q2',q:'มีสองคนลงทุนเดือนละ 2,000 บาท เท่ากัน แต่**เริ่มไม่พร้อมกัน** คุณคิดว่าใครได้เปรียบ?',
      opts:['คนที่เริ่มตอนอายุ 25 แล้วลง 10 ปีจากนั้นหยุด','คนที่เริ่มตอนอายุ 35 แล้วลงต่อเนื่อง 30 ปี','พอๆ กัน เพราะลงเดือนละเท่ากัน'],
      insight:'เวลาช่วยให้ดอกเบี้ยทบต้นทำงาน — เริ่มเร็วมักได้เปรียบกว่าลงเยอะแต่เริ่มช้า'},
-    {icon:'lc-route',img:'route',q:'ฉาก 3 เงินส่วนที่จะลงทุน **คุณเลือกเส้นทางไหน**?',
+    {icon:'lc-route',img:'route',q:'เงินส่วนที่จะลงทุน **คุณเลือกเส้นทางไหน**?',
      opts:['เส้นทางสบายใจ ขึ้นลงน้อย','เส้นทางสมดุล','เส้นทางท้าทาย ขึ้นลงแรง'],
      insight:'ผลตอบแทนที่หวังได้มาก มักมาพร้อมการขึ้นลงที่แรงขึ้น'},
-    {icon:'lc-lock',img:'padlock',q:'ก้าวแรก ตอนที่ 1 อะไรที่ทำให้คุณ**ยังไม่ได้เริ่มลงทุนสักที**?',sub:'ตอบตามจริงได้เลย ทุกข้อเป็นเรื่องปกติที่หลายคนเจอ',
+    {icon:'lc-lock',img:'padlock',q:'อะไรที่ทำให้คุณ**ยังไม่ได้เริ่มลงทุนสักที**?',sub:'ตอบตามจริงได้เลย ทุกข้อเป็นเรื่องปกติที่หลายคนเจอ',
      opts:['เงินยังน้อย รอมีเงินก้อนก่อน','กลัวขาดทุน ยังไม่กล้า','ยุ่ง ไม่มีเวลา ค่อยทำทีหลัง','ไม่รู้จะเริ่มยังไง งงไปหมด']},
-    {icon:'lc-play-circle',img:'playcircle',q:'ก้าวแรก ตอนที่ 2 **ก้าวที่เล็กที่สุด**ที่คุณทำได้ภายในสัปดาห์นี้คืออะไร?',multi:true,skippable:true,skipLabel:'ยังไม่พร้อมเลือก ข้ามก่อน',
+    {icon:'lc-play-circle',img:'playcircle',q:'**ก้าวที่เล็กที่สุด**ที่คุณทำได้ภายในสัปดาห์นี้คืออะไร?',multi:true,skippable:true,skipLabel:'ยังไม่พร้อมเลือก ข้ามก่อน',
      opts:['เปิดบัญชีหรือแอปลงทุน','ตั้งลงทุนอัตโนมัติรายเดือน','ลองของจริงด้วยเงิน 100 บาท วันนี้','เลือกกองทุน 1 กองมาศึกษา','กำหนดงบลงทุนต่อเดือนที่ไหว','จดรายรับ-รายจ่าย 7 วัน','เริ่มแยกเงินสำรองเผื่อฉุกเฉินก้อนแรก','นัดคุยกับผู้แนะนำการลงทุนที่มีใบอนุญาต']}
   ]},
   {questions:[
@@ -7097,7 +7580,7 @@ function renderGames(){
                instant play on this page, and close on the PLAYBOOK payoff — replaces the old single
                run-on sentence framed as a warning ("อย่าพลาดการปลดล็อกสำคัญนี้ไป..."). Line breaks kept
                as authored (3 short lines) rather than one flowing sentence. */
-            '<div class="ev-empty-s" style="max-width:44ch">เช็กอินที่บูธ efin.finance ด้วย QR Code ของคุณ<br>เพื่อปลดล็อกทั้ง 6 เกม และเล่นเกมได้จากหน้านี้ทันที<br>PLAYBOOK ของคุณจะสมบูรณ์ยิ่งขึ้น</div>'+
+            '<div class="ev-empty-s" style="max-width:44ch">เช็คอินที่บูธ efin.finance ด้วย QR Code ของคุณ<br>เพื่อปลดล็อกทั้ง 6 เกม และเล่นเกมได้จากหน้านี้ทันที<br>PLAYBOOK ของคุณจะสมบูรณ์ยิ่งขึ้น</div>'+
             /* display:inline-block added (2026-09-01, per direction — padding read as way too wide
                left/right on tablet) — as a block div, width:auto fills the AVAILABLE width up to its
                own max-width cap rather than shrinking to the text, so the tinted panel stretched to
@@ -7145,6 +7628,21 @@ var PLAY=null; // {kind:'game'|'booth', idx, step:'brief'|'question'|'summary', 
 var PLAY_TIMER=null,PLAY_TIMELEFT=0;
 function playSet(kind,idx){return kind==='game'?MINIGAME_Q[idx]:BOOTH_Q[idx];}
 function playLabel(kind,idx){return kind==='game'?SIDES[idx].title:BOOTHS[idx].game;}
+/* GAME_TITLE_TAIL/BOOTH_TITLE_TAIL (2026-09-14) — the trailing WORD of each game/booth name, hand-
+   picked (same "hand-marked, not algorithmic" approach emphasizeQ's own comment already documents
+   for question text) since Thai compound names carry no spaces to split on — playLabel(kind,idx)
+   itself stays untouched (still used verbatim in the nav header/game-list rows/etc.), this is a
+   separate lookup only consulted by resultTitleHTML() below, so nothing else on screen is affected.
+   Suffix must match the tail of playLabel(kind,idx) exactly — resultTitleHTML() slices on it. */
+var GAME_TITLE_TAIL=['พอร์ต','เครื่องมือ','กระแส','วัย','แรก','วิกฤต']; // SIDES/MINIGAME_Q order
+var BOOTH_TITLE_TAIL=['หุ้น','โลก','กองทุน','กันตก','วิกฤต','ค่าเช่า','ชีวิต','ความผันผวน','ของสะสม','เงิน']; // BOOTHS order
+/* resultTitleHTML — renderPlaySummary's title, with the trailing word wrapped in <b> so `.q-title
+   b`'s existing --w-label(700) rule kicks in (matches the DNA quiz's own emphasizeQ() bold-tail
+   look, per direction "หน้า result...ให้ title...ให้คำท้าย text weight 700", 2026-09-14). */
+function resultTitleHTML(kind,idx){
+  var full=playLabel(kind,idx),tail=(kind==='game'?GAME_TITLE_TAIL:BOOTH_TITLE_TAIL)[idx];
+  return tail&&full.slice(-tail.length)===tail?full.slice(0,full.length-tail.length)+'<b>'+tail+'</b>':full;
+}
 /* learnedInsights — every distinct question insight the player has picked up so far this session,
    derived from GAME_PLAYED/BOOTH_ACT (the real committed-completion flags) rather than a separate
    mutable log, same "derive from real state" convention sideResult()/boothPointsTotal() already use.
@@ -7234,25 +7732,36 @@ function renderPlayBrief(){
     cards=briefCard('var(--violet)','จำนวนข้อ',n+' ข้อ','ตอบทีละข้อ')+briefCard('var(--yellow)','กติกา',s.rule,'อ่านก่อนเริ่ม');
   }else{
     var b=BOOTHS[idx];
-    headA='';headB=b.game; // booth names aren't "เกม…" prefixed — whole name in ch-2 (ink)
+    /* headA/headB split (2026-09-15, per direction "text title ต้องการให้มี text weight 700 ตอนท้าย
+       (เหมือนหน้าคั่น ของหน้าเกมหลัก)") — booth names aren't "เกม…"-prefixed, so there's no natural
+       prefix word to demote the way the game branch above splits off "เกม"; reused BOOTH_TITLE_TAIL
+       (already defined for resultTitleHTML's identical tail-bold treatment on the RESULT screen) to
+       split off the trailing word instead, landing it in ch-2 (ink/700) same as the game branch, with
+       everything before it in ch-1 (muted/500) — the same two-tone look, just split at the END of the
+       name instead of the start. Falls back to the old whole-name-in-ch-2 behavior if a tail somehow
+       doesn't match (shouldn't happen — BOOTH_TITLE_TAIL is verbatim-matched against BOOTHS already). */
+    var bTail=BOOTH_TITLE_TAIL[idx];
+    if(bTail&&b.game.slice(-bTail.length)===bTail){headA=b.game.slice(0,b.game.length-bTail.length);headB=bTail;}
+    else{headA='';headB=b.game;}
     lead=BOOTH_BRIEF[idx];
     cards=briefCard('var(--violet)','จำนวนข้อ',n+' ข้อ','ตอบทีละข้อ')+briefCard('var(--amber-text)','รางวัล','+'+set.points+' แต้ม','สะสมลุ้นรางวัลใหญ่','rc-title-pts');
   }
-  /* art — renders above the title for every BOOTH brief (see BOOTH_ART_PNG; games/SIDES have no
-     entry there so `art` stays '' for kind==='game', unchanged). The CTA stays pinned to the bottom
-     either way (:root[data-view="mobile"] .consent-btn's own position:sticky+margin-top:auto —
-     deliberate, unrelated to this); .consent-body already self-centers art+title+lead+cards WITHIN
-     the space above that pinned button (:root[data-view="mobile"] .consent-body{flex:1;justify-
-     content:center}), so simply adding the taller art block re-centers the group lower on screen for
-     free — no extra override needed (verified 2026-09-11 on the 'หุ้นไทย' booth before extending to
-     all 10). */
-  var artSrc=BOOTH_ART_PNG[b&&b.asset];
-  var art=artSrc?'<div class="play-brief-art"><img src="'+artSrc+'" alt=""></div>':'';
+  /* art — REMOVED from every brief now (2026-09-14, per direction "หน้าคั่น (เดินบูธ)...เอา illustration
+     ที่หน้าคั่นทั้งหมดออก เพราะมี illustration เปลี่ยนไปแสดงในหน้า result แทนแล้ว"). The 6 main-game briefs
+     dropped their art earlier the same day; the 10 booth briefs now follow, so NO brief renders an
+     illustration anymore — it lives only on renderPlaySummary's result screen (see .play-result-art
+     there). `art` stays '' for both kinds; .consent-body still self-centers title+lead+cards above the
+     bottom-pinned CTA (:root[data-view="mobile"] .consent-body{flex:1;justify-content:center}). */
+  var art='';
   var head='<div class="consent-h play-brief-h">'+(headA?'<span class="ch-1">'+headA+'</span> ':'')+'<span class="ch-2">'+headB+'</span></div>';
-  // bg — booth briefs get their own backdrop (room2-1.png, 2026-09-11 direction "background ส่วนของ
-  // หน้าคั่น (เกมส์เดินบูธทั้งหมด) ใช้ภาพนี้แทน"); the 6 main-game briefs (kind==='game') keep room1
-  // unchanged. Same .consent background-size/position rule either way — only the url() swaps.
-  var bgImg=kind==='booth'?BG_IMG.room2:BG_IMG.room1;
+  // bg — briefs shared room1 for ~1 session (2026-09-14 direction "หน้าคั่น ใช้ภาพพื้นหลังเดียวกับ ของ
+  // หน้าคั่น เกมส์หลัก") but booth briefs got their OWN per-booth backdrop instead (same-day follow-up
+  // direction, see BOOTH_BG_IMG's own comment for the full sourcing/crop/responsive story), then game
+  // briefs followed the same path (see GAME_BG_IMG's own comment) — both kinds now use a per-item
+  // illustration, room1 no longer read by either. `.bg-boothart`/`.bg-gameart` (own CSS comments) pin
+  // a shared, centered background-position for these since — unlike room1's off-center door — every
+  // one of these crops is already roughly centered, so no per-device tuning is needed the way room1 got.
+  var bgImg=kind==='booth'?BOOTH_BG_IMG[b&&b.asset]:GAME_BG_IMG[s&&s.title];
   root.innerHTML=
     /* align-self:center override (2026-09-10, per direction "header ไอคอนให้ alignment center กับ
        text") — .tb-ic's own align-self:flex-start (see its CSS comment) exists for renderLibrary's
@@ -7261,7 +7770,7 @@ function renderPlayBrief(){
        bar instead of centered against it — inline override, scoped to this one header only, since
        Library's own 2-line case still needs the base flex-start behavior untouched. */
     '<header class="topbar"><button class="tb-ic" id="playBackBtn" type="button" aria-label="ย้อนกลับ" style="align-self:center">'+ic('lc-arrow-left')+'</button><span class="tb-title">'+playLabel(kind,idx)+'</span></header>'+
-    '<div class="consent fade pb-consent'+(art?' has-art':'')+(kind==='booth'?' bg-room2':'')+'" style="background-image:url(\''+bgImg+'\')">'+
+    '<div class="consent fade pb-consent'+(kind==='booth'?' bg-boothart'+(BOOTH_BG_POS_CLS[b&&b.asset]?' '+BOOTH_BG_POS_CLS[b&&b.asset]:''):' bg-gameart'+(GAME_BG_POS_CLS[s&&s.title]?' '+GAME_BG_POS_CLS[s&&s.title]:''))+'" style="background-image:url(\''+bgImg+'\')">'+
       '<div class="content">'+
         '<div class="consent-body scroll-reveal">'+
           art+head+
@@ -7509,11 +8018,13 @@ function renderPlayBody(){
    Split into two separate, visually distinct boxes (2026-09-10 follow-up, per direction "หน้า result
    อยากให้แยกข้อมูลออกมาจัดเป็นข้อมูล card ข้อมูลใคร ข้อมูลมัน...และให้ดูเรื่อง visual heirachy") — an
    earlier pass merged both into one plain .hero-sig-c line + one .str-box, losing the hierarchy; now:
-     - resultCard ("ข้อมูลใคร" — the verdict ABOUT the player, only some games/booths have one): its
-       own .ast-block callout, reusing the same tinted-surface idiom ความแข็งแกร่ง's sibling
-       "สินทรัพย์ที่ถนัด" card uses elsewhere in this exact DNA — violet-tinted for a real verdict,
-       a muted dashed variant (borrowing .pe-locked's "informational, not a verdict" language) for
-       `noType` games that explicitly never classify the player.
+     - resultCard ("ข้อมูลใคร" — the verdict ABOUT the player, only some games/booths have one): a real
+       verdict reuses the same tinted .ast-block idiom ความแข็งแกร่ง's sibling "สินทรัพย์ที่ถนัด" card
+       uses elsewhere in this exact DNA (violet-tinted); `noType` games that explicitly never classify
+       the player get หมายเหตุ instead, built on .hero-note.skill-note verbatim (2026-09-14, per
+       direction "section หมายเหตุ ต้องการให้เป็น dna เดียวกับ section ค่า SKILL บนการ์ด...") — the same
+       flat var(--accent) disclaimer component redeemCardHTML's own SKILL note uses, not a paler
+       ast-block.
      - insights ("ข้อมูลมัน" — general/factual takeaways from the questions, not about the player) stay
        their own .str-box of .str-li rows, the same block idiom as ความแข็งแกร่ง/สิ่งที่ต้องระวัง there.
    Either box is omitted when its data is empty (most booths + 2 of 6 games carry no resultNote) rather
@@ -7537,7 +8048,19 @@ function renderPlaySummary(){
   clearPlayTimer();
   var kind=PLAY.kind,idx=PLAY.idx,set=playSet(kind,idx);
   var insights=set.questions.map(function(q){return q.insight;}).filter(Boolean);
-  var badgeIcon=kind==='game'?ic(SIDES[idx].icon):ic(BOOTHS[idx].icon); // Lucide only — .q-icon-bare sizes svg, not img
+  /* result-screen art (2026-09-14, per direction) — GAME_ART_PNG/BOOTH_ART_PNG's illustration
+     renders here as the summary's own hero visual: positioned as the FIRST element inside .hero-in,
+     the exact slot the Playbook identity tab's character card (compareBlock, see book2Identity's own
+     hero-gw/hero-in markup) occupies before its own detail content. Moved OFF renderPlayBrief the
+     same day (see that function's own comment) — this result screen is now the ONLY place this art
+     shows, not a duplicate of a brief-screen copy. */
+  var artSrc=kind==='game'?GAME_ART_PNG[SIDES[idx].title]:BOOTH_ART_PNG[BOOTHS[idx].asset];
+  var artHTML=artSrc?'<div class="play-result-art"><img src="'+artSrc+'" alt=""></div>':'';
+  // badgeIcon (.q-icon-bare) REMOVED 2026-09-14, per direction "เอาไอคอนออกได้เลย เพราะมี assets/games/
+  // มาแทนแล้ว" — the illustration above now carries this header's visual weight; the small Lucide
+  // glyph badge was redundant once both existed. Kept as a documented removal (not a silent one) since
+  // `.q-icon-bare`'s CSS + the SIDES[idx].icon/BOOTHS[idx].icon data are both still used elsewhere
+  // (gameRow list icons, quiz question headers) — only this ONE call site is gone.
   // "ข้อมูลใคร" — the verdict about the player. .ast-block reused verbatim (radius/padding/margin,
   // .ast-lbl header row) from the identity tab's "สินทรัพย์ที่ถนัด" card; only the background/border
   // tint + label swap between the two states, same recipe .redeem-card.on/.locked already uses for
@@ -7550,9 +8073,15 @@ function renderPlaySummary(){
     // used to pull .str-li flush left under the icon; .str-li's own default margin-left
     // (calc(var(--ic-lg) + var(--sp-inline))) already exists for exactly this — it's the same value
     // insBox's str-hd/str-li pairing below relies on, and ast-lbl uses the identical icon-size+gap
-    // recipe, so the unmodified default lines the description up under "หมายเหตุ"/"ผลจากเกมนี้" for free.
+    // recipe, so the unmodified default lines the description up under "ผลจากเกมนี้" for free.
+    // หมายเหตุ swapped OFF the ast-block/dashed-border treatment onto .hero-note.skill-note verbatim
+    // (2026-09-14, per direction "section หมายเหตุ ต้องการให้เป็น dna เดียวกับ section ค่า SKILL บน
+    // การ์ด...") — same component redeemCardHTML's own SKILL-disclaimer note uses: flat --accent
+    // background (no border), bold <b> lead line in ink over a muted supporting line underneath, same
+    // icon+text row idiom. Both are "soft disclaimer, not a verdict" callouts, so they now share DNA
+    // instead of หมายเหตุ looking like a paler variant of the real ผลจากเกมนี้ verdict card.
     resultCard=noType
-      ? '<div class="ast-block" style="background:var(--paper);border:1px dashed var(--line-strong)"><div class="ast-lbl">'+ic('lc-info')+'หมายเหตุ</div><div class="str-li">'+set.resultNote+'</div></div>'
+      ? '<div class="hero-note skill-note">'+ic('lc-info')+'<span><b style="font-weight:var(--w-label);color:var(--ink)">หมายเหตุ</b><br>'+set.resultNote+'</span></div>'
       : '<div class="ast-block" style="background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)"><div class="ast-lbl">'+ic('lc-sparkles')+'ผลจากเกมนี้</div><div class="str-li">'+set.resultNote+'</div></div>';
   }
   // "ข้อมูลมัน" — factual/educational takeaways from the questions, not about the player specifically.
@@ -7564,6 +8093,17 @@ function renderPlaySummary(){
   var knowCount=learnedInsights({kind:kind,idx:idx}).length;
   var insHd='<div class="str-hd">'+ic('lc-check-circle')+'สิ่งที่ได้เรียนรู้จากเกมนี้'+(knowCount?'<span class="sc" style="margin-left:auto">สะสม '+knowCount+' เรื่อง</span>':'')+'</div>';
   var insBox=insights.length?'<div class="str-box">'+insHd+insights.map(function(t){return '<div class="str-li">'+t+'</div>';}).join('')+'</div>':'';
+  // Section order (2026-09-14, per direction "section หมายเหตุ ให้สลับกับ section สิ่งที่ได้เรียนรู้
+  // จากเกมนี้"): "ผลจากเกมนี้" (a real verdict — same lead-position precedent as the identity tab's
+  // "สินทรัพย์ที่ถนัด" card) always stays FIRST; it's only the noType "หมายเหตุ" variant (the muted
+  // dashed card — the DNA's own "SKILL value = the collectible card's fun/lighter layer" framing) that
+  // drops below insBox (สิ่งที่ได้เรียนรู้จากเกมนี้ — mirrors the identity tab's ความแข็งแกร่ง card
+  // position). resultCard/insBox stay mutually exclusive per-game (a game is either typed or noType),
+  // so this is a per-render order swap, not simultaneous display of both variants.
+  // noType order wraps insBox with the same margin-bottom .ast-block carries natively (str-box has
+  // none of its own outside .str-grid) — without it the two cards sit flush with zero gap when insBox
+  // leads (2026-09-14 bug: "เกมก้าวแรก spacing ระหว่าง section...ตอนนี้ติดกัน").
+  var mainSectionsHTML=set.noType?('<div style="margin-bottom:var(--sp-stack)">'+insBox+'</div>'+resultCard):(resultCard+insBox);
   // ptsHTML (the "+N แต้ม" reward card on this "เล่นจบแล้ว" screen — .play-sum-pts, its ptsPop entrance
   // + ptsCountUp() number animation) removed entirely (2026-09-11, per direction "เล่นจบแล้ว (ทุกเกมส์
   // ทุกด้าน ทุกบูธ)...กรณีมี — ให้เอาออกทั้งหมด") — was only ever shown for booth games (kind==='booth'
@@ -7579,18 +8119,23 @@ function renderPlaySummary(){
   // card — same position a closing stat/note occupies in every other .hero-in result card here.
   var saveNoteHTML=insights.length?'<div class="pf-note" style="margin-top:var(--sp-stack)">'+ic('lc-check-circle')+'บันทึกเรื่องที่เรียนรู้จากเกมนี้เข้า Playbook ของคุณแล้ว</div>':'';
   var backLabel=kind==='game'?'กลับหน้าเกมหลัก':'กลับหน้าเดินบูธ';
-  // Title block — DNA quiz's own .q-icon-bare + .q-title header (icon circle above a bold title),
-  // finalized 2026-09-11 (per direction "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย") — was briefly a
-  // DEMO.sumTitleVer-toggled choice between this and an efin-banner-style icon+title row (v1);
-  // v1 and the demo panel's "ชื่อหน้าเล่นจบแล้ว" segment are gone now that v2 is the confirmed pick.
-  var titleHTML='<div class="q-head" style="margin:0 0 var(--sp-block);--qc:var(--violet)"><div class="q-icon-bare">'+badgeIcon+'</div><div class="q-title" style="margin-bottom:0">'+playLabel(kind,idx)+'</div></div>';
+  // Title block — DNA quiz's own .q-head/.q-title header, finalized 2026-09-11 (per direction
+  // "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย") — was briefly a DEMO.sumTitleVer-toggled choice between this
+  // and an efin-banner-style icon+title row (v1); v1 and the demo panel's "ชื่อหน้าเล่นจบแล้ว" segment
+  // are gone now that v2 is the confirmed pick. The .q-icon-bare badge that used to sit above this
+  // title is gone too (2026-09-14, see badgeIcon's own removal comment above) — artHTML now carries
+  // that visual weight instead. resultTitleHTML (2026-09-14) replaces the plain playLabel() call —
+  // bolds the trailing word (--w-label/700 via .q-title b) per direction "ให้ title...ให้คำท้าย text
+  // weight 700", applying to BOTH kinds (booth + main game) since this same titleHTML is shared by
+  // both result screens.
+  var titleHTML='<div class="q-head" style="margin:0 0 var(--sp-block);--qc:var(--violet)"><div class="q-title" style="margin-bottom:0">'+resultTitleHTML(kind,idx)+'</div></div>';
   root.innerHTML=
     '<header class="topbar"><span class="tb-title">เล่นจบแล้ว</span></header>'+
     '<div class="q-scroll fade">'+
       '<section class="hero-sec"><div class="hero-gw">'+heroGlowMarkup()+'<div class="hero-in scroll-reveal">'+
+        artHTML+
         titleHTML+
-        resultCard+
-        insBox+
+        mainSectionsHTML+
         saveNoteHTML+
       '</div></div></section>'+
       /* Icon moved AFTER the label AND flipped to a right-pointing arrow (2026-09-10, per direction
@@ -7602,6 +8147,13 @@ function renderPlaySummary(){
       '<div class="q-nav"><span></span><button class="btn btn-primary" type="button" id="playDoneBtn">'+backLabel+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
     '</div>';
   sizeHeroGlow();
+  // Re-size once the art image itself loads (2026-09-14 bug: "border gradient...ยังมีเส้นขาดๆ") —
+  // sizeHeroGlow() measures .hero-gw's box synchronously right after mount, but artHTML's <img> has
+  // no explicit width/height so the browser doesn't reserve its space; the box then grows taller once
+  // the image decodes, leaving the glow ring's oversized-square layers sized for the shorter
+  // pre-image box and no longer covering the new (taller) real corners — the visible gap/dash.
+  var artImg=root.querySelector('.play-result-art img');
+  if(artImg&&!artImg.complete)artImg.addEventListener('load',sizeHeroGlow,{once:true});
   root.querySelector('#playDoneBtn').onclick=completePlay;
 }
 /* ptsCountUp (2026-09-11, per direction "ต้องการเพิ่ม motion ที่ทำให้ตัวเลขขยับ...เหมือนการรันเลข
