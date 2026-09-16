@@ -8068,7 +8068,13 @@ function renderPlaySummary(){
      hero-gw/hero-in markup) occupies before its own detail content. Moved OFF renderPlayBrief the
      same day (see that function's own comment) — this result screen is now the ONLY place this art
      shows, not a duplicate of a brief-screen copy. */
-  var artSrc=kind==='game'?GAME_ART_PNG[SIDES[idx].title]:BOOTH_ART_PNG[BOOTHS[idx].asset];
+  /* GAME_ART_PNG temporarily disabled on the main-games (เกมหลัก) result screen only (2026-09-16,
+     per direction "ปิดภาพที่แสดงทั้งหมดไว้ก่อน...จะมีการ replace ภาพใหม่ ทั้ง 6 ภาพภายหลัง") — a new set
+     of 6 is coming to replace the current game-art illustrations, so this hides them without
+     touching the GAME_ART_PNG data/wiring itself (re-enable by restoring the
+     `GAME_ART_PNG[SIDES[idx].title]` branch below once the new 6 are in). Booth results
+     (BOOTH_ART_PNG) are untouched — this only scopes to kind==='game'. */
+  var artSrc=kind==='game'?null:BOOTH_ART_PNG[BOOTHS[idx].asset];
   var artHTML=artSrc?'<div class="play-result-art"><img src="'+artSrc+'" alt=""></div>':'';
   // badgeIcon (.q-icon-bare) REMOVED 2026-09-14, per direction "เอาไอคอนออกได้เลย เพราะมี assets/games/
   // มาแทนแล้ว" — the illustration above now carries this header's visual weight; the small Lucide
