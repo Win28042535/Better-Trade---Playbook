@@ -633,6 +633,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .consent-p b{color:var(--ink);font-weight:var(--w-label);}
 .round-cards{position:relative;z-index:2;display:flex;gap:var(--sp-inline);width:100%;margin:32px 0 4px;}
 .round-card{flex:1;border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad-sm);background:var(--white);}
+/* .round-cards.single — booth briefs dropped their "รางวัล"/+N แต้ม card 2026-09-16 (per direction),
+   leaving just "จำนวนข้อ". Centers the lone card instead of letting .round-card's flex:1 stretch it
+   to the full row width — same half-share width the card already had when it sat next to a sibling,
+   just centered alone rather than widened to fill the gap. */
+.round-cards.single{justify-content:center;}
+.round-cards.single .round-card{flex:0 0 auto;width:calc(50% - var(--sp-inline)/2);}
 .rc-top{display:flex;align-items:center;justify-content:center;gap:var(--sp-glue);margin-bottom:var(--sp-list);}
 .rc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 /* color+weight bumped to ink/700 (2026-08-15, per direction "card รายละเอียด ส่วนที่ 1,2,3 text
@@ -1574,16 +1580,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    one single .tb-logo rule (base height below) with the Book page — there is no second number to
    keep in sync. */
 .home-hero{position:relative;overflow:hidden;text-align:center;border:1px solid var(--line-soft);border-radius:var(--r2);background:radial-gradient(120% 80% at 50% 0%,color-mix(in srgb,var(--violet) 14%,transparent),color-mix(in srgb,var(--cyan) 8%,transparent) 46%,var(--white) 78%);padding:22px var(--sp-card-pad) 24px;}
-/* "คู่มือลงทุนของคุณ" poster eyebrow — locked to weight 500 (var(--w-head)) in muted gray, matching
-   every other eyebrow in the app (.s-ey etc. — see design.md's eyebrow convention). Was flipped to
-   700 + a spectrum-gradient-clip in an earlier pass; reverted per direction, this time for good —
-   an eyebrow reading louder than the heading under it fought the system's own hierarchy. */
-.hh-badge{display:inline-flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);font-weight:var(--w-head);letter-spacing:0.04em;color:var(--muted);}
-.hh-badge svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--muted);}
-.hh-badge-tx{font-weight:var(--w-label);color:var(--muted);}
 /* Smaller hero logo, bigger emphasis on .hh-sub below — the eyebrow badge/logo were carrying more
-   visual weight than the sentence that actually says what this screen is for. */
-.hh-logo{display:block;width:min(56%,210px);height:auto;margin:var(--sp-inline) auto 0;}
+   visual weight than the sentence that actually says what this screen is for. The eyebrow badge
+   itself (.hh-badge, "Playbook ลงทุนของคุณ" + book icon) was cut from the poster 2026-09-16 per
+   direction, so .hh-logo is now the card's first element — its old margin-top (spacing it away
+   from the badge above) is dropped; the card's own padding-top already clears it. */
+.hh-logo{display:block;width:min(56%,210px);height:auto;margin:0 auto;}
 .hh-sub{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);line-height:1.55;max-width:34ch;margin:var(--sp-inline) auto 0;}
 /* 500 base / 700 emphasized trailing clause — same "text weight play" convention as .q-title/
    .q-title b (emphasizeQ()), hand-authored here since this is one static string, not a per-item
@@ -1615,14 +1617,6 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    shows at 25%. Mobile keeps the base rule untouched — only tablet/pc get the top anchor. */
 :root[data-view="tablet"] .hh-video,:root[data-view="pc"] .hh-video{object-position:center top;}
 .home-hero.v3:active .hh-video{transform:scale(1.04);}
-/* Badge+icon retoned gray instead of near-white (2026-08-20, per direction "อยากให้...ใช้เป็นสีโทน
-   เทา") — rooted in the same var(--muted) gray this exact badge already uses on v1 (see .hh-badge
-   above), lightened toward white just enough to stay legible over the v2 photo's darker scrim
-   (measured ~34 avg luminance behind the badge row): plain var(--muted) alone (lum ~110) only hit
-   ~2.6:1 contrast there — readable but faint for an already-quiet eyebrow; this mix lands ~4:1
-   while still reading as gray, not white. v3 shares the same rule (same dark scrim, just a video
-   behind it instead of a photo). */
-.home-hero.v3 .hh-badge,.home-hero.v3 .hh-badge-tx,.home-hero.v3 .hh-badge svg{color:color-mix(in srgb,var(--muted) 55%,white 45%);}
 .home-hero.v3 .hh-sub{color:var(--cloud);}
 .home-hero.v3 .hh-meta span{color:rgba(255,255,255,.8);}
 .home-hero.v3 .hh-meta svg{color:var(--cyan);}
@@ -1959,6 +1953,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    review "--cyan-ink ทางเลือก B" — reverted to a flat --ink instead of wiring the token, since the
    chosen answer this time was to keep the icon's current (ink) look, not make it cyan. */
 .pe-report.on svg{color:var(--ink);}
+/* .pe-report-lg (2026-09-16, per direction "ให้ไอคอน size เท่ากับของ section อื่น ในหน้าเดียวกัน") —
+   scoped to renderPlaySummary's saveNoteHTML call site only: that screen's other icon-led sections
+   (.str-hd, .ast-lbl, .hero-note.skill-note) all use --ic-lg/24px, so the base .pe-report svg's
+   --ic-md/20px (sized for Home's own "รายงานพัฒนาการหลังงาน" card, left untouched) read small next to
+   them. margin-top recalculated for the bigger icon using the same centering math as the base rule's
+   own comment: (25.2 - 24)/2 ≈ 1px, not the base rule's 3px (which was centering a 20px icon). */
+.pe-report.pe-report-lg svg{width:var(--ic-lg);height:var(--ic-lg);margin-top:1px;}
 .pe-report-t{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.4;}
 .pe-report-s{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;}
 /* Sized/weighted to match .pe-track-lbl (the "Conference"/"Workshop"/"Master Class" sub-section
@@ -2879,6 +2880,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pr-v{color:var(--ink);font-weight:var(--w-label);text-align:right;min-width:0;line-height:1.5;}
 .prof-foot{border-top:1px solid var(--line-soft);padding-top:var(--sp-stack);display:flex;flex-direction:column;gap:var(--sp-list);}
 .pf-brand{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);}
+/* .pf-brand-bold (2026-09-16, per direction) — "BetterTrade"/"New world New Playbook" bumped to
+   --w-label/700; the lead description line right below stays at the base --w-head/500. */
+.pf-brand-bold{font-weight:var(--w-label);}
 .pf-note{display:flex;align-items:flex-start;gap:var(--sp-glue);font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.6;}
 .pf-note svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;margin-top:2px;}
 /* ══ SPLASH / ATTRACT ══ two-tone headline · drifting brand assets · card carousel */
@@ -5399,7 +5403,7 @@ function redeemCardHTML(isUltimate){
        game-stat UIs conventionally mark a skill rating. Title <b> colored ink to match .redeem-note's
        own bold lead line (its color:var(--ink) is inherited from the block; this one sits inside
        .hero-note's own color:var(--muted), so needs the override explicit). */
-    '<div class="hero-note skill-note">'+ic('lc-zap')+'<span><b style="font-weight:var(--w-label);color:var(--ink)">ค่า SKILL บนการ์ดคือชั้นสนุกของการ์ดสะสม</b><br>ทีมออกแบบกำหนดและผู้เชี่ยวชาญสอบทาน ไม่ใช่ค่าที่วัดจากการเล่นของคุณ · ตัวตนจริงของคุณดูได้จาก Playbook ทั้งหมด · มิใช่คำแนะนำการลงทุน</span></div>';
+    '<div class="hero-note skill-note">'+ic('lc-zap')+'<span><b style="font-weight:var(--w-label);color:var(--ink)">ค่า SKILL บนการ์ด</b><br>สะท้อนความถนัดในแต่ละสไตล์ ไม่ใช่คำแนะนำการลงทุน</span></div>';
 }
 /* PLAY BOOK PDF download (2026-08-19, per direction — also present in the mockup, absent from the
    app). Shown in the post-event ("หลังงาน") view of both Book versions — locked behind Ultimate,
@@ -6381,10 +6385,13 @@ function renderHome(){
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
     /* v3 (2026-08-24, demo-panel preview toggle) — same dark poster as v2, but a looping video
-       (BG_VIDEO.sky) instead of a still photo; see .hh-video/.home-hero.v3 for the layering. */
-    '<section class="home-hero scroll-reveal v3"><video class="hh-video" src="'+BG_VIDEO.sky+'" autoplay muted loop playsinline></video><div class="hh-badge">'+ic('lc-book-open')+'<span class="hh-badge-tx">Playbook ลงทุนของคุณ</span></div>'+
+       (BG_VIDEO.sky) instead of a still photo; see .hh-video/.home-hero.v3 for the layering.
+       The eyebrow badge ("Playbook ลงทุนของคุณ" + book icon) that used to sit above the logo was
+       cut per print-poster direction 2026-09-16 ("ตัดออก" on the badge line) — .hh-logo is now
+       the card's first element, see .hh-logo's own margin comment. */
+    '<section class="home-hero scroll-reveal v3"><video class="hh-video" src="'+BG_VIDEO.sky+'" autoplay muted loop playsinline></video>'+
       '<img class="hh-logo" src="'+LOGO_IMG.nwnp+'" alt="New World New Playbook">'+
-      '<p class="hh-sub"><b>Playbook การลงทุนส่วนตัวของคุณ ประกอบจากการ์ดตัวตนและสิ่งที่คุณทำจริงในงาน</b> ดูย้อนหลังได้บน efin.finance</p>'+
+      '<p class="hh-sub"><b>PLAYBOOK คู่มือการลงทุนส่วนตัว</b> สร้างจาก Investor DNA และ Action ที่คุณทำจริงในงาน Better Trade เพื่อแสกนทุกโอกาสการลงทุนในโลกยุคใหม่</p>'+
       '<div class="hh-meta"><span>'+ic('lc-calendar')+'31 ต.ค. – 1 พ.ย. 2569</span><span>'+ic('lc-map-pin')+'Samyan Mitrtown ชั้น 5</span></div></section>'+
     (DEMO.multiTicket?passCardMultiHTML():(function(){var tp=(t.meta.sub||'').split(' · ');var benefit=tp[0]||'',price=tp[1]||'';
       /* Tier icon inline with .pass-ey (the "บัตรของคุณ" eyebrow), not .pass-name (2026-08-24, per
@@ -6916,7 +6923,7 @@ function renderBooth(){
      requires RESULT) — an Explorer ticket-holder without a RESULT yet still gets the minimal map,
      never the full one. */
   var mapOnly=curTier().name==='Explorer';
-  var chk=boothCheckinCount(),act=boothActivityCount(),pts=boothPointsTotal();
+  var chk=boothCheckinCount(),act=boothActivityCount();
   var chkOK=chk>=CHECKIN_NEED,actOK=act>=ACTIVITY_NEED;
   /* DEMO.draw force (2026-08-26, per direction "อยากให้จำลองเคส...ไว้ด้วย กรณีครบเงื่อนไขแล้ว และ
      กรณียังขาด") — 'ok'/'need' let the demo panel force-preview either draw-status state without
@@ -6985,13 +6992,9 @@ function renderBooth(){
         '<div class="bp-card"><div class="bp-hd">'+ic('lc-qr-code')+'<span class="bp-lbl">เช็คอินบูธ</span><span class="bp-frac" style="color:'+(chkOK?'var(--cyan)':'var(--violet)')+'">'+(chkOK?('ครบแล้ว '+chk+' บูธ'):(chk+'/'+CHECKIN_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,chk/CHECKIN_NEED*100)+'%;background:'+(chkOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
         '<div class="bp-card"><div class="bp-hd">'+ic('lc-building-2')+'<span class="bp-lbl">กิจกรรมประจำบูธ</span><span class="bp-frac" style="color:'+(actOK?'var(--cyan)':'var(--violet)')+'">'+(actOK?('ครบแล้ว '+act+' บูธ'):(act+'/'+ACTIVITY_NEED))+'</span></div><div class="bp-bar"><div class="bp-fill" style="width:'+Math.min(100,act/ACTIVITY_NEED*100)+'%;background:'+(actOK?'var(--cyan)':'var(--violet)')+'"></div></div></div>'+
       '</div>'+
-      /* Points total (Phase 4, 2026-09-09) — display-only, see boothPointsTotal()'s own comment for
-         why this doesn't gate anything yet (no real prize-tier numbers exist in any source doc). */
-      // Icon lc-sparkles->lc-gift (2026-09-11, per direction "สะสมแล้ว N แต้ม...ใช้เป็น ไอคอน
-      // กล่องของขวัญ") — matches play-pts-badge's own icon (the only other remaining "+N แต้ม" call
-      // site that carries one; the briefing's รางวัล card is icon-less, just a colored dot) instead
-      // of a generic sparkle.
-      (pts>0?'<div class="pe-report on bp-pts">'+ic('lc-gift')+'<div><div class="pe-report-t">สะสมแล้ว '+pts+' แต้ม</div><div class="pe-report-s">จากกิจกรรมประจำบูธ</div></div></div>':'')+
+      /* Points total card ("สะสมแล้ว N แต้ม", .pe-report.bp-pts) removed entirely (2026-09-16, per
+         direction) — boothPointsTotal() itself and its CSS (.bp-pts) are left in place, unused, same
+         "kept for history" precedent as .play-sum-pts elsewhere in this file. */
       (eligible
         ? '<div class="next-step ds-ok"><div class="ns-ic"><img src="'+ICON_GIFT_PNG+'" alt=""></div><div class="ns-tx"><div class="ns-ey">ลุ้นรางวัลใหญ่</div><div class="ns-t">ครบเงื่อนไขแล้ว ร่วมลุ้นรางวัลได้เลย</div></div>'+
             (DRAW_JOINED
@@ -7002,7 +7005,7 @@ function renderBooth(){
                  since .next-step's card background is already --ink — a stock .btn-primary would be
                  near-invisible ink-on-ink here, unlike .gr-play which sits on a plain white card. */
               : '<button class="btn btn-primary ns-cta-slot" id="drawCtaBtn">'+ic('lc-gift')+'ร่วมลุ้นรางวัล</button>')+
-          '<div class="ns-body"><div class="ns-b">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">✓ กดร่วมลุ้นก่อน 16:00 น. ของวันที่ 2</div></div></div>'
+          '<div class="ns-body"><div class="ns-b">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div></div></div>'
         : '<div class="next-step ds-need"><div class="ns-ic"><img src="'+ICON_GIFT_PNG+'" alt=""></div><div class="ns-tx"><div class="ns-ey">ลุ้นรางวัลใหญ่</div><div class="ns-t">ยังขาด</div></div><div class="ns-body"><div class="ds-chips">'+need.map(function(n){return '<span class="ds-chip">'+n+'</span>';}).join('')+'</div><div class="ns-b">เงื่อนไขลุ้นรางวัลใหญ่ · เช็คอิน 5 บูธ + ร่วมกิจกรรมประจำบูธ 5 บูธ (คนละบูธกันได้)</div><div class="ds-dl">ครบเมื่อไหร่ ปุ่มร่วมลุ้นรางวัลใหญ่จะขึ้นตรงนี้ให้กด</div></div></div>')+
     '</section>')+
     (mapOnly
@@ -7068,8 +7071,8 @@ function renderBooth(){
      so it would otherwise sit unreachable (2026-08-28). */
   (pre?'':(
   '<div class="howto-modal" id="howtoModal"><div class="howto-scrim" id="howtoScrim"></div><div class="howto-card"><button class="howto-x" id="howtoClose">'+ic('lc-x')+'</button>'+
-    '<div class="howto-hd"><div class="howto-t">วิธีเล่นกิจกรรมประจำโซน</div><div class="howto-s">เช็คอิน → ปลดเกมประจำโซน → ร่วมกิจกรรม</div></div>'+
-    '<div class="zh-in"><div class="zh-li"><b>1)</b><span>เช็คอิน — แตะชื่อบูธแล้วสแกน QR ที่บูธ (หรือเปิด QR ของคุณให้เจ้าหน้าที่สแกน ได้ผลเหมือนกัน)</span></div><div class="zh-li"><b>2)</b><span>เกมประจำโซนปลดให้เล่น — ไม่บังคับ แต่เล่นแล้ว Playbook ของคุณสมบูรณ์ขึ้น</span></div><div class="zh-li"><b>3)</b><span>ร่วมกิจกรรมประจำบูธ — สแกน QR กิจกรรม (บางบูธใช้ QR ใบเดียวกับเช็คอิน บางบูธแยก 2 ใบ ดูป้ายที่บูธ)</span></div><div class="zh-note">เช็คอิน 5 บูธ + ร่วมกิจกรรม 5 บูธ = สิทธิ์ลุ้นรางวัลใหญ่ · เป็นคนละบูธกันได้</div></div>'+
+    '<div class="howto-hd"><div class="howto-t">วิธีเล่นกิจกรรมประจำโซน</div><div class="howto-s">เช็คอิน → ปลดล็อกเกมประจำโซน → ร่วมกิจกรรมประจำบูธ</div></div>'+
+    '<div class="zh-in"><div class="zh-li"><b>1)</b><span>เช็คอิน — สแกน QR ที่บูธ หรือเปิด QR ของคุณให้เจ้าหน้าที่สแกน</span></div><div class="zh-li"><b>2)</b><span>เกมประจำโซนปลดล็อกให้เล่น — ไม่บังคับ แต่เล่นแล้ว PLAY BOOK ของคุณจะสมบูรณ์ยิ่งขึ้น</span></div><div class="zh-li"><b>3)</b><span>ร่วมกิจกรรมประจำบูธ — เมื่อร่วมกิจกรรมเสร็จสิ้น ให้เจ้าหน้าที่บูธ สแกน QR ของคุณเพื่อบันทึกการเข้าร่วม</span></div><div class="zh-note"><b style="font-weight:var(--w-label);color:var(--ink)">ลุ้นรางวัลใหญ่</b><br>เช็คอิน 5 บูธ + ร่วมกิจกรรม 5 บูธ= สิทธิ์ลุ้นรางวัลใหญ่ (เป็นคนละบูธกันได้)</div></div>'+
   '</div></div>'))+
   '<div class="map-lightbox" id="mapLightbox"><div class="ml-scrim" id="mlScrim"></div><div class="ml-card"><button class="ml-close" id="mlClose">'+ic('lc-x')+'</button><div class="ml-body"><img class="ml-img" src="'+MAP_IMG+'" alt="ผังงาน BetterTrade 2026 · Samyan Mitrtown ชั้น 5"></div><div class="ml-cap">ผังงาน · Samyan Mitrtown ชั้น 5</div></div></div>'+
   appTabbar('passport');
@@ -7758,7 +7761,7 @@ function renderPlayBrief(){
     if(bTail&&b.game.slice(-bTail.length)===bTail){headA=b.game.slice(0,b.game.length-bTail.length);headB=bTail;}
     else{headA='';headB=b.game;}
     lead=BOOTH_BRIEF[idx];
-    cards=briefCard('var(--violet)','จำนวนข้อ',n+' ข้อ','ตอบทีละข้อ')+briefCard('var(--amber-text)','รางวัล','+'+set.points+' แต้ม','สะสมลุ้นรางวัลใหญ่','rc-title-pts');
+    cards=briefCard('var(--violet)','จำนวนข้อ',n+' ข้อ','ตอบทีละข้อ');
   }
   /* art — REMOVED from every brief now (2026-09-14, per direction "หน้าคั่น (เดินบูธ)...เอา illustration
      ที่หน้าคั่นทั้งหมดออก เพราะมี illustration เปลี่ยนไปแสดงในหน้า result แทนแล้ว"). The 6 main-game briefs
@@ -7789,7 +7792,7 @@ function renderPlayBrief(){
         '<div class="consent-body scroll-reveal">'+
           art+head+
           '<div class="consent-p">'+lead+'</div>'+
-          '<div class="round-cards">'+cards+'</div>'+
+          '<div class="round-cards'+(kind==='booth'?' single':'')+'">'+cards+'</div>'+
         '</div>'+
         '<div class="consent-btn"><button class="btn btn-primary" type="button" id="playStartBtn">เริ่มเล่นเกม '+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
       '</div>'+
@@ -7930,14 +7933,11 @@ function renderPlayBody(){
   var answered=q.multi?(sel.length>0):(sel!==null);
   var canBack=!PLAY.lockedBack&&!set.noBack;
   var timerHTML=q.timer?'<span class="play-timer">'+ic('lc-hourglass')+'<span id="playTimerVal">'+q.timer+'</span>s</span>':'';
-  // Points badge (2026-09-10) — booth questions only; never coexists with timerHTML in practice
-  // (only a GAME question — M3's ฉาก 1 — ever sets q.timer), so sharing this one badge row is safe.
-  // #playPtsNum starts at "+0 แต้ม" and counts up via ptsCountUp() below (2026-09-11, per direction
-  // "Badge ระหว่างเล่นคำถาม...เพิ่ม motion นับเลขวิ่งขึ้น") — same treatment/helper as the summary
-  // screen's #sumPtsNum (see renderPlaySummary/ptsCountUp's own comment), replayed on every question
-  // since this whole badge markup is rebuilt fresh each renderPlayBody() call.
-  var ptsBadgeHTML=(kind==='booth'&&set.points)?'<span class="play-pts-badge">'+ic('lc-gift')+'<span id="playPtsNum">+0 แต้ม</span></span>':'';
-  var badgesHTML=(timerHTML||ptsBadgeHTML)?'<div class="play-eyebrow">'+timerHTML+ptsBadgeHTML+'</div>':'';
+  // Points badge (.play-pts-badge, the question screen's "+N แต้ม" eyebrow) removed entirely
+  // (2026-09-16, per direction "หน้าคำถามทั้งหมด badge คะแนน เอาออก") — badgesHTML now only ever
+  // carries timerHTML. ptsCountUp() (below) is left in place, unused, same "kept for history"
+  // precedent as .play-sum-pts elsewhere in this file.
+  var badgesHTML=timerHTML?'<div class="play-eyebrow">'+timerHTML+'</div>':'';
   // Multi-select counter (2026-09-10) — borrows the DNA quiz's own S3 interest-picker pattern
   // (.int-count "เลือกแล้ว X/3") so a multi-choice question reads visibly differently from a
   // single-choice one, not just via the (easy to miss) absence of radio-style exclusivity.
@@ -8009,15 +8009,6 @@ function renderPlayBody(){
   // the demo panel toggling something), and a naive restart-on-every-render would keep resetting it.
   if(q.timer&&PLAY.timerQi!==qi){PLAY.timerQi=qi;startPlayTimer(q.timer);}
   else if(!q.timer)clearPlayTimer();
-  // #playPtsNum count-up (2026-09-11) — same PLAY.xxxQi-tracked "only on a genuinely new question"
-  // guard as the timer fix just above, for the exact same reason: an unrelated global render() can
-  // re-invoke renderPlayBody() for the SAME question, and without this the badge would keep
-  // restarting its count-up from 0 instead of just sitting at the final value.
-  if(kind==='booth'&&set.points){
-    var ptsNumEl=root.querySelector('#playPtsNum');
-    if(PLAY.ptsQi!==qi){PLAY.ptsQi=qi;ptsCountUp(ptsNumEl,set.points);}
-    else if(ptsNumEl)ptsNumEl.textContent='+'+set.points+' แต้ม';
-  }
 }
 /* renderPlaySummary — the game's result/payoff screen. Rebuilt 2026-09-10 (per direction "หน้า result
    อยากให้ใช้ dna เดียวกับ หน้าคู่มือ แท่ป ตัวตน") onto the Playbook identity (ตัวตน) tab's own DNA: the
@@ -8053,7 +8044,7 @@ function renderPlayBody(){
    prototype always shows (1) a running cross-game "cumulative knowledge" count and (2) an explicit
    line confirming what just got saved. Both were genuinely missing here, not just re-skinned — see
    knowCount/insHd (the .sc pill reused from skillCardHTML's own "คำประจำตัว" chip, right-aligned in
-   .str-hd) and saveNoteHTML (.pf-note reused from Profile's footer) below. Deliberately NOT ported:
+   .str-hd) and saveNoteHTML (now .pe-report's own DNA, see its own comment below) below. Deliberately NOT ported:
    that prototype's separate "Ark Hero" persona computed live from mini-game mindset points — this app
    already anchors identity on RESULT.hero from the upfront DNA quiz, so a second emergent persona
    would compete with it rather than extend it; the mindset signal only feeds the existing Playbook via
@@ -8128,16 +8119,18 @@ function renderPlaySummary(){
   // + ptsCountUp() number animation) removed entirely (2026-09-11, per direction "เล่นจบแล้ว (ทุกเกมส์
   // ทุกด้าน ทุกบูธ)...กรณีมี — ให้เอาออกทั้งหมด") — was only ever shown for booth games (kind==='booth'
   // &&set.points; the 6 main games never carried a `points` field), so this one removal already covers
-  // every game/side/booth's end screen. The other 3 "+N แต้ม" call sites (play-pts-badge during play,
-  // the briefing's รางวัล card, .bp-pts's "สะสมแล้ว" running total) are untouched — this was only ever
-  // about the end-screen card. CSS (.play-sum-pts/@keyframes ptsPop) and ptsCountUp() kept: the
-  // function is still used by play-pts-badge, and the CSS stays commented-as-unused for history, same
-  // precedent as .play-brief/etc. above.
-  // Save confirmation (2026-09-10) — .pf-note reused verbatim (Profile footer's own muted icon+text
-  // line) as a plain-language stand-in for a "signal recorded" trust cue: names WHAT got saved
-  // (the insights above) instead of an opaque internal code, then sits as the last line inside the
-  // card — same position a closing stat/note occupies in every other .hero-in result card here.
-  var saveNoteHTML=insights.length?'<div class="pf-note" style="margin-top:var(--sp-stack)">'+ic('lc-check-circle')+'บันทึกเรื่องที่เรียนรู้จากเกมนี้เข้า Playbook ของคุณแล้ว</div>':'';
+  // every game/side/booth's end screen. The other 3 "+N แต้ม" call sites this comment used to note as
+  // untouched (play-pts-badge during play, the briefing's รางวัล card, .bp-pts's "สะสมแล้ว" running
+  // total) were all removed too as of 2026-09-16 — every "+N แต้ม" surface in the app is gone now.
+  // CSS (.play-sum-pts/.play-pts-badge/.bp-pts/@keyframes ptsPop) and ptsCountUp() are left in place,
+  // unused, kept for history same precedent as .play-brief/etc. above.
+  // Save confirmation — reskinned onto .pe-report's own DNA (2026-09-16, per direction "section
+  // บันทึกเรื่องที่เรียนรู้...ใช้ design dna ของ section รายงานพัฒนาการหลังงาน (หน้าหลัก)"), the same
+  // icon+title row on var(--done-wash) as Home's post-event progress card (renderHome's own
+  // .pe-report.on call site) and .bp-pts before it was removed — was .pf-note (Profile footer's own
+  // flat muted icon+text line, no card background) verbatim; still sits as the last line inside the
+  // card, same position a closing stat/note occupies in every other .hero-in result card here.
+  var saveNoteHTML=insights.length?'<div class="pe-report on pe-report-lg" style="margin-top:var(--sp-stack)">'+ic('lc-check-circle')+'<div><div class="pe-report-t">บันทึกเรื่องที่เรียนรู้จากเกมนี้เข้า Playbook ของคุณแล้ว</div></div></div>':'';
   var backLabel=kind==='game'?'กลับหน้าเกมหลัก':'กลับหน้าเดินบูธ';
   // Title block — DNA quiz's own .q-head/.q-title header, finalized 2026-09-11 (per direction
   // "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย") — was briefly a DEMO.sumTitleVer-toggled choice between this
@@ -8250,9 +8243,10 @@ function renderProfile(){
     '</section>'+
     (m?ticketHistoryHTML():'')+
     '<section class="prof-rows scroll-reveal">'+rows.map(function(r){return '<div class="pr-row"><span class="pr-k">'+r.k+'</span><span class="pr-v">'+r.v+'</span></div>';}).join('')+'</section>'+
-    '<div class="prof-foot scroll-reveal"><div class="pf-brand">efin × BetterTrade · New World, New Playbook</div>'+
-      '<div class="pf-note">'+ic('lc-info')+'เราแค่ "จด" ไม่ "ชี้" · แต้ม ≠ ตัวตน · เพื่อการวางแผนและการศึกษา ไม่ใช่คำชี้ชวนลงทุน</div>'+
-      '<div class="pf-note">'+ic('lc-lock')+'เปิด Playbook ด้วย OTP/QR ตาม PDPA · ตัวเลข/สิทธิเป็นข้อมูลเบื้องต้น (MOCK) ต้องเคาะกับทีมจัดงานก่อนใช้จริง</div>'+
+    '<div class="prof-foot scroll-reveal"><div class="pf-brand pf-brand-bold">BetterTrade</div>'+
+      '<div class="pf-brand pf-brand-bold">New world New Playbook</div>'+
+      '<div class="pf-brand">เปิดมุมมองใหม่ให้การลงทุน เห็นข้อมูลรอบด้าน วางแผนได้อย่างมั่นใจ และตัดสินใจในแบบของคุณ</div>'+
+      '<div class="pf-note">เนื้อหานี้จัดทำเพื่อการศึกษาและการวางแผน ไม่ใช่คำแนะนำในการลงทุน</div>'+
     '</div>'+
   '</main>'+
   appTabbar('profile');
