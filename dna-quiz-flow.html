@@ -6499,7 +6499,21 @@ var BOOTH_ICON_PNG={
    returning base64 text — much cheaper than the base64-round-trip approach GAME_ART_PNG's own history
    used, worth reusing for any future batch image conversion in this project. Verified live: all 10
    files fetch 200 OK from the real dev server post-conversion, alpha round-trip confirmed (corner
-   alpha=0, center alpha~253) on one sample. */
+   alpha=0, center alpha~253) on one sample.
+   All 10 re-sourced 2026-09-16, per direction — user supplied a new art set (`เดินบูธ Result/`,
+   project root, 10 files named verbatim after BOOTHS[i].game, a clean untrimmed 1:1 match so no
+   panel-guessing was needed unlike the GAME_ART_PNG collages above). Deliberate style break from the
+   monochrome-character-illustration family every other asset set in this file uses (booths-bg/
+   games-bg/game-art): these are full-color glossy 3D-render mascot icons (holographic rainbow
+   gradients — a crystal bull, a glowing globe, gold ingots, etc.) — flagged to the user as a real
+   design-direction change before wiring, confirmed anyway. 8 of the 10 source files were .png with
+   real alpha already (straight trim→360px-wide→WebP q80, same recipe as above); the other 2
+   (สร้างตาข่ายกันตก, โต้คลื่นความผันผวน) were .jpg on a solid white canvas — JPEG has no alpha
+   channel — so those got the mirror image of GAME_ART_PNG's black-backdrop flood-fill: border-seeded
+   BFS keying min(R,G,B)≥250 instead of max≤14, background alpha 0, plus the same 4px soft-edge band
+   (alpha from distance-from-white instead of brightness, unpremultiplied against white instead of
+   black) to avoid a white fringe on the curved glossy edges. Verified by zooming a busy curved edge
+   on both before replacing — clean, no white halo. */
 var BOOTH_ART_PNG={
   'หุ้นไทย':'assets/results/result-01-stock-arena.webp',
   'หุ้นต่างประเทศ':'assets/results/result-02-passport-global.webp',
