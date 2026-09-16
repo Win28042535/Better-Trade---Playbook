@@ -951,6 +951,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* size bumped ic-sm(16px)->ic-lg(24px) to match .redeem-note's own icon size (2026-08-28, per
    direction "icon size scale เท่ากับของ section บัตร Explorer และ Master Class..."). */
 .str-hd svg{width:var(--ic-lg);height:var(--ic-lg);}
+/* height:auto (not a forced square var(--ic-lg)) — matches .pass-ey-ic's own icon-DNA exactly
+   (2026-09-16, per direction "ไอคอน size เท่ากับของ section ความคืบหน้าของ Playbook"); renders
+   identically to the old forced-square rule for this square 160x160 source PNG, just literally the
+   same recipe as that section's icon instead of a same-result-different-rule coincidence. */
+.str-hd img{width:var(--ic-lg);height:auto;flex:0 0 auto;}
 /* margin-left added (2026-09-02, per direction — "ข้อความสีดำ...alignment left กับ text title [not]
    กับไอคอน") — .str-hd's title text starts at icon-width + gap (--ic-lg 24px + --sp-inline 12px) from
    the box's own padding edge, but these list rows sit flush at that padding edge instead, one full
@@ -2760,15 +2765,14 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    lines (e.g. "ภูมิคุ้มกันความกลัวตกขบวน") or a status line sits under it, the icon/play-button
    floated in the row's vertical middle instead of lining up with the title's own first line. */
 .gr-hd{display:flex;align-items:flex-start;gap:var(--sp-inline);padding:var(--sp-card-pad-sm);}
-/* Badged icon (2026-09-11, follow-up direction "ด้านอื่นใน Playbook...ให้ icon dna เหมือนกับ section
-   เล่นเกมนี้ต่อ") — the bare/no-backdrop treatment above (matched to .pass-ey-ic instead) didn't
-   last: matched .next-step's own .ns-ic badge (48px, var(--r2) rounded, bordered tint) one section
-   up on this same page instead, var(--cloud)+var(--line-soft) standing in for .ns-ic's dark-card
-   rgba(255,255,255,.1)/.16 pair. Then (same day, follow-up direction "background icon dna ไม่ต้องมี
-   สีพื้นเทา (ให้มีแต่ border)") the var(--cloud) fill itself came back OFF — the custom holographic
-   art (see SIDES[i].img) reads better against the page's own paper background than boxed into a
-   flat grey tile; var(--line-soft) border kept alone, same 48px/var(--r2) footprint. */
-.gr-ic{width:48px;height:48px;border-radius:var(--r2);border:1px solid var(--line-soft);flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:var(--muted);}
+/* Bordered 48px box (2026-09-11, follow-up direction "ด้านอื่นใน Playbook...ให้ icon dna เหมือนกับ
+   section เล่นเกมนี้ต่อ") — matched .next-step's own .ns-ic badge one section up on this same page —
+   then (same day, follow-up direction) the fill dropped, border-only. REVERTED again 2026-09-16 (per
+   direction "เอากรอบสี่เหลี่ยมออก (ใช้ icon dna เดียวกับของ section ความคืบหน้าของ Playbook)") back to
+   the original bare/no-backdrop treatment this comment used to describe as tried-and-reverted — this
+   time for good: no box, no border, just the icon at its own var(--ic-lg) size (.gr-ic svg/img below,
+   unchanged), same as .pass-ey-ic's own bare icon. */
+.gr-ic{flex:0 0 auto;display:flex;align-items:center;justify-content:center;}
 .gr-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
 .gr-ic img{width:var(--ic-lg);height:var(--ic-lg);object-fit:contain;}
 .gr-tx{flex:1;min-width:0;cursor:pointer;}
@@ -7419,14 +7423,14 @@ var MINIGAME_Q=[
      opts:['ให้มีเงินใช้ทุกเดือนอย่างสม่ำเสมอ','รักษาเงินต้นให้อยู่ครบ','เก็บส่งต่อให้ลูกหลาน หรือทำประโยชน์ให้สังคม'],
      insight:'วิธีถอนเงินมาใช้หลังเกษียณ สำคัญไม่แพ้วิธีเก็บ'}
   ]},
-  {noType:true,resultNote:'เกมนี้ไม่สรุปว่าคุณเป็นคนประเภทไหน — ปิดท้ายด้วยสิ่งที่ได้เรียนรู้ และ "ก้าวแรก" ที่คุณเลือกเอง',
+  {noType:true,resultNote:'เกมนี้ไม่สรุปว่าคุณเป็นคนประเภทไหน ปิดท้ายด้วยสิ่งที่ได้เรียนรู้ และ "ก้าวแรก" ที่คุณเลือกเอง',
    questions:[
     {icon:'lc-coins',img:'coinbaht',q:'สมมติว่าคุณเพิ่งเก็บเงินก้อนแรกได้ 100,000 บาท แล้วมีคนชวนลงทุน บอกว่า "**น่าจะได้กำไรดี**"',
      opts:['ลงทั้ง 100,000 บาท ไปเลย','แบ่งครึ่ง ลง 50,000 บาท เก็บไว้ 50,000 บาท','ยังไม่ลง เก็บไว้ก่อนทั้งหมด'],
      insight:'ก่อนลงทุน ควรมีเงินสำรองเผื่อฉุกเฉินก่อน · แต่ถ้าเก็บเงินสดไว้เฉยๆ นานๆ ค่าของเงินก็ลดลงจากเงินเฟ้อ'},
     {icon:'lc-calendar',img:'s1q2',q:'มีสองคนลงทุนเดือนละ 2,000 บาท เท่ากัน แต่**เริ่มไม่พร้อมกัน** คุณคิดว่าใครได้เปรียบ?',
      opts:['คนที่เริ่มตอนอายุ 25 แล้วลง 10 ปีจากนั้นหยุด','คนที่เริ่มตอนอายุ 35 แล้วลงต่อเนื่อง 30 ปี','พอๆ กัน เพราะลงเดือนละเท่ากัน'],
-     insight:'เวลาช่วยให้ดอกเบี้ยทบต้นทำงาน — เริ่มเร็วมักได้เปรียบกว่าลงเยอะแต่เริ่มช้า'},
+     insight:'เวลาช่วยให้ดอกเบี้ยทบต้นทำงาน เริ่มเร็วมักได้เปรียบกว่าลงเยอะแต่เริ่มช้า'},
     {icon:'lc-route',img:'route',q:'เงินส่วนที่จะลงทุน **คุณเลือกเส้นทางไหน**?',
      opts:['เส้นทางสบายใจ ขึ้นลงน้อย','เส้นทางสมดุล','เส้นทางท้าทาย ขึ้นลงแรง'],
      insight:'ผลตอบแทนที่หวังได้มาก มักมาพร้อมการขึ้นลงที่แรงขึ้น'},
@@ -8077,6 +8081,12 @@ function renderPlaySummary(){
   // tint + label swap between the two states, same recipe .redeem-card.on/.locked already uses for
   // an on/off tint pair. Omitted entirely when the game has no resultNote (M2/M6 + every booth).
   var resultCard='';
+  // noteHTML ("หมายเหตุ", the noType variant) pulled OUT of resultCard/mainSectionsHTML entirely
+  // (2026-09-16, per direction "section หมายเหตุ...จะอยู่ section ล่างสุดเสมอ") — appended after
+  // saveNoteHTML at the very bottom of the page now (see its own call site below), not just below
+  // insBox within mainSectionsHTML, so it's unconditionally the LAST section on the page regardless
+  // of what else renders.
+  var noteHTML='';
   if(set.resultNote){
     var noType=!!set.noType;
     // Description now aligns under the ast-lbl TITLE text, not the icon (2026-09-10, per direction
@@ -8090,10 +8100,12 @@ function renderPlaySummary(){
     // การ์ด...") — same component redeemCardHTML's own SKILL-disclaimer note uses: flat --accent
     // background (no border), bold <b> lead line in ink over a muted supporting line underneath, same
     // icon+text row idiom. Both are "soft disclaimer, not a verdict" callouts, so they now share DNA
-    // instead of หมายเหตุ looking like a paler variant of the real ผลจากเกมนี้ verdict card.
-    resultCard=noType
-      ? '<div class="hero-note skill-note">'+ic('lc-info')+'<span><b style="font-weight:var(--w-label);color:var(--ink)">หมายเหตุ</b><br>'+set.resultNote+'</span></div>'
-      : '<div class="ast-block" style="background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)"><div class="ast-lbl">'+ic('lc-sparkles')+'ผลจากเกมนี้</div><div class="str-li">'+set.resultNote+'</div></div>';
+    // instead of หมายเหตุ looking like a paler variant of the real ผลจากเกมนี้ verdict card. Title <b>
+    // font-size bumped to --fs-bodysm/18px (2026-09-16, per direction "text title size เท่ากับ บันทึก
+    // เข้า Playbook แล้ว") to match saveNoteHTML's own .pe-report-t title — was inheriting .hero-note's
+    // base --fs-eyebrow/14px.
+    if(noType)noteHTML='<div class="hero-note skill-note" style="margin-top:var(--sp-stack)">'+ic('lc-info')+'<span><b style="font-weight:var(--w-label);color:var(--ink);font-size:var(--fs-bodysm)">หมายเหตุ</b><br>'+set.resultNote+'</span></div>';
+    else resultCard='<div class="ast-block" style="background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)"><div class="ast-lbl">'+ic('lc-sparkles')+'ผลจากเกมนี้</div><div class="str-li">'+set.resultNote+'</div></div>';
   }
   // "ข้อมูลมัน" — factual/educational takeaways from the questions, not about the player specifically.
   // Cumulative badge (2026-09-10) — .sc reused verbatim (the same pill skillCardHTML's "คำประจำตัว"
@@ -8101,20 +8113,17 @@ function renderPlaySummary(){
   // since .str-hd is already a flex row. counts THIS game's own insights immediately (see
   // learnedInsights' `inProgress` param) so the number visible here always matches what the ledger
   // card on the Playbook identity tab will show once the player leaves this screen.
+  // Icon swapped lc-check-circle -> ICON_JOYSTICK_PNG (2026-09-16, per direction) — same joystick
+  // art Home's "เล่นเกมหลักอีก N เกม" next-step card and gameRow's list icons already use elsewhere,
+  // sized via .str-hd img to the same --ic-lg/24px the lc-check-circle glyph rendered at.
   var knowCount=learnedInsights({kind:kind,idx:idx}).length;
-  var insHd='<div class="str-hd">'+ic('lc-check-circle')+'สิ่งที่ได้เรียนรู้จากเกมนี้'+(knowCount?'<span class="sc" style="margin-left:auto">สะสม '+knowCount+' เรื่อง</span>':'')+'</div>';
+  var insHd='<div class="str-hd"><img src="'+ICON_JOYSTICK_PNG+'" alt="">สิ่งที่ได้เรียนรู้จากเกมนี้'+(knowCount?'<span class="sc" style="margin-left:auto">สะสม '+knowCount+' เรื่อง</span>':'')+'</div>';
   var insBox=insights.length?'<div class="str-box">'+insHd+insights.map(function(t){return '<div class="str-li">'+t+'</div>';}).join('')+'</div>':'';
-  // Section order (2026-09-14, per direction "section หมายเหตุ ให้สลับกับ section สิ่งที่ได้เรียนรู้
-  // จากเกมนี้"): "ผลจากเกมนี้" (a real verdict — same lead-position precedent as the identity tab's
-  // "สินทรัพย์ที่ถนัด" card) always stays FIRST; it's only the noType "หมายเหตุ" variant (the muted
-  // dashed card — the DNA's own "SKILL value = the collectible card's fun/lighter layer" framing) that
-  // drops below insBox (สิ่งที่ได้เรียนรู้จากเกมนี้ — mirrors the identity tab's ความแข็งแกร่ง card
-  // position). resultCard/insBox stay mutually exclusive per-game (a game is either typed or noType),
-  // so this is a per-render order swap, not simultaneous display of both variants.
-  // noType order wraps insBox with the same margin-bottom .ast-block carries natively (str-box has
-  // none of its own outside .str-grid) — without it the two cards sit flush with zero gap when insBox
-  // leads (2026-09-14 bug: "เกมก้าวแรก spacing ระหว่าง section...ตอนนี้ติดกัน").
-  var mainSectionsHTML=set.noType?('<div style="margin-bottom:var(--sp-stack)">'+insBox+'</div>'+resultCard):(resultCard+insBox);
+  // mainSectionsHTML is just resultCard+insBox now — the noType "หมายเหตุ"/insBox order-swap this
+  // comment used to document is gone along with noteHTML's move out of this variable (see noteHTML's
+  // own comment above); resultCard is '' for every noType game now, so this is effectively insBox
+  // alone there, same as it read before the swap.
+  var mainSectionsHTML=resultCard+insBox;
   // ptsHTML (the "+N แต้ม" reward card on this "เล่นจบแล้ว" screen — .play-sum-pts, its ptsPop entrance
   // + ptsCountUp() number animation) removed entirely (2026-09-11, per direction "เล่นจบแล้ว (ทุกเกมส์
   // ทุกด้าน ทุกบูธ)...กรณีมี — ให้เอาออกทั้งหมด") — was only ever shown for booth games (kind==='booth'
@@ -8130,7 +8139,7 @@ function renderPlaySummary(){
   // .pe-report.on call site) and .bp-pts before it was removed — was .pf-note (Profile footer's own
   // flat muted icon+text line, no card background) verbatim; still sits as the last line inside the
   // card, same position a closing stat/note occupies in every other .hero-in result card here.
-  var saveNoteHTML=insights.length?'<div class="pe-report on pe-report-lg" style="margin-top:var(--sp-stack)">'+ic('lc-check-circle')+'<div><div class="pe-report-t">บันทึกเรื่องที่เรียนรู้จากเกมนี้เข้า Playbook ของคุณแล้ว</div></div></div>':'';
+  var saveNoteHTML=insights.length?'<div class="pe-report on pe-report-lg" style="margin-top:var(--sp-stack)">'+ic('lc-check-circle')+'<div><div class="pe-report-t">บันทึกเข้า Playbook แล้ว</div><div class="pe-report-s">เราได้ทำการบันทึกเรื่องที่เรียนรู้จากเกมนี้เข้า Playbook ของคุณแล้ว</div></div></div>':'';
   var backLabel=kind==='game'?'กลับหน้าเกมหลัก':'กลับหน้าเดินบูธ';
   // Title block — DNA quiz's own .q-head/.q-title header, finalized 2026-09-11 (per direction
   // "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย") — was briefly a DEMO.sumTitleVer-toggled choice between this
@@ -8150,6 +8159,7 @@ function renderPlaySummary(){
         titleHTML+
         mainSectionsHTML+
         saveNoteHTML+
+        noteHTML+
       '</div></div></section>'+
       /* Icon moved AFTER the label AND flipped to a right-pointing arrow (2026-09-10, per direction
          "ให้ไอคอนสลับมาไว้ด้านหลังข้อความ" then follow-up "ให้เปลี่ยนไอคอนเป็นลูกศรหันขวาแทน") — was a
