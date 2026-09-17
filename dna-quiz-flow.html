@@ -1778,7 +1778,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    via its own .dd-tablist hook, not the shared .bt-tabs--primary base, since the other two consumers
    (profile before/after toggle, scan-mode switcher) still want the underline track. */
 .dd-tablist{border-bottom:none;}
-.bt-tabs--primary .bt-tab{padding:var(--sp-list) 1px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border-bottom:2px solid transparent;margin-bottom:-1px;}
+/* min-height:44px added (2026-09-17, responsive audit — was ~42px from padding+line-height alone). */
+.bt-tabs--primary .bt-tab{min-height:44px;padding:var(--sp-list) 1px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border-bottom:2px solid transparent;margin-bottom:-1px;}
 .bt-tabs--primary .bt-tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:var(--w-label);}
 @media(max-width:420px){.bt-tabs--primary{overflow-x:auto;scrollbar-width:none;}.bt-tabs--primary::-webkit-scrollbar{display:none;}}
 /* --secondary: compact/pill active state. flex-wrap:nowrap (was wrap) keeps every item on ONE row
@@ -1800,7 +1801,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    down to 320px, for both label sets. Ellipsis rule kept below as a last-resort safety net for any
    future label wider than this can size for even while scrolling. */
 .bt-tabs--secondary{flex-wrap:nowrap;justify-content:space-between;}
-.bt-tabs--secondary .bt-tab{flex:0 1 auto;min-width:0;padding:var(--sp-list) var(--sp-glue);min-height:40px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border:1px solid var(--line-soft);border-radius:var(--rpill);background:var(--white);transition:color .15s,border-color .15s,background .15s;}
+/* min-height 40->44px (2026-09-17, responsive audit). */
+.bt-tabs--secondary .bt-tab{flex:0 1 auto;min-width:0;padding:var(--sp-list) var(--sp-glue);min-height:44px;font-size:var(--fs-bodysm);font-weight:var(--w-head);border:1px solid var(--line-soft);border-radius:var(--rpill);background:var(--white);transition:color .15s,border-color .15s,background .15s;}
 /* Softened from solid --ink/--cloud (2026-08-19, per direction) — sitting right under the header's
    own black "ลงทะเบียน" CTA, a solid-black selected pill read as a second primary button stacked
    underneath it. Switched to the app's existing violet "active" wash (--active-fill/--violet/
@@ -2105,7 +2107,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .map-ph .mp-in svg{width:var(--ic-lg);height:var(--ic-lg);}
 .map-ph .mp-img{width:100%;height:100%;object-fit:cover;display:block;}
 .map-ph .mp-cap{position:absolute;left:10px;bottom:9px;font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--cloud);background:var(--ink);padding:var(--sp-stack-tight) var(--sp-list);border-radius:var(--r0);}
-.map-ph .mp-zoom{position:absolute;right:10px;top:9px;display:flex;align-items:center;gap:var(--sp-stack-tight);background:var(--white);color:var(--ink);border:1px solid var(--line-soft);padding:6px var(--sp-inline);border-radius:var(--rpill);font-size:var(--fs-eyebrow);font-weight:var(--w-head);box-shadow:0 2px 6px rgba(17,19,24,.1);cursor:pointer;transition:transform .15s var(--ease),background .15s var(--ease);}
+/* min-height:44px added (2026-09-17, responsive audit — touch target below the 44x44 minimum). */
+.map-ph .mp-zoom{position:absolute;right:10px;top:9px;display:flex;align-items:center;gap:var(--sp-stack-tight);background:var(--white);color:var(--ink);border:1px solid var(--line-soft);padding:6px var(--sp-inline);min-height:44px;border-radius:var(--rpill);font-size:var(--fs-eyebrow);font-weight:var(--w-head);box-shadow:0 2px 6px rgba(17,19,24,.1);cursor:pointer;transition:transform .15s var(--ease),background .15s var(--ease);}
 .map-ph .mp-zoom svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
 /* "เพิ่ม interaction" (2026-08-28, per direction) — was a static pill with no press/hover feedback
    at all; same :active press-scale idiom .btn/.demo-fab/.go-top already use, plus a hover tint
@@ -2627,6 +2630,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    number; the current pin and the tapped pin reveal their short label. Sized/positioned so labels
    stay inside .map-ph's clipped bounds (short labels, centered, small type) — no horizontal overflow. */
 .map-ph.v2 .bmk{position:absolute;transform:translate(-50%,-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;padding:0;cursor:pointer;font-family:var(--font);-webkit-tap-highlight-color:transparent;}
+/* ::before hit-area (2026-09-17, responsive audit) — the visible pin (.bmk-num) is a deliberately
+   small 26px circle so the crowded floor-plan stays legible; this adds an invisible 44x44 tap area
+   centered on it (a pseudo-element, not padding on .bmk itself) specifically so it doesn't touch
+   .bmk's own box — .bmk-ring's top:0 and .bmk-lbl's top:calc(100% + 3px) below are both positioned
+   relative to that box, and padding would have shifted both away from the circle they're meant to
+   ring/label. */
+.map-ph.v2 .bmk::before{content:'';position:absolute;top:50%;left:50%;width:44px;height:44px;transform:translate(-50%,-50%);}
 .map-ph.v2 .bmk-num{position:relative;z-index:1;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--white);font-weight:var(--w-label);font-size:var(--fs-eyebrow);line-height:1;border:2px solid var(--white);box-shadow:0 2px 6px rgba(17,19,24,.35);transition:transform .18s var(--ease);}
 .map-ph.v2 .bmk.done .bmk-num{background:var(--cyan);}
 .map-ph.v2 .bmk.cur .bmk-num,.map-ph.v2 .bmk.start .bmk-num{background:var(--violet);}
@@ -2659,7 +2669,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    every marker: none sits below ~y53% or right of ~x63%) AND collapses to an icon-only chip so it
    can't collide with the bottom-left caption on a narrow phone. v1's labeled top-right button is
    untouched. */
-.map-ph.v2 .mp-zoom{top:auto;bottom:9px;padding:7px;}
+/* min-width:44px added, justify-content:center (2026-09-17, responsive audit) — this icon-only
+   variant collapsed to ~34px square (7px padding + a 20px icon); the base rule's min-height:44px
+   still applies here, this just squares up the width to match and centers the lone icon in it. */
+.map-ph.v2 .mp-zoom{top:auto;bottom:9px;padding:7px;min-width:44px;justify-content:center;}
 .map-ph.v2 .mp-zoom span{display:none;}
 .map-ph.v2 .mp-zoom svg{width:var(--ic-md);height:var(--ic-md);}
 /* v2 legend spacing — sits between the map and the route list. */
@@ -2691,7 +2704,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .zh-li{display:flex;gap:var(--sp-list);font-size:var(--fs-bodysm);color:var(--ink);line-height:1.5;margin-bottom:var(--sp-list);}
 .zh-li b{font-weight:var(--w-label);}
 .zh-note{font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);line-height:1.5;padding-top:var(--sp-list);border-top:1px solid var(--line-soft);}
-.howto-btn{display:inline-flex;align-items:center;gap:var(--sp-stack-tight);border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-weight:var(--w-head);font-size:var(--fs-label);min-height:38px;padding:0 var(--sp-stack);border-radius:var(--rpill);cursor:pointer;flex:0 0 auto;}
+/* min-height 38->44px (2026-09-17, responsive audit — touch target below the 44x44 minimum) —
+   this is the shared small-button component (also used as .bc-play/.bc-play.locked on booth cards,
+   the "วิธีเล่น" button, etc.), so the fix cascades to every one of those call sites at once. */
+.howto-btn{display:inline-flex;align-items:center;gap:var(--sp-stack-tight);border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-weight:var(--w-head);font-size:var(--fs-label);min-height:44px;padding:0 var(--sp-stack);border-radius:var(--rpill);cursor:pointer;flex:0 0 auto;}
 .howto-btn svg{width:var(--ic-sm);height:var(--ic-sm);}
 /* .bc-play — the asset card's main action, was sharing .howto-btn's plain white/outline look with
    secondary things like "วิธีเล่น"; bumped to a real primary (solid ink) state so it reads as THE
@@ -2738,7 +2754,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .bc-zchip{font-size:var(--fs-label);font-weight:var(--w-head);padding:4px var(--sp-inline);border-radius:var(--rpill);white-space:nowrap;}
 .bc-game{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:2px;margin-left:calc(var(--ic-lg) + var(--sp-inline));}
 .bc-partners{display:flex;flex-wrap:wrap;gap:var(--sp-glue);margin-top:var(--sp-inline);margin-left:calc(var(--ic-lg) + var(--sp-inline));}
-.bp-btn{display:inline-flex;align-items:center;gap:var(--sp-glue);border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);min-height:36px;padding:0 var(--sp-inline);border-radius:var(--r1);cursor:pointer;transition:background .15s,border-color .15s,transform .15s var(--ease);}
+/* min-height 36->44px (2026-09-17, responsive audit) — this button is the booth check-in flow's
+   main action, repeated up to 12x per booth card, so undersized targets here hit the most taps. */
+.bp-btn{display:inline-flex;align-items:center;gap:var(--sp-glue);border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);min-height:44px;padding:0 var(--sp-inline);border-radius:var(--r1);cursor:pointer;transition:background .15s,border-color .15s,transform .15s var(--ease);}
 .bp-btn svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;}
 /* press/hover feedback (2026-08-29, per direction "ให้มี button interaction") — same idiom as
    .mp-zoom/.ag-more: a press-scale everyone gets, a desktop-only hover tint since a touch kiosk has
@@ -2780,7 +2798,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    button, per direction. .btn-primary's own flex:1 is for CTAs that stand alone on their own row
    (route-cta-w, consent-btn); here it sits beside .gr-tx (also flex:1) in a compact row, so it's
    overridden back to content-width like the old .howto-btn was, keeping the row's flush-right look. */
-.gr-hd .btn-primary{flex:0 0 auto;min-height:38px;padding:0 var(--sp-stack);font-size:var(--fs-label);}
+/* min-height 38->44px (2026-09-17, responsive audit — touch target below the 44x44 minimum). */
+.gr-hd .btn-primary{flex:0 0 auto;min-height:44px;padding:0 var(--sp-stack);font-size:var(--fs-label);}
 /* font-size/weight now match Booth's "กิจกรรมประจำโซน" asset title (.bc-asset — fs-bodysm/w-label,
    2026-08-28, per direction "text size และ text weight อ้างอิงให้เท่ากับ...หุ้นไทย") — was fs-sub/
    w-head, a size step up and a lighter weight than that reference. */
