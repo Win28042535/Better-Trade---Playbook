@@ -3836,17 +3836,27 @@ var ICON_CARD_PNG='assets/ICON_CARD_PNG.png';
 var ICON_CROWN_PNG='assets/ICON_CROWN_PNG.png';
 var ICON_DIAMOND_PNG='assets/ICON_DIAMOND_PNG.png';
 var ICON_COMPASS_PNG='assets/ICON_COMPASS_PNG.png';
-var ICON_STOCK_TH_PNG='assets/ICON_STOCK_TH_PNG.png';
-var ICON_STOCK_INTL_PNG='assets/ICON_STOCK_INTL_PNG.png';
-var ICON_FUND_PNG='assets/ICON_FUND_PNG.png';
-var ICON_BOND_PNG='assets/ICON_BOND_PNG.png';
-var ICON_REALESTATE_PNG='assets/ICON_REALESTATE_PNG.png';
-var ICON_COLLECTIBLE_PNG='assets/ICON_COLLECTIBLE_PNG.png';
-var ICON_GOLD_PNG='assets/ICON_GOLD_PNG.png';
-var ICON_CRYPTO_PNG='assets/ICON_CRYPTO_PNG.png';
-var ICON_HEALTH_PNG='assets/ICON_HEALTH_PNG.png';
+/* BOOTH_ICON_PNG's 10 category icons (below, through ICON_INSURANCE_PNG) re-pointed PNG->WebP
+   (2026-09-17, per direction "ควบคุมไม่ให้หนักในระบบเกินไป" — asset-weight audit on the booth result
+   flow) — same canvas toBlob('image/webp',0.8) re-encode as BOOTH_ART_PNG/BOOTH_BG_IMG's own history
+   above, this time with NO resize (source PNGs were already 160x160/96x96, already at or under the
+   80px@2x retina ceiling these ever display at — .q-icon-bare's 80px box is the largest of their 3
+   call sites, .bc-asset-ic/qIcon's booth-list and question-header uses are smaller still), so the
+   ~85-90% cut (14-51KB PNG -> 3-6KB WebP each) is pure format-efficiency, not a resolution loss.
+   Var names kept as *_PNG despite the extension change, same precedent as BOOTH_ART_PNG/GAME_ART_PNG
+   not being renamed either. ICON_JOYSTICK_PNG (used elsewhere, not a BOOTH_ICON_PNG entry) was
+   untouched — out of scope for this pass. */
+var ICON_STOCK_TH_PNG='assets/ICON_STOCK_TH_PNG.webp';
+var ICON_STOCK_INTL_PNG='assets/ICON_STOCK_INTL_PNG.webp';
+var ICON_FUND_PNG='assets/ICON_FUND_PNG.webp';
+var ICON_BOND_PNG='assets/ICON_BOND_PNG.webp';
+var ICON_REALESTATE_PNG='assets/ICON_REALESTATE_PNG.webp';
+var ICON_COLLECTIBLE_PNG='assets/ICON_COLLECTIBLE_PNG.webp';
+var ICON_GOLD_PNG='assets/ICON_GOLD_PNG.webp';
+var ICON_CRYPTO_PNG='assets/ICON_CRYPTO_PNG.webp';
+var ICON_HEALTH_PNG='assets/ICON_HEALTH_PNG.webp';
 var ICON_JOYSTICK_PNG='assets/ICON_JOYSTICK_PNG.png';
-var ICON_INSURANCE_PNG='assets/ICON_INSURANCE_PNG.png';
+var ICON_INSURANCE_PNG='assets/ICON_INSURANCE_PNG.webp';
 var SERIFFONT="'Baskervville',Georgia,'Times New Roman',serif";
 var PROFILE_PHOTO='assets/PROFILE_PHOTO.jpg';
 var LOGO_IMG={aiSymbol:'assets/aiSymbol.png',efinAiIcon:'assets/efinAiIcon.png',efin:'assets/efin.png',efinBT:'assets/efinBT.png',bt:'assets/bt.png',nwnp:'assets/nwnp.png'};
