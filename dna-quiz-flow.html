@@ -7274,7 +7274,18 @@ var SIDES=[
    real silhouette edges around it) and can't spread into an unrelated black shape elsewhere in the
    same cell. Only game-02/game-04 needed re-export.
    All 6 GAME_ART_PNG entries now come from this third collage, with the de-fringe pass and (for
-   game-02/04) the pocket fix applied. */
+   game-02/04) the pocket fix applied.
+   Replaced again 2026-09-17, per direction (a full new 6-image set, confirmed) — this is the set
+   `artSrc` was re-enabled for (see renderPlaySummary's own comment history for the temporary-disable
+   this replaces). Source: `เกมหลัก Result/1.png`..`6.png` (project root), 1254×1254 each, matched to
+   SIDES in array order (no descriptive filenames to match by name, confirmed with the user before
+   wiring — see [[games-questions-dna]] for the SIDES order itself). Unlike every prior GAME_ART_PNG
+   source, these already had clean per-pixel alpha baked in (corner alpha=0, no flood-fill/bg-removal
+   needed) — same resize-then-WebP recipe otherwise (1254px→360px, canvas toBlob('image/webp',0.8)),
+   1254×1254→360×360 kept square (no per-cell crop needed, these are already single full-canvas
+   pieces, not a collage). Net ~7.86MB (6 raw PNGs) → ~188KB (6 WebP) total, alpha verified via a
+   canvas round-trip (corner=0, center~253) same as every prior pass. Same filenames as the set this
+   replaces (game-01-crisis-rewind.webp etc.) — old raw source collages (project root) untouched. */
 var GAME_ART_PNG={
   'เกมย้อนเวลาพอร์ต':'assets/games/game-01-crisis-rewind.webp',
   'เกมเลือกเครื่องมือ':'assets/games/game-02-tool-picker.webp',
@@ -8073,13 +8084,7 @@ function renderPlaySummary(){
      hero-gw/hero-in markup) occupies before its own detail content. Moved OFF renderPlayBrief the
      same day (see that function's own comment) — this result screen is now the ONLY place this art
      shows, not a duplicate of a brief-screen copy. */
-  /* GAME_ART_PNG temporarily disabled on the main-games (เกมหลัก) result screen only (2026-09-16,
-     per direction "ปิดภาพที่แสดงทั้งหมดไว้ก่อน...จะมีการ replace ภาพใหม่ ทั้ง 6 ภาพภายหลัง") — a new set
-     of 6 is coming to replace the current game-art illustrations, so this hides them without
-     touching the GAME_ART_PNG data/wiring itself (re-enable by restoring the
-     `GAME_ART_PNG[SIDES[idx].title]` branch below once the new 6 are in). Booth results
-     (BOOTH_ART_PNG) are untouched — this only scopes to kind==='game'. */
-  var artSrc=kind==='game'?null:BOOTH_ART_PNG[BOOTHS[idx].asset];
+  var artSrc=kind==='game'?GAME_ART_PNG[SIDES[idx].title]:BOOTH_ART_PNG[BOOTHS[idx].asset];
   var artHTML=artSrc?'<div class="play-result-art"><img src="'+artSrc+'" alt=""></div>':'';
   // badgeIcon (.q-icon-bare) REMOVED 2026-09-14, per direction "เอาไอคอนออกได้เลย เพราะมี assets/games/
   // มาแทนแล้ว" — the illustration above now carries this header's visual weight; the small Lucide
