@@ -2762,7 +2762,15 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    .mp-zoom/.ag-more: a press-scale everyone gets, a desktop-only hover tint since a touch kiosk has
    no hover to give (see .mp-zoom's own comment for why that's the safer default). */
 .bp-btn:active{transform:scale(.96);}
-@media(hover:hover) and (pointer:fine){.bp-btn:not(.done):hover{background:var(--cloud);}}
+@media(hover:hover) and (pointer:fine){.bp-btn:not(.done):not(.chk):hover{background:var(--cloud);}}
+/* .chk (checked in, booth activity not done yet) added 2026-09-17, per direction — was missing
+   entirely: every checked-in partner rendered .done (the "ร่วมกิจกรรมแล้ว" blue/cyan look) the
+   moment BOOTH_CHK had them, collapsing the legend's 3 states above (.booth-legend, ยังไม่เช็คอิน/
+   เช็คอินแล้ว/ร่วมกิจกรรมแล้ว) into 2. .chk reuses the same amber tokens the legend's own "เช็คอินแล้ว"
+   swatch and .next-step.ds-need use; .done is now gated on BOOTH_ACT[bi] too (see its call site)
+   instead of firing on check-in alone, so it's genuinely "activity done", matching its blue/cyan
+   legend swatch. */
+.bp-btn.chk{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber-text);}
 .bp-btn.done{background:var(--done-fill);border-color:var(--done-border);color:var(--ink);}
 
 /* ══ GAMES TAB ══ the source's "คู่มือ 6 ด้านของคุณ" — 6 mini-games, each fills one Playbook side.
@@ -3886,6 +3894,7 @@ var MAP_IMG="assets/MAP_IMG.webp";
 var RADAR_AXES=['หุ้นไทย','ต่างปท.','กองทุน','คริปโต','ทอง','สุขภาพ'];
 /* Custom illustrated question/analyzing icons — replaces specific Lucide icons per direction; each compressed via in-browser canvas (no local image tool available) from a 1920x1920 source PNG down to 160x160, kept as PNG (not JPEG) to preserve alpha transparency. */
 var ICON_HOURGLASS_PNG='assets/ICON_HOURGLASS_PNG.png';
+var ICON_EFIN2_PNG='assets/efin-2.png'; // renderGames' efinLocked card icon (2026-09-17, per direction) — same .ev-empty-ic slot ICON_HOURGLASS_PNG fills on the pre-event card, swapped for this one instead
 var ICON_IMG={s1q2:'assets/s1q2.png',s2q6:'assets/s2q6.png',s2q7:'assets/s2q7.png',hourglass:'assets/hourglass.png',s1q1:'assets/s1q1.png',s1q3:'assets/s1q3.png',s2q1:'assets/s2q1.png',s2q2:'assets/s2q2.png',s2q3:'assets/s2q3.png',s2q4:'assets/s2q4.png',s2q5:'assets/s2q5.png',s3q1:'assets/s3q1.png',
   // Mini-game (MINIGAME_Q) custom icons (2026-09-11, per direction) — same 1920→160px compression
   // treatment as the DNA-quiz set above; some questions reuse the DNA-quiz's own art (s1q2/s2q1/s2q5/
@@ -6345,10 +6354,16 @@ function bindHeaderLogo(){var el=root.querySelector('#hdLogo');if(el)el.onclick=
 /* Every screen that renders appHeader() calls this right after — same re-callable-mount pattern as
    mountSplashCTA(), just aimed at the 'compact' preset/slot instead of the hero one. Now opens the
    QR scan modal (generic — no specific booth) instead of being a no-op tap. */
+/* Games-tab-aware onClick (2026-09-17, per direction) — while on เกมหลัก and not yet checked in at
+   efin.finance, this SAME header pill opens the 'efin' scan branch instead of the generic any-booth
+   scan; everywhere else (and once checked in) it's unchanged. Chosen over a dedicated button on the
+   games page itself, per direction "ใช้ปุ่ม สแกน QR ที่ header เดิม". */
 function mountHeaderQR(){
   if(DEMO.eventPhase==='pre')return; // appHeader() didn't render the slot at all in this phase
   if(!window.mountLiquidMetalButtonInto)return;
-  window.mountLiquidMetalButtonInto('#qr-cta-slot','compact',{label:'สแกน QR',icon:ic('lc-qr-code'),onClick:function(){openScan(null,null);}});
+  window.mountLiquidMetalButtonInto('#qr-cta-slot','compact',{label:'สแกน QR',icon:ic('lc-qr-code'),onClick:function(){
+    if(st.phase==='games'&&!EFIN_CHECKED_IN)openScan('efin',null);else openScan(null,null);
+  }});
 }
 /* Registration-site link (2026-08-19) — moved here from a 6th bottom-nav item (see git history)
    into the header, to the LEFT of the QR pill (per direction "ปุ่มลงทะเบียนไว้ด้านซ้าย"). Rendered as
@@ -6477,6 +6492,17 @@ function renderHome(){
    bars and grand-prize gate react; the floorplan (MAP_IMG) is the real event floor plan asset. */
 var CHECKIN_NEED=5,ACTIVITY_NEED=5;
 var BOOTH_CHK={},BOOTH_ACT={},BOOTH_HOWTO=false,DRAW_JOINED=false; // BOOTH_CHK[assetIdx]=Set(companyIdx); BOOTH_ACT[assetIdx]=bool; DRAW_JOINED=tapped "ร่วมลุ้นรางวัล"
+/* EFIN_CHECKED_IN (2026-09-17, per direction) — เกมหลัก's own copy has always promised "เช็คอินที่
+   บูธ efin.finance...เพื่อปลดล็อกทั้ง 6 เกม" (see renderGames' pre-event empty state), but that was
+   only ever shown pre-event; nothing enforced it once the event went live — every game was openable
+   with zero gate, same "promised in copy, never wired" gap the booth check-in gate had before its
+   own 2026-09-09 fix. This is a SEPARATE physical check-in point from the 10 asset booths (confirmed
+   with user) — not a BOOTH_CHK index, its own flag. Set true via the scan modal's SCAN.bi==='efin'
+   branch (see confirmScan) — the header's "สแกน QR" button opens that branch specifically while on
+   the games tab and not yet checked in (see mountHeaderQR). Defaults true — GAME_PLAYED below
+   already defaults to 2 games played, which couldn't have happened without this being true first;
+   reset to false alongside GAME_PLAYED/BOOTH_CHK at every "fresh arrival"/reset point instead. */
+var EFIN_CHECKED_IN=true;
 var BOOTH_ANSWERS={}; // BOOTH_ANSWERS[assetIdx] = the real answers given in that booth's mini-game (see BOOTH_Q/openPlay below) — captured but not yet read by any scoring logic (still persona-based, see [[games-questions-dna]] memory "Phase 3")
 /* Booth v2 preview only (DEMO.boothVer==='v2', see renderBooth): the route step / map marker the
    user has focused via the two-way Step↔Map sync. null = nothing focused. Persists across the
@@ -6832,7 +6858,9 @@ function closeScan(){
 }
 function confirmScan(){
   if(!SCAN)return;
-  if(SCAN.bi!=null){
+  if(SCAN.bi==='efin'){
+    EFIN_CHECKED_IN=true;
+  } else if(SCAN.bi!=null){
     var bi=SCAN.bi,ci=SCAN.ci;
     if(!BOOTH_CHK[bi])BOOTH_CHK[bi]=new Set();
     if(BOOTH_CHK[bi].has(ci))BOOTH_CHK[bi].delete(ci);else BOOTH_CHK[bi].add(ci);
@@ -6852,9 +6880,11 @@ function confirmScan(){
   }
   closeScan();
   if(st.phase==='passport')renderBooth();
+  if(st.phase==='games')renderGames();
 }
 function scanTitle(){
   if(!SCAN)return '';
+  if(SCAN.bi==='efin')return 'เช็คอิน · efin.finance';
   if(SCAN.bi==null)return 'สแกน QR ในงาน';
   var name=(ZONE_BOOTHS[SCAN.bi]||[])[SCAN.ci]||'';
   var already=BOOTH_CHK[SCAN.bi]&&BOOTH_CHK[SCAN.bi].has(SCAN.ci);
@@ -6862,6 +6892,7 @@ function scanTitle(){
 }
 function scanSubText(){
   if(!SCAN)return '';
+  if(SCAN.bi==='efin')return 'ปลดล็อกเกมหลักทั้ง 6 เกม + รับของรางวัล';
   if(SCAN.bi==null)return 'สแกน QR ที่จุดใดก็ได้ในงาน — ระบบจะเช็คอินบูธถัดไปที่ยังไม่ได้ทำให้อัตโนมัติ';
   var b=BOOTHS[SCAN.bi];
   return b?(b.asset+' · '+BOOTH_ZONES[b.zone].chip):'';
@@ -7080,7 +7111,14 @@ function renderBooth(){
            checked in — matches that copy exactly, and is the SAME condition boothActivityCount's
            sibling boothCheckinCount() already uses per-booth elsewhere (BOOTH_CHK[bi]?.size>0). */
         var checkedIn=!!(BOOTH_CHK[bi]&&BOOTH_CHK[bi].size>0);
-        var partners=ZONE_BOOTHS[bi].map(function(name,ci){var done=BOOTH_CHK[bi]&&BOOTH_CHK[bi].has(ci);return '<button class="bp-btn'+(done?' done':'')+'" data-b="'+bi+'" data-c="'+ci+'">'+ic(done?'lc-check-circle':'lc-qr-code')+name+'</button>';}).join('');
+        /* checked-in-only ("chk", amber) vs activity-done ("done", blue/cyan) split (2026-09-17,
+           per direction) — was a single `done` state firing off BOOTH_CHK alone, which visually
+           jumped straight to the "ร่วมกิจกรรมแล้ว" color the moment a partner was checked in,
+           skipping the legend's middle "เช็คอินแล้ว" state entirely. `played` (BOOTH_ACT[bi],
+           computed above) is booth-wide — this is one shared game per booth, not per partner — so
+           every checked-in partner here flips from chk to done together once that booth's activity
+           is completed. */
+        var partners=ZONE_BOOTHS[bi].map(function(name,ci){var chkd=!!(BOOTH_CHK[bi]&&BOOTH_CHK[bi].has(ci));var cls=chkd?(played?' done':' chk'):'';return '<button class="bp-btn'+cls+'" data-b="'+bi+'" data-c="'+ci+'">'+ic(chkd?'lc-check-circle':'lc-qr-code')+name+'</button>';}).join('');
         var bcIcHTML=BOOTH_ICON_PNG[b.asset]?'<img class="bc-asset-ic" src="'+BOOTH_ICON_PNG[b.asset]+'" alt="">':ic(b.icon,'bc-asset-ic');
         /* Dropped the extra "เล่นแล้ว" .bc-zchip pill from the title row (2026-08-26, per direction
            — screenshot showed it on หุ้นไทย, the pre-seeded played=true booth) — .bc-asset wraps
@@ -7587,11 +7625,15 @@ function renderGames(){
   // the booth QR flow), so before doors open there's nothing playable; the whole progress/game-list
   // body is swapped for the shared .ev-empty "coming soon" card instead.
   var pre=DEMO.eventPhase==='pre';
+  /* efinLocked (2026-09-17, per direction) — On-Event but not yet checked in at efin.finance
+     (EFIN_CHECKED_IN, see its own comment near BOOTH_CHK): every game stays locked, same promise
+     the pre-event copy below already makes but — until this — never actually enforced live. */
+  var efinLocked=!pre&&!EFIN_CHECKED_IN;
   var filled=gamesPlayedCount();
   var nextIdx=-1;for(var i=0;i<6;i++){if(!GAME_PLAYED[i]){nextIdx=i;break;}}
   var restIdx=[];for(var j=0;j<6;j++){if(j!==nextIdx)restIdx.push(j);}
   var nextCard='';
-  if(!pre&&nextIdx>=0){var ns=SIDES[nextIdx];
+  if(!pre&&!efinLocked&&nextIdx>=0){var ns=SIDES[nextIdx];
     /* Same .next-step card as Home's "ขั้นต่อไป" — one shared component for "the one next action",
        not a bespoke spectrum-border card, per direction. */
     /* Icon reverted to the per-game meaningful icon (2026-09-11, per direction "ด้านอื่น
@@ -7653,25 +7695,52 @@ function renderGames(){
                is the only thing left reading as "padding." */
             '<div class="ev-empty-s ast-block" style="max-width:44ch;display:inline-block;font-weight:700;font-size:20px;color:var(--violet);background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)">ร่วมสนุกและปลดล็อกได้<span style="white-space:nowrap">วันงาน</span>เท่านั้น</div>'+
           '</div></section>'
+      : efinLocked
+      /* On-Event, not yet checked in — reuses the pre-event "Coming soon" card's exact DNA verbatim
+         (2026-09-17, per direction "ให้ใช้ design dna เดียวกับ section coming soon...แต่เปลี่ยน...
+         ไอคอน"): same .ev-empty-ic PNG-icon treatment (swapped ICON_HOURGLASS_PNG -> ICON_EFIN2_PNG),
+         same two-line shimmer heading (.shimmer-ink/.shimmer-violet), same 2-paragraph body + closing
+         .ast-block highlight — only the copy changed, to "you're at the event, just not checked in
+         yet" instead of "doors aren't open", and the closing highlight now points at the header's own
+         "สแกน QR" pill (mountHeaderQR is phase-aware — see its own comment) instead of "เฉพาะวันงาน".
+         This is the version that actually gates openPlay (see the [data-play] binding guard below),
+         not just descriptive copy like the pre-event card above it. */
+      ? '<section class="home-card scroll-reveal">'+
+          '<div class="s-h">Playbook 6 ด้านของคุณ</div><div class="gh-sub">เล่นเกมแล้วเติมทีละด้าน</div>'+
+          '<div class="ev-empty" style="margin-top:var(--sp-stack)"><div class="ev-empty-ic" style="background:none;width:48px;height:48px"><img src="'+ICON_EFIN2_PNG+'" alt=""></div>'+
+            '<div class="ev-empty-t shimmer-ink" style="font-size:var(--fs-h2)">ยังไม่ปลดล็อก</div>'+
+            '<div class="ev-empty-t shimmer-violet" style="font-size:32px">6 เกม 6 มุมมอง</div>'+
+            '<div class="ev-empty-s">หนึ่งในส่วนสำคัญของ PLAYBOOK ในแบบของคุณ</div>'+
+            '<div class="ev-empty-s" style="max-width:44ch">เช็คอินที่บูธ efin.finance ด้วย QR Code ของคุณ<br>เพื่อปลดล็อกทั้ง 6 เกม และเล่นเกมได้จากหน้านี้ทันที<br>PLAYBOOK ของคุณจะสมบูรณ์ยิ่งขึ้น</div>'+
+            '<div class="ev-empty-s ast-block" style="max-width:44ch;display:inline-block;font-weight:700;font-size:20px;color:var(--violet);background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)">แตะปุ่ม "สแกน QR" ด้านบนเพื่อเช็คอิน</div>'+
+          '</div></section>'
       : '<section class="home-card scroll-reveal">'+
       '<div class="s-h">Playbook 6 ด้านของคุณ</div><div class="gh-sub">เล่นเกมแล้วเติมทีละด้าน</div>'+
       /* Same .pass-card as Home's "บัตรของคุณ" — plain icon+eyebrow+value text, no chart. Replaces
          the old dark donut ring, which crammed "X/6" into a 66px circle hard to read at a glance
          when the surrounding text already says the same thing. */
       '<div class="pass-card" style="margin-top:var(--sp-stack);cursor:default"><div class="pass-top"><div class="pass-hd"><div class="pass-ey"><img class="pass-ey-ic" src="'+ICON_BOOK_PNG+'" alt="">ความคืบหน้าของ Playbook</div><div class="pass-name pn-indent">เปิดแล้ว '+filled+' จาก 6 ด้าน</div></div></div></div>'+
+      /* "เล่นไม่ครบมีผลมาก" warning (2026-09-17, per direction) — reuses .pe-report's own DNA
+         verbatim (per direction "ให้ใช้ design dna เดียวกับ section รายงานพัฒนาการหลังงาน"), the
+         same icon+title+subtitle row Home's post-event progress card and saveNoteHTML (result
+         screen) both already use. Plain (no .on modifier) — this is a caution, not an achieved
+         state, so it keeps .pe-report's own muted/paper default rather than the done-wash tint
+         .on adds. Plain copy only (no numeric scoring system exists to back a real weighted
+         score, per direction), shown only while filled<6. */
+      (filled<6?'<div class="pe-report" style="margin-top:var(--sp-stack)">'+ic('lc-alert-triangle')+'<div><div class="pe-report-t">เล่นไม่ครบมีผลมาก</div><div class="pe-report-s">เล่นไม่ครบ 6 เกม จะมีผลกับข้อมูลสรุปใน Playbook ของคุณอย่างมาก</div></div></div>':'')+
       '<div style="margin-top:var(--sp-stack)">'+nextCard+'<div class="game-list">'+listIdx.map(gameRow).join('')+'</div></div>'+
       '<div class="games-note">'+ic('lc-info')+'ผลมาจากสิ่งที่คุณเลือกในเกม ไม่ใช่คะแนนสูงต่ำ</div>'+
     '</section>')+
   '</main>'+
   appTabbar('games');
   bindTabbar();
-  if(!pre){
+  if(!pre&&!efinLocked){
     root.querySelectorAll('[data-play]').forEach(function(b){b.onclick=function(e){e.stopPropagation();openPlay('game',+b.dataset.play);};});
     root.querySelectorAll('[data-open]').forEach(function(t){t.onclick=function(){var i=+t.dataset.open;if(!GAME_PLAYED[i])return;togGame(i);};});
   }
   mountHeaderQR();
   bindHeaderLogo();
-  if(!pre)mountNgCta(nextIdx);
+  if(!pre&&!efinLocked)mountNgCta(nextIdx);
 }
 
 /* ══ MINI-GAME PLAY — FULL PAGE (2026-09-10, converted from a floating modal to a real page, per
@@ -8357,7 +8426,7 @@ function seedPersonaResult(key){
   RESULT={hero:h,heroKey:key,declared:h.riskLevel,revealed:Math.max(1,Math.min(10,h.riskLevel+simGap)),gap:simGap,
     conf:74,confLevel:'สูง - สอดคล้องดี',
     subs:{identity:16,behavior:16,riskAlign:18,discipline:15},knowledge:'intermediate',horizon:'mid',votes:{},interests:[0,2,4]};
-  GAME_PLAYED={0:true,1:true,2:true,3:true};GAME_ANSWERS={};BOOTH_CHK={0:new Set([0])};BOOTH_ACT={0:true};BOOTH_ANSWERS={};
+  GAME_PLAYED={0:true,1:true,2:true,3:true};GAME_ANSWERS={};BOOTH_CHK={0:new Set([0])};BOOTH_ACT={0:true};BOOTH_ANSWERS={};EFIN_CHECKED_IN=true;
 }
 function forcePersona(key){seedPersonaResult(key);st.phase='book';stopSplashTimer();render();}
 /* Demo-only: play the Character Card Reveal (Case 01 — After Analysis). Uses the persona currently
@@ -8438,6 +8507,10 @@ function buildDemo(){
     '<div class="demo-lbl">ผลเกมย้อนเวลาพอร์ต → สิ่งที่ทำจริง</div><select class="demo-sel" id="demoCrisis"><option>ตอนวิกฤต "คงเส้น" (ถือ)</option><option>ตอนวิกฤต "ขายหนี" (ตัดขาย)</option><option>ตอนวิกฤต "ช้อนซื้อ" (เก็บเพิ่ม)</option></select>'+
     '<div class="demo-lbl">วิกฤตรอบที่ 2 (สวนขั้วกัน = ยังไม่นิ่ง)</div><select class="demo-sel" id="demoCrisis2"><option>เหมือนรอบแรก</option><option>สวนทางรอบแรก</option></select>'+
     '<div class="demo-stub">* เกมในงานยังไม่ออกแบบ — 2 ช่องนี้เป็น stub</div>'+
+    /* เช็คอิน efin.finance (2026-09-17, per direction) — force-preview the เกมหลัก page's own
+       lock/unlock state (EFIN_CHECKED_IN, a real state flag, not DEMO-namespaced — see its own
+       comment near BOOTH_CHK) without needing to open the scan modal from the header QR button. */
+    '<div class="demo-lbl">เช็คอิน efin.finance (ปลดล็อกเกมหลัก)</div>'+seg('segEfin',[{v:'yes',t:'เช็คอินแล้ว'},{v:'no',t:'ยังไม่เช็คอิน'}],EFIN_CHECKED_IN?'yes':'no')+
     '<button class="btn btn-secondary demo-reset" id="demoReset">'+ic('lc-refresh-cw')+'รีเซ็ตเกมหลักที่เล่น</button>'+
     /* เช็คอินครบทุกบูธ (2026-09-10, per direction "หน้าเดินบูธ ต้องการทดสอบเล่นเกมส์แต่ละสินทรัพย์ได้") —
        the real check-in flow (openScan/confirmScan, per BOOTHS[i]'s own ZONE_BOOTHS partner list) is
@@ -8458,7 +8531,7 @@ function buildDemo(){
     var v=b.dataset.v;if(v===DEMO.eventPhase)return;
     DEMO.eventPhase=v;
     document.querySelectorAll('#segPhase button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
-    if(v==='on'){BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};GAME_PLAYED={};GAME_ANSWERS={};DRAW_JOINED=false;} // fresh arrival — see DEMO.eventPhase comment above
+    if(v==='on'){BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};GAME_PLAYED={};GAME_ANSWERS={};DRAW_JOINED=false;EFIN_CHECKED_IN=false;} // fresh arrival — see DEMO.eventPhase comment above
     // Switching to Pre-Event goes back to Splash (2026-09-10, per direction) — the symmetric
     // counterpart of On-Event's "fresh arrival" reset above: Pre-Event is where the quiz-taking
     // flow (splash → consent → quiz → reveal → cardreveal) actually lives, so picking it in the
@@ -8473,6 +8546,7 @@ function buildDemo(){
   document.getElementById('segSplashVer').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.splashVer=b.dataset.v;document.querySelectorAll('#segSplashVer button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='splash')renderSplash();};});
   document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.multiTicket=(b.dataset.v==='2');document.querySelectorAll('#segTicketCount button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segRegistered').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.registered=(b.dataset.v==='yes');document.querySelectorAll('#segRegistered button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='book')render();};});
+  document.getElementById('segEfin').querySelectorAll('button').forEach(function(b){b.onclick=function(){EFIN_CHECKED_IN=(b.dataset.v==='yes');document.querySelectorAll('#segEfin button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='games')render();};});
   document.getElementById('demoPersona').onchange=function(){if(this.value){DEMO.quizDone=true;document.getElementById('demoQuiz').classList.add('on');forcePersona(this.value);}};
   document.getElementById('demoCardPlay').onclick=function(){panel.classList.remove('open');demoPlayCardReveal();};
   document.getElementById('demoCardReplay').onclick=function(){panel.classList.remove('open');demoPlayCardReveal();};
@@ -8483,7 +8557,7 @@ function buildDemo(){
     // promised a played-state reset, but the code never actually touched GAME_PLAYED/BOOTH_ACT (only
     // resetQuiz()'s quiz-taking state st/RESULT). Now genuinely clears every game/booth back to
     // unplayed so all 6 เกมหลัก + 10 บูธ can be replayed from scratch for testing.
-    GAME_PLAYED={};GAME_ANSWERS={};BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};DRAW_JOINED=false;
+    GAME_PLAYED={};GAME_ANSWERS={};BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};DRAW_JOINED=false;EFIN_CHECKED_IN=false;
     // Bug fix (2026-09-10, reported: "กด รีเซ็ตเกมหลักที่เล่น แล้วกดเข้าคู่มือไม่ได้") — this handler
     // used to ALSO reset the quiz identity (DEMO.quizDone=false + cleared demoPersona + resetQuiz(),
     // which sets RESULT=null), even though the label/comment above only ever promised a games/booths
