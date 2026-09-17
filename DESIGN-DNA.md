@@ -4,7 +4,7 @@ Source of truth: [dna-quiz-flow.html](dna-quiz-flow.html) — the `:root` block 
 below it (components), and the `<script>` at the bottom (motion + render logic). **This document is a
 read-out of that live file, not a new spec.** If this doc and the CSS ever disagree, the CSS wins — grep
 the file (`--fs-`, `--ink`, `.next-step`, etc.) before trusting a number here. Written 2026-08-26 for
-design review, last synced 2026-09-01 (see §10); expect it to drift the same way its siblings have (see §11).
+design review, last synced 2026-09-17 (see §10); expect it to drift the same way its siblings have (see §11).
 
 **Sibling docs** (this file indexes/condenses them — don't duplicate their detail here):
 - [PRODUCT.md](PRODUCT.md) — brand personality, users, product purpose, anti-references
@@ -81,8 +81,8 @@ amber's shape) is worth a review — see §11.
 
 **Where each tone shows up today:**
 - Violet: `.bp-fill` (booth progress bar, not-yet-complete), `.rt-badge.new`, active tab state, `.int-bar-fi` (interest bars, real signal)
-- Cyan: `.bp-fill`/`.pe-track-badge.full` once complete, `.bc-play.played`, `.game-row.played`
-- Amber: `.draw-status`→`.next-step.ds-need` ("ยังขาด"), `.redeem-card.on`, `.prof-tier`, `.rt-badge.feat`
+- Cyan: `.bp-fill`/`.pe-track-badge.full` once complete, `.bc-play.played`, `.game-row.played`, `.bp-btn.done` (booth partner button, that booth's shared activity genuinely completed — see §10 2026-09-17)
+- Amber: `.draw-status`→`.next-step.ds-need` ("ยังขาด"), `.redeem-card.on`, `.prof-tier`, `.rt-badge.feat`, `.bp-btn.chk` (booth partner button, checked in but that booth's activity not done yet — added 2026-09-17 to stop this state collapsing into `.bp-btn.done`'s cyan, see §10)
 - Green: `.next-step.ds-ok` ("ครบเงื่อนไขแล้ว" prize-draw success card), `.trait-chip.done`, `.ds-joined` (post-CTA acknowledgment)
 
 ---
@@ -156,7 +156,11 @@ steps with size: 16px→1.75px, 20/24px→2px. Never filled/duotone/emoji.
 **Override: custom PNG icon-set art**, loaded from `assets/*.png` (base64-inlined `data:` URIs until
 the 2026-09-02 extraction pass, see §10 — same PNGs, just external files now), for specific domains
 where bespoke illustrated icons were supplied (17 images: `ICON_STOCK_TH_PNG`, `ICON_GOLD_PNG`,
-`ICON_JOYSTICK_PNG`, `ICON_CROWN_PNG`, etc.). Every consumer follows the same **fallback pattern** —
+`ICON_JOYSTICK_PNG`, `ICON_CROWN_PNG`, etc.). **10 of these 17 (the `BOOTH_ICON_PNG` set) are now
+`.webp` on disk as of 2026-09-17 (see §10)** — var names kept as `*_PNG` regardless, same "don't
+rename despite the extension change" precedent `GAME_ART_PNG`/`BOOTH_ART_PNG` already established;
+check the actual `var X_PNG='assets/...'` string, not the var name, before assuming a format. Every
+consumer follows the same **fallback pattern** —
 PNG art if this specific key has it, else fall back to the Lucide symbol — so a future entry without
 commissioned art never renders broken:
 ```js
@@ -320,6 +324,78 @@ for the next time a version A/B is needed, not as a pointer to live code.
 
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
+
+**2026-09-17 — efin.finance check-in gate for เกมหลัก + partial-completion warning.** The เกมหลัก
+page's own copy has always promised "เช็คอินที่บูธ efin.finance...เพื่อปลดล็อกทั้ง 6 เกม" (the
+pre-event "Coming soon" empty state below), but that promise only ever showed pre-event — once
+`eventPhase==='on'`, every one of the 6 games was openable with zero gate, the same "promised in
+copy, never wired" gap the booth check-in gate had before its own 2026-09-09 fix. Added a new state
+flag, `EFIN_CHECKED_IN` (a separate physical check-in point from the 10 asset booths, confirmed with
+direction), gating `openPlay('game',...)` until true. The locked state **reuses the pre-event "Coming
+soon" card's exact DNA verbatim** (`.ev-empty-ic`/`.shimmer-ink`/`.shimmer-violet`/`.ast-block`, §7/§6
+— only the PNG icon and copy changed, not the structure), and the header's existing "สแกน QR" pill
+(`mountHeaderQR()`) became phase-aware — it opens a new `SCAN.bi==='efin'` branch of the same scan
+modal (§ "QR SCAN MODAL") while on เกมหลัก and not yet checked in, instead of a dedicated new button.
+Also added a "เล่นไม่ครบมีผลมาก" note (shown while <6 games are done) — plain copy only (no numeric
+weighting system exists to back a real score), built on **`.pe-report`/`.pe-report-t`/`.pe-report-s`
+verbatim**, the same DNA as Home's "รายงานพัฒนาการหลังงาน" card (§7.2's reuse-don't-invent discipline
+applied to both of these). Demo panel (§9.1) gained a "เช็คอิน efin.finance" toggle. Verified live:
+lock/unlock round-trips cleanly via the real scan flow, booth check-in's own generic scan (`SCAN.bi
+==null`) unaffected, no console errors.
+
+**2026-09-17 (same session, earlier) — booth partner check-in split into its own amber "checked in"
+state, distinct from cyan "activity done."** `.bp-btn` (the per-partner QR button on a booth card)
+only ever read `BOOTH_CHK` and rendered `.done` (cyan/`--done-fill`) the instant a partner was
+checked in — collapsing the booth-legend's own 3 states (ยังไม่เช็คอิน/เช็คอินแล้ว/ร่วมกิจกรรมแล้ว,
+§2.2) down to 2, since the legend's amber "เช็คอินแล้ว" middle state never actually rendered. Added
+`.bp-btn.chk` (amber, the same 3 tokens `.next-step.ds-need` uses) for "checked in, that booth's
+shared activity (`BOOTH_ACT[bi]`, booth-wide — one game per booth, not per partner) not done yet";
+`.bp-btn.done` now only fires once `BOOTH_ACT[bi]` is true too, so every checked-in partner under a
+booth flips from amber to cyan together the moment that booth's game is completed. Verified live at
+both states plus the existing demo-seeded default.
+
+**2026-09-16/17 — responsive audit, touch-target fixes, and a run of DNA-consistency passes
+(one session, several direction rounds — see `git log` on this range for individual commits).**
+Grouped here since they share one session but touch unrelated surfaces:
+- **Touch targets**: a scripted audit (§ this section's own 2026-09-02/09-03 precedent) flagged 6
+  interactive elements under the 44×44px minimum — `.bp-btn`, `.howto-btn` (cascades to `.bc-play`),
+  `.gr-hd .btn-primary`, `.bt-tabs--primary`/`--secondary .bt-tab`, `.mp-zoom` — all bumped to
+  `min-height:44px`. `.bmk` (the 26px map-pin marker) got an invisible `::before` hit-area instead
+  of padding (padding would have shifted `.bmk-ring`/`.bmk-lbl`'s own position math, both anchored to
+  `.bmk`'s box) — same "small icon, bigger tap zone" technique as native platform guidance, verified
+  via `elementFromPoint()` at an offset outside the visible circle, not just a bounding-rect read.
+- **Games-page icon DNA aligned to `.pass-ey-ic`**: "สิ่งที่ได้เรียนรู้จากเกมนี้"'s icon swapped
+  `lc-check-circle` → `ICON_JOYSTICK_PNG`, and `.gr-ic` (the "ด้านอื่นใน Playbook" row icon) dropped
+  its bordered 48px square frame — both now bare icons at `width:var(--ic-lg);height:auto`, the exact
+  same recipe `.pass-ey-ic` (Home's "ความคืบหน้าของ Playbook") already used. `.gr-ic`'s box had been
+  tried bare once before (2026-09-11) and reverted to a bordered badge same-day; this reverts it back
+  again, this time confirmed to stay.
+- **Result-screen save-note reskinned + หมายเหตุ repositioned**: `saveNoteHTML` ("บันทึกเรื่องที่
+  เรียนรู้...") moved off `.pf-note` (Profile footer's flat muted line) onto `.pe-report.on`/
+  `.pe-report-t`/`.pe-report-s` — the same icon+title+subtitle-on-done-wash DNA as Home's "รายงาน
+  พัฒนาการหลังงาน" card (title/subtitle text also split, weights 700/500) — and its icon sized up via
+  a scoped `.pe-report-lg` modifier to match the result screen's other icon-led sections (`.str-hd`/
+  `.ast-lbl`/`.hero-note.skill-note`, all `--ic-lg`/24px; the base `.pe-report svg` stays `--ic-md`/
+  20px for Home's own card). The noType "หมายเหตุ" note (`.hero-note.skill-note`) was pulled out of
+  its old position (between insBox and resultCard) and now always renders dead-last on the page,
+  after saveNoteHTML — genuinely bottom-most regardless of game type, not just bottom-of-one-variable.
+- **Points UI removed entirely.** Every "+N แต้ม" surface in the app — `.play-pts-badge` (question
+  screen), `.bp-pts`/`.pe-report` "สะสมแล้ว" running total (booth list), the briefing's "รางวัล" card
+  (booth pre-game brief) — removed per direction ("เอาออกทั้งหมด"), continuing the 2026-09-11 removal
+  of the same reward card on the end-of-game screen. `boothPointsTotal()`/`.play-sum-pts`/
+  `.play-pts-badge` CSS and `ptsCountUp()` left in place, unused — same "kept for history" precedent
+  §9.2 documents for retired version-toggles. Booth briefs now show only the "จำนวนข้อ" card, centered
+  at its original half-width (`.round-cards.single`) rather than stretched full-width once its "รางวัล"
+  sibling was gone.
+- **Asset-weight pass**: the 10 `BOOTH_ICON_PNG` category icons converted PNG→WebP (canvas
+  `toBlob('image/webp',0.8)`, no resize — already at/under their largest real display size, 80px@2x
+  — see §5's own note): 318.9KB → 48.2KB combined, ~85% smaller. Main-games result-screen art (§7,
+  `GAME_ART_PNG`, temporarily `null`'d 2026-09-16 pending a new set) restored with a freshly-supplied
+  6-image set, already carrying clean per-pixel alpha (unlike every prior `GAME_ART_PNG` source, which
+  needed flood-fill background removal) — resized 1254px→360px + WebP q0.8: ~7.86MB → ~188KB total.
+- **Content/copy pass**: home hero poster trimmed (dropped the `.hh-badge` eyebrow line, new
+  subtext), the booth "วิธีเล่น" modal and draw-eligibility copy updated (its deadline line removed),
+  Profile's footer rewritten (brand name + tagline lines bumped to `--w-label`/700).
 
 **2026-09-10 — responsive audit: real tablets stuck rendering the mobile phone-frame, header/content/
 bottom-nav not filling the screen.** Per direction "responsive audit" with device screenshots (real
@@ -517,6 +593,12 @@ still current, no further changes since.
 - **`.conf-box` now serves two jobs too** (Confidence Score card *and* the SKILL card via
   `skillCardHTML()`, §7.2) — same watch-out as `.next-step` above: fine while both stay simple rows +
   a foot/chip row, worth a second look if either grows bespoke needs the other shouldn't inherit.
+- **`.pe-report` picked up a third job as of 2026-09-17** (Home's "รายงานพัฒนาการหลังงาน" progress
+  card, the result-screen save-note, *and* the เกมหลัก partial-completion warning, §10) — same
+  watch-out as `.next-step`/`.conf-box` above, plus a real size split already: the base rule stays
+  `--ic-md`/20px for Home's card, while a scoped `.pe-report-lg` modifier bumps it to `--ic-lg`/24px
+  for the result-screen instance (to match that screen's OTHER icon-led sections). Worth confirming
+  this two-size split is intentional-and-final rather than a sign `.pe-report` needs a size prop.
 - **This doc itself will go stale** — the same way `design-dna-bt2026` (memory) and the sibling `.md`
   files already have, per their own admitted history. Re-grep `:root` and the component classes named
   here before trusting a specific value in a future review.
