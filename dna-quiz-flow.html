@@ -3941,28 +3941,28 @@ var ASSET_IMG=/*__ASSET_IMG__*/{candle:'assets/candle.png',gold:'assets/gold.png
 var REAL_CARD_IMG={guardian:'assets/guardian.jpg',harvester:'assets/harvester.jpg',steadyhand:'assets/steadyhand.jpg',diamondhand:'assets/diamondhand.jpg',analyst:'assets/analyst.jpg',planner:'assets/planner.jpg',explorer:'assets/explorer.jpg',sage:'assets/sage.jpg',maverick:'assets/maverick.jpg',waverider:'assets/waverider.jpg',contrarian:'assets/contrarian.jpg',collector:'assets/collector.jpg'};
 var CARD_BACK_IMG='assets/cardback.jpg';
 /* Character Card Reveal — living-card clips (2026-09-08, per direction "ฝังคลิปเหล่านั้นลงไป...อิงตาม
-   midjourney_session"). Every persona's MJ session clip (528×736, ratio 0.717 — the same 5/7 card aspect
-   as REAL_CARD_IMG) is a near-identical cinemagraph render of that SAME persona's real card art
-   (title/figure/signature object/tagline/tags all matching REAL_CARD_IMG 1:1) with a slow iridescent
-   colour-cycle on the card's signature object — verified frame-by-frame against the static photos before
-   mapping. Copied into assets/card-anim/<key>.mp4 (renamed from MJ's raw export filenames) rather than
-   embedded, matching this file's existing external-video convention (BG_VIDEO).
-   Re-encoded 2026-09-08 (per direction "ความยาวคลิป...เท่ากันที่ 5 วินาที" + "ลดขนาดคลิป"): MJ's raw
-   exports varied 5.04-5.21s at a needlessly high ~5.6-6.0Mbps (h264, 528×736@24fps — a mostly-static
-   illustration with only a slow colour-shift, nowhere near complex enough to need that bitrate). Every
-   clip is trimmed to EXACTLY 120 frames @ 24fps (=5.000s, verified via ffprobe) and re-encoded at libx264
-   CRF28/preset slow/yuv420p/+faststart/no audio track — visually indistinguishable from the originals in
-   a direct side-by-side frame comparison (the iridescent gradients were the compression-risk area; no
-   visible banding at this CRF). Originals kept outside the repo (scratchpad only) in case a future pass
-   wants to re-derive from them.
-   Coverage history: shipped 2026-09-08 with 10 of 12 (sage/contrarian had no matching clip in the
-   midjourney_session/ export yet — renderCardReveal fell back to the CSS-only flip reveal for just those
-   two). Completed 2026-09-09 once both were added to midjourney_session/ (identified the same way as the
-   original 10 — frame-matched against REAL_CARD_IMG's title/art before mapping) and re-encoded with the
-   identical pipeline above (both confirmed dur=5.000000/frames=120 via ffprobe). All 12 personas now have
-   a living-card clip; the CSS-only flip path stays in renderCardReveal as a defensive fallback only (e.g.
-   a future persona added without one yet), never reached for any current persona. assets/card-anim/ is
-   now 4.0MB total for all 12. */
+   midjourney_session"). Every persona's clip (554×736-740, close to REAL_CARD_IMG's 5/7 card aspect) is
+   a near-identical cinemagraph render of that SAME persona's real card art (title/figure/signature
+   object/tagline/tags all matching REAL_CARD_IMG 1:1) with a slow iridescent colour-cycle on the card's
+   signature object — verified frame-by-frame against the static photos before mapping. Copied into
+   assets/card-anim/<key>.mp4 (renamed from the source export filenames) rather than embedded, matching
+   this file's existing external-video convention (BG_VIDEO).
+   Coverage history: shipped 2026-09-08 with 10 of 12 (sage/contrarian had no matching clip yet —
+   renderCardReveal fell back to the CSS-only flip reveal for just those two); completed 2026-09-09 once
+   both were added. Replaced 2026-09-17 with a full 12-clip re-shoot ("Character Card Animation/", Magnific
+   AI object-reference renders, per persona's signature object/title burned into frame — mapped by reading
+   that on-frame title back against REAL_CARD_IMG, not filename) at the user's direction to "ลดขนาดไฟล์ /
+   ไม่ต้องตัดต่อความยาว" (shrink file size, leave each clip's native length alone — no re-trim to a uniform
+   duration this time). Re-encoded from the 554×740@30fps/~3Mbps sources via libx264 CRF27/preset
+   slow/yuv420p/+faststart/no audio track (same visual-risk check as before: iridescent gradients hold up,
+   no visible banding at this CRF). Durations are native per clip, NOT uniform: 4.000s for 11 of 12,
+   explorer alone at 5.000s — the reveal's 'ended' listener (not a fixed timer) drives the transition, so
+   this doesn't break timing, it just means explorer's living-card beat runs ~1s longer than the rest.
+   Raw sources kept in the repo under "Character Card Animation/" (same precedent as midjourney_session/
+   for the original set) in case a future pass wants to re-derive from them.
+   All 12 personas have a living-card clip; the CSS-only flip path stays in renderCardReveal as a
+   defensive fallback only (e.g. a future persona added without one yet), never reached for any current
+   persona. assets/card-anim/ is now ~1.97MB total for all 12 (was ~4.0MB). */
 var CARD_ANIM_VIDEO={guardian:'assets/card-anim/guardian.mp4',harvester:'assets/card-anim/harvester.mp4',steadyhand:'assets/card-anim/steadyhand.mp4',diamondhand:'assets/card-anim/diamondhand.mp4',analyst:'assets/card-anim/analyst.mp4',planner:'assets/card-anim/planner.mp4',explorer:'assets/card-anim/explorer.mp4',sage:'assets/card-anim/sage.mp4',maverick:'assets/card-anim/maverick.mp4',waverider:'assets/card-anim/waverider.mp4',contrarian:'assets/card-anim/contrarian.mp4',collector:'assets/card-anim/collector.mp4'};
 
 /* Family umbrellas — accent hue only; persona content is what actually differs.
@@ -5156,7 +5156,7 @@ function renderCardReveal(){
   crStep(1000,function(){scene.classList.add('s-activate');});         // light / energy build
   crStep(1500,startVideo);                                             // "character begins moving" = the clip itself starts
   crStep(2300,function(){scene.classList.add('s-alive');});            // ambient float continues under the clip
-  crStep(1500+5600,finishReveal); // safety net only — every clip is trimmed to exactly 5.000s (120 frames @ 24fps, see CARD_ANIM_VIDEO), so 'ended' always fires well before this
+  crStep(1500+5600,finishReveal); // safety net only — clips run 4.000-5.000s natively (see CARD_ANIM_VIDEO), so 'ended' always fires well before this
 }
 
 function compute(){
