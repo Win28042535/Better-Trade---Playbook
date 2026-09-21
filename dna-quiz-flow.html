@@ -2225,8 +2225,6 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* Now holds only the timer/points badge row (no label text — that moved into the page's own
    .topbar .tb-sub — and no close-X to clear space for, so centered instead of space-between). */
 .play-eyebrow{display:flex;align-items:center;justify-content:center;gap:var(--sp-inline);margin-bottom:var(--sp-stack);}
-.play-timer{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-label);font-weight:var(--w-head);color:var(--white);background:var(--pink);padding:2px var(--sp-list);border-radius:var(--rpill);flex:0 0 auto;}
-.play-timer svg{width:13px;height:13px;}
 /* Booth points badge (2026-09-10, per direction "badge แต้มค้างอยู่ระหว่างตอบคำถาม") — sits in the
    same right-hand eyebrow slot .play-timer uses; mutually exclusive with it in practice (only M3's
    game-side ฉาก 1 has a timer, only booth questions have points), so sharing the slot never collides.
@@ -6994,7 +6992,7 @@ function renderBooth(){
 var SIDES=[
   {icon:'lc-refresh-cw',img:'portfolio',title:'เกมย้อนเวลาพอร์ต',side:'ความเสี่ยงแท้จริง',emoji:'🎭',intro:'เรากำลังพาคุณย้อนไปเจอเหตุการณ์จริงที่เคยเกิดขึ้น ตอนนั้นไม่มีใครรู้ว่าพรุ่งนี้จะเป็นยังไง',rule:'ตอบแล้วไปต่อ ย้อนกลับไม่ได้',measures:'เทียบความเสี่ยงที่ "บอก" กับที่ "ทำจริง" ตอนวิกฤต'}, // refresh-cw = rewinding back through past crises
   {icon:'lc-file-text',img:'document',title:'เกมเลือกเครื่องมือ',side:'สิ่งที่คุณดูก่อนตัดสินใจ',emoji:'🔍',intro:'ก่อนตัดสินใจ คุณจะเลือกดูข้อมูลแบบไหน เราดูจากสิ่งที่คุณเลือกดูจริง ไม่ใช่แค่คำตอบสุดท้าย',rule:'เลือกจากสิ่งที่คุณดูจริง',measures:'ลำดับเครื่องมือวิเคราะห์ที่คุณเปิดจริง'}, // file-text = the business/financial-statement tool you choose to open
-  {icon:'lc-alert-triangle',img:'warning',title:'เกมทนกระแส',side:'ภูมิคุ้มกันความกลัวตกขบวน',emoji:'🔥',intro:'เจอสถานการณ์ที่ยั่วให้รีบตัดสินใจ ลองดูว่าคุณจะทนกระแสและกับดักได้แค่ไหน',rule:'บางฉากมีเวลาจำกัด',measures:'วินัยภายใต้แรงกดดันจากกระแส'}, // alert-triangle = the FOMO/scam traps this game tests resistance to
+  {icon:'lc-alert-triangle',img:'warning',title:'เกมทนกระแส',side:'ภูมิคุ้มกันความกลัวตกขบวน',emoji:'🔥',intro:'เจอสถานการณ์ที่ยั่วให้รีบตัดสินใจ ลองดูว่าคุณจะทนกระแสและกับดักได้แค่ไหน',rule:'ตอบแล้วไปต่อ ย้อนกลับไม่ได้',measures:'วินัยภายใต้แรงกดดันจากกระแส'}, // alert-triangle = the FOMO/scam traps this game tests resistance to
   {icon:'lc-calendar',img:'s1q2',title:'เกมเป้าหมายแต่ละวัย',side:'เป้าหมายตามวัย',emoji:'🗺️',intro:'สวมบทบาทในแต่ละช่วงวัย ตั้งแต่ 25 ถึง 65 ปี แล้วดูว่าเป้าหมายเงินของคุณเปลี่ยนไปไหม',rule:'ย้อนกลับแก้ไขได้ทุกข้อ',measures:'เป้าหมายเงินตั้งแต่วัย 25 ถึง 65'}, // calendar = goals across different ages/life-stages (25→65)
   {icon:'lc-compass',img:'compass',title:'เกมก้าวแรก',side:'ก้าวแรก',emoji:'🚀',intro:'เกมนี้ไม่ตัดสินว่าคุณเป็นคนแบบไหน ปิดท้ายด้วย "ก้าวแรก" เล็กๆ ที่คุณเลือกเอง',rule:'เลือกก้าวแรกได้หลายข้อ',measures:'กำแพงที่ทำให้ยังไม่เริ่ม + ก้าวเล็กที่สุด'}, // compass = finding your direction/first step as a new investor
   {icon:'lc-shield',img:'gold',title:'เกมทองคำ เพื่อนยามวิกฤต',side:'ทองคำในพอร์ต',emoji:'🛡️',intro:'ไม่ต้องทายราคาทอง เป้าหมายคือเข้าใจว่าทองคำมีไว้ทำอะไรในพอร์ตของคุณ',rule:'เดาจากความรู้สึกได้เลย',measures:'บทบาทของทองคำสำหรับคุณ — ตัวถ่วงความเสี่ยง หรือตัวทำกำไร'} // shield = "เพื่อนยามวิกฤต" — gold as a protective refuge during a crisis
@@ -7233,7 +7231,7 @@ var MINIGAME_Q=[
   ]},
   {resultNote:'เขียนแบบให้กำลังใจ — คนที่พลาดในเกมวันนี้คือคนที่ได้กฎกลับบ้านไปใช้จริง',
    questions:[
-    {icon:'lc-zap',img:'lightning',q:'เหรียญชื่อ "MOON" **ขึ้น 312.00% ในสัปดาห์เดียว** คุณจะทำอะไร?',sub:'สถานการณ์สมมติ ไม่ใช่ของจริงในตลาด',timer:15,
+    {icon:'lc-zap',img:'lightning',q:'เหรียญชื่อ "MOON" **ขึ้น 312.00% ในสัปดาห์เดียว** คุณจะทำอะไร?',sub:'สถานการณ์สมมติ ไม่ใช่ของจริงในตลาด',
      opts:['ซื้อเลย เดี๋ยวไม่ทัน','ขอดูข้อมูลก่อน ว่ามันคืออะไร พื้นฐานเป็นยังไง','ไม่เอา ดูเร่งเร้าผิดปกติ'],
      insight:'ความกลัวตกขบวนทำให้เราซื้อเพราะ "คนอื่นซื้อ" ไม่ใช่เพราะเข้าใจของ'},
     {icon:'lc-alert-triangle',img:'warning',q:'มีคนทักมาบอกว่า "**การันตีผลตอบแทน 30.00% ต่อเดือน** ไม่มีขาดทุน วันนี้วันสุดท้าย รีบโอนเลย"',
@@ -7597,7 +7595,6 @@ function dlpbModalHTML(){
    only replaces HOW a game is "played" — RESULT scoring stays on sideResultFromAnswers()/the old
    persona fallback; GAME_ANSWERS/BOOTH_ANSWERS are still just captured for that future pass. */
 var PLAY=null; // {kind:'game'|'booth', idx, step:'brief'|'question'|'summary', qi, sel, lockedBack, timerQi, returnPhase} while a mini-game is active; null otherwise
-var PLAY_TIMER=null,PLAY_TIMELEFT=0;
 function playSet(kind,idx){return kind==='game'?MINIGAME_Q[idx]:BOOTH_Q[idx];}
 function playLabel(kind,idx){return kind==='game'?SIDES[idx].title:BOOTHS[idx].game;}
 /* GAME_TITLE_TAIL/BOOTH_TITLE_TAIL (2026-09-14) — the trailing WORD of each game/booth name, hand-
@@ -7786,36 +7783,20 @@ function syncBriefOverflow(){
   if(!c)return;
   c.classList.toggle('overflow-fix',c.scrollHeight>c.clientHeight+1);
 }
-function clearPlayTimer(){if(PLAY_TIMER){clearInterval(PLAY_TIMER);PLAY_TIMER=null;}}
 /* closePlay — exits the whole mini-game flow back to whichever tab launched it (PLAY.returnPhase),
    the same role as the DNA quiz's own "back from question 1 → splash". Bound only to the brief
    screen's "ย้อนกลับ" — mid-question, playGoBack() steps back INTO the brief screen instead (see
    below), so there's one single linear back-chain, same shape as the quiz's own. */
 function closePlay(){
-  clearPlayTimer();
   var back=(PLAY&&PLAY.returnPhase)||'home';
   PLAY=null;
   st.phase=back;
   render();
 }
-/* Countdown is atmospheric pressure ONLY (per เกมทนกระแส ฉาก 1's on-screen timer) — the source docx
-   never specifies what happens at 0 (an open item, see [[games-questions-dna]] #5), so this
-   deliberately never force-advances or locks the player out; it just stops counting at 0. */
-function startPlayTimer(seconds){
-  clearPlayTimer();
-  PLAY_TIMELEFT=seconds;
-  PLAY_TIMER=setInterval(function(){
-    PLAY_TIMELEFT--;
-    var el=document.getElementById('playTimerVal');
-    if(el)el.textContent=Math.max(0,PLAY_TIMELEFT);
-    if(PLAY_TIMELEFT<=0)clearPlayTimer();
-  },1000);
-}
 function completePlay(){
   var kind=PLAY.kind,idx=PLAY.idx,back=PLAY.returnPhase;
   if(kind==='game'){GAME_ANSWERS[idx]=PLAY.sel;GAME_PLAYED[idx]=true;}
   else{BOOTH_ANSWERS[idx]=PLAY.sel;BOOTH_ACT[idx]=true;}
-  clearPlayTimer();
   PLAY=null;
   st.phase=back;
   if(kind==='game')GAME_OPEN=idx; // auto-expand the just-finished row once we land back on the Games tab
@@ -7887,12 +7868,12 @@ function renderPlayBody(){
   var sel=PLAY.sel[qi];
   var answered=q.multi?(sel.length>0):(sel!==null);
   var canBack=!PLAY.lockedBack&&!set.noBack;
-  var timerHTML=q.timer?'<span class="play-timer">'+ic('lc-hourglass')+'<span id="playTimerVal">'+q.timer+'</span>s</span>':'';
   // Points badge (.play-pts-badge, the question screen's "+N แต้ม" eyebrow) removed entirely
   // (2026-09-16, per direction "หน้าคำถามทั้งหมด badge คะแนน เอาออก") — badgesHTML now only ever
   // carries timerHTML. ptsCountUp() (below) is left in place, unused, same "kept for history"
   // precedent as .play-sum-pts elsewhere in this file.
-  var badgesHTML=timerHTML?'<div class="play-eyebrow">'+timerHTML+'</div>':'';
+  // (2026-09-21, per direction "เกมทนกระแส หน้าคำถาม เอาตัวจับเวลา ออก") the on-screen countdown badge + its
+  // setInterval are removed entirely; no question carries `timer` any more, so the eyebrow row is gone too.
   // Multi-select counter (2026-09-10) — borrows the DNA quiz's own S3 interest-picker pattern
   // (.int-count "เลือกแล้ว X/3") so a multi-choice question reads visibly differently from a
   // single-choice one, not just via the (easy to miss) absence of radio-style exclusivity.
@@ -7942,7 +7923,6 @@ function renderPlayBody(){
       '<div class="tb-sub tb-sub--strong"><span class="tb-dot" style="background:var(--violet)"></span>'+(qi+1)+'/'+total+'</div>'+
     '</header>'+
     '<div class="q-scroll fade">'+
-      badgesHTML+
       '<div class="q-head scroll-reveal" style="--qc:var(--violet)"><div class="q-icon-bare">'+qIcon+'</div>'+
         '<div class="q-title">'+emphasizeQ(q.q)+'</div>'+(q.sub?'<div class="q-sub">'+q.sub+'</div>':'')+'</div>'+
       multiCountHTML+
@@ -7958,12 +7938,6 @@ function renderPlayBody(){
   var backBtn=root.querySelector('#playBackBtn');if(backBtn)backBtn.onclick=playGoBack;
   root.querySelector('#playNextBtn').onclick=playGoNext;
   var skipBtn=root.querySelector('#playSkipBtn');if(skipBtn)skipBtn.onclick=playGoNext;
-  // Bug fix (2026-09-09, still relevant post full-page conversion): only (re)start the timer when
-  // this is genuinely a NEW timed question (tracked via PLAY.timerQi) — renderPlayBody() can still
-  // be re-invoked for the SAME question by an unrelated global render() elsewhere in the app (e.g.
-  // the demo panel toggling something), and a naive restart-on-every-render would keep resetting it.
-  if(q.timer&&PLAY.timerQi!==qi){PLAY.timerQi=qi;startPlayTimer(q.timer);}
-  else if(!q.timer)clearPlayTimer();
 }
 /* renderPlaySummary — the game's result/payoff screen. Rebuilt 2026-09-10 (per direction "หน้า result
    อยากให้ใช้ dna เดียวกับ หน้าคู่มือ แท่ป ตัวตน") onto the Playbook identity (ตัวตน) tab's own DNA: the
@@ -8005,7 +7979,6 @@ function renderPlayBody(){
    would compete with it rather than extend it; the mindset signal only feeds the existing Playbook via
    learnedInsights()/learnedLedgerHTML() (journey tab) instead. */
 function renderPlaySummary(){
-  clearPlayTimer();
   var kind=PLAY.kind,idx=PLAY.idx,set=playSet(kind,idx);
   var insights=set.questions.map(function(q){return q.insight;}).filter(Boolean);
   /* result-screen art (2026-09-14, per direction) — GAME_ART_PNG/BOOTH_ART_PNG's illustration
