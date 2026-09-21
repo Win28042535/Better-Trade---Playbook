@@ -171,7 +171,16 @@ html{font-size:16px;}
    100vh is actually TALLER than what's visible whenever the address bar is showing, pushing the CTA/
    bottom controls below the fold; 100dvh tracks the true visible height and updates as the bar shows/
    hides). Browsers that don't know dvh simply ignore that one declaration and keep the vh value. */
-body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weight:var(--w-body);-webkit-font-smoothing:antialiased;min-height:100vh;min-height:100dvh;display:flex;justify-content:center;}
+/* line-height:1.5 (2026-09-21, per direction "line-height 150%", typography audit F4) — body had no base
+   line-height, so 64% of rendered text fell back to `normal`, and FC Minimal's `normal` is ~1.0 (a 28px
+   heading measured 27.5px tall) — much tighter than the 1.4-1.65 every hand-set paragraph rule uses.
+   Every selector that already sets its own line-height (display 0.96-1.2, body 1.3-1.65) is unaffected. */
+/* 2026-09-21 line-height exceptions to body 1.5 (user-approved): headings 1.2, chips/pills/badges/tags 1.1,
+   buttons inherit (UA resets them to normal). :where() = 0 specificity, so any rule that sets its own line-height still wins. */
+:where(.tb-title,.prog-val,.s-h,.quote-h,.pe-vlbl,.pe-track-lbl,.stub-t,.prof-name,.conf-sc,.consent-h,.ev-empty-t){line-height:1.2;}
+:where([class*="-pill"],[class*="-chip"],[class*="-badge"],[class*="-tag"]){line-height:1.1;}
+:where(button){line-height:inherit;}
+body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weight:var(--w-body);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;min-height:100dvh;display:flex;justify-content:center;}
 .shell{width:100%;max-width:430px;min-height:100vh;min-height:100dvh;background:var(--paper);position:relative;display:flex;flex-direction:column;}
 
 /* The .spec-bd spectrum-comet accent system (CSS + --ring-idle token + ensureCometSVG/setSpecPath/
@@ -558,8 +567,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    .round-cards were missing the same treatment. .consent-btn already has z-index:6 from its own
    sticky rule, so it didn't need it. */
 /* Bumped 36px(--fs-title)->64px per direction (2026-08-19) — a dedicated size for THIS headline
-   only, not a change to the shared --fs-title token (still used by .q-title/.conf-sc elsewhere). */
-.consent-h{position:relative;z-index:2;font-size:64px;letter-spacing:-0.01em;line-height:1.06;margin-bottom:var(--sp-stack);}
+   only, not a change to the shared --fs-title token (still used by .q-title/.conf-sc elsewhere).
+   letter-spacing:-0.01em -> 0 (2026-09-21, per direction, typography audit F3) — zero tracking on sans
+   headlines is the house rule (.tb-title/.q-title/.hero-th/.s-h all set 0); negative tracking is
+   reserved for the serif display faces. .ch-1/.ch-2 inherit this too. */
+.consent-h{position:relative;z-index:2;font-size:64px;letter-spacing:0;line-height:1.06;margin-bottom:var(--sp-stack);}
 /* Colors swapped per direction: the lighter 500 line (ch-1) is now the muted/gray one and the
    heavier 700 line (ch-2) is now the solid ink one — previously the bold line was the faint gray
    and the light line was dark, which read upside-down. Weights stay 500/700; only the colors moved. */
@@ -967,6 +979,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    accent color, applied inline via h.accent) instead of just sitting bare on the card surface —
    this is the highlight the customer should see they're "คู่ควรกับ", not a footnote. */
 .ast-block{border-radius:var(--r1);padding:var(--sp-card-pad-sm);margin-bottom:var(--sp-stack);}
+/* .ev-empty-s.ast-block — the highlighted closing callout in the 3 empty-state cards (Book coming-soon,
+   เกมหลัก pre-event, เกมหลัก ยังไม่ปลดล็อก). 2026-09-21, per direction (typography audit F5): the size/weight/
+   width used to be inlined per call site — 16px / 20px / 20px, hand-typed weight 700 — so the same component
+   rendered at two sizes across three pages, and the 20px was --fs-sub's pre-v4 value never followed up. One
+   rule now: --fs-sub / --w-label. Only the per-instance tint (color/background/border) stays inline. */
+.ev-empty-s.ast-block{max-width:44ch;display:inline-block;font-size:var(--fs-sub);font-weight:var(--w-label);}
 .ast-lbl{display:flex;align-items:center;gap:var(--sp-inline);font-family:var(--font);font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);margin-bottom:var(--sp-inline);}
 /* svg sizing (2026-09-10) — .ast-lbl's only call site used to be a plain text label
    ("สินทรัพย์ที่ถนัด", no icon); renderPlaySummary's result card is the first to put an icon in
@@ -1627,7 +1645,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .home-hero.v3 .hh-meta svg{color:var(--cyan);}
 /* pass-card — the tier row reworked into a "your ticket" status card: eyebrow ("บัตรของคุณ") +
    prominent tier name, a benefit line, then a divided price row. */
-.pass-card{display:block;width:100%;text-align:left;font-family:var(--font);background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-stack) var(--sp-stack);cursor:pointer;}
+/* font-weight:var(--w-body) (2026-09-21, per direction, typography audit F1) — .pass-card is a <button> on
+   Home, and buttons don't inherit font-weight from body (UA default 400), so .pass-benefit/.pass-foot-lbl,
+   which set no weight of their own, rendered at 400 — the one place the system's 500/700 rule leaked. */
+.pass-card{display:block;width:100%;text-align:left;font-family:var(--font);font-weight:var(--w-body);background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-stack) var(--sp-stack);cursor:pointer;}
 .pass-top{display:flex;align-items:center;gap:var(--sp-inline);}
 .pass-hd{flex:1;min-width:0;}
 /* "ความคืบหน้าของคู่มือ" dropped its .pass-ic badge entirely (2026-08-24, per direction "ไอคอนให้
@@ -3653,7 +3674,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .cr-en{font-family:var(--serif);font-size:48px;font-weight:var(--w-label);color:var(--ink);line-height:1.06;letter-spacing:-0.01em;background-repeat:no-repeat;background-size:220% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-image:linear-gradient(100deg,var(--ink) 0%,var(--ink) 34%,color-mix(in srgb,var(--violet) 78%,var(--ink) 22%) 48%,color-mix(in srgb,var(--violet) 78%,var(--ink) 22%) 52%,var(--ink) 66%,var(--ink) 100%);animation:shimmerSweep 4.2s ease-in-out infinite;}
 /* Thai name — same text DNA as the splash's own subtitle (.sp-sub, "โลกการลงทุนใบใหม่...") per direction. */
 .cr-th{font-family:var(--font);font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--ink);line-height:1.55;margin-top:6px;}
-/* hint — same text DNA as the splash fan carousel's own caption (.cr2-cap, "แตะการ์ดกลางเพื่อดูด้านหลัง") per direction. */
+/* hint — was "same text DNA as the splash fan carousel's own caption (.cr2-cap)" per direction; that splash caption
+   was removed 2026-09-21 (see renderSplash), the values below (14px/muted/lh1.5/280px) stand on their own now. */
 .cr-hint{position:relative;z-index:3;margin-top:16px;font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;max-width:280px;margin-left:auto;margin-right:auto;opacity:0;transition:opacity .6s var(--ease);}
 .cr-scene.s-appear .cr-hint{opacity:.8;}
 .cr-scene.s-peak .cr-hint,.cr-scene.s-final .cr-hint{opacity:0;}
@@ -4299,9 +4321,9 @@ function renderSplash(){
       '<img class="sp-hero-logo" src="'+LOGO_IMG.nwnp+'" alt="New World, New Playbook · BetterTrade 2026">'+
       '<p class="sp-sub">โลกการลงทุนใบใหม่ เริ่มจากรู้จักตัวเอง พบตัวตนนักลงทุน 1 ใน 12 แบบที่เป็นคุณ</p></div>'+
     '<div class="sp-stage"><div class="fan-stage" id="fanStage">'+slides+'</div></div>'+
-    /* reuses .cr2-cap verbatim (same centered/muted/280px-cap micro-hint the compare-reveal slider
-       uses for "ลากเส้นแบ่ง...") for this preview's own hint line. */
-    '<p class="cr2-cap">แตะการ์ดกลางเพื่อดูด้านหลัง</p>'+
+    /* The ".cr2-cap" hint line ("แตะการ์ดกลางเพื่อดูด้านหลัง") that used to sit here was removed 2026-09-21,
+       per direction — it told people to tap the centered card, but tap-to-flip was already gone
+       (2026-09-18), so the hint promised an interaction that no longer exists. */
     '<div class="sp-cta"><div id="cta-slot"></div></div>'+
   '</div>';
   paintFan();
@@ -5368,7 +5390,7 @@ function unregisteredCtaHTML(){
       '<div class="ev-empty-ic" style="background:none;width:48px;height:48px"><img src="'+ICON_BOOK_PNG+'" alt=""></div>'+
       '<div class="ev-empty-t shimmer-violet" style="font-size:26px">Investment DNA ของคุณคือจุดเริ่มต้น</div>'+
       '<div class="ev-empty-s" style="max-width:44ch">ร่วมเดินทางต่อในวันงาน กับ <b>10 INVESTMENT EXPERIENCES</b> • <b>6 INVESTMENT GAMES</b> พร้อม efin AI • Speaker ชั้นนำ • PAVILION ZONE</div>'+
-      '<div class="ev-empty-s ast-block" style="max-width:44ch;display:inline-block;font-weight:700;font-size:16px;color:var(--violet);background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)">รับ <span style="white-space:nowrap">Playbook</span> การลงทุนส่วนตัว เพื่อสแกนทุกโอกาสการลงทุนในโลกยุคใหม่</div>'+
+      '<div class="ev-empty-s ast-block" style="color:var(--violet);background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)">รับ <span style="white-space:nowrap">Playbook</span> การลงทุนส่วนตัว เพื่อสแกนทุกโอกาสการลงทุนในโลกยุคใหม่</div>'+
     '</div>'+
     /* text-decoration:none inline (not a new CSS rule) — .btn-primary is normally a <button>
        everywhere else in this file; only .reg-cta (the header's own register link) already resets
@@ -7434,7 +7456,7 @@ function renderGames(){
                the parent — margin:0 auto from .ev-empty-s doesn't apply to inline-block, but that's
                fine, text-align does the same job here), so the real padding (--sp-card-pad-sm, 16px)
                is the only thing left reading as "padding." */
-            '<div class="ev-empty-s ast-block" style="max-width:44ch;display:inline-block;font-weight:700;font-size:20px;color:var(--violet);background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)">ร่วมสนุกและปลดล็อกได้<span style="white-space:nowrap">วันงาน</span>เท่านั้น</div>'+
+            '<div class="ev-empty-s ast-block" style="color:var(--violet);background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)">ร่วมสนุกและปลดล็อกได้<span style="white-space:nowrap">วันงาน</span>เท่านั้น</div>'+
           '</div></section>'
       : efinLocked
       /* On-Event, not yet checked in — reuses the pre-event "Coming soon" card's exact DNA verbatim
@@ -7458,7 +7480,7 @@ function renderGames(){
                คุณ" section, Book tab's ตัวตน panel) — same cyan→violet 135deg wash + var(--line-soft)
                border + .efin-t's own plain var(--ink) text color, inlined here since this sits outside
                .efin-banner's own container context. */
-            '<div class="ev-empty-s ast-block" style="max-width:44ch;display:inline-block;font-weight:700;font-size:20px;color:var(--ink);background:linear-gradient(135deg,color-mix(in srgb,var(--cyan) 10%,transparent),color-mix(in srgb,var(--violet) 10%,transparent));border:1px solid var(--line-soft)">แตะปุ่ม "สแกน QR" ด้านบนเพื่อเช็คอิน</div>'+
+            '<div class="ev-empty-s ast-block" style="color:var(--ink);background:linear-gradient(135deg,color-mix(in srgb,var(--cyan) 10%,transparent),color-mix(in srgb,var(--violet) 10%,transparent));border:1px solid var(--line-soft)">แตะปุ่ม "สแกน QR" ด้านบนเพื่อเช็คอิน</div>'+
           '</div></section>'
       : '<section class="home-card scroll-reveal">'+
       /* "ดาวน์โหลด PLAYBOOK" (2026-09-18, per direction, 4th round) — .gh-title-row's two flex
