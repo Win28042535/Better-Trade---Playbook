@@ -11,10 +11,35 @@
      layout width, so every max-width:575px/480px breakpoint in this file (including the Liquid
      Metal CTA's own compactOptions switch) would never actually fire on a real phone. -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- PWA installability (2026-09-25) — manifest.json + icons in assets/, sw.js registered near the
+     bottom of the script (see 'serviceWorker' in navigator). theme-color/background match --paper
+     (this app is light-theme-only, see :root's own note below) so the OS install splash and browser
+     chrome don't flash a mismatched dark color. apple-mobile-web-app-* covers iOS Safari, which
+     never fires beforeinstallprompt at all — the Home "ติดตั้งแอปบนหน้าจอหลัก" card falls back to a
+     manual "แตะ Share > เพิ่มไปยังหน้าจอโฮม" instruction there instead of a native prompt. -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f7f8f7">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Playbook">
 <style>
 @font-face{font-family:'FC Minimal';src:url(assets/fc-minimal-100-500.ttf) format('truetype');font-weight:100 500;font-style:normal;font-display:swap;}
 @font-face{font-family:'FC Minimal';src:url(assets/fc-minimal-600-900.ttf) format('truetype');font-weight:600 900;font-style:normal;font-display:swap;}
 @font-face{font-family:'Baskervville';src:url(assets/baskervville-400-700.ttf) format('truetype');font-weight:400 700;font-style:normal;font-display:swap;}
+/* Taviraj (2026-09-25) — FC Minimal has zero Thai glyph coverage (it's a Latin-only display face), so
+   every Thai character on this page was silently falling through --font's OLD tail
+   ('Noto Sans Thai'/'Thonburi'/'DB Helvethaica X') to whatever the OS substitutes for an unmatched
+   name — none of those three were ever actually installed or embedded anywhere in this repo, so on a
+   machine without them (confirmed: this Windows dev box) Thai text rendered in the system's own
+   default looped (มีหัว) UI font instead of a loopless face matching FC Minimal's geometric look.
+   Taviraj (OFL, Cadson Demak) was already sitting in Font/Taviraj/ as raw source — same "source
+   asset never wired up" gap the character-card-animation work's own Character Card Animation/ folder
+   precedent describes, just for a font instead of video. Two static weights only (matching this app's
+   real --w-body/--w-head:500 and --w-label:700 usage — see :root's own weight tokens — not the full
+   9-weight family), same 2-file weight-range-split pattern as FC Minimal above. */
+@font-face{font-family:'Taviraj';src:url(assets/taviraj-medium.ttf) format('truetype');font-weight:100 599;font-style:normal;font-display:swap;}
+@font-face{font-family:'Taviraj';src:url(assets/taviraj-bold.ttf) format('truetype');font-weight:600 900;font-style:normal;font-display:swap;}
 /* ── BetterTrade 2026 · Design DNA v2.0 (editorial) ─────────── */
 :root{
   --ink:#111318; --muted:#687078;
@@ -102,7 +127,11 @@
                            uses --sp-block and smaller. Mobile keeps this 20px value; tablet/pc override
                            to 24px below — a wider canvas can afford (and reads better with) slightly more
                            breathing room than the narrow phone frame. */
-  --font:'FC Minimal','Noto Sans Thai','Thonburi','DB Helvethaica X',system-ui,-apple-system,'Segoe UI',sans-serif;
+  /* 'Taviraj' replaces the old 'Noto Sans Thai'/'Thonburi'/'DB Helvethaica X' tail (2026-09-25) — none
+     of those three were ever embedded via @font-face or reliably present on a real OS; Taviraj now is
+     (see its own @font-face above), so Thai script actually resolves to a real loopless face instead
+     of whatever system-ui/-apple-system/Segoe UI substitutes with when NONE of the named fonts exist. */
+  --font:'FC Minimal','Taviraj',system-ui,-apple-system,'Segoe UI',sans-serif;
   --serif:'Baskervville','Bodoni MT','Didot',Georgia,'Times New Roman',serif; /* Editorial display serif — matches the printed character-card art. English display + numerals ONLY; Thai stays on --font (FC Minimal). Baskervville embedded (OFL, variable font — one @font-face covers weight 400–700); Bodoni MT = local-first fallback */
   /* --mono retired (2026-08-12, per direction) — every former mono site (topbar count, opt-key,
      eyebrow labels, side/route numerals, card-back stat rows) now sets font-family:var(--font)
@@ -2748,6 +2777,90 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    (เช็คอิน → ปลดเกมประจำโซน → ร่วมกิจกรรม), which the button never actually enforced before this.
    Muted/disabled look — same "quiet, not clickable" treatment as a disabled .btn elsewhere. */
 .bc-play.locked{background:var(--accent);border-color:var(--line-soft);color:var(--muted);cursor:not-allowed;}
+/* ══ HOME UTILITY CARDS (2026-09-25) ══ "ตั้งรหัสผ่านสำหรับแอป" + "ติดตั้งแอปบนหน้าจอหลัก" — a plain
+   white settings-style card (icon badge top-left, title/subtitle, full-width primary button) that no
+   existing component quite matches: .next-step (§7.2) is the closest structural cousin (icon badge +
+   title + CTA) but is an ink-dark "next action" card by default, and .pass-card is a single tappable
+   row, not this icon+title+subtitle+button stack. New minimal component instead of forcing either.
+   Icon badge reuses the violet tint .bt-ic/.ns-ic already use for "your own identity/data" content
+   (not the amber/green status-ladder — this isn't a progress state). Button stays the app's own
+   ink .btn.btn-primary rather than the blue reference mockup's button — this app has no blue token
+   anywhere (--focus:#2b6cff is focus-ring-only, never a fill), so ink keeps it consistent with every
+   other primary action instead of introducing a one-off color. */
+.util-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad-sm) var(--sp-card-pad);position:relative;}
+.util-card+.util-card{margin-top:var(--sp-list);}
+.util-hd{display:flex;align-items:flex-start;gap:var(--sp-inline);margin-bottom:var(--sp-stack);}
+.util-ic{width:48px;height:48px;flex:0 0 auto;border-radius:var(--r2);background:color-mix(in srgb,var(--violet) 12%,var(--white));display:flex;align-items:center;justify-content:center;color:var(--violet);}
+.util-ic svg{width:var(--ic-lg);height:var(--ic-lg);}
+.util-tx{min-width:0;padding-top:2px;}
+.util-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);}
+.util-s{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.4;margin-top:2px;}
+.util-card .btn{width:100%;justify-content:center;}
+/* Same inset-circle close button as .howto-x/.dlpb — only the install card uses this (the PIN card
+   is never silently dismissible, just changeable/removable through its own button). */
+.util-x{position:absolute;right:12px;top:12px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--ink);border:none;cursor:pointer;}
+.util-x svg{width:var(--ic-md);height:var(--ic-md);}
+/* "ปิดการล็อก"/"ไม่ต้องแสดงอีก" (2026-09-25, per direction+screenshot reference) — reuse .ag-more
+   verbatim (the white-outline pill DNA dlpbModal's own "กลับไปเล่นเกมต่อ" secondary button already
+   uses, border-radius bumped to --rpill the same way that call site does inline) instead of a plain
+   text link — a dedicated .util-dismiss rule used to exist here but every one of its call sites was
+   swapped over to .ag-more instead, so it's removed rather than left unused. */
+
+/* ══ PIN PAD (2026-09-25) ══ shared by the Home PIN-setup/change/disable modal AND the full-page
+   lock screen (renderLock, near render()) — this app has zero <input> anywhere (every screen is
+   fully tap-driven), so PIN entry follows the same idiom instead of introducing the app's first text
+   field: a 6-dot progress row + a 3x4 numeric keypad, same as a native OS PIN pad. */
+.pin-dots{display:flex;justify-content:center;gap:14px;margin:var(--sp-stack) 0;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--line-strong);background:transparent;transition:background-color .15s var(--ease),border-color .15s var(--ease);}
+.pin-dot.fill{background:var(--ink);border-color:var(--ink);}
+/* width:100% (2026-09-25 fix) — .pin-pad is a block-level grid container almost everywhere it's used
+   (inside .howto-card for the Home modal), where a block box's default width already fills its
+   parent, so max-width:280px alone was enough there. The lock screen is the one consumer that's
+   DIFFERENT: its parent (.lock-scr) is a flex column with align-items:center for the rest of its
+   content, and a flex item's default cross-axis size is shrink-to-fit, not stretch, once align-items
+   isn't its default 'stretch' value — so .pin-pad's grid columns (repeat(3,1fr)) had no definite
+   container width to divide, and each 1fr track collapsed toward its own min-content (~22px, barely
+   wider than a single digit) instead of dividing 280px into three ~85px columns. That's what turned
+   every key into a narrow vertical pill instead of a properly proportioned rounded square. */
+/* #lockPad/#pinModalPad — the plain wrapper divs renderLock()/pinModalStep() inject pinPadHTML()
+   into (so they have a stable id to re-query on repaint) — also need width:100%, not just .pin-pad
+   itself: #lockPad is ALSO a flex item of .lock-scr (align-items:center), so it shrink-wraps to
+   content first, and .pin-pad's own width:100% then resolves against that already-collapsed parent
+   width instead of the intended 280px. #pinModalPad never had this problem (its ancestor .howto-card
+   is a plain block, whose children fill it by default) but gets the same rule for symmetry. */
+#lockPad,#pinModalPad{width:100%;}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-list);width:100%;max-width:280px;margin:0 auto;}
+.pin-key{min-height:56px;border-radius:var(--r2);border:1px solid var(--line-soft);background:var(--white);font-family:var(--font);font-size:20px;font-weight:var(--w-label);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.pin-key:active{background:var(--paper);}
+.pin-key--blank{border:none;background:none;cursor:default;}
+/* border:none;background:none (2026-09-25, per direction) — ลบ (backspace) isn't a digit, so it
+   shouldn't read as a 10th equal-weight key card the way 0-9 do; bare icon only, same "quiet, not a
+   boxed button" treatment .pin-key--blank's empty cell already gets. */
+.pin-key--del{border:none;background:none;color:var(--muted);}
+.pin-key--del svg{width:var(--ic-md);height:var(--ic-md);}
+/* Wrong-PIN feedback — same shake a native lock screen uses; scoped to whichever box (the modal
+   card, or the lock screen itself) currently holds the pad, so it never fights .fade's own entrance
+   transition on the element it's applied to. */
+@keyframes pinShake{10%,90%{transform:translateX(-2px);}20%,80%{transform:translateX(4px);}30%,50%,70%{transform:translateX(-8px);}40%,60%{transform:translateX(8px);}}
+.pin-shake{animation:pinShake .4s;}
+
+/* ══ APP LOCK SCREEN (2026-09-25) ══ renderLock()'s full-page takeover — same "own top-level phase,
+   not a modal" shape as .consent, since it must block the ENTIRE app, not float over one screen. */
+.lock-scr{width:100%;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--sp-section) var(--sp-card-pad);background:var(--paper);text-align:center;}
+.lock-ic{width:56px;height:56px;border-radius:var(--r2);background:color-mix(in srgb,var(--violet) 12%,var(--white));display:flex;align-items:center;justify-content:center;color:var(--violet);margin-bottom:var(--sp-stack);}
+.lock-ic svg{width:28px;height:28px;}
+/* 32px (2026-09-25, per direction) — a dedicated one-off size for THIS headline only, not a change to
+   the shared --fs-h2 token (still 24px, still used everywhere else --fs-h2 appears) — same "hardcoded
+   pixel for one specific screen" precedent as .consent-h/64px and the old .play-q/32px. */
+.lock-t{font-size:32px;font-weight:var(--w-label);color:var(--ink);}
+.lock-s{font-size:var(--fs-bodysm);color:var(--muted);margin-top:2px;margin-bottom:var(--sp-block);}
+/* font-family:var(--font) (2026-09-25 fix) — .lock-forgot is a <button>, and buttons don't inherit
+   font-family from body any more than they inherit font-weight (same UA-leak class the typography
+   audit's .pass-card fix documents) — this one rendered in the browser's own default UI font (Arial
+   on this Windows box) instead of FC Minimal/Taviraj until it had its own explicit declaration. */
+.lock-forgot{margin-top:var(--sp-block);background:none;border:none;font-family:var(--font);color:var(--muted);font-size:var(--fs-label);font-weight:var(--w-head);text-decoration:underline;cursor:pointer;}
+.lock-reset-row{display:flex;flex-direction:column;gap:var(--sp-list);margin-top:var(--sp-stack);max-width:280px;width:100%;}
+.lock-reset-row .btn{width:100%;justify-content:center;}
 .booth-legend{display:flex;flex-wrap:wrap;gap:var(--sp-list) var(--sp-inline);margin:var(--sp-inline) 0 var(--sp-inline);font-size:var(--fs-eyebrow);color:var(--muted);}
 .booth-legend span{display:inline-flex;align-items:center;gap:var(--sp-stack-tight);}
 /* border-radius bumped 3px->4px (2026-08-31, per corner-radius audit) — see .alloc-dot's comment. */
@@ -3684,6 +3797,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 <symbol id="lc-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
 <symbol id="lc-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
 <symbol id="lc-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<!-- lc-key/lc-smartphone/lc-delete (2026-09-25, added for the PIN-lock + PWA-install home cards) —
+     simplified hand-drawn shapes in the same stroke idiom as every symbol here (round joins, no
+     fill, 24x24 box), not verbatim Lucide path data — close enough to read correctly at icon size,
+     no license/attribution concern either way since Lucide is MIT. -->
+<symbol id="lc-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12 20 3"/><path d="m17 6 2 2"/><path d="m14 9 2 2"/></symbol>
+<symbol id="lc-smartphone" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></symbol>
+<symbol id="lc-delete" viewBox="0 0 24 24"><path d="M20 5H9l-7 7 7 7h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z"/><path d="m12 9 6 6"/><path d="m18 9-6 6"/></symbol>
 <symbol id="lc-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
 <symbol id="lc-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
 <symbol id="lc-trending-up" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></symbol>
@@ -3779,7 +3899,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    to the full original artwork through the same plain trim+~82%-fill recipe as the other 11 — the
    mismatched ₿ stays, matching the source verbatim; only the canvas/proportion got fixed here, not
    the content. */
-var ICON_BOOK_PNG='assets/ICON_BOOK_PNG.png';var SVGFONT="'FC Minimal','Noto Sans Thai','Thonburi',system-ui,sans-serif";
+var ICON_BOOK_PNG='assets/ICON_BOOK_PNG.png';var SVGFONT="'FC Minimal','Taviraj',system-ui,sans-serif"; // kept in sync with --font's own 2026-09-25 Taviraj swap — see that token's comment
 var ICON_GIFT_PNG='assets/ICON_GIFT_PNG.png';
 var ICON_CARD_PNG='assets/ICON_CARD_PNG.png';
 var ICON_CROWN_PNG='assets/ICON_CROWN_PNG.png';
@@ -4446,6 +4566,257 @@ var PB_INTRO=false;
 var root=document.getElementById('root');
 function ic(id,cls){return '<svg viewBox="0 0 24 24" class="lucide'+(cls?' '+cls:'')+'"><use href="#'+id+'"/></svg>';}
 
+/* ══ localStorage (2026-09-25) ══ this app's FIRST use of any persistence — every other piece of
+   state here is a plain in-memory var, reset on reload by design (see the old dev-bar removal note
+   near .home-hero, "a real browser refresh already returns to splash on its own...nothing persists
+   to localStorage/sessionStorage"). Two new features need to survive a reload on purpose (the PIN
+   hash, and "ไม่ต้องแสดงอีก" on the install card), so this wrapper is scoped to just those — nothing
+   else in the app should start reaching for localStorage without a fresh reason. Wrapped in try/catch
+   since Safari private-mode/blocked-storage throws on ANY call, not just write. */
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
+
+/* ══ APP PIN LOCK (2026-09-25) ══ the wristband QR opens a bare link with zero auth — anyone who
+   scans someone else's wristband lands straight on their Playbook. This is a CLIENT-SIDE-ONLY
+   deterrent (this app has no backend to check a PIN against): the hash check runs in plain page JS,
+   trivially bypassable from devtools by anyone who'd actually try. It stops a stranger from casually
+   opening a scanned wristband link, not a determined attacker — sized to the actual threat described,
+   not represented as real security.
+   PIN hash (SHA-256 via SubtleCrypto where available — this app is served over HTTPS/Vercel, a
+   secure context, so that's the normal path; a non-crypto fallback below covers any oddball insecure-
+   context preview server instead of hard-failing) is the ONE thing that persists across reloads,
+   in pb_pin_hash. PIN_UNLOCKED itself deliberately does NOT persist (plain in-memory var, same as
+   every other piece of app state) — every fresh page load re-locks, which is exactly the point: each
+   new wristband scan is a fresh load. */
+var PIN_UNLOCKED=false;
+function hasPin(){return !!lsGet('pb_pin_hash');}
+function sha256Hex(str){
+  if(window.crypto&&window.crypto.subtle&&window.isSecureContext){
+    return crypto.subtle.digest('SHA-256',new TextEncoder().encode(str)).then(function(buf){
+      return Array.prototype.map.call(new Uint8Array(buf),function(b){return b.toString(16).padStart(2,'0');}).join('');
+    });
+  }
+  var h=0;for(var i=0;i<str.length;i++){h=((h<<5)-h+str.charCodeAt(i))|0;}
+  return Promise.resolve('fb'+Math.abs(h).toString(16));
+}
+function setPin(pin){return sha256Hex(pin).then(function(h){lsSet('pb_pin_hash',h);});}
+/* No stored hash but the lock screen is showing anyway (DEMO.forceLock, a pure UI preview with no
+   real PIN behind it — see buildDemo()) — any 6 digits unlock, there's nothing real to check against.
+   Every real caller (the lock screen once hasPin() is true, and Home's change/disable flows, which
+   are only reachable once hasPin() is true) always has a stored hash, so this branch never fires
+   outside the demo-preview case. */
+function checkPin(pin){return sha256Hex(pin).then(function(h){var stored=lsGet('pb_pin_hash');if(!stored)return true;return h===stored;});}
+function clearPin(){lsDel('pb_pin_hash');}
+
+/* ── PIN pad DNA ── shared by the Home setup/change/disable modal AND the full-page lock screen
+   below. This app has no <input> anywhere (every screen is fully tap-driven, see Design DNA §7) —
+   PIN entry follows the same idiom instead of introducing the app's first text field: a 6-dot
+   progress row + a 3x4 numeric keypad (native-OS-PIN-pad shape), not a keyboard. */
+function pinDotsHTML(filled){
+  var d='';for(var i=0;i<6;i++)d+='<span class="pin-dot'+(i<filled?' fill':'')+'"></span>';
+  return '<div class="pin-dots">'+d+'</div>';
+}
+function pinPadHTML(){
+  var keys=['1','2','3','4','5','6','7','8','9','','0','del'];
+  return '<div class="pin-pad">'+keys.map(function(k){
+    if(k==='')return '<span class="pin-key pin-key--blank"></span>';
+    if(k==='del')return '<button type="button" class="pin-key pin-key--del" data-k="del" aria-label="ลบ">'+ic('lc-delete')+'</button>';
+    return '<button type="button" class="pin-key" data-k="'+k+'">'+k+'</button>';
+  }).join('')+'</div>';
+}
+/* padEl holds the .pin-pad keys, dotsEl is repainted on every tap; onComplete(pin) fires once 6
+   digits are in, then the buffer resets to '' so the SAME pad can be reused for a second entry (e.g.
+   the confirm-PIN step) without a fresh render. */
+function bindPinPad(padEl,dotsEl,onComplete){
+  var buf='';
+  function paint(){dotsEl.innerHTML=pinDotsHTML(buf.length);}
+  padEl.querySelectorAll('.pin-key[data-k]').forEach(function(btn){
+    btn.onclick=function(){
+      var k=btn.dataset.k;
+      if(k==='del'){buf=buf.slice(0,-1);paint();return;}
+      if(buf.length>=6)return;
+      buf+=k;paint();
+      /* buf resets to '' (so a wrong PIN/mismatch immediately leaves the pad ready for the NEXT
+         attempt) and paint() runs again right here, not just before this `if` — otherwise the dots
+         stayed showing all 6 filled after a failed attempt (stale: buf itself had already reset,
+         but nothing had repainted dotsEl to reflect that yet) until the very next keypress. */
+      if(buf.length===6){var pin=buf;buf='';paint();setTimeout(function(){onComplete(pin);},120);}
+    };
+  });
+  paint();
+}
+function pinShake(el){el.classList.add('pin-shake');setTimeout(function(){el.classList.remove('pin-shake');},400);}
+
+/* ── Home's PIN card modal — set (no PIN yet) / change (verify old, then set new) / disable (verify
+   old, then clear). Reuses .howto-modal/.howto-scrim/.howto-card/.howto-x/.howto-hd/.howto-t/.howto-s
+   verbatim (same shell dlpbModal/howtoModal already use) — embedded into renderHome()'s own markup
+   rather than a buildOnce-and-append-to-<body> modal (scan/share's pattern), since Home is its only
+   entry point, same "embed where it's used" choice dlpbModal made for เกมหลัก's download flow. */
+function pinModalHTML(){
+  return '<div class="howto-modal" id="pinModal"><div class="howto-scrim" id="pinScrim"></div><div class="howto-card"><button class="howto-x" id="pinModalX">'+ic('lc-x')+'</button>'+
+    '<div class="howto-hd"><div class="howto-t" id="pinModalT"></div><div class="howto-s" id="pinModalS"></div></div>'+
+    '<div id="pinModalDots"></div><div id="pinModalPad"></div>'+
+    '<div id="pinModalErr" style="display:none;text-align:center;color:var(--amber-text);font-size:var(--fs-eyebrow);font-weight:var(--w-head);margin-top:var(--sp-list)"></div>'+
+  '</div></div>';
+}
+function closePinModal(){var m=root.querySelector('#pinModal');if(m)m.classList.remove('show');}
+/* errMsg (optional) — shown immediately on THIS repaint rather than via a separate pinModalError()
+   call, which flashed for one tick and vanished the instant the very next pinModalStep() call (e.g.
+   restarting after a mismatch) reset #pinModalErr back to hidden. Passing the message forward into
+   the step that should display it keeps it on screen through the repaint, not just before it. */
+function pinModalStep(title,sub,onComplete,errMsg){
+  var m=root.querySelector('#pinModal');if(!m)return;
+  m.querySelector('#pinModalT').textContent=title;
+  m.querySelector('#pinModalS').textContent=sub;
+  var errEl=m.querySelector('#pinModalErr');
+  if(errMsg){errEl.textContent=errMsg;errEl.style.display='block';pinShake(m.querySelector('.howto-card'));}
+  else errEl.style.display='none';
+  m.querySelector('#pinModalDots').innerHTML=pinDotsHTML(0);
+  m.querySelector('#pinModalPad').innerHTML=pinPadHTML();
+  bindPinPad(m.querySelector('#pinModalPad'),m.querySelector('#pinModalDots'),onComplete);
+}
+function openPinModal(){
+  var m=root.querySelector('#pinModal');if(!m)return;
+  m.classList.add('show');
+  m.querySelector('#pinModalX').onclick=closePinModal;
+  m.querySelector('#pinScrim').onclick=closePinModal;
+}
+function pinModalAskNewThenConfirm(titleNew,titleConfirm,onSaved){
+  var first=null;
+  function askNew(errMsg){pinModalStep(titleNew,'ใส่รหัส 6 หลัก',function(pin){first=pin;askConfirm();},errMsg);}
+  function askConfirm(){pinModalStep(titleConfirm,'ใส่รหัส 6 หลักอีกครั้ง',function(pin){
+    if(pin===first)setPin(pin).then(onSaved);
+    else{first=null;askNew('รหัสไม่ตรงกัน ลองใหม่');}
+  });}
+  askNew();
+}
+function openPinSetupModal(){
+  openPinModal();
+  pinModalAskNewThenConfirm('ตั้งรหัสผ่าน','ยืนยันรหัสผ่าน',function(){closePinModal();renderHome();});
+}
+function openPinVerifyThen(title,onVerified){
+  openPinModal();
+  function askCurrent(errMsg){pinModalStep(title,'ใส่รหัสผ่านเดิม 6 หลัก',function(pin){
+    checkPin(pin).then(function(ok){if(ok)onVerified();else askCurrent('รหัสไม่ถูกต้อง ลองใหม่');});
+  },errMsg);}
+  askCurrent();
+}
+function openPinChangeFlow(){
+  openPinVerifyThen('เปลี่ยนรหัสผ่าน',function(){
+    pinModalAskNewThenConfirm('ตั้งรหัสผ่านใหม่','ยืนยันรหัสผ่านใหม่',function(){closePinModal();renderHome();});
+  });
+}
+function openPinDisableFlow(){
+  openPinVerifyThen('ปิดการล็อก',function(){clearPin();closePinModal();renderHome();});
+}
+/* Home card markup — see the §"HOME UTILITY CARDS" CSS comment for why this is a new component
+   rather than a reused one. Never dismissible (unlike the install card below): once a PIN protects
+   your data you shouldn't be able to silently hide the one control that manages it. */
+function pinCardHTML(){
+  var set=hasPin();
+  return '<div class="util-card scroll-reveal" id="pinCard"><div class="util-hd"><div class="util-ic">'+ic('lc-key')+'</div><div class="util-tx">'+
+      '<div class="util-t">ตั้งรหัสผ่านสำหรับแอป</div>'+
+      '<div class="util-s">'+(set?'เปิดใช้งานการล็อกอยู่ · ป้องกันคนอื่นเปิดดูข้อมูลของคุณ':'กำหนดรหัส 6 หลักเพื่อล็อกข้อมูลของคุณ')+'</div>'+
+    '</div></div>'+
+    '<button class="btn btn-primary" id="pinCardBtn">'+(set?'เปลี่ยนรหัสผ่าน':'ตั้งรหัสผ่าน')+'</button>'+
+    (set?'<button class="ag-more" id="pinCardOff" style="font-size:var(--fs-sub);border-radius:var(--rpill)">ปิดการล็อก</button>':'')+
+  '</div>';
+}
+
+/* ══ PWA INSTALL (2026-09-25) ══ no manifest/service-worker existed anywhere in this app before —
+   manifest.json + sw.js (minimal, no caching — see its own comment) added alongside this. Chrome/
+   Android fire beforeinstallprompt once their own installability criteria pass; we just capture and
+   defer it (preventDefault) so it can be re-fired from the Home card's own button instead of the
+   browser's mini-infobar. iOS Safari never fires this event at all, so isIOSDevice() below drives a
+   manual "แตะ Share > เพิ่มไปยังหน้าจอโฮม" fallback for it instead of a native prompt. */
+var DEFERRED_INSTALL=null;
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();DEFERRED_INSTALL=e;
+  if(st.phase==='home')renderHome(); // card was hidden until the browser confirmed installability — show it now
+});
+window.addEventListener('appinstalled',function(){DEFERRED_INSTALL=null;if(st.phase==='home')renderHome();});
+function isStandaloneDisplay(){return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;}
+function isIOSDevice(){return /iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.MSStream;}
+function installCardDismissed(){return lsGet('pb_install_dismissed')==='1';}
+function dismissInstallCard(){lsSet('pb_install_dismissed','1');if(st.phase==='home')renderHome();}
+function triggerInstall(){
+  if(DEFERRED_INSTALL){
+    var evt=DEFERRED_INSTALL;DEFERRED_INSTALL=null;
+    evt.prompt();
+    evt.userChoice.then(function(){renderHome();});
+  }else if(isIOSDevice()){
+    var card=root.querySelector('#installCard');if(!card)return;
+    card.querySelector('.util-s').innerHTML='แตะปุ่ม <b>แชร์</b> '+ic('lc-upload')+' ด้านล่าง แล้วเลือก <b>"เพิ่มไปยังหน้าจอโฮม"</b>';
+    var btn=card.querySelector('#installCardBtn');if(btn)btn.remove();
+  }else if(DEMO.forceInstall){
+    /* Demo-panel preview (§9.1's "บังคับแสดง" toggle) with no real beforeinstallprompt behind it —
+       same "acknowledge the tap in place, no real action exists yet" idiom gamesDlDone()/[data-pe-dl]
+       already use elsewhere for stub CTAs. */
+    var demoCard=root.querySelector('#installCard');if(!demoCard)return;
+    var demoBtn=demoCard.querySelector('#installCardBtn');
+    if(demoBtn){demoBtn.textContent='(เดโม) ไม่มี prompt จริงในเบราว์เซอร์นี้';demoBtn.disabled=true;}
+  }
+}
+/* Hidden entirely (returns '') rather than shown-but-disabled when there's nothing useful to do yet:
+   already standalone, already dismissed, or — on a non-iOS browser that hasn't fired
+   beforeinstallprompt (desktop Firefox, or Chrome/Android before its own criteria have resolved) —
+   no real action exists for the button to take. The dismiss X + "ไม่ต้องแสดงอีก" text link are two
+   ways to the same lsSet('pb_install_dismissed','1') — a persistent dismiss, the one precedent-free
+   piece of UI in this whole feature (no card in the app was ever dismissible-forever before this).
+   DEMO.forceInstall (§9.1) bypasses the 2nd check only — still hidden once standalone/dismissed,
+   since those two states are real regardless of what the demo panel is forcing. */
+function installCardHTML(){
+  if(isStandaloneDisplay()||installCardDismissed())return '';
+  if(!DEFERRED_INSTALL&&!isIOSDevice()&&!DEMO.forceInstall)return '';
+  return '<div class="util-card scroll-reveal" id="installCard"><button class="util-x" id="installCardX" aria-label="ปิด">'+ic('lc-x')+'</button>'+
+    '<div class="util-hd"><div class="util-ic">'+ic('lc-smartphone')+'</div><div class="util-tx">'+
+      '<div class="util-t">ติดตั้งแอปบนหน้าจอหลัก</div>'+
+      '<div class="util-s">เปิดได้เร็วขึ้น ใช้งานแบบออฟไลน์ได้</div>'+
+    '</div></div>'+
+    '<button class="btn btn-primary" id="installCardBtn">ติดตั้ง</button>'+
+    '<button class="ag-more" id="installCardDismiss" style="font-size:var(--fs-sub);border-radius:var(--rpill)">ไม่ต้องแสดงอีก</button>'+
+  '</div>';
+}
+
+/* ══ APP LOCK SCREEN ══ renderLock()'s full-page takeover, checked at the very top of render() below
+   (single choke point, same shape as the On-Event gate just below it) — blocks EVERY phase, not just
+   one tab, until the right PIN is entered this session. LOCK_RESET_CONFIRM toggles the inline "ลืม
+   รหัสผ่าน" confirm row (reuses the .dlpb-actions two-button-stack idiom, not a native confirm() —
+   this app uses zero native dialogs anywhere). */
+var LOCK_RESET_CONFIRM=false;
+function renderLock(){LOCK_RESET_CONFIRM=false;paintLock();}
+function paintLock(){
+  root.innerHTML=
+  '<div class="lock-scr fade">'+
+    '<div class="lock-ic">'+ic('lc-key')+'</div>'+
+    '<div class="lock-t">ปลดล็อกแอป</div>'+
+    '<div class="lock-s">ใส่รหัสผ่าน 6 หลักของคุณ</div>'+
+    '<div id="lockDots"></div>'+
+    '<div id="lockPad">'+pinPadHTML()+'</div>'+
+    '<div id="lockErr" style="display:none;color:var(--amber-text);font-size:var(--fs-eyebrow);font-weight:var(--w-head);margin-top:var(--sp-list)">รหัสไม่ถูกต้อง ลองอีกครั้ง</div>'+
+    (LOCK_RESET_CONFIRM?
+      '<div class="lock-reset-row"><div class="lock-s" style="margin:0">ล้างรหัสผ่านนี้และปลดล็อกแอป? ต้องตั้งรหัสใหม่ภายหลัง</div><button class="btn btn-primary" id="lockResetGo">ยืนยันล้างรหัสผ่าน</button><button class="ag-more" id="lockResetCancel" style="font-size:var(--fs-sub);border-radius:var(--rpill)">ยกเลิก</button></div>'
+      :'<button class="lock-forgot" id="lockForgot">ลืมรหัสผ่าน?</button>')+
+  '</div>';
+  root.querySelector('#lockDots').innerHTML=pinDotsHTML(0);
+  bindPinPad(root.querySelector('#lockPad'),root.querySelector('#lockDots'),function(pin){
+    checkPin(pin).then(function(ok){
+      /* !hasPin() here means this was a DEMO.forceLock preview, not a real lock (checkPin() only
+         accepts "any 6 digits" when no hash is stored) — clear the demo flag too so it doesn't keep
+         forcing the screen back up on some later unrelated render(). */
+      if(ok){PIN_UNLOCKED=true;if(!hasPin())DEMO.forceLock=false;render();}
+      else{root.querySelector('#lockErr').style.display='block';pinShake(root.querySelector('.lock-scr'));}
+    });
+  });
+  if(LOCK_RESET_CONFIRM){
+    root.querySelector('#lockResetCancel').onclick=function(){LOCK_RESET_CONFIRM=false;paintLock();};
+    root.querySelector('#lockResetGo').onclick=function(){clearPin();DEMO.forceLock=false;PIN_UNLOCKED=true;render();};
+  }else{
+    root.querySelector('#lockForgot').onclick=function(){LOCK_RESET_CONFIRM=true;paintLock();};
+  }
+}
+
 /* ══ BT-TABS (behavior) ══ generic tablist engine — ARIA state, full keyboard nav (ArrowLeft/
    ArrowRight/Home/End, skipping disabled tabs), click-to-select, whole-group disable via
    aria-disabled="true" on the tablist itself, per-tab disable via the `disabled` attribute.
@@ -4519,6 +4890,12 @@ function initBtTabs(tablist,onSelect){
    showing during On-Event, same class of bug this gate exists to prevent — this gate itself still
    matters even with the manual trigger gone, since the ช่วงงาน-toggle path is still live. */
 function render(){
+  /* PIN lock gate (2026-09-25) — checked FIRST, ahead of the On-Event gate below, so it blocks every
+     phase including 'splash' itself. Same single-choke-point shape as that gate: one check here
+     instead of patching each of the ~11 phases render() can otherwise reach. DEMO.forceLock previews
+     this screen on demand (see buildDemo()) without needing a real PIN set first — checkPin() itself
+     already knows to accept anything when there's no stored hash to check against. */
+  if((hasPin()||DEMO.forceLock)&&!PIN_UNLOCKED){renderLock();return;}
   if(DEMO.eventPhase==='on'&&['splash','consent','quiz','reveal','cardreveal'].indexOf(st.phase)>-1)st.phase=RESULT?'book':'home';
   if(st.phase!=='splash')stopSplashTimer();
   if(st.phase!=='reveal')clearRevealTimer(); // don't force-advance to Book if the user left the analyzing screen
@@ -6206,6 +6583,11 @@ function renderHome(){
         '<div class="pass-benefit">'+benefit+'</div>'+
         (price?'<div class="pass-foot"><span class="pass-foot-lbl">ราคาบัตร</span><span class="pass-price">'+price+'</span></div>':'')+
       '</button>';})())+
+    /* PIN-lock + PWA-install cards (2026-09-25, per direction — screenshot placed them right under
+       the ticket card, ahead of เวทีห้องใหญ่, regardless of pre/on-event phase) — both are account-
+       level app settings, not event-progress content, so they sit outside the `pre?'':(...)` block
+       that gates the in-event-only next-step/counters/book-teaser group just below. */
+    pinCardHTML()+installCardHTML()+pinModalHTML()+
     (pre?'':(
     '<section class="next-step scroll-reveal"><div class="ns-ic">'+(ns.iconPng?'<img src="'+ns.iconPng+'" alt="">':ic(ns.icon))+'</div><div class="ns-tx"><div class="ns-ey">'+ns.ey+'</div><div class="ns-t">'+ns.t+'</div></div><div class="ns-cta-slot" id="ns-cta-slot"></div><div class="ns-body"><div class="ns-b">'+ns.b+'</div></div></section>'+
     '<div class="home-counters scroll-reveal">'+HOME_COUNTERS.map(function(c){return '<button class="hc-card" data-go="'+c.go+'"><svg viewBox="0 0 24 24" class="lucide" style="color:'+c.color+'"><use href="#'+c.icon+'"/></svg><div class="hc-val">'+c.val()+'</div><div class="hc-label">'+c.label+'</div></button>';}).join('')+'</div>'+
@@ -6240,6 +6622,14 @@ function renderHome(){
   mountHeaderQR();
   bindHeaderLogo();
   if(!pre){mountHomeNsCta(ns);bindPostEvent(t);}
+  root.querySelector('#pinCardBtn').onclick=hasPin()?openPinChangeFlow:openPinSetupModal;
+  var pinOff=root.querySelector('#pinCardOff');if(pinOff)pinOff.onclick=openPinDisableFlow;
+  var installCard=root.querySelector('#installCard');
+  if(installCard){
+    installCard.querySelector('#installCardBtn').onclick=triggerInstall;
+    installCard.querySelector('#installCardX').onclick=dismissInstallCard;
+    installCard.querySelector('#installCardDismiss').onclick=dismissInstallCard;
+  }
 }
 /* ══ BOOTH / PASSPORT TAB ══ content ported from Playbook Final's Passport screen (BOOTHS/ZONES/
    ZONE_BOOTHS + hero-route builder). Check-in/activity is real (toggled locally) so the top progress
@@ -8205,7 +8595,7 @@ function renderProfile(){
    ACTIVITY_NEED, so it reads "ยังขาด" out of the box — see the 'auto' branch in renderBooth this
    direction restored). Switching the ช่วงงาน segment to Pre-Event is the one way back to the
    splash/quiz flow (RESULT/quizDone/boothVer aren't touched by that switch, same as before). */
-var DEMO={view:'auto',quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,boothVer:'v2',registered:true}; // draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. (splashVer removed 2026-09-18, per direction "preview card เอา v1 ออก" — the splash fan carousel's "การ์ดมีชีวิต" build (added 2026-09-09, promoted to shipped default 2026-09-11) is now the only splash preview; v1 the plain static carousel, v3/v5 the "3D Character Card Flow" field and its living-card variant, were all removed the same day/session — see renderSplash's own comment for that full history.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO. (sumTitleVer — a brief demo-panel toggle comparing 2 title treatments for renderPlaySummary's game-name — removed 2026-09-11, per direction "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย": v2, the DNA quiz's .q-icon-bare + .q-title header, is now just how renderPlaySummary always renders — see its own comment there.)
+var DEMO={view:'auto',quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,boothVer:'v2',registered:true,forceLock:false,forceInstall:false}; // forceLock/forceInstall (2026-09-25) — demo-panel-only previews for the PIN lock screen and the install card, see buildDemo()'s own "ล็อก PIN / ติดตั้งแอป" section. draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. (splashVer removed 2026-09-18, per direction "preview card เอา v1 ออก" — the splash fan carousel's "การ์ดมีชีวิต" build (added 2026-09-09, promoted to shipped default 2026-09-11) is now the only splash preview; v1 the plain static carousel, v3/v5 the "3D Character Card Flow" field and its living-card variant, were all removed the same day/session — see renderSplash's own comment for that full history.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO. (sumTitleVer — a brief demo-panel toggle comparing 2 title treatments for renderPlaySummary's game-name — removed 2026-09-11, per direction "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย": v2, the DNA quiz's .q-icon-bare + .q-title header, is now just how renderPlaySummary always renders — see its own comment there.)
 /* 'auto' resolves from real window.innerWidth again (2026-09-10 responsive audit — the 2026-08-26
    "always resolve to mobile" change meant a real event-tablet visitor (768–1024px wide) never got
    data-view="tablet": the .shell/topbar/book-tabbar all clamped to the 400px phone-frame width,
@@ -8303,6 +8693,21 @@ function buildDemo(){
        lock/unlock state (EFIN_CHECKED_IN, a real state flag, not DEMO-namespaced — see its own
        comment near BOOTH_CHK) without needing to open the scan modal from the header QR button. */
     '<div class="demo-lbl">เช็คอิน efin.finance (ปลดล็อกเกมหลัก)</div>'+seg('segEfin',[{v:'yes',t:'เช็คอินแล้ว'},{v:'no',t:'ยังไม่เช็คอิน'}],EFIN_CHECKED_IN?'yes':'no')+
+    /* ล็อก PIN / ติดตั้งแอป (2026-09-25) — Home's two utility cards (§ "HOME UTILITY CARDS") are
+       both real-device-dependent: the lock screen only shows once a PIN is actually set, and the
+       install card only shows once the browser itself fires beforeinstallprompt (or on iOS) — neither
+       is easy to reach on demand while demoing, same gap every other device/state-dependent feature
+       in this file already got a demo-panel shortcut for (เช็คอิน efin.finance right above, ช่วงงาน,
+       รางวัลใหญ่, etc.). "ดูหน้าจอล็อก PIN" force-shows renderLock() via DEMO.forceLock WITHOUT
+       setting a real PIN — checkPin() already accepts any 6 digits when nothing is actually stored,
+       so this is a pure UI preview, never a real lock. "การ์ดติดตั้งแอป" force-shows the install card
+       on browsers that never fire the real event (most desktop preview setups); its button just
+       acknowledges the tap since there's no real prompt to trigger (see triggerInstall()). */
+    '<div class="demo-lbl">ล็อก PIN (พรีวิว)</div>'+
+    '<button class="btn btn-secondary demo-reset" id="demoLockPreview">'+ic('lc-lock')+'ดูหน้าจอล็อก PIN</button>'+
+    '<div class="demo-lbl">การ์ดติดตั้งแอปบนหน้าหลัก</div>'+seg('segInstall',[{v:'auto',t:'อัตโนมัติ'},{v:'force',t:'บังคับแสดง'}],DEMO.forceInstall?'force':'auto')+
+    '<div class="demo-stub">* อัตโนมัติ = ตามเบราว์เซอร์จริง (มักไม่ขึ้นในพรีวิวเดสก์ท็อป) · บังคับแสดง = โชว์การ์ดเสมอเพื่อดูดีไซน์ ปุ่ม "ติดตั้ง" จะไม่ทำงานจริง</div>'+
+    '<button class="btn btn-secondary demo-reset" id="demoClearPinDemo">'+ic('lc-refresh-cw')+'ล้าง PIN จริง + สถานะไม่ต้องแสดงอีก (เดโม)</button>'+
     '<button class="btn btn-secondary demo-reset" id="demoReset">'+ic('lc-refresh-cw')+'รีเซ็ตเกมหลักที่เล่น</button>'+
     /* เช็คอินครบทุกบูธ (2026-09-10, per direction "หน้าเดินบูธ ต้องการทดสอบเล่นเกมส์แต่ละสินทรัพย์ได้") —
        the real check-in flow (openScan/confirmScan, per BOOTHS[i]'s own ZONE_BOOTHS partner list) is
@@ -8338,6 +8743,9 @@ function buildDemo(){
   document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.multiTicket=(b.dataset.v==='2');document.querySelectorAll('#segTicketCount button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segRegistered').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.registered=(b.dataset.v==='yes');document.querySelectorAll('#segRegistered button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='book')render();};});
   document.getElementById('segEfin').querySelectorAll('button').forEach(function(b){b.onclick=function(){EFIN_CHECKED_IN=(b.dataset.v==='yes');document.querySelectorAll('#segEfin button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='games')render();};});
+  document.getElementById('demoLockPreview').onclick=function(){PIN_UNLOCKED=false;DEMO.forceLock=true;panel.classList.remove('open');render();};
+  document.getElementById('segInstall').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.forceInstall=(b.dataset.v==='force');document.querySelectorAll('#segInstall button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='home')renderHome();};});
+  document.getElementById('demoClearPinDemo').onclick=function(){clearPin();lsDel('pb_install_dismissed');DEMO.forceLock=false;DEMO.forceInstall=false;PIN_UNLOCKED=true;panel.classList.remove('open');render();};
   document.getElementById('demoPersona').onchange=function(){if(this.value){DEMO.quizDone=true;document.getElementById('demoQuiz').classList.add('on');forcePersona(this.value);}};
   document.getElementById('demoQuiz').onclick=function(){DEMO.quizDone=!DEMO.quizDone;this.classList.toggle('on',DEMO.quizDone);};
   document.getElementById('demoReset').onclick=function(){
@@ -8416,4 +8824,9 @@ function buildGoTop(){
 seedPersonaResult('planner');
 applyView();buildDemo();buildScanModal();buildShareModal();buildGoTop();
 render();
+/* sw.js registration (2026-09-25) — deferred to 'load' (standard practice, keeps it off the critical
+   render path) and silently swallowed on failure: a preview server without HTTPS/localhost (no
+   secure context) or one that 404s sw.js shouldn't block anything else on this page, it just means
+   the install card falls back to its no-op-until-supported state (see installCardHTML). */
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
 </script>

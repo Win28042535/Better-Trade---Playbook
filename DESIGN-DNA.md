@@ -325,6 +325,117 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-09-25 — Thai text app-wide switched from an unembedded font-stack tail to a real embedded
+Taviraj; PIN-lock keypad's pill-shaped keys fixed.** Two bugs found reviewing the PIN-lock screen
+(below) against a reference screenshot, both pre-existing/latent rather than introduced that session:
+(1) **`--font`'s old tail** — `'Noto Sans Thai','Thonburi','DB Helvethaica X'` — **was never actually
+embedded or reliably installed anywhere**; FC Minimal itself has zero Thai glyphs, so every Thai
+character on every screen was silently falling through to whatever the OS substitutes when none of
+those three names resolve (a looped/มีหัว system font on this Windows dev box, confirmed via
+`getComputedStyle`). `Font/Taviraj/` (Medium+Bold, OFL) had been sitting in the repo unused since
+2026-08-03 — same "raw source never wired up" gap as other asset folders — now embedded via
+`@font-face` (`assets/taviraj-{medium,bold}.ttf`, weight-range-split 100–599/600–900 to match this
+app's real `--w-body`/`--w-head`:500 and `--w-label`:700 usage) and swapped into `--font` + the canvas
+`SVGFONT` string. (2) **`.pin-pad`'s 3x4 keypad rendered as narrow vertical pills** (~22px wide ×
+56px tall) on the lock screen specifically, not the Home modal that shares the same component —
+root cause: `.lock-scr{align-items:center}` makes its flex children (including `#lockPad`, the plain
+wrapper div `pinPadHTML()` renders into) shrink-to-fit instead of stretch, so `.pin-pad`'s `1fr` grid
+columns had no real 280px-wide box to divide and collapsed toward min-content. Fixed with
+`#lockPad,#pinModalPad{width:100%}` alongside `.pin-pad`'s own (necessary but not sufficient alone)
+`width:100%`. Neither bug was visible in in-session testing earlier the same day — both are small
+enough at a glance that they needed a zoomed reference screenshot to actually notice.
+
+**2026-09-25 — Home gained a PIN-lock + PWA-install pair of settings cards; this app's first-ever
+localStorage use and first-ever PWA scaffolding.** Direction: the event link is stuck to a physical
+wristband with zero auth, so anyone who scans a stranger's wristband landed straight on their data —
+a client-side PIN (`hasPin()`/`setPin()`/`checkPin()`, SHA-256 via SubtleCrypto, `pb_pin_hash` in
+localStorage) now re-locks the WHOLE app every fresh page load via a single choke point at the very
+top of `render()` (`renderLock()`, same shape as the On-Event gate just below it) — explicitly a
+deterrent against casual snooping, not real security, since the check runs in plain client JS with no
+backend to verify against. PIN entry uses a new shared component (`pinPadHTML`/`bindPinPad`/
+`pinDotsHTML` — 6-dot progress row + 3x4 numeric keypad) instead of a native `<input>`, since this app
+has never had a text field anywhere; it's reused by both the lock screen and Home's set/change/disable
+modal (`pinModalHTML`, embedded per-render like `dlpbModal` rather than built-once-and-appended like
+scan/share). Separately, `manifest.json`/`sw.js` (deliberately non-caching — see its own comment) +
+4 generated icons (`assets/icon-*.png`, a plain violet-on-ink arrow, since no existing brand asset
+was square) make the app installable; Home's install card wraps `beforeinstallprompt` (captured once
+and deferred) with an iOS Safari fallback (manual "แตะ Share" copy swapped in, since iOS never fires
+that event) and a `pb_install_dismissed` localStorage flag for "ไม่ต้องแสดงอีก" — the one
+dismiss-forever pattern anywhere in this app; every existing `lc-x` close button only ever closed a
+modal, never persisted. Both cards sit in a new `.util-card` component (icon badge + title/subtitle +
+full-width button) — `.next-step` (§7.2) was the closest existing cousin but is an ink-dark "next
+action" card by default, not this white settings-card shape, so a new minimal component was added
+instead of forcing it in. Button color stayed the app's own ink `.btn.btn-primary` rather than the
+blue reference mockup's button — this app has no blue fill token anywhere (`--focus:#2b6cff` is
+focus-ring-only). Card position (ticket card → PIN card → install card → เวทีห้องใหญ่, ahead of the
+in-event-only next-step/counters/book-teaser group) was pinned by direction mid-session, overriding
+the original plan to place them after ประกาศจากงาน. Not yet done: no demo-panel toggle for
+force-previewing the lock screen or install-card states (every other gated feature in this doc got one
+— see §9.1's own precedent); §7 doesn't yet list `.util-card` alongside `.next-step`/`.pass-card`.
+
+**2026-09-21 — Typography audit: base line-height 1.5 + weight/tracking cleanup, plus dead-code
+removal.** A scripted audit found `body` had no base `line-height` (64% of rendered text fell back to
+the UA default `normal`, ~1.0 for FC Minimal — noticeably tighter than the 1.4–1.65 every hand-set
+paragraph rule already used). Set `body{line-height:1.5}` and carved out `:where()` (0-specificity)
+exceptions so nothing that already set its own line-height changed: headings → 1.2 (`.tb-title`/
+`.prog-val`/`.s-h`/`.quote-h`/`.pe-vlbl`/`.pe-track-lbl`/`.stub-t`/`.prof-name`/`.conf-sc`/`.consent-h`/
+`.ev-empty-t`), chips/pills/badges/tags → 1.1, `button` → `inherit` (UA resets buttons to `normal`
+otherwise). Also fixed: `.consent-h` letter-spacing -0.01em→0 (zero tracking on sans headlines is the
+house rule; negative tracking is reserved for serif display faces) and `.conf-su` gained an explicit
+`letter-spacing:0` it had been silently missing; `.pass-card` (a `<button>` on Home) gained
+`font-weight:var(--w-body)` since buttons don't inherit `font-weight` from `body`, so its unweighted
+children (`.pass-benefit`/`.pass-foot-lbl`) had been rendering at UA-default 400 — the one place the
+system's 500/700 rule leaked; the three `.ev-empty-s.ast-block` closing-callout instances (Book
+coming-soon, เกมหลัก pre-event, เกมหลัก locked) were de-duplicated onto one rule
+(`font-size:var(--fs-sub);font-weight:var(--w-label)`) instead of each hand-inlining its own
+16px/20px/20px + hard-coded weight 700; the dead splash card caption (promised a tap-to-flip
+interaction already removed 2026-09-18, below) was deleted. Full read-out in the new
+`TYPOGRAPHY-AUDIT.md`. Same-day follow-up commit removed `.play-q` (a 32px modal question-text rule
+with zero remaining markup users — the game question renders through `.q-title`/36px instead).
+
+**2026-09-21 — Removed the เกมทนกระแส question-page countdown timer.** Dropped `timer:15` off ฉาก 1's
+first question, the `.play-timer` badge/CSS, and `startPlayTimer`/`clearPlayTimer`/`PLAY_TIMER`/
+`PLAY_TIMELEFT` entirely — no question in the app carries a `timer` field any more, so
+`renderPlayBody`'s timer-badge branch and its restart-guard (`PLAY.timerQi`) are gone too. The game
+card's own rule text ("บางฉากมีเวลาจำกัด") was updated to match ("ตอบแล้วไปต่อ ย้อนกลับไม่ได้", the same
+no-back-nav rule ฉาก 1 already had).
+
+**2026-09-18 — Splash carousel simplified to one version; เกมหลัก download flow DNA-matching pass.**
+The splash screen's `.fan-stage` card carousel ("การ์ดมีชีวิต") is now the ONLY splash preview — v1
+(plain fan, no living-card clip) was dropped as a demo-panel-selectable option, closing out the same
+v3/v5 + Character Animation demo-trigger cleanup from earlier in the week (below). Reordered the
+parade sequence into a new `SPLASH_ORDER` array, kept deliberately separate from `PORDER` (the
+canonical catalog order that `pnum()`/`roman()` print as "I/XII"–"XII/XII" on the card art itself) so
+reordering the parade never renumbers a card's own printed edition — only `splashGo`/`paintFan`/
+`renderSplash` read `SPLASH_ORDER`. Auto-advance slowed to 3.2s. The centered card's tap-to-flip
+(`bindFanFlip` + its CSS) was removed entirely — every card is now `pointer-events:none`, purely
+decorative; `paintFan`'s per-tick reset-to-rest-orientation logic stayed (it was never only about
+undoing taps, see `fanRestState`). Separately, the "ดาวน์โหลด PLAYBOOK" button, the incomplete-Playbook
+warning banner, and the confirm modal's buttons/labels/order went through several DNA-matching passes;
+the locked (not-checked-in) state's highlighted callout now reuses the same cyan→violet gradient +
+ink text as the Book tab's "ให้ AI ช่วยแนะนำแบบคุณ" banner instead of a bespoke treatment.
+
+**2026-09-17 (evening) — Added the เกมหลัก "ดาวน์โหลด PLAYBOOK" download flow; dropped unused
+splash/demo previews.** Gated by `gamesPlayedCount()`, not ticket tier: 0 games played shows the
+efin.finance check-in reminder; 1–5 opens a confirm modal warning the Playbook is incomplete; 6/6 (or
+confirming anyway) swaps the button in-place to an inert "จะพร้อมหลังงาน" state (no real PDF export
+exists yet — same acknowledge-the-tap idiom as the post-event `[data-pe-dl]` button). Went through
+several DNA-matching passes against existing components (เล่นเกม 6 ด้าน / เล่นเกม row button / แชร์ภาพ
+การ์ด / DNA quiz nav buttons) before landing on the current look, plus a responsive fix so the
+title+subtitle pair stays glued together with the button dropping below on mobile instead of wedging
+in between. Also removed two now-unused preview surfaces: the demo panel's manual "Character
+Animation" trigger for the card-reveal screen, and the splash screen's v3/v5 "3D Character Card Flow"
+preview variant (~300 lines of CSS/JS) — leaving v1/v4 as the only splash options at this point (v1
+itself was dropped the next day, above).
+
+**2026-09-17 (afternoon) — Replaced all 12 character-card animation clips with an upscaled Magnific AI
+set.** Swapped every `assets/card-anim/<persona>.mp4` for a new Magnific object-reference render
+(personas mapped by reading the title burned into each frame — source filenames were opaque job
+hashes), re-encoded via libx264 CRF27, no audio, native duration kept as-is (4.000s for 11 of 12,
+explorer at 5.000s) rather than re-trimmed to a uniform length. `assets/card-anim/` dropped from
+~4.0MB to ~1.97MB total. Raw exports kept in `Character Card Animation/` as source material, same
+precedent as `midjourney_session/`.
+
 **2026-09-17 — efin.finance check-in gate for เกมหลัก + partial-completion warning.** The เกมหลัก
 page's own copy has always promised "เช็คอินที่บูธ efin.finance...เพื่อปลดล็อกทั้ง 6 เกม" (the
 pre-event "Coming soon" empty state below), but that promise only ever showed pre-event — once
