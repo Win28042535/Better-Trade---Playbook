@@ -1700,10 +1700,28 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    continuously with .hh-top's own width (so props visibly grow/shrink between a narrow phone and
    this card's natural ~380px content width), the px min/max just floor/ceiling it so a prop can
    never shrink to illegible or (now that .hh-top itself is capped, see its own comment) balloon
-   past a sane size. */
+   past a sane size.
+   Sized down + pushed lower (2026-09-29, 3rd same-day follow-up, per direction "สัดส่วน...เล็กลง...
+   ขยับลงมากลางๆ ภาพ ตอนนี้อยู่บนเกินไป") — widths cut ~25-30% from the previous pass. top switched
+   from a small percentage OF .hh-top (which only spans the logo's own ~83px-tall box, so any
+   percentage here stays glued near the logo) to calc(100% ± Npx): 100% sits exactly at .hh-top's own
+   bottom edge (the logo/headline seam), so an offset of a few px either side straddles that seam
+   instead of drifting toward the card's true vertical middle — this app has no CSS container-
+   relative unit that reaches past .hh-top's own box otherwise, since %/vh don't know about
+   .home-hero's real rendered height once flex-wrapped text length is unpredictable (see .hh-top's
+   own comment on why anchoring to the CARD's height was the original bug). First follow-up (per
+   direction "ขยับลงมากลางๆ ภาพ") used +24/+34px, landing near the card's true middle; this pass (per
+   direction "ขึ้นไปอีกนิดนึง ระหว่าง โลโก้ กับ Headline") pulls that back up to -28/-24px so each prop
+   is centered ON the seam instead. Still anchored to .hh-top (not .home-hero) so the tablet/pc "stay
+   grouped with the text column" fix from two passes ago is untouched — only the vertical offset
+   changed. */
 .hh-prop{position:absolute;z-index:0;pointer-events:none;filter:drop-shadow(0 6px 16px rgba(0,0,0,.3));animation:propFloat 5.5s ease-in-out infinite;}
-.hh-prop-efin{top:-8%;left:-10%;width:clamp(58px,34%,150px);animation-duration:5s;}
-.hh-prop-gold{top:2%;right:-8%;width:clamp(36px,21%,95px);animation-duration:6.5s;animation-delay:-2.4s;animation-direction:reverse;}
+.hh-prop-efin{top:calc(100% - 28px);left:-8%;width:clamp(42px,24%,105px);animation-duration:5s;}
+.hh-prop-gold{top:calc(100% - 24px);right:-6%;width:clamp(26px,15%,66px);animation-duration:6.5s;animation-delay:-2.4s;animation-direction:reverse;}
+/* Bottom pair (2026-09-29, per direction: heart + stock from the reference poster, diagonal to efin/gold) — anchored to .hh-bot (wraps ONLY .hh-sub, same trick as .hh-top) so they track the sub text block, not the card. heart = bottom-right (opposite efin), stock = bottom-left (opposite gold). clamp() scales fluidly like the top pair; no hide on mobile. */
+.hh-bot{position:relative;max-width:380px;margin:0 auto;}
+.hh-prop-heart{bottom:-22px;right:-8%;width:clamp(34px,20%,86px);animation-duration:5.8s;animation-delay:-1.3s;}
+.hh-prop-stock{bottom:-18px;left:-6%;width:clamp(30px,17%,76px);animation-duration:6.2s;animation-delay:-3.6s;animation-direction:reverse;}
 @keyframes propFloat{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-7px) rotate(-3deg);}}
 @media(prefers-reduced-motion:reduce){.hh-prop{animation:none;}}
 /* Poster v3 — the home-hero's only remaining look now (v1's light spectrum-wash and v2's night-sky
@@ -4035,7 +4053,7 @@ var BG_IMG={nightSky:'assets/nightSky.jpg',room1:'assets/room1.jpg',room2:'asset
    iridescent hero-prop renders above ever could. */
 var HERO_BG='assets/hero-sky.webp';
 /* Home poster decorative props (2026-09-29) — see .hh-prop's own CSS comment for sourcing/sizing. */
-var HERO_PROP={efin:'assets/hero-prop-efin.webp',gold:'assets/hero-prop-gold.webp'};
+var HERO_PROP={efin:'assets/hero-prop-efin.webp',gold:'assets/hero-prop-gold.webp',heart:'assets/hero-prop-heart.webp',stock:'assets/hero-prop-stock.webp'};
 var ASSET_IMG=/*__ASSET_IMG__*/{candle:'assets/candle.png',gold:'assets/gold.png',bitcoin:'assets/bitcoin.png',card:'assets/card.png',heart:'assets/heart.png',efin:'assets/efin-2.png'};
 /* 2026-09-04: all 12 personas now have approved final photographed card art (replaces the earlier
    3-card partial set — harvester/diamondhand/waverider — with the full set), so pcFrontInner's CSS
@@ -6639,7 +6657,11 @@ function renderHome(){
         '<img class="hh-logo" src="'+LOGO_IMG.nwnp+'" alt="New World New Playbook">'+
       '</div>'+
       '<div class="hh-headline">สัมมนาการลงทุนแห่งปี เปิดกลยุทธ์จากวิทยากรชั้นนำ</div>'+
+      '<div class="hh-bot">'+
+      '<img class="hh-prop hh-prop-heart" src="'+HERO_PROP.heart+'" alt="" aria-hidden="true">'+
+      '<img class="hh-prop hh-prop-stock" src="'+HERO_PROP.stock+'" alt="" aria-hidden="true">'+
       '<p class="hh-sub"><b>PLAYBOOK คู่มือการลงทุนส่วนตัว</b> สร้างจาก Investor DNA และ Action ที่คุณทำจริงในงาน Better Trade เพื่อแสกนทุกโอกาสการลงทุนในโลกยุคใหม่</p>'+
+      '</div>'+
     '</section>'+
     (DEMO.multiTicket?passCardMultiHTML():(function(){var tp=(t.meta.sub||'').split(' · ');var benefit=tp[0]||'',price=tp[1]||'';
       /* Tier icon inline with .pass-ey (the "บัตรของคุณ" eyebrow), not .pass-name (2026-08-24, per
