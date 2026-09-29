@@ -1732,6 +1732,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 :root[data-view="pc"] .hh-prop-heart{width:clamp(38px,min(96px,23.2cqw),96px);}
 :root[data-view="pc"] .hh-prop-stock{width:clamp(30px,min(72px,20cqw),72px);}
 :root[data-view="pc"] .hh-prop-gold{width:clamp(24px,min(56px,14.4cqw),56px);}
+/* Sky-only demo case (DEMO.heroProps=false, demo-panel "องค์ประกอบโปสเตอร์"): props not rendered at all; the reserved band under .hh-sub that only exists to clear heart/stock goes away so the card is not left with dead space at the bottom. */
+.home-hero.sky-only .hh-bot{padding-bottom:0;}
 @keyframes propFloat{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(var(--fy,-7px)) rotate(var(--fr,-3deg));}}
 @media(prefers-reduced-motion:reduce){.hh-prop{animation:none;}}
 /* Poster v3 — the home-hero's only remaining look now (v1's light spectrum-wash and v2's night-sky
@@ -6660,16 +6662,16 @@ function renderHome(){
        for the layering. The eyebrow badge ("Playbook ลงทุนของคุณ" + book icon) that used to sit above
        the logo was cut per print-poster direction 2026-09-16 ("ตัดออก" on the badge line) — .hh-logo
        is now the card's first element, see .hh-logo's own margin comment. */
-    '<section class="home-hero scroll-reveal v3"><img class="hh-bg" src="'+HERO_BG+'" alt="">'+
+    '<section class="home-hero scroll-reveal v3'+(DEMO.heroProps?'':' sky-only')+'"><img class="hh-bg" src="'+HERO_BG+'" alt="">'+
       '<div class="hh-top">'+
-        '<img class="hh-prop hh-prop-efin" src="'+HERO_PROP.efin+'" alt="" aria-hidden="true">'+
-        '<img class="hh-prop hh-prop-gold" src="'+HERO_PROP.gold+'" alt="" aria-hidden="true">'+
+        (DEMO.heroProps?'<img class="hh-prop hh-prop-efin" src="'+HERO_PROP.efin+'" alt="" aria-hidden="true">':'')+
+        (DEMO.heroProps?'<img class="hh-prop hh-prop-gold" src="'+HERO_PROP.gold+'" alt="" aria-hidden="true">':'')+
         '<img class="hh-logo" src="'+LOGO_IMG.nwnp+'" alt="New World New Playbook">'+
       '</div>'+
       '<div class="hh-headline">สัมมนาการลงทุนแห่งปี เปิดกลยุทธ์จากวิทยากรชั้นนำ</div>'+
       '<div class="hh-bot">'+
-      '<img class="hh-prop hh-prop-heart" src="'+HERO_PROP.heart+'" alt="" aria-hidden="true">'+
-      '<img class="hh-prop hh-prop-stock" src="'+HERO_PROP.stock+'" alt="" aria-hidden="true">'+
+      (DEMO.heroProps?'<img class="hh-prop hh-prop-heart" src="'+HERO_PROP.heart+'" alt="" aria-hidden="true">':'')+
+      (DEMO.heroProps?'<img class="hh-prop hh-prop-stock" src="'+HERO_PROP.stock+'" alt="" aria-hidden="true">':'')+
       '<p class="hh-sub"><b>PLAYBOOK คู่มือการลงทุนส่วนตัว</b> สร้างจาก Investor DNA และ Action ที่คุณทำจริงในงาน Better Trade เพื่อแสกนทุกโอกาสการลงทุนในโลกยุคใหม่</p>'+
       '</div>'+
     '</section>'+
@@ -8696,7 +8698,7 @@ function renderProfile(){
    ACTIVITY_NEED, so it reads "ยังขาด" out of the box — see the 'auto' branch in renderBooth this
    direction restored). Switching the ช่วงงาน segment to Pre-Event is the one way back to the
    splash/quiz flow (RESULT/quizDone/boothVer aren't touched by that switch, same as before). */
-var DEMO={view:'auto',quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,boothVer:'v2',registered:true,forceLock:false,forceInstall:false}; // forceLock/forceInstall (2026-09-25) — demo-panel-only previews for the PIN lock screen and the install card, see buildDemo()'s own "ล็อก PIN / ติดตั้งแอป" section. draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. (splashVer removed 2026-09-18, per direction "preview card เอา v1 ออก" — the splash fan carousel's "การ์ดมีชีวิต" build (added 2026-09-09, promoted to shipped default 2026-09-11) is now the only splash preview; v1 the plain static carousel, v3/v5 the "3D Character Card Flow" field and its living-card variant, were all removed the same day/session — see renderSplash's own comment for that full history.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO. (sumTitleVer — a brief demo-panel toggle comparing 2 title treatments for renderPlaySummary's game-name — removed 2026-09-11, per direction "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย": v2, the DNA quiz's .q-icon-bare + .q-title header, is now just how renderPlaySummary always renders — see its own comment there.)
+var DEMO={view:'auto',quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,heroProps:true,boothVer:'v2',registered:true,forceLock:false,forceInstall:false}; // forceLock/forceInstall (2026-09-25) — demo-panel-only previews for the PIN lock screen and the install card, see buildDemo()'s own "ล็อก PIN / ติดตั้งแอป" section. draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. (splashVer removed 2026-09-18, per direction "preview card เอา v1 ออก" — the splash fan carousel's "การ์ดมีชีวิต" build (added 2026-09-09, promoted to shipped default 2026-09-11) is now the only splash preview; v1 the plain static carousel, v3/v5 the "3D Character Card Flow" field and its living-card variant, were all removed the same day/session — see renderSplash's own comment for that full history.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO. (sumTitleVer — a brief demo-panel toggle comparing 2 title treatments for renderPlaySummary's game-name — removed 2026-09-11, per direction "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย": v2, the DNA quiz's .q-icon-bare + .q-title header, is now just how renderPlaySummary always renders — see its own comment there.)
 /* 'auto' resolves from real window.innerWidth again (2026-09-10 responsive audit — the 2026-08-26
    "always resolve to mobile" change meant a real event-tablet visitor (768–1024px wide) never got
    data-view="tablet": the .shell/topbar/book-tabbar all clamped to the 400px phone-frame width,
@@ -8765,6 +8767,7 @@ function buildDemo(){
        Default stays "1 ใบ" — the single-ticket case is the real/active one. */
     '<div class="demo-lbl">จำนวนบัตร</div>'+seg('segTicketCount',[{v:'1',t:'บัตร 1 ใบ'},{v:'2',t:'บัตร 2 ใบ (ตัวอย่าง)'}],DEMO.multiTicket?'2':'1')+
     '<div class="demo-stub">* พรีวิว Home + โปรไฟล์ เท่านั้น ไม่กระทบสิทธิ์ของคุณด้านบน</div>'+
+    '<div class="demo-lbl">องค์ประกอบโปสเตอร์ (Home)</div>'+seg('segHeroProps',[{v:'on',t:'มี asset element'},{v:'off',t:'เฉพาะท้องฟ้า'}],DEMO.heroProps?'on':'off')+
     '<div class="demo-lbl">การ์ดตัวตน</div><select class="demo-sel" id="demoPersona"><option value="">— เลือกเพื่อดูการ์ด —</option>'+personaOpts+'</select>'+
     '<div class="demo-lbl">สถานะ</div><div class="demo-row"><span class="rl">'+ic('lc-book-open')+'ทำแบบทดสอบตัวตนแล้ว</span><span class="sw'+(DEMO.quizDone?' on':'')+'" id="demoQuiz"></span></div>'+
     /* การลงทะเบียน (2026-09-04) — separate preview toggle for a quiz-taker who never went through the
@@ -8841,6 +8844,7 @@ function buildDemo(){
   document.getElementById('segView').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.view=b.dataset.v;document.querySelectorAll('#segView button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');applyView();};});
   document.getElementById('segDraw').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.draw=b.dataset.v;document.querySelectorAll('#segDraw button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segBoothVer').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.boothVer=b.dataset.v;BOOTH_SEL=null;document.querySelectorAll('#segBoothVer button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
+  document.getElementById('segHeroProps').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.heroProps=(b.dataset.v==='on');document.querySelectorAll('#segHeroProps button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.multiTicket=(b.dataset.v==='2');document.querySelectorAll('#segTicketCount button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segRegistered').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.registered=(b.dataset.v==='yes');document.querySelectorAll('#segRegistered button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='book')render();};});
   document.getElementById('segEfin').querySelectorAll('button').forEach(function(b){b.onclick=function(){EFIN_CHECKED_IN=(b.dataset.v==='yes');document.querySelectorAll('#segEfin button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='games')render();};});
