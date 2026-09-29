@@ -445,14 +445,14 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
   .int-opt:hover{border-color:var(--line-strong);transform:translateY(-1px);}
   .tab-item:hover{color:var(--ink);}
   .bt-tabs--secondary .bt-tab:hover{border-color:var(--line-strong);color:var(--ink);}
-  .home-hero.v3:hover .hh-video{transform:scale(1.06);}
+  .home-hero.v3:hover .hh-bg{transform:scale(1.06);}
   .prof-av:hover img{transform:scale(1.06);}
 }
 .btn:active{transform:scale(.97);}
 /* Profile avatar — re-done to match the home poster's own zoom interaction (2026-08-20, per
    direction "รูป user อยากให้ใช้ interaction แบบเดียวกับ หน้าหลัก section poster (hover ที่รูปแล้ว จะ
    ซูมเข้า แต่ยังอยู่ภายใน frame)"), replacing the earlier "photo press-scale only, no hover" direction
-   this same comment used to document. Same technique as .home-hero.v3::before: the VIDEO scales up,
+   this same comment used to document. Same technique as .home-hero.v3 .hh-bg: the IMAGE scales up,
    not the circle frame — .prof-av's own overflow:hidden (already set, for the profPop mount
    animation) clips the zoomed image to the circle so it never spills past the round mask. Mouse
    hover (pointer:fine) scales in; touch gets the :active equivalent, same split as .home-hero.v3. */
@@ -1632,46 +1632,102 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    one single .tb-logo rule (base height below) with the Book page — there is no second number to
    keep in sync. */
 .home-hero{position:relative;overflow:hidden;text-align:center;border:1px solid var(--line-soft);border-radius:var(--r2);background:radial-gradient(120% 80% at 50% 0%,color-mix(in srgb,var(--violet) 14%,transparent),color-mix(in srgb,var(--cyan) 8%,transparent) 46%,var(--white) 78%);padding:22px var(--sp-card-pad) 24px;}
-/* Smaller hero logo, bigger emphasis on .hh-sub below — the eyebrow badge/logo were carrying more
-   visual weight than the sentence that actually says what this screen is for. The eyebrow badge
-   itself (.hh-badge, "Playbook ลงทุนของคุณ" + book icon) was cut from the poster 2026-09-16 per
-   direction, so .hh-logo is now the card's first element — its old margin-top (spacing it away
-   from the badge above) is dropped; the card's own padding-top already clears it. */
-.hh-logo{display:block;width:min(56%,210px);height:auto;margin:0 auto;}
-.hh-sub{font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);line-height:1.55;max-width:34ch;margin:var(--sp-inline) auto 0;}
+/* .hh-top (2026-09-29) — wraps ONLY the logo + the two decorative props, giving them a stable,
+   predictably-sized positioning box (roughly the logo's own height) instead of the whole
+   .home-hero card. This fixes a real bug: the props used to be position:absolute against the
+   CARD itself with top/bottom percentages, but the card's total height varies a lot across
+   breakpoints (headline/sub wrap to different numbers of lines at different widths) — so a prop
+   anchored at "bottom:-4% of the card" landed in a different spot, sometimes overlapping .hh-meta
+   or getting clipped oddly, depending on how tall the text happened to be that render. Anchoring
+   both props to .hh-top instead (a box whose height is just the logo's own rendered height, never
+   affected by how the headline/sub text below happens to wrap) keeps them pinned to the logo
+   corners on every viewport, same structural idea the reference poster's own site uses (its
+   decorative props are positioned inside the logo's own container, never against the full hero).
+   max-width:380px (2026-09-29 follow-up, per direction + screenshots) — on tablet/pc .home-hero
+   sits inside the shared 760px content column and stretches edge-to-edge with it, but the text
+   below (.hh-headline/.hh-sub) stays capped at 20ch/34ch and centered — so on a wide card the props
+   (anchored to .hh-top's OWN edges) drifted far from that narrow text column, reading as "stuck to
+   the far left/right of the screen" rather than part of the same visual group. 380px roughly matches
+   the card's real mobile content width (430px shell − 2×22px padding ≈ 386px), so this is a no-op on
+   phones and only kicks in once the card grows wider than that — capping .hh-top keeps logo+props+
+   text reading as one centered group at every width, same as the reference site's own hero. */
+.hh-top{position:relative;max-width:380px;margin:0 auto;}
+/* Logo bumped 56%/210px -> 74%/280px (2026-09-29, per direction "โลโก้...ใหญ่ขึ้นอีก"). The eyebrow
+   badge (.hh-badge, "Playbook ลงทุนของคุณ" + book icon) was cut from the poster 2026-09-16 per
+   direction, so .hh-logo is the card's first element — its old margin-top (spacing it away from the
+   badge above) is dropped; the card's own padding-top already clears it. */
+.hh-logo{display:block;width:min(74%,280px);height:auto;margin:0 auto;position:relative;z-index:1;}
+/* .hh-headline (2026-09-29, per direction + reference poster) — "สัมมนาการลงทุนแห่งปี เปิดกลยุทธ์
+   จากวิทยากรชั้นนำ", copied verbatim from the reference marketing poster. No token in the scale
+   sits at the weight this needs to read as a real headline over .hh-sub's own body-ish --fs-sub, so
+   this borrows --fs-heading (28px) — already used elsewhere as a true heading size, not a one-off
+   hardcoded px like .lock-t's 32px. --ink (dark) since the poster background is now a bright sky
+   photo (2026-09-29) — matches .hh-sub's own base --ink color below and the reference poster's own
+   bold-black-on-bright-sky headline treatment; no scrim needed for either, same as that reference.
+   margin-top bumped --sp-stack -> --sp-section (2026-09-29, per direction "เลื่อน headline ลงมาอีก
+   ได้") — extra breathing room under the now-larger logo. */
+.hh-headline{position:relative;z-index:1;font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);line-height:1.25;max-width:20ch;margin:var(--sp-section) auto 0;}
+.hh-sub{position:relative;z-index:1;font-size:var(--fs-sub);font-weight:var(--w-head);color:var(--ink);line-height:1.55;max-width:34ch;margin:var(--sp-inline) auto 0;}
 /* 500 base / 700 emphasized trailing clause — same "text weight play" convention as .q-title/
    .q-title b (emphasizeQ()), hand-authored here since this is one static string, not a per-item
    render. Bolds "ดูย้อนหลังได้บน efin.finance" so the poster subtext isn't one flat weight. */
 .hh-sub b{font-weight:var(--w-label);}
-.hh-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-list) 18px;margin-top:var(--sp-stack);}
-.hh-meta span{display:inline-flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);}
-.hh-meta svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--violet);}
+/* .hh-meta (the date/location row) removed entirely 2026-09-29, per direction "เอาวันที่ และสถานที่
+   ออก" — .home-hero's own <section> now ends right after .hh-sub; this same info still lives in the
+   agenda card (§ "เวทีห้องใหญ่") directly below on Home, so it isn't lost, just not duplicated here. */
+/* Decorative 3D props (2026-09-29, per direction + reference poster) — the iridescent efin.finance
+   mark + gold bar renders that flank the poster's logo lockup in the reference. Sourced full-res
+   (2.85MB/9.8MB) from Asset-element/, resized to realistic display size and re-encoded to WebP
+   (assets/hero-prop-efin.webp 600x577/54KB, assets/hero-prop-gold.webp 500x750/24KB — combined
+   ~78KB, down from ~12.6MB combined) — same "resize-to-real-size + WebP" discipline this file's own
+   asset-weight passes already established (see the booth-icon/result-art WebP conversions). Both
+   files were re-exported once already, same session — the FIRST pass resized via PowerShell/GDI+
+   before the WebP step, and GDI+'s bicubic resize doesn't premultiply alpha, so semi-transparent
+   edge pixels (the gold bar's own bottom reflection, fading to transparent) picked up a gray
+   fringing artifact from the source canvas. Re-done end-to-end through a single browser <canvas>
+   drawImage+toBlob('image/webp') pass instead (canvas handles alpha correctly) — confirmed clean by
+   re-reading both files before committing. Bleed past .hh-top's own edges (negative offsets, see
+   .hh-top's own comment for why that's the positioning parent, not .home-hero) — the OUTER
+   .home-hero still clips via overflow:hidden, so nothing escapes the card itself. z-index:0 (below
+   the z-index:1 logo/headline/sub content, above .hh-bg's own z-index:-2) so props read as
+   background flourishes, never covering real copy. pointer-events:none — purely decorative, never
+   intercepts the card's own tap targets. Floating motion (per direction, referencing the reference
+   site's own subtle drift — inspected live there, it's a slow easing settle, not a hard bounce) via
+   propFloat below; each prop gets its own duration/delay so they never move in lock-step, same
+   "organic, not synchronized" feel.
+   width:clamp() (2026-09-29 follow-up, per direction "สัดส่วน...อยากให้ดูมีการเปลี่ยนแปลง ยืดหยุ่น
+   ตาม responsive") replaces the old flat %+max-width px pair — the % middle value still scales
+   continuously with .hh-top's own width (so props visibly grow/shrink between a narrow phone and
+   this card's natural ~380px content width), the px min/max just floor/ceiling it so a prop can
+   never shrink to illegible or (now that .hh-top itself is capped, see its own comment) balloon
+   past a sane size. */
+.hh-prop{position:absolute;z-index:0;pointer-events:none;filter:drop-shadow(0 6px 16px rgba(0,0,0,.3));animation:propFloat 5.5s ease-in-out infinite;}
+.hh-prop-efin{top:-8%;left:-10%;width:clamp(58px,34%,150px);animation-duration:5s;}
+.hh-prop-gold{top:2%;right:-8%;width:clamp(36px,21%,95px);animation-duration:6.5s;animation-delay:-2.4s;animation-direction:reverse;}
+@keyframes propFloat{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-7px) rotate(-3deg);}}
+@media(prefers-reduced-motion:reduce){.hh-prop{animation:none;}}
 /* Poster v3 — the home-hero's only remaining look now (v1's light spectrum-wash and v2's night-sky
    photo background were removed 2026-08-29, per direction "ไม่ต้องมี preview...V1, V2 ลบออก เหลือ
-   แค่ V3" — see the deleted POSTER_VER var's own comment for what those looked like). A looping
-   video (sky-video-v3-loop.mp4, embedded as BG_VIDEO.sky) sits on its own real <video> element
-   (.hh-video, z-index:-2) rather than a CSS background-image, since background-image can't paint a
-   <video>; ::before here is just the scrim gradient, no image behind it, layered on top of the
-   video (z-index:-1) so it paints behind the card's own in-flow content (badge/logo/sub/meta)
-   without needing to touch every one of their z-index values, same trick as elsewhere in this
-   file's ink cards (compare .next-step::after, which instead bumps its own children to z-index:1).
-   Hover/tap zoom targets .hh-video directly (see the shared :hover rule up in the
-   @media(hover:hover) block, and the :active rule below) — same "camera push-in" idiom as
-   .prof-av's own hover/active zoom. */
-.home-hero.v3{border-color:rgba(255,255,255,.16);}
-.home-hero.v3::before{content:"";position:absolute;inset:0;z-index:-1;background-image:linear-gradient(180deg,rgba(8,12,20,.42) 0%,rgba(8,12,20,.6) 42%,rgba(8,12,20,.4) 68%,rgba(8,12,20,.54) 100%);}
-.hh-video{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center 25%;transition:transform .6s cubic-bezier(.16,1,.3,1);}
-/* Tablet/pc anchor the video to the TOP (2026-08-24, per direction "ต้องการให้วีดีโอ...alignment
+   แค่ V3" — see the deleted POSTER_VER var's own comment for what those looked like).
+   2026-09-29 — swapped the dark sky.mp4 LOOP for a static bright-sky photo (per direction + the
+   reference poster's own background), so .hh-bg is now a plain <img> (was .hh-video/<video>) —
+   renamed since it's no longer a video, kept as its own element (not a CSS background-image) purely
+   so the existing hover/active "camera push-in" zoom idiom (transform:scale, see the shared :hover
+   rule up in the @media(hover:hover) block and the :active rule below) keeps working unchanged,
+   same trick .prof-av's own hover/active zoom uses. The dark ::before scrim this needed for WHITE
+   text-on-dark-video legibility is gone entirely — .hh-headline/.hh-sub both read fine as
+   plain --ink dark text directly on a bright sky/cloud photo, same as the reference poster itself
+   has no visible overlay either. z-index stays -2 for .hh-bg (still behind the card's own in-flow
+   content, still trivially above thanks to no scrim layer in between now). */
+.hh-bg{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center 25%;transition:transform .6s cubic-bezier(.16,1,.3,1);}
+/* Tablet/pc anchor the image to the TOP (2026-08-24, per direction "ต้องการให้วีดีโอ...alignment
    top เสมอ เพื่อให้เห็นช่องแสง ท้องฟ้า และเมฆด้านบน") — the hero box is wider/shorter at these two
    sizes (.home-hero sits inside the shared 760px content column, see :root[data-view="tablet"/"pc"]
    main.scroll{max-width:760px}), so object-fit:cover's default center crop on the base rule above
-   cuts into the sky/light-beam/clouds at the top of sky-video-v3-loop.mp4 that mobile's taller box still
-   shows at 25%. Mobile keeps the base rule untouched — only tablet/pc get the top anchor. */
-:root[data-view="tablet"] .hh-video,:root[data-view="pc"] .hh-video{object-position:center top;}
-.home-hero.v3:active .hh-video{transform:scale(1.04);}
-.home-hero.v3 .hh-sub{color:var(--cloud);}
-.home-hero.v3 .hh-meta span{color:rgba(255,255,255,.8);}
-.home-hero.v3 .hh-meta svg{color:var(--cyan);}
+   would crop into the sky/clouds at the top that mobile's taller box still shows at 25%. Mobile
+   keeps the base rule untouched — only tablet/pc get the top anchor. */
+:root[data-view="tablet"] .hh-bg,:root[data-view="pc"] .hh-bg{object-position:center top;}
+.home-hero.v3:active .hh-bg{transform:scale(1.04);}
 /* pass-card — the tier row reworked into a "your ticket" status card: eyebrow ("บัตรของคุณ") +
    prominent tier name, a benefit line, then a divided price row. */
 /* font-weight:var(--w-body) (2026-09-21, per direction, typography audit F1) — .pass-card is a <button> on
@@ -3971,7 +4027,15 @@ var ICON_IMG={s1q2:'assets/s1q2.png',s2q6:'assets/s2q6.png',s2q7:'assets/s2q7.pn
 /* Brand asset elements (efin/BetterTrade KV), compressed + base64-embedded so the
    splash scatter renders inside the sandboxed Artifact (no external requests). */
 var BG_IMG={nightSky:'assets/nightSky.jpg',room1:'assets/room1.jpg',room2:'assets/room2-1.png'};
-var BG_VIDEO={sky:'assets/sky.mp4'};
+/* Home poster background (2026-09-29) — replaces the old BG_VIDEO.sky looping video (assets/sky.mp4,
+   left on disk unreferenced, same "retired asset stays, the var pointing at it doesn't" precedent as
+   BG_IMG.nightSky above) with a static bright-sky photo, per direction + the reference poster.
+   Sourced from Bg/KV-BT-2026-BG.png (3240x4050, 4.87MB), resized to realistic display size (900x1125)
+   and re-encoded to WebP — 9.6KB, since a smooth sky/cloud gradient compresses far better than the
+   iridescent hero-prop renders above ever could. */
+var HERO_BG='assets/hero-sky.webp';
+/* Home poster decorative props (2026-09-29) — see .hh-prop's own CSS comment for sourcing/sizing. */
+var HERO_PROP={efin:'assets/hero-prop-efin.webp',gold:'assets/hero-prop-gold.webp'};
 var ASSET_IMG=/*__ASSET_IMG__*/{candle:'assets/candle.png',gold:'assets/gold.png',bitcoin:'assets/bitcoin.png',card:'assets/card.png',heart:'assets/heart.png',efin:'assets/efin-2.png'};
 /* 2026-09-04: all 12 personas now have approved final photographed card art (replaces the earlier
    3-card partial set — harvester/diamondhand/waverider — with the full set), so pcFrontInner's CSS
@@ -3988,7 +4052,7 @@ var CARD_BACK_IMG='assets/cardback.jpg';
    object/tagline/tags all matching REAL_CARD_IMG 1:1) with a slow iridescent colour-cycle on the card's
    signature object — verified frame-by-frame against the static photos before mapping. Copied into
    assets/card-anim/<key>.mp4 (renamed from the source export filenames) rather than embedded, matching
-   this file's existing external-video convention (BG_VIDEO).
+   this file's existing external-asset convention (REAL_CARD_IMG, BG_IMG, etc.).
    Coverage history: shipped 2026-09-08 with 10 of 12 (sage/contrarian had no matching clip yet —
    renderCardReveal fell back to the CSS-only flip reveal for just those two); completed 2026-09-09 once
    both were added. Replaced 2026-09-17 with a full 12-clip re-shoot ("Character Card Animation/", Magnific
@@ -6563,15 +6627,20 @@ function renderHome(){
   var bookTeaser=RESULT?'เติมแล้ว 2/6 ด้าน · เล่นเพิ่มเพื่อให้ครบ':(pre?'ทำแบบทดสอบตัวตน 7 ข้อ เพื่อเปิด Playbook':'ปิดรับทำแบบทดสอบแล้ว · เฉพาะช่วง Pre-Event');
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
-    /* v3 (2026-08-24, demo-panel preview toggle) — same dark poster as v2, but a looping video
-       (BG_VIDEO.sky) instead of a still photo; see .hh-video/.home-hero.v3 for the layering.
-       The eyebrow badge ("Playbook ลงทุนของคุณ" + book icon) that used to sit above the logo was
-       cut per print-poster direction 2026-09-16 ("ตัดออก" on the badge line) — .hh-logo is now
-       the card's first element, see .hh-logo's own margin comment. */
-    '<section class="home-hero scroll-reveal v3"><video class="hh-video" src="'+BG_VIDEO.sky+'" autoplay muted loop playsinline></video>'+
-      '<img class="hh-logo" src="'+LOGO_IMG.nwnp+'" alt="New World New Playbook">'+
+    /* v3 (2026-08-24, demo-panel preview toggle, since promoted to the only version) — bright-sky
+       still photo (HERO_BG) as of 2026-09-29, was a looping dark-sky video; see .hh-bg/.home-hero.v3
+       for the layering. The eyebrow badge ("Playbook ลงทุนของคุณ" + book icon) that used to sit above
+       the logo was cut per print-poster direction 2026-09-16 ("ตัดออก" on the badge line) — .hh-logo
+       is now the card's first element, see .hh-logo's own margin comment. */
+    '<section class="home-hero scroll-reveal v3"><img class="hh-bg" src="'+HERO_BG+'" alt="">'+
+      '<div class="hh-top">'+
+        '<img class="hh-prop hh-prop-efin" src="'+HERO_PROP.efin+'" alt="" aria-hidden="true">'+
+        '<img class="hh-prop hh-prop-gold" src="'+HERO_PROP.gold+'" alt="" aria-hidden="true">'+
+        '<img class="hh-logo" src="'+LOGO_IMG.nwnp+'" alt="New World New Playbook">'+
+      '</div>'+
+      '<div class="hh-headline">สัมมนาการลงทุนแห่งปี เปิดกลยุทธ์จากวิทยากรชั้นนำ</div>'+
       '<p class="hh-sub"><b>PLAYBOOK คู่มือการลงทุนส่วนตัว</b> สร้างจาก Investor DNA และ Action ที่คุณทำจริงในงาน Better Trade เพื่อแสกนทุกโอกาสการลงทุนในโลกยุคใหม่</p>'+
-      '<div class="hh-meta"><span>'+ic('lc-calendar')+'31 ต.ค. – 1 พ.ย. 2569</span><span>'+ic('lc-map-pin')+'Samyan Mitrtown ชั้น 5</span></div></section>'+
+    '</section>'+
     (DEMO.multiTicket?passCardMultiHTML():(function(){var tp=(t.meta.sub||'').split(' · ');var benefit=tp[0]||'',price=tp[1]||'';
       /* Tier icon inline with .pass-ey (the "บัตรของคุณ" eyebrow), not .pass-name (2026-08-24, per
          direction "อยากให้ icon มงกุฎ alignment กับคำว่า บัตรของคุณ") — same .pass-ey-ic treatment

@@ -325,6 +325,71 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-09-29 (2nd same-day follow-up) — Fixed a real gray-fringing artifact baked into
+hero-prop-gold.webp; grouped the decorative props with the text column on tablet/pc instead of
+letting them drift to the card's far edges; prop sizing now `clamp()`-based.** Per direction +
+screenshots. (1) The gold bar's bottom edge (where its reflection fades to transparent) had a
+visible gray banding artifact — root cause: the FIRST export pass resized via PowerShell/GDI+ before
+the WebP step, and GDI+'s bicubic resize doesn't premultiply alpha, so semi-transparent edge pixels
+picked up fringing from the source canvas. Confirmed by diffing against the untouched source
+(`Asset-element/Gold/Gold.png`, clean) — re-exported both props end-to-end through a single browser
+`<canvas>` `drawImage`+`toBlob('image/webp')` pass instead (no GDI+ in the path at all), verified
+clean by re-reading both files before committing. (2) `.hh-top` (the props' positioning parent, see
+its own 2026-09-29 comment) gained `max-width:380px` — on tablet/pc `.home-hero` stretches to the
+760px content column, but the text below stays capped at 20ch/34ch and centered, so props anchored
+to `.hh-top`'s own (previously full-card-width) edges drifted far from that narrow text column. 380px
+roughly matches the card's real mobile content width, so it's a no-op on phones and only constrains
+the box once the card grows wider — confirmed via `getBoundingClientRect()` at tablet width that both
+props now sit right against `.hh-sub`'s own edges instead of the card's. (3) Prop `width` switched
+from a flat `%`+`max-width px` pair to `clamp(px, %, px)` — the `%` component still scales
+continuously with `.hh-top`'s own (now-bounded) width instead of jumping between fixed states.
+
+**2026-09-29 (same-day follow-up) — Fixed the new decorative props overlapping/clipping across
+breakpoints; removed `.hh-meta`; bigger logo; headline pushed down; props now float.** Root cause of
+the overlap (per direction, with screenshots): the props were `position:absolute` against
+`.home-hero` itself using `top`/`bottom` **percentages of the card's own total height** — but that
+height varies a lot across breakpoints (`.hh-headline`/`.hh-sub` wrap to different line counts at
+different widths), so a prop anchored at `bottom:-4%` landed in a different spot every render,
+sometimes over `.hh-meta`, sometimes clipped oddly. Fixed structurally: new `.hh-top` wrapper holds
+ONLY the logo + both props, so their percentage offsets resolve against a stable box (basically just
+the logo's own height) instead of the whole unpredictable card — same shape the reference site's own
+markup uses (its decorative props are children of the logo's own container, confirmed by inspecting
+it live, not a guess). Also per direction: `.hh-meta` (date/location row) removed entirely — same
+info already lives in the "เวทีห้องใหญ่" agenda card right below on Home, so nothing is lost, just not
+duplicated; `.hh-logo` bumped 56%/210px → 74%/280px; `.hh-headline`'s top margin bumped
+`--sp-stack`→`--sp-section` for more breathing room under the bigger logo. Props now float
+(`@keyframes propFloat`, `translateY`+`rotate`, `prefers-reduced-motion` respected per this file's own
+existing convention) — reference-checked live via `getComputedStyle`/GSAP inspection on the reference
+site itself (`window.gsap` present there) rather than guessed: its motion reads as a slow easing
+settle/drift, not a hard bounce, so `propFloat` is deliberately gentle (±7px, 5–6.5s, offset
+durations/delays per prop so they never move in lock-step) — implemented in plain CSS, no GSAP
+dependency added to this app for it.
+
+**2026-09-29 — Home poster (`.home-hero`) redone against a reference marketing poster for this same
+event: bright-sky photo replaces the old dark looping video, plus a real headline and two decorative
+3D props.** Landed in two passes the same session — headline+props first (while the background photo
+was still in transit), background photo once it arrived — but all three are one coherent redesign,
+not separate features. `.hh-bg` (was `.hh-video`/`<video>`, now a plain `<img>`, `HERO_BG`) replaced
+`BG_VIDEO.sky` (`assets/sky.mp4`, left on disk unreferenced, deleted the now-dead `BG_VIDEO` var) —
+sourced from `Bg/KV-BT-2026-BG.png` (3240×4050, 4.87MB), resized to 900×1125 and re-encoded to WebP
+at 9.6KB (a smooth sky/cloud gradient compresses far better than the iridescent props below ever
+could). The dark `::before` scrim gradient this needed for white text-on-dark-video legibility is
+gone entirely — `.hh-headline`/`.hh-sub`/`.hh-meta` all read as plain `--ink` dark text directly on
+the bright photo now, no overlay, matching the reference poster's own look exactly. New `.hh-headline`
+("สัมมนาการลงทุนแห่งปี เปิดกลยุทธ์จากวิทยากรชั้นนำ", copied verbatim from the reference) sits between
+`.hh-logo` and the existing `.hh-sub` — borrows `--fs-heading`/28px (an existing token, not a new
+hardcoded size) since nothing in the scale read as headline-weight next to `.hh-sub`'s own body-ish
+22px. Two new decorative images (`.hh-prop-efin`/`.hh-prop-gold`, `HERO_PROP.efin`/`.gold`) reuse the
+exact iridescent-triangle + gold-bar renders from the reference poster's own asset source
+(`Asset-element/`) — resized from their original 1504×1447/2.85MB and 4096×6144/9.8MB down to
+realistic display size (600×577, 500×750) and re-encoded to WebP via the same canvas-
+`toBlob('image/webp')` technique the 2026-09-17 booth-icon pass already established, landing at
+54KB/25KB. All three new images combined: ~89KB, vs. ~17.5MB combined for the three untouched
+originals. Props positioned `position:absolute` with negative offsets so they bleed past
+`.home-hero`'s own edges (clipped by its existing `overflow:hidden`), `z-index:0` — below the
+logo/headline/sub/meta content (bumped to `z-index:1` for this), above `.hh-bg`'s own `z-index:-2`.
+`.hh-sub`'s copy itself was deliberately left untouched — only the direction's 3 named items changed.
+
 **2026-09-25 — Thai text app-wide switched from an unembedded font-stack tail to a real embedded
 Taviraj; PIN-lock keypad's pill-shaped keys fixed.** Two bugs found reviewing the PIN-lock screen
 (below) against a reference screenshot, both pre-existing/latent rather than introduced that session:
