@@ -2364,6 +2364,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    ดูกำหนดการทั้งวัน 11 รายการ (หน้าหลัก)" — the skip button (multi-select questions' "ยังไม่พร้อมเลือก
    ข้ามก่อน") now renders with the .ag-more class directly (see renderPlayBody's skipHTML) instead of
    this plain underlined-text-link look. Rule kept for history only, nothing renders it anymore. */
+/* Tablet/pc alignment (2026-09-30): the skip button shares .q-opts' 460px column (it is a sibling of .play-opts, so .ag-more's width:100% otherwise stretches it to the full page width); the result page's .q-nav-wide spans the same width as its summary card and pins the CTA to the card's right edge instead of the 460px column's. */
+.play-skip-btn{max-width:460px;margin-left:auto;margin-right:auto;}
+.q-nav.q-nav-wide{max-width:none;justify-content:flex-end;}
 .play-skip{display:block;width:100%;text-align:center;background:none;border:none;font-family:var(--font);font-size:var(--fs-label);color:var(--muted);text-decoration:underline;cursor:pointer;padding:0 0 var(--sp-stack);}
 /* Insight box (2026-09-10, per direction) — moved cyan→violet: per DESIGN-DNA.md §2.2's status-tone
    ladder, cyan means "done/unlocked" (already the meaning of this SAME screen's "เล่นแล้ว" badge
@@ -8391,7 +8394,7 @@ function renderPlayBody(){
   // .ag-more's OWN source instance (agMore on Home) leads with its icon since that one's a
   // toggle whose icon literally flips open/closed; this skip button is a plain forward action, so
   // trailing the icon reads as "skip →" instead of borrowing that toggle's chevron-first convention.
-  var skipHTML=q.skippable?'<button class="ag-more" type="button" id="playSkipBtn">'+(q.skipLabel||'ข้ามข้อนี้')+ic('lc-chevron-right')+'</button>':'';
+  var skipHTML=q.skippable?'<button class="ag-more play-skip-btn" type="button" id="playSkipBtn">'+(q.skipLabel||'ข้ามข้อนี้')+ic('lc-chevron-right')+'</button>':'';
   var isLast=qi>=total-1;
   var nextLabel=isLast?('เสร็จสิ้น '+ic('lc-check','ic-fwd')):('ถัดไป '+ic('lc-arrow-right','ic-fwd'));
   // Focal question icon (2026-09-10, per direction "หน้าคำถามทั้งหมด...ใช้ design dna...เดียวกับ
@@ -8580,7 +8583,7 @@ function renderPlaySummary(){
          step-back action though (it exits the whole mini-game flow forward to the games/booth list),
          so trailing + right-pointing now matches "เริ่มเล่นเกม →"/"ถัดไป →" elsewhere in this same flow
          (ic-fwd, not ic-back, for the same hover-nudge-right micro-motion those share). */
-      '<div class="q-nav"><span></span><button class="btn btn-primary" type="button" id="playDoneBtn">'+backLabel+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
+      '<div class="q-nav q-nav-wide"><span></span><button class="btn btn-primary" type="button" id="playDoneBtn">'+backLabel+ic('lc-arrow-right','ic-fwd')+'</button></div>'+
     '</div>';
   sizeHeroGlow();
   // Re-size once the art image itself loads (2026-09-14 bug: "border gradient...ยังมีเส้นขาดๆ") —
