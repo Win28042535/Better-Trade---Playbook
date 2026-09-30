@@ -2365,7 +2365,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    ข้ามก่อน") now renders with the .ag-more class directly (see renderPlayBody's skipHTML) instead of
    this plain underlined-text-link look. Rule kept for history only, nothing renders it anymore. */
 /* Tablet/pc alignment (2026-09-30): the skip button shares .q-opts' 460px column (it is a sibling of .play-opts, so .ag-more's width:100% otherwise stretches it to the full page width); the result page's .q-nav-wide spans the same width as its summary card and pins the CTA to the card's right edge instead of the 460px column's. */
-.play-skip-btn{max-width:460px;margin-left:auto;margin-right:auto;}
+.play-skip-btn,.play-insight{width:100%;max-width:460px;margin-left:auto;margin-right:auto;}
 .q-nav.q-nav-wide{max-width:none;justify-content:flex-end;}
 .play-skip{display:block;width:100%;text-align:center;background:none;border:none;font-family:var(--font);font-size:var(--fs-label);color:var(--muted);text-decoration:underline;cursor:pointer;padding:0 0 var(--sp-stack);}
 /* Insight box (2026-09-10, per direction) — moved cyan→violet: per DESIGN-DNA.md §2.2's status-tone
