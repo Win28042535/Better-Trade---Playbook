@@ -6759,6 +6759,11 @@ var BOOTH_CHK={},BOOTH_ACT={},BOOTH_HOWTO=false,DRAW_JOINED=false; // BOOTH_CHK[
    already defaults to 2 games played, which couldn't have happened without this being true first;
    reset to false alongside GAME_PLAYED/BOOTH_CHK at every "fresh arrival"/reset point instead. */
 var EFIN_CHECKED_IN=true;
+/* COLLECT_CHECKED_IN (2026-10-02, per direction) — one extra stamp check-in at the Pavilion Zone's
+   collectible-card-game point (SD BOOTH, ของสะสม — NOT the character-card redemption). Its own flag,
+   like EFIN_CHECKED_IN: not a BOOTH_CHK index, so it does not count toward CHECKIN_NEED (5) or the
+   draw gate. Shown as the last stop of the booth route; set via confirmScan's SCAN.bi==='collect'. */
+var COLLECT_CHECKED_IN=false;
 var BOOTH_ANSWERS={}; // BOOTH_ANSWERS[assetIdx] = the real answers given in that booth's mini-game (see BOOTH_Q/openPlay below) — captured but not yet read by any scoring logic (still persona-based, see [[games-questions-dna]] memory "Phase 3")
 /* Booth v2 preview only (DEMO.boothVer==='v2', see renderBooth): the route step / map marker the
    user has focused via the two-way Step↔Map sync. null = nothing focused. Persists across the
@@ -6770,7 +6775,8 @@ var BOOTH_SEL=null;
    put. `s` is the short marker label (per the spec's "Short Name / Label เมื่อจำเป็น"); the full
    name still lives on the route row. Positions read off the floor plan's own printed zone labels. */
 var BOOTH_MAP_POS={
-  'จุดแลกรับการ์ดตัวจริง':{x:30,y:82.3,s:'แลกการ์ด'},
+  'จุดแลกรับการ์ดตัวจริง':{x:7.5,y:57.7,s:'แลกการ์ด'},
+  'โซนการ์ดเกม · ของสะสม':{x:30,y:82.3,s:'การ์ดเกม'},
   'Capital Zone':{x:50.8,y:51.6,s:'Capital',more:[{x:44,y:51.6},{x:58.2,y:51.6}]},
   'Crypto Zone':{x:58.2,y:36.1,s:'Crypto'},
   'Commodity + Property Zone':{x:41,y:21.5,s:'Commodity+Property'},
@@ -7116,6 +7122,8 @@ function confirmScan(){
   if(!SCAN)return;
   if(SCAN.bi==='efin'){
     EFIN_CHECKED_IN=true;
+  } else if(SCAN.bi==='collect'){
+    COLLECT_CHECKED_IN=true;
   } else if(SCAN.bi!=null){
     var bi=SCAN.bi,ci=SCAN.ci;
     if(!BOOTH_CHK[bi])BOOTH_CHK[bi]=new Set();
@@ -7141,6 +7149,7 @@ function confirmScan(){
 function scanTitle(){
   if(!SCAN)return '';
   if(SCAN.bi==='efin')return 'เช็คอิน · efin.finance';
+  if(SCAN.bi==='collect')return 'เช็คอิน · โซนการ์ดเกม ของสะสม';
   if(SCAN.bi==null)return 'สแกน QR ในงาน';
   var name=(ZONE_BOOTHS[SCAN.bi]||[])[SCAN.ci]||'';
   var already=BOOTH_CHK[SCAN.bi]&&BOOTH_CHK[SCAN.bi].has(SCAN.ci);
@@ -7149,6 +7158,7 @@ function scanTitle(){
 function scanSubText(){
   if(!SCAN)return '';
   if(SCAN.bi==='efin')return 'ปลดล็อกเกมหลักทั้ง 6 เกม + รับของรางวัล';
+  if(SCAN.bi==='collect')return 'Pavilion Zone · SD Booth · สแตมป์เช็คอิน 1 จุด';
   if(SCAN.bi==null)return 'สแกน QR ที่จุดใดก็ได้ในงาน — ระบบจะเช็คอินบูธถัดไปที่ยังไม่ได้ทำให้อัตโนมัติ';
   var b=BOOTHS[SCAN.bi];
   return b?(b.asset+' · '+BOOTH_ZONES[b.zone].chip):'';
@@ -7217,11 +7227,13 @@ function buildRoute(){
   // reset (DEMO.eventPhase → 'on', see buildDemo's segPhase handler) couldn't show a genuinely
   // fresh/zero-visited map. Now reflects the real checked-in zone count (2026-08-28).
   var visited=Math.min(boothCheckinCount(),stops.length);
+  /* last stop — Pavilion collectible-card-game point; visited state is its own flag, not the count */
+  stops.push({name:'โซนการ์ดเกม · ของสะสม',zone:'Pavilion Zone · SD Booth · สแตมป์เช็คอิน',icon:'lc-gem',topPick:false,newAngle:false,featured:false,color:'var(--violet)',own:true});
   return stops.map(function(z,i){
-    var isV=i<visited;
+    var isV=z.own?COLLECT_CHECKED_IN:i<visited;
     var pos=BOOTH_MAP_POS[z.name]||{x:50,y:50,s:z.name}; // mx/my/short for the v2 map markers (see BOOTH_MAP_POS)
     return {name:z.name,zone:z.zone,icon:z.icon,topPick:z.topPick,newAngle:z.newAngle,featured:z.featured,color:z.color,
-      mx:pos.x,my:pos.y,short:pos.s,more:pos.more||[],
+      mx:pos.x,my:pos.y,short:pos.s,more:pos.more||[],isV:isV,own:!!z.own,
       status:isV?'✓ แวะแล้ว':(z.topPick?'แนะนำอันดับ 1 สำหรับคุณ':(z.newAngle?'แนะนำให้ลอง (มุมใหม่)':'ยังไม่แวะ')),
       dotColor:isV?'var(--cyan)':(z.topPick?'var(--violet)':(z.featured?'var(--amber-text)':(z.newAngle?'var(--violet)':'var(--muted)')))};
   });
@@ -7279,7 +7291,7 @@ function renderBooth(){
      first stop as the start ("เริ่มที่นี่") — the numbered sequence + shared colors carry the rest. */
   var semState=pre
     ? function(i){return i===0?'start':'up';}
-    : function(i){return visited>=route.length?'done':(i<visited?'done':(i===visited?'cur':(i===visited+1?'next':'up')));};
+    : function(i){if(route[i].isV)return 'done';var open=[];route.forEach(function(r,j){if(!r.isV)open.push(j);});var k=open.indexOf(i);return k===0?'cur':(k===1?'next':'up');};
   var semLegend=v2?(pre
     ? '<div class="booth-legend bmk-legend"><span><span class="lg-sw" style="background:var(--violet)"></span>เริ่มที่นี่</span><span><span class="lg-sw" style="background:var(--muted)"></span>จุดต่อไปตามลำดับ</span></div>'
     : '<div class="booth-legend bmk-legend"><span><span class="lg-sw" style="background:var(--cyan)"></span>เสร็จแล้ว</span><span><span class="lg-sw" style="background:var(--violet)"></span>อยู่ตรงนี้</span><span><span class="lg-sw" style="background:var(--amber-text)"></span>ถัดไป</span><span><span class="lg-sw" style="background:var(--muted)"></span>ยังไม่ถึง</span></div>'):'';
@@ -7350,7 +7362,7 @@ function renderBooth(){
         if(v2){
           var s=semState(i);
           var stChip=s==='cur'?'<span class="rt-state cur">'+ic('lc-map-pin')+'อยู่ตรงนี้</span>':(s==='start'?'<span class="rt-state start">'+ic('lc-map-pin')+'เริ่มที่นี่</span>':(s==='next'?'<span class="rt-state next">'+ic('lc-arrow-right')+'ถัดไป</span>':(s==='done'?'<span class="rt-state done">'+ic('lc-check')+'เสร็จแล้ว</span>':'')));
-          return '<div class="rt-row v2 '+s+(BOOTH_SEL===i?' sel':'')+'" data-i="'+i+'"><div class="rt-rail"><div class="rt-dot rt-num" style="background:'+semColor[s]+'">'+(i+1)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+stChip+'</div><div class="rt-meta">'+p.zone+' · '+p.status+'</div></div></div>';
+          return '<div class="rt-row v2 '+s+(BOOTH_SEL===i?' sel':'')+'" data-i="'+i+'"><div class="rt-rail"><div class="rt-dot rt-num" style="background:'+semColor[s]+'">'+(i+1)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+stChip+'</div><div class="rt-meta">'+p.zone+' · '+p.status+'</div>'+(p.own&&!p.isV&&!pre?'<button type="button" class="btn btn-secondary rt-scan" data-collect="1" style="margin-top:var(--sp-glue)">'+ic('lc-qr-code')+'สแกนเช็คอิน</button>':'')+'</div></div>';
         }
         return '<div class="rt-row'+(p.topPick?' top':'')+'"><div class="rt-rail"><div class="rt-dot" style="background:'+p.dotColor+'">'+ic(p.icon)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+'</div><div class="rt-meta">'+p.zone+' · '+p.status+'</div></div></div>';
       }).join('')+'</div>'+
@@ -7464,6 +7476,7 @@ function renderBooth(){
       else{var rr=root.querySelector('.rt-row.v2[data-i="'+i+'"]');if(rr&&rr.scrollIntoView)rr.scrollIntoView({behavior:'smooth',block:'center'});}
     };
     root.querySelectorAll('.rt-row.v2').forEach(function(r){r.onclick=function(){selectStop(+r.dataset.i,'step');};});
+    root.querySelectorAll('.rt-scan[data-collect]').forEach(function(b){b.onclick=function(e){e.stopPropagation();openScan('collect',null);};});
     root.querySelectorAll('.map-ph .bmk').forEach(function(m){m.onclick=function(e){e.stopPropagation();selectStop(+m.dataset.i,'map');};});
   }
   mountHeaderQR();
@@ -8744,7 +8757,7 @@ function seedPersonaResult(key){
   RESULT={hero:h,heroKey:key,declared:h.riskLevel,revealed:Math.max(1,Math.min(10,h.riskLevel+simGap)),gap:simGap,
     conf:74,confLevel:'สูง - สอดคล้องดี',
     subs:{identity:16,behavior:16,riskAlign:18,discipline:15},knowledge:'intermediate',horizon:'mid',votes:{},interests:[0,2,4]};
-  GAME_PLAYED={0:true,1:true,2:true,3:true};GAME_ANSWERS={};BOOTH_CHK={0:new Set([0])};BOOTH_ACT={0:true};BOOTH_ANSWERS={};EFIN_CHECKED_IN=true;
+  GAME_PLAYED={0:true,1:true,2:true,3:true};GAME_ANSWERS={};BOOTH_CHK={0:new Set([0])};BOOTH_ACT={0:true};BOOTH_ANSWERS={};EFIN_CHECKED_IN=true;COLLECT_CHECKED_IN=false;
 }
 function forcePersona(key){seedPersonaResult(key);st.phase='book';stopSplashTimer();render();}
 
@@ -8842,7 +8855,7 @@ function buildDemo(){
     var v=b.dataset.v;if(v===DEMO.eventPhase)return;
     DEMO.eventPhase=v;
     document.querySelectorAll('#segPhase button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
-    if(v==='on'){BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};GAME_PLAYED={};GAME_ANSWERS={};DRAW_JOINED=false;EFIN_CHECKED_IN=false;} // fresh arrival — see DEMO.eventPhase comment above
+    if(v==='on'){BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};GAME_PLAYED={};GAME_ANSWERS={};DRAW_JOINED=false;EFIN_CHECKED_IN=false;COLLECT_CHECKED_IN=false;} // fresh arrival — see DEMO.eventPhase comment above
     // Switching to Pre-Event goes back to Splash (2026-09-10, per direction) — the symmetric
     // counterpart of On-Event's "fresh arrival" reset above: Pre-Event is where the quiz-taking
     // flow (splash → consent → quiz → reveal → cardreveal) actually lives, so picking it in the
@@ -8869,7 +8882,7 @@ function buildDemo(){
     // promised a played-state reset, but the code never actually touched GAME_PLAYED/BOOTH_ACT (only
     // resetQuiz()'s quiz-taking state st/RESULT). Now genuinely clears every game/booth back to
     // unplayed so all 6 เกมหลัก + 10 บูธ can be replayed from scratch for testing.
-    GAME_PLAYED={};GAME_ANSWERS={};BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};DRAW_JOINED=false;EFIN_CHECKED_IN=false;
+    GAME_PLAYED={};GAME_ANSWERS={};BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};DRAW_JOINED=false;EFIN_CHECKED_IN=false;COLLECT_CHECKED_IN=false;
     // Bug fix (2026-09-10, reported: "กด รีเซ็ตเกมหลักที่เล่น แล้วกดเข้าคู่มือไม่ได้") — this handler
     // used to ALSO reset the quiz identity (DEMO.quizDone=false + cleared demoPersona + resetQuiz(),
     // which sets RESULT=null), even though the label/comment above only ever promised a games/booths
