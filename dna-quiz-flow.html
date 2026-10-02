@@ -2777,6 +2777,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    ring/label. */
 .map-ph.v2 .bmk::before{content:'';position:absolute;top:50%;left:50%;width:44px;height:44px;transform:translate(-50%,-50%);}
 .map-ph.v2 .bmk-num{position:relative;z-index:1;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--white);font-weight:var(--w-label);font-size:var(--fs-eyebrow);line-height:1;border:2px solid var(--white);box-shadow:0 2px 6px rgba(17,19,24,.35);transition:transform .18s var(--ease);}
+.map-ph.v2 .bmk-sub{position:absolute;transform:translate(-50%,-50%);z-index:2;width:12px;height:12px;border-radius:50%;border:2px solid var(--white);box-shadow:0 1px 4px rgba(17,19,24,.4);background:var(--muted);pointer-events:none;}
+.map-ph.v2 .bmk-sub.done{background:var(--cyan);}
+.map-ph.v2 .bmk-sub.cur,.map-ph.v2 .bmk-sub.start{background:var(--violet);}
+.map-ph.v2 .bmk-sub.next{background:var(--amber-text);}
 .map-ph.v2 .bmk.done .bmk-num{background:var(--cyan);}
 .map-ph.v2 .bmk.cur .bmk-num,.map-ph.v2 .bmk.start .bmk-num{background:var(--violet);}
 .map-ph.v2 .bmk.next .bmk-num{background:var(--amber-text);}
@@ -6766,12 +6770,12 @@ var BOOTH_SEL=null;
    put. `s` is the short marker label (per the spec's "Short Name / Label เมื่อจำเป็น"); the full
    name still lives on the route row. Positions read off the floor plan's own printed zone labels. */
 var BOOTH_MAP_POS={
-  'จุดแลกรับการ์ดตัวจริง':{x:41,y:36.1,s:'แลกการ์ด'},
-  'Capital Zone':{x:51.2,y:51.6,s:'Capital'},
+  'จุดแลกรับการ์ดตัวจริง':{x:30,y:82.3,s:'แลกการ์ด'},
+  'Capital Zone':{x:50.8,y:51.6,s:'Capital',more:[{x:44,y:51.6},{x:58.2,y:51.6}]},
   'Crypto Zone':{x:58.2,y:36.1,s:'Crypto'},
-  'Commodity Zone':{x:41,y:21.5,s:'Commodity'},
+  'Commodity + Property Zone':{x:41,y:21.5,s:'Commodity+Property'},
   'Alternative Investment Zone':{x:54,y:5.5,s:'Alternative'},
-  'Health Zone':{x:58.2,y:21.5,s:'Health'}
+  'Health Zone':{x:58.2,y:21.5,s:'Health',more:[{x:49.8,y:21.5}]}
 };
 /* 10 booths — asset / gamified game name / icon (Material→Lucide) — verbatim from BOOTHS. */
 var BOOTHS=[
@@ -7086,7 +7090,7 @@ var BOOTH_ZONES=[
   /* color unified to --amber-text (2026-08-15, per Color DNA review "05") — was a second, darker,
      unrelated gold (#b88a10) rendering on the same Booth screen as .rt-badge.feat's --amber-text. */
   {name:'Crypto Zone',zone:'โซนกิจกรรม · บูธ 2',icon:'lc-bitcoin',chip:'Crypto',color:'var(--amber-text)',featured:true,score:function(rd,h){return rd[3];}},
-  {name:'Commodity Zone',zone:'โซนกิจกรรม · บูธ 3',icon:'lc-coins',chip:'Commodity',color:'#d1622a',score:function(rd,h){return rd[4];}},
+  {name:'Commodity + Property Zone',zone:'โซนกิจกรรม · บูธ 3',icon:'lc-coins',chip:'Commodity + Property',color:'#d1622a',score:function(rd,h){return rd[4];}},
   {name:'Alternative Investment Zone',zone:'โซนกิจกรรม · บูธ 4',icon:'lc-gem',chip:'Alternative',color:'#9c6bd0',score:function(rd,h){return /สะสม/.test(JSON.stringify(h.assets))?78:(h.fam==='V'?48:30);}},
   {name:'Health Zone',zone:'โซนกิจกรรม · บูธ 5',icon:'lc-heart',chip:'Health',color:'#c048b6',score:function(rd,h){return rd[5];}}
 ];
@@ -7217,7 +7221,7 @@ function buildRoute(){
     var isV=i<visited;
     var pos=BOOTH_MAP_POS[z.name]||{x:50,y:50,s:z.name}; // mx/my/short for the v2 map markers (see BOOTH_MAP_POS)
     return {name:z.name,zone:z.zone,icon:z.icon,topPick:z.topPick,newAngle:z.newAngle,featured:z.featured,color:z.color,
-      mx:pos.x,my:pos.y,short:pos.s,
+      mx:pos.x,my:pos.y,short:pos.s,more:pos.more||[],
       status:isV?'✓ แวะแล้ว':(z.topPick?'แนะนำอันดับ 1 สำหรับคุณ':(z.newAngle?'แนะนำให้ลอง (มุมใหม่)':'ยังไม่แวะ')),
       dotColor:isV?'var(--cyan)':(z.topPick?'var(--violet)':(z.featured?'var(--amber-text)':(z.newAngle?'var(--violet)':'var(--muted)')))};
   });
@@ -7335,6 +7339,7 @@ function renderBooth(){
         /* v2 markers — one per route stop, numbered to match its step, placed at BOOTH_MAP_POS % and
            colored by the shared semantic state. Number shows by default; the short label reveals on
            the current marker and on tap (per the spec's "Default → Number Only / Tap → Show Label"). */
+        (v2?route.map(function(p,i){var s=semState(i);return p.more.map(function(m){return '<span class="bmk-sub '+s+'" aria-hidden="true" style="left:'+m.x+'%;top:'+m.y+'%"></span>';}).join('');}).join(''):'')+
         (v2?route.map(function(p,i){var s=semState(i);var lup=p.my<22?' lbl-up':'';return '<button type="button" class="bmk '+s+lup+(BOOTH_SEL===i?' sel':'')+'" data-i="'+i+'" style="left:'+p.mx+'%;top:'+p.my+'%" aria-label="จุดที่ '+(i+1)+' · '+p.name+'"><span class="bmk-ring"></span><span class="bmk-num">'+(i+1)+'</span><span class="bmk-lbl">'+p.short+'</span></button>';}).join(''):'')+
         '<span class="mp-cap">ผังงาน · Samyan Mitrtown ชั้น 5</span><button class="mp-zoom" id="mapZoomBtn" aria-label="ดูแผนที่แบบเต็มจอ">'+ic('lc-maximize-2')+'<span>ดูแบบเต็มจอ</span></button></div>'+
       /* v2 semantic legend — the one key that makes both markers and step dots readable at a glance;
