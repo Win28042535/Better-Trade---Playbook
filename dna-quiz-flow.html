@@ -2247,7 +2247,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* aspect-ratio matches Floorplan BTT (1).png's real 3657×2772 (2026-08-26, per direction — swapped
    in for the old square Map.png mockup) — was 1/1, which forced object-fit:cover to crop the sides
    off this wider top-down floor plan. */
-.map-ph{position:relative;border:1px solid var(--line-soft);border-radius:var(--r1);overflow:hidden;background:linear-gradient(135deg,var(--paper),var(--cloud));aspect-ratio:3657/2772;display:flex;align-items:center;justify-content:center;margin-bottom:var(--sp-stack);}
+.map-ph{position:relative;border:1px solid var(--line-soft);border-radius:var(--r1);overflow:hidden;background:linear-gradient(135deg,var(--paper),var(--cloud));aspect-ratio:3373/1960;display:flex;align-items:center;justify-content:center;margin-bottom:var(--sp-stack);}
 .map-ph .mp-in{display:flex;flex-direction:column;align-items:center;gap:var(--sp-glue);color:var(--muted);}
 .map-ph .mp-in svg{width:var(--ic-lg);height:var(--ic-lg);}
 .map-ph .mp-img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -4023,7 +4023,7 @@ var LOGO_IMG={aiSymbol:'assets/aiSymbol.png',efinAiIcon:'assets/efinAiIcon.png',
 /* Real event floor plan (Floorplan BTT (1).png, 2026-08-26 per direction — replaces the earlier
    generic Map.png mockup placeholder), base64-embedded like the other images so the app stays
    self-contained. Used in the booth map card + its fullscreen lightbox. */
-var MAP_IMG="assets/MAP_IMG.webp";
+var MAP_IMG="assets/MAP_IMG.webp?v=2";
 var RADAR_AXES=['หุ้นไทย','ต่างปท.','กองทุน','คริปโต','ทอง','สุขภาพ'];
 /* Custom illustrated question/analyzing icons — replaces specific Lucide icons per direction; each compressed via in-browser canvas (no local image tool available) from a 1920x1920 source PNG down to 160x160, kept as PNG (not JPEG) to preserve alpha transparency. */
 var ICON_HOURGLASS_PNG='assets/ICON_HOURGLASS_PNG.png';
@@ -6766,12 +6766,12 @@ var BOOTH_SEL=null;
    put. `s` is the short marker label (per the spec's "Short Name / Label เมื่อจำเป็น"); the full
    name still lives on the route row. Positions read off the floor plan's own printed zone labels. */
 var BOOTH_MAP_POS={
-  'จุดแลกรับการ์ดตัวจริง':{x:40,y:15,s:'แลกการ์ด'},
-  'Capital Zone':{x:58.3,y:53.4,s:'Capital'},
-  'Crypto Zone':{x:46.9,y:38.8,s:'Crypto'},
-  'Commodity Zone':{x:46.9,y:27.4,s:'Commodity'},
-  'Alternative Investment Zone':{x:61.3,y:13.2,s:'Alternative'},
-  'Health Zone':{x:62.5,y:27.4,s:'Health'}
+  'จุดแลกรับการ์ดตัวจริง':{x:41,y:36.1,s:'แลกการ์ด'},
+  'Capital Zone':{x:51.2,y:51.6,s:'Capital'},
+  'Crypto Zone':{x:58.2,y:36.1,s:'Crypto'},
+  'Commodity Zone':{x:41,y:21.5,s:'Commodity'},
+  'Alternative Investment Zone':{x:54,y:5.5,s:'Alternative'},
+  'Health Zone':{x:58.2,y:21.5,s:'Health'}
 };
 /* 10 booths — asset / gamified game name / icon (Material→Lucide) — verbatim from BOOTHS. */
 var BOOTHS=[
