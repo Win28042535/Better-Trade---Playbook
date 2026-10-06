@@ -1551,6 +1551,127 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .lib-stub{display:flex;gap:var(--sp-list);align-items:flex-start;padding:var(--sp-list) var(--sp-inline);border-radius:var(--r1);background:var(--paper);font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;}
 .lib-stub svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;margin-top:1px;}
 .klib-item svg{width:var(--ic-sm);height:var(--ic-sm);color:var(--muted);flex-shrink:0;}
+/* ══ ASSET PLAYBOOKS (2026-10-06) ══ 14-book index + read-only book page (phase 1). Content is the
+   content team's verified Asset Playbooks, exported by tools/build-asset-playbooks.js into
+   assets/playbooks/*.js and loaded on demand. Their own efin.finance CI (blue/navy/lime, Noto Sans
+   Thai + Inter, 16px body) is NOT carried over — re-skinned onto this file's tokens: FC Minimal for
+   all Thai, Baskervville only for the English book names/step codes/numerals, hairline-divided rows
+   instead of stacked boxes, violet = the step you have open, amber = every pitfall/red flag (no red
+   tone exists in this DNA — per direction "ป้ายเตือน: ใช้โทนอำพันแทนแดง"). Long reading text sits on
+   --fs-bodysm (18px), not --fs-body (22px), since these pages are far longer than any other screen. */
+.apb-list{display:flex;flex-direction:column;margin-top:var(--sp-stack);}
+.apb-li{display:grid;grid-template-columns:40px 1fr auto;gap:var(--sp-inline);align-items:flex-start;width:100%;padding:var(--sp-stack) 0;background:none;border:none;border-top:1px solid var(--line-soft);font-family:var(--font);text-align:left;cursor:pointer;color:var(--ink);}
+.apb-li:first-child{border-top:none;padding-top:0;}
+.apb-li:last-child{padding-bottom:0;}
+.apb-li .klib-cv{margin-top:var(--sp-list);}
+.apb-t{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.35;}
+.apb-en{font-family:var(--serif);font-size:var(--fs-eyebrow);letter-spacing:.06em;color:var(--muted);text-transform:uppercase;}
+.apb-s{font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin-top:var(--sp-stack-tight);}
+.apb-hd-en{font-family:var(--serif);letter-spacing:.06em;}
+/* Top-bar English name 2px under the shared .tb-sub size (14 -> 12px), per direction 2026-10-06. */
+.tb-sub .apb-hd-en{font-size:calc(var(--fs-meta) - 2px);}
+/* "เล่ม n/14" pinned to the card's right edge. */
+.apb-bn{margin-left:auto;text-transform:none;}
+.apb-kv{margin-top:var(--sp-stack);padding-top:var(--sp-stack);border-top:1px solid var(--line-soft);}
+.apb-lab{font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--muted);margin-bottom:var(--sp-stack-tight);}
+.apb-txt{font-size:var(--fs-bodysm);line-height:1.65;color:var(--ink);}
+.apb-txt p{margin:0;}
+.apb-txt p+p,.apb-txt p+.apb-ol{margin-top:var(--sp-list);}
+.apb-ol{margin:var(--sp-glue) 0 0;padding-left:1.4em;}
+.apb-ol li+li{margin-top:var(--sp-glue);}
+.apb-meta{display:flex;flex-wrap:wrap;gap:var(--sp-glue) var(--sp-inline);margin-top:var(--sp-stack);font-size:var(--fs-meta);color:var(--muted);}
+.apb-meta span{display:inline-flex;align-items:center;gap:var(--sp-glue);}
+.apb-meta svg{width:var(--ic-sm);height:var(--ic-sm);}
+.apb-toc{display:flex;flex-wrap:wrap;gap:var(--sp-list);margin-top:var(--sp-stack);}
+.apb-toc button{font-family:var(--font);font-size:var(--fs-label);color:var(--ink);background:var(--white);border:1px solid var(--line-strong);border-radius:var(--rpill);padding:var(--sp-glue) var(--sp-inline);min-height:44px;cursor:pointer;}
+.apb-sec{scroll-margin-top:70px;}
+.apb-item{padding:var(--sp-stack) 0;border-top:1px solid var(--line-soft);}
+.s-h+.apb-item,.s-h+.apb-step{border-top:none;padding-top:0;}
+.apb-tbt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.apb-q{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.45;margin-bottom:var(--sp-glue);}
+.apb-analogy{margin-top:var(--sp-list);font-size:var(--fs-label);color:var(--muted);line-height:1.6;}
+/* "อ่านคำตอบทั้งหมด"/"ย่อคำตอบ" and the phase-2 reveal toggles use Home's .ag-more ("ดูกำหนดการทั้งวัน
+   N รายการ") verbatim — same open/collapse behavior, same chevron that flips on open (2026-10-06, per
+   direction). Only the spacing under the answer text is set here. */
+.apb-more{margin-top:var(--sp-list);}
+/* Asset Knowleges header card = .efin-banner's own shape (icon+title row, description under it) in
+   another hue pair: pink->yellow from the same --spectrum instead of cyan->violet (2026-10-06). */
+.efin-banner.apb-banner{background:linear-gradient(135deg,color-mix(in srgb,var(--pink) 10%,transparent),color-mix(in srgb,var(--yellow) 16%,transparent));}
+.apb-banner .efin-logo{height:32px;}
+/* English serif book names (MACRO, STOCK…) on the Asset Knowleges index: violet text. The Thai names
+   (หุ้นรายตัว…) and the book page's own titles keep their original ink style (2026-10-06, per direction). */
+.apb-li .apb-en{color:var(--violet);}
+.apb-tabs{margin-top:calc(var(--sp-stack-tight) * -1);}
+.apb-panel .apb-list{margin-top:var(--sp-stack);}
+.apb-panel .apb-li:first-child{padding-top:0;}
+/* phase 2 */
+/* phase 3: read-progress chips (violet = in progress, cyan = done, per the DNA status-tone ladder) */
+.apb-pc{display:inline-block;margin-top:var(--sp-list);font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--violet);background:var(--active-fill);padding:var(--sp-stack-tight) var(--sp-list);border-radius:var(--rpill);}
+.apb-pc.done{color:var(--ink);background:var(--done-fill);}
+.apb-rd{color:var(--violet);font-weight:var(--w-label);}
+.apb-step.seen .apb-num{background:var(--done-fill);border-color:var(--done-border);}
+.apb-step.seen.open .apb-num{background:var(--active-fill);border-color:var(--active-border);}
+.apb-pe{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.55;margin-bottom:var(--sp-stack);}
+.apb-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:var(--sp-inline);padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);font-size:var(--fs-label);line-height:1.5;}
+.apb-row:first-of-type{border-top:none;}
+.apb-row span:first-child{color:var(--muted);}
+.apb-calc{font-size:var(--fs-bodysm);line-height:1.6;padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);overflow-wrap:anywhere;}
+.apb-calc:first-of-type{border-top:none;}
+.apb-take{margin-top:var(--sp-stack);padding:var(--sp-inline) var(--sp-stack);border-radius:var(--r1);background:var(--done-wash);border:1px solid var(--done-border);}
+.apb-take .apb-lab{color:var(--ink);}
+.apb-mrow .apb-sb{padding-left:0;}
+.apb-mc+.apb-mc{margin-top:var(--sp-stack);}
+.apb-map-note{display:flex;gap:var(--sp-list);align-items:flex-start;font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin-bottom:var(--sp-stack);}
+.apb-map-note svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;margin-top:3px;}
+.apb-fld{font-size:var(--fs-bodysm);line-height:2.1;padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);overflow-wrap:anywhere;}
+.apb-fld:first-of-type{border-top:none;}
+.apb-bl{font-family:var(--font);font-size:var(--fs-bodysm);color:var(--ink);background:var(--paper);border:1px solid var(--line-strong);border-radius:var(--r0);padding:2px var(--sp-list);width:5.5em;max-width:100%;min-height:44px;margin:0 2px;vertical-align:middle;}
+.apb-bl.w{width:100%;margin:var(--sp-glue) 0 0;display:block;}
+.apb-bl:focus{outline:2px solid var(--focus);outline-offset:1px;background:var(--white);}
+.apb-ck{display:flex;gap:var(--sp-inline);align-items:flex-start;min-height:44px;padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);font-size:var(--fs-bodysm);line-height:1.5;cursor:pointer;}
+.apb-ck:first-of-type{border-top:none;}
+.apb-ck input{width:20px;height:20px;margin-top:3px;flex:0 0 auto;accent-color:var(--ink);}
+.apb-prog{font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--muted);margin:var(--sp-stack) 0 var(--sp-list);}
+.apb-fq{margin-top:var(--sp-stack);padding:var(--sp-inline) var(--sp-stack);border-radius:var(--r1);background:var(--accent);}
+.apb-fq .apb-q{margin:0;}
+.apb-bl-link{display:flex;align-items:center;gap:var(--sp-inline);width:100%;margin-top:var(--sp-stack);padding:var(--sp-inline) var(--sp-stack);background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r1);font-family:var(--font);text-align:left;cursor:pointer;color:var(--ink);}
+.apb-bl-link svg{width:var(--ic-md);height:var(--ic-md);flex:0 0 auto;}
+.apb-bl-link .apb-t{flex:1;min-width:0;font-size:var(--fs-bodysm);}
+.apb-bl-link small{display:block;font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);}
+.apb-refs{margin-top:var(--sp-list);font-size:var(--fs-meta);color:var(--muted);}
+.apb-ref{color:var(--muted);text-decoration:underline;text-underline-offset:2px;margin-left:4px;}
+.apb-step{border-top:1px solid var(--line-soft);}
+.apb-st{display:grid;grid-template-columns:34px 1fr auto;gap:var(--sp-inline);align-items:flex-start;width:100%;min-height:44px;padding:var(--sp-stack) 0;background:none;border:none;font-family:var(--font);text-align:left;cursor:pointer;color:var(--ink);}
+.apb-num{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:var(--fs-label);color:var(--ink);transition:background .18s var(--ease),border-color .18s var(--ease);}
+.apb-step.open .apb-num{background:var(--active-fill);border-color:var(--active-border);}
+.apb-code{font-family:var(--serif);font-size:var(--fs-eyebrow);letter-spacing:.06em;color:var(--muted);}
+.apb-st .lib-cat-cv{margin-top:var(--sp-list);}
+.apb-st[aria-expanded="true"] .lib-cat-cv{transform:rotate(180deg);}
+.apb-sb{padding:0 0 var(--sp-block) calc(34px + var(--sp-inline));}
+.apb-sb>*+*{margin-top:var(--sp-stack);}
+.apb-ul{margin:0;padding-left:1.2em;font-size:var(--fs-bodysm);line-height:1.6;color:var(--ink);}
+.apb-ul li+li{margin-top:var(--sp-glue);}
+.apb-tool{font-size:var(--fs-bodysm);line-height:1.5;}
+.apb-tool+.apb-tool{margin-top:var(--sp-list);}
+.apb-tool a{color:var(--ink);font-weight:var(--w-label);text-underline-offset:3px;}
+.apb-tool div{font-size:var(--fs-label);color:var(--muted);}
+.apb-warn{padding:var(--sp-inline) var(--sp-stack);border-radius:var(--r1);background:var(--amber-bg);border:1px solid var(--amber-border);}
+.apb-warn .apb-lab{display:flex;align-items:center;gap:var(--sp-glue);color:var(--amber-text);}
+.apb-warn .apb-lab svg{width:var(--ic-sm);height:var(--ic-sm);}
+.apb-flag+.apb-flag{margin-top:var(--sp-inline);}
+.apb-flag .apb-q{margin-bottom:var(--sp-list);}
+.apb-flag .apb-txt+.apb-txt{margin-top:var(--sp-glue);}
+.apb-src{font-size:var(--fs-label);line-height:1.5;padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);scroll-margin-top:70px;}
+.apb-src:first-child{border-top:none;}
+.apb-src b{font-family:var(--serif);font-weight:500;margin-right:var(--sp-glue);}
+.apb-src a{color:var(--ink);word-break:break-word;}
+.apb-src .apb-acc{font-size:var(--fs-meta);color:var(--muted);}
+.apb-src.hit{background:var(--active-wash);}
+.apb-pn{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-inline);}
+.apb-pn button{display:flex;flex-direction:column;gap:2px;padding:var(--sp-stack);background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);font-family:var(--font);text-align:left;cursor:pointer;color:var(--ink);}
+.apb-pn button.nx{text-align:right;align-items:flex-end;}
+.apb-pn .apb-lab{margin:0;}
+.apb-load{display:flex;align-items:center;gap:var(--sp-inline);font-size:var(--fs-bodysm);color:var(--muted);}
 .rk-lab{fill:var(--muted);}
 .donut-track{stroke:var(--line-soft);}
 .donut-arc{stroke:var(--ink);}
@@ -5010,6 +5131,8 @@ function render(){
   else if(st.phase==='cardreveal')renderCardReveal();
   else if(st.phase==='book')renderBook();
   else if(st.phase==='library')renderLibrary();
+  else if(st.phase==='assetpb')renderAssetIndex();
+  else if(st.phase==='assetbook')renderAssetBook();
   else if(st.phase==='home')renderHome();
   else if(st.phase==='passport')renderBooth();
   else if(st.phase==='games')renderGames();
@@ -6010,6 +6133,9 @@ function renderBook(){
          the persona card itself, and .card's own border would read as a card-inside-a-card there. */
       learnedLedgerHTML()+
       '<section class="card scroll-reveal"><div class="s-pad"><div class="list-row klib-row" id="klibRow"><div class="klib-ic">'+ic('lc-library')+'</div><div class="klib-tx"><div class="klib-t">คลังความรู้</div><div class="klib-s">41 บทความที่คัดมาสำหรับ '+h.th+'</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
+      /* Asset Playbooks entry (2026-10-06, per direction "หน้าย่อยในแท็บ Playbook ถัดจากคลังความรู้")
+         — same list-row shape as klibRow right above it; opens renderAssetIndex(). */
+      '<section class="card scroll-reveal"><div class="s-pad"><div class="list-row klib-row" id="apbRow"><div class="klib-ic">'+ic('lc-book-open')+'</div><div class="klib-tx"><div class="klib-t">Asset Knowleges</div><div class="klib-s">14 เล่ม รู้จักสินทรัพย์ ตั้งแต่หุ้น ทองคำ ไปจนถึงภาษีและกลโกง'+(function(){var p=apbReadSummary();return p.started?'<br><span class="apb-rd">เริ่มอ่านแล้ว '+p.started+' เล่ม · อ่านครบ '+p.done+' เล่ม</span>':'';})()+'</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
     '</div>'
     ))
     ))+
@@ -6089,6 +6215,7 @@ function renderBook(){
   root.querySelectorAll('.side-row').forEach(function(rw){rw.onclick=function(){togSide(rw);};});
   mountSideCtaBtn();
   var kr=root.querySelector('#klibRow');if(kr)kr.onclick=function(){LIB_OPEN=null;st.phase='library';render();};
+  var apr=root.querySelector('#apbRow');if(apr)apr.onclick=function(){st.phase='assetpb';render();};
   var confPlayBtn2=root.querySelector('#confPlayBtn');if(confPlayBtn2)confPlayBtn2.onclick=function(){st.phase='games';render();};
   /* unreg: no qr-cta-slot in the header to mount into (see the header markup above) — bindHeaderLogo()
      moved up above the `if(unreg)return;` (2026-09-10) since the logo itself IS clickable in every
@@ -6244,6 +6371,298 @@ function renderLibrary(){
     root.querySelectorAll('.lib-cat.open').forEach(function(c){c.classList.remove('open');var cb=c.querySelector('.lib-cat-body');if(cb)cb.classList.remove('show');});
     if(!isOpen){cat.classList.add('open');body.classList.add('show');LIB_OPEN=i;}else{LIB_OPEN=null;}
   };});
+}
+/* ══ ASSET PLAYBOOKS (2026-10-06, phase 1) ══ 14-book index (renderAssetIndex, phase 'assetpb') +
+   read-only book page (renderAssetBook, phase 'assetbook'). Data = assets/playbooks/index.js and
+   <id>.js, generated by tools/build-asset-playbooks.js from the content team's verified source and
+   pulled in by a <script> tag on first open (apbLoad) so neither the 14 books (~700KB) nor the index
+   weigh on the main file, and it still works from file:// where fetch() of local JSON is blocked.
+   Phase 1 shows: header, key questions (verified 1–2 line short first, full answer on tap), basics,
+   the 8 steps as an accordion, red flags, sources. Deferred to phase 2 (already in the data, not
+   rendered yet): worked_example, takehome (MY ___ MAP), method_matrix, at_event. */
+var APB_CUR=null;
+var APB_TAB=0; // selected group tab on the index, kept across book -> back
+/* Read progress (phase 3, 2026-10-06): a step counts as read once opened. Kept per book in this
+   device's localStorage ('apbRead_<id>' = {s:[opened step indexes], n:total steps}) — same
+   device-only, try/catch'd storage rule as the MY ___ MAP state. In-progress reads violet, finished
+   reads cyan (the DNA status-tone ladder: violet = active, cyan = done). */
+var APB_IDS=['macro','stock','bond','fund','dr','gold','realestate','crypto','collectible','tax','insurance','longevity','ai','scam'];
+function apbReadLoad(id){
+  try{var r=JSON.parse(localStorage.getItem('apbRead_'+id)||'null');if(r&&Array.isArray(r.s))return {s:r.s.filter(function(x){return typeof x==='number';}),n:+r.n||8};}catch(e){}
+  return {s:[],n:8};
+}
+function apbReadMark(id,i,n){
+  var r=apbReadLoad(id);
+  if(r.s.indexOf(i)>-1)return r;
+  r.s.push(i);r.n=n||r.n;
+  try{localStorage.setItem('apbRead_'+id,JSON.stringify(r));}catch(e){}
+  return r;
+}
+function apbReadSummary(){ // {started, done} over all 14 books, for the Playbook-tab entry row
+  var st0=0,dn=0;
+  APB_IDS.forEach(function(id){var r=apbReadLoad(id);if(r.s.length)st0++;if(r.s.length>=r.n)dn++;});
+  return {started:st0,done:dn};
+}
+function apbReadChip(id,total){
+  var r=apbReadLoad(id),n=total||r.n;
+  if(!r.s.length)return '';
+  return r.s.length>=n?'<span class="apb-pc done">อ่านครบแล้ว</span>':'<span class="apb-pc">อ่านแล้ว '+r.s.length+'/'+n+' ขั้นตอน</span>';
+}
+/* Booth (BOOTHS[].asset) -> its Asset Knowleges book, for the "อ่านเรื่อง … ต่อ" row on the booth result screen.
+   'หุ้นต่างประเทศ' -> dr is a provisional pairing (per direction "ให้ลิงก์ไป DR ก่อนได้"); 'สุขภาพ' has no book. */
+var BOOTH_BOOK={'หุ้นไทย':'stock','หุ้นต่างประเทศ':'dr','กองทุนรวม':'fund','ตราสารหนี้':'bond','ทองคำ':'gold','อสังหา/REIT':'realestate','ประกัน':'insurance','คริปโต':'crypto','ของสะสม':'collectible'};
+var APB_LOADING={};
+function apbLoad(file,done){
+  var ready=file==='index'?!!window.ASSET_PB_INDEX:!!(window.ASSET_PB_DATA&&window.ASSET_PB_DATA[file]);
+  if(ready){done(true);return;}
+  if(APB_LOADING[file]){APB_LOADING[file].push(done);return;}
+  APB_LOADING[file]=[done];
+  var s=document.createElement('script');
+  s.src='assets/playbooks/'+file+'.js';
+  function fin(ok){var cbs=APB_LOADING[file]||[];delete APB_LOADING[file];if(!ok&&s.parentNode)s.parentNode.removeChild(s);cbs.forEach(function(cb){cb(ok);});}
+  s.onload=function(){fin(true);};
+  s.onerror=function(){fin(false);};
+  document.head.appendChild(s);
+}
+/* English book names drop the trailing "PLAYBOOK" ("MACRO PLAYBOOK" -> "MACRO"), per direction 2026-10-06. */
+function apbEn(s){return apbEsc(String(s==null?'':s).replace(/\s*PLAYBOOK\s*$/i,''));}
+function apbEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+/* Source text conventions: **bold**, literal \n line breaks, and inline "(1) … (2) … (3) …" sub-items
+   (the source's own full edition breaks those onto their own indented lines — same here, as a list). */
+function apbTxt(s,inLi){
+  // inLi: result goes INSIDE an <li> (step actions) — no <p> wrappers there, so no stray </p> is left
+  // behind when the text also carries a "(1) … (2) …" sub-list (bug found 2026-10-06: stripping the
+  // wrapper with a regex only worked for plain text, not for text ending in </ol>).
+  var t=apbEsc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+  var parts=t.split(/\s(?=\(\d{1,2}\)\s)/);
+  var firstItem=/^\(1\)\s/.test(parts[0])?0:(parts.length>1&&/^\(1\)\s/.test(parts[1])?1:-1);
+  if(parts.length>2&&firstItem>-1){
+    var lead=firstItem?(inLi?parts[0].replace(/\n/g,'<br>'):'<p>'+parts[0].replace(/\n/g,'<br>')+'</p>'):'';
+    return lead+'<ol class="apb-ol">'+parts.slice(firstItem).map(function(p){return '<li>'+p.replace(/^\(\d{1,2}\)\s/,'').replace(/\n/g,'<br>')+'</li>';}).join('')+'</ol>';
+  }
+  return inLi?t.replace(/\n/g,'<br>'):'<p>'+t.replace(/\n/g,'<br>')+'</p>';
+}
+var APB_TH_MONTH=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function apbDate(iso){var m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||'');return m?(+m[3])+' '+APB_TH_MONTH[+m[2]-1]+' '+(+m[1]+543):apbEsc(iso);}
+/* MY ___ MAP (takehome) state — typed fields + ticked checklist, kept per book in this device's
+   localStorage only ("ข้อมูลที่กรอกเก็บไว้ในเครื่องนี้เท่านั้น", per direction for phase 2). Every
+   access is try/catch'd (private mode / blocked storage must never break the page). */
+function apbMapLoad(id){
+  var s={f:{},c:{}};
+  try{var r=JSON.parse(localStorage.getItem('apbMap_'+id)||'null');if(r&&typeof r==='object'){s.f=r.f&&typeof r.f==='object'?r.f:{};s.c=r.c&&typeof r.c==='object'?r.c:{};}}catch(e){}
+  return s;
+}
+function apbMapSave(id,s){
+  try{
+    var empty=!Object.keys(s.f).some(function(k){return s.f[k];})&&!Object.keys(s.c).some(function(k){return s.c[k];});
+    if(empty)localStorage.removeItem('apbMap_'+id);else localStorage.setItem('apbMap_'+id,JSON.stringify(s));
+  }catch(e){}
+}
+/* A takehome field is free text with "____" blanks and " | " between sub-items. Blanks become inputs
+   in place (short ones inline, long ones a full-width line); a field with no blank gets one input at
+   the end so it can still be answered. */
+function apbFieldHTML(f,fi,state){
+  var parts=String(f).split(/(_{3,})/),j=0,out='';
+  var label=String(f).replace(/_{3,}/g,'').replace(/\s*\|\s*/g,' ').replace(/\s+/g,' ').trim().slice(0,60);
+  function inp(len){
+    var k=fi+'.'+(j++);
+    return '<input class="apb-bl'+(len>=6?' w':'')+'" type="text" data-fk="'+k+'" value="'+apbEsc(state.f[k]||'')+'" maxlength="200" autocomplete="off" aria-label="'+apbEsc(label)+'">';
+  }
+  parts.forEach(function(p){
+    if(/^_{3,}$/.test(p))out+=inp(p.length);
+    else out+=apbEsc(p).replace(/\s*\|\s*/g,'<br>');
+  });
+  if(!j)out+=inp(6);
+  return out;
+}
+function apbRefs(refs){
+  if(!refs||!refs.length)return '';
+  return '<div class="apb-refs">ที่มา'+refs.map(function(r){return '<a href="#" class="apb-ref" data-ref="'+apbEsc(r)+'">'+apbEsc(String(r).replace(/^S/,''))+'</a>';}).join('')+'</div>';
+}
+function apbShell(title,sub,backPhase,body){
+  root.innerHTML=
+    '<header class="topbar"><button class="tb-ic" id="apbBack" type="button" aria-label="ย้อนกลับ">'+ic('lc-arrow-left')+'</button><div style="flex:1;min-width:0"><div class="tb-title apb-tbt">'+title+'</div><div class="tb-sub">'+sub+'</div></div></header>'+
+    '<main class="scroll fade">'+body+'</main>';
+  appTabbar('book');
+  bindTabbar();
+  root.querySelector('#apbBack').onclick=function(){st.phase=backPhase;render();};
+}
+function apbLoadingCard(failed,retryFile){
+  return '<section class="card"><div class="s-pad"><div class="apb-load">'+ic(failed?'lc-alert-triangle':'lc-hourglass')+
+    '<span>'+(failed?'โหลดเนื้อหาไม่สำเร็จ ตรวจสัญญาณแล้วลองใหม่':'กำลังโหลด…')+'</span></div>'+
+    (failed?'<button class="apb-more" id="apbRetry" data-file="'+apbEsc(retryFile)+'">ลองใหม่</button>':'')+'</div></section>';
+}
+function apbAwait(file,phase,title,sub,backPhase){
+  apbShell(title,sub,backPhase,apbLoadingCard(false));
+  apbLoad(file,function(ok){
+    if(st.phase!==phase)return; // user already left — don't paint over another screen
+    if(ok){render();return;}
+    apbShell(title,sub,backPhase,apbLoadingCard(true,file));
+    var r=root.querySelector('#apbRetry');if(r)r.onclick=function(){render();};
+  });
+}
+function renderAssetIndex(){
+  var IX=window.ASSET_PB_INDEX;
+  if(!IX){apbAwait('index','assetpb','Asset Knowleges','เพื่อการศึกษา','book');return;}
+  /* Header = the "ให้ AI ช่วยแนะนำแบบคุณ" banner's shape (.efin-banner) with the spectrum-book icon
+     (ICON_BOOK_PNG) in a pink->yellow tint. The 3 groups are a .bt-tabs--primary tab bar — the same
+     tab DNA as "สรุปไว้คุยกับผู้แนะนำการลงทุน" (ddTabs) — instead of 3 stacked cards. */
+  var GROUP_ICON=['lc-trending-up','lc-gem','lc-shield'];
+  if(APB_TAB>=IX.groups.length)APB_TAB=0;
+  var tablist=IX.groups.map(function(g,i){return '<button class="bt-tab" type="button" role="tab" aria-selected="'+(i===APB_TAB?'true':'false')+'" data-value="'+i+'"><span class="bt-tab-icon">'+ic(GROUP_ICON[i]||'lc-book-open')+'</span><span class="bt-tab-label">'+apbEsc(g)+'</span></button>';}).join('');
+  var panels=IX.groups.map(function(g,i){
+    var books=IX.books.filter(function(b){return b.group===g;});
+    return '<div class="apb-panel" data-apbp="'+i+'"'+(i===APB_TAB?'':' style="display:none"')+'><div class="apb-list">'+
+      books.map(function(b){
+        return '<button class="apb-li" type="button" data-book="'+apbEsc(b.id)+'"><div class="klib-ic">'+ic(b.icon)+'</div>'+
+          '<div><div class="apb-en">'+apbEn(b.name_en)+'</div><div class="apb-t">'+apbEsc(b.name_th)+'</div><div class="apb-s">'+apbEsc(b.tagline)+'</div>'+apbReadChip(b.id,b.steps)+'</div>'+
+          ic('lc-chevron-right','klib-cv')+'</button>';
+      }).join('')+'</div></div>';
+  }).join('');
+  var body=
+    '<div class="efin-banner apb-banner scroll-reveal"><div class="efin-hd"><img class="efin-logo" src="'+ICON_BOOK_PNG+'" alt=""><div class="efin-t"><span class="lib-num">'+IX.books.length+'</span> Asset Knowleges สินทรัพย์</div></div>'+
+      '<div class="efin-d" style="margin-bottom:0">เลือกเล่มที่สนใจ แต่ละเล่มพาตั้งแต่รู้จักตัวเอง ตรวจข้อมูลจากแหล่งทางการ จนเขียนกติกาของตัวเองได้ ✦ เอกสารเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุนหรือภาษีเฉพาะบุคคล</div></div>'+
+    '<section class="card scroll-reveal"><div class="s-pad">'+
+      '<div class="bt-tabs bt-tabs--primary dd-tablist apb-tabs" id="apbTabs" role="tablist" aria-label="หมวดสินทรัพย์">'+tablist+'</div>'+panels+
+    '</div></section>';
+  apbShell('Asset Knowleges',IX.books.length+' เล่ม ✦ '+IX.groups.length+' หมวด','book',body);
+  initBtTabs(root.querySelector('#apbTabs'),function(value){
+    APB_TAB=+value;
+    root.querySelectorAll('.apb-panel').forEach(function(p){p.style.display=(p.dataset.apbp===value)?'':'none';});
+  });
+  root.querySelectorAll('.apb-li[data-book]').forEach(function(b){b.onclick=function(){APB_CUR=b.dataset.book;st.phase='assetbook';render();};});
+}
+function renderAssetBook(){
+  var IX=window.ASSET_PB_INDEX,D=window.ASSET_PB_DATA&&window.ASSET_PB_DATA[APB_CUR];
+  if(!APB_CUR){st.phase='assetpb';render();return;}
+  if(!IX){apbAwait('index','assetbook','Asset Knowleges','เพื่อการศึกษา','assetpb');return;}
+  if(!D){var meta=IX.books.filter(function(b){return b.id===APB_CUR;})[0]||{};apbAwait(APB_CUR,'assetbook',apbEsc(meta.name_th||''),'<span class="apb-hd-en">'+apbEn(meta.name_en||'')+'</span>','assetpb');return;}
+  var pos=IX.books.map(function(b){return b.id;}).indexOf(D.id);
+  var prev=IX.books[pos-1],next=IX.books[pos+1];
+  var shortsHere=(D.key_questions||[]).some(function(k){return k.short;})||(D.basics||[]).some(function(k){return k.short;});
+  /* Expandable answer: verified short first, full answer behind "อ่านคำตอบเต็ม" (source's own pattern). */
+  function qa(head,short,full,extra,refs){
+    var hasShort=!!short;
+    return '<div class="apb-item"><div class="apb-q">'+head+'</div>'+
+      (hasShort?'<div class="apb-txt apb-short">'+apbTxt(short)+'</div>':'')+
+      '<div class="apb-full"'+(hasShort?' hidden':'')+'><div class="apb-txt">'+apbTxt(full)+'</div>'+(extra||'')+apbRefs(refs)+'</div>'+
+      (hasShort?'<button class="ag-more apb-more" type="button" data-more>'+ic('lc-chevron-down','ag-more-ic')+'<span>อ่านคำตอบทั้งหมด</span></button>':'')+
+    '</div>';
+  }
+  function sec(id,ey,title,inner){
+    return '<section class="card scroll-reveal apb-sec" id="apb-'+id+'"><div class="s-pad"><div class="s-ey"><span>'+ey+'</span></div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">'+title+'</h2>'+inner+'</div></section>';
+  }
+  var READ0=apbReadLoad(D.id);
+  var WE=D.worked_example,TH=D.takehome,MM=D.method_matrix,AE=D.at_event;
+  var hasMM=!!(MM&&MM.rows&&MM.rows.length),hasEx=!!(WE&&WE.calc_steps&&WE.calc_steps.length),hasMap=!!(TH&&TH.fields&&TH.fields.length),hasEv=!!(AE&&AE.length);
+  var toc=[['kq','คำถามหลัก'],['basics','ศัพท์พื้นฐาน'],['steps',D.steps.length+' ขั้นตอน']]
+    .concat(hasMM?[['mm','ตารางวิธีลงทุน']]:[]).concat(hasEx?[['ex','ตัวอย่างคำนวณ']]:[]).concat(hasMap?[['map','แผนที่ของฉัน']]:[]).concat(hasEv?[['ev','ที่งานนี้']]:[])
+    .concat([['flags','สัญญาณอันตราย'],['src','แหล่งอ้างอิง']]);
+  /* ── phase 2 sections ── */
+  var mmHTML='',exHTML='',mapHTML='',evHTML='';
+  if(hasMM){
+    mmHTML=sec('mm','วิธีลงทุน',apbEsc(MM.title),
+      (MM.note?'<div class="lib-stub" style="margin-bottom:var(--sp-stack)">'+ic('lc-info')+'<span>'+apbEsc(MM.note)+'</span></div>':'')+
+      MM.rows.map(function(r){
+        return '<div class="apb-step apb-mrow"><button class="apb-st" type="button" data-mrow aria-expanded="false" style="grid-template-columns:1fr auto"><span class="apb-t">'+apbEsc(r.step)+'</span>'+ic('lc-chevron-down','lib-cat-cv')+'</button>'+
+          '<div class="apb-sb" hidden>'+r.cells.map(function(c,j){return '<div class="apb-mc"><div class="apb-lab">'+apbEsc((MM.columns||[])[j]||'')+'</div><div class="apb-txt">'+apbTxt(c)+'</div></div>';}).join('')+'</div></div>';
+      }).join(''));
+  }
+  if(hasEx){
+    exHTML=sec('ex','ตัวอย่างคำนวณ',apbEsc(WE.title),
+      (WE.persona?'<div class="apb-pe">'+apbEsc(WE.persona)+'</div>':'')+
+      '<button class="ag-more apb-more" type="button" data-rv data-open="ดูข้อมูลและขั้นคำนวณ" data-close="ย่อขั้นคำนวณ" style="margin-top:0">'+ic('lc-chevron-down','ag-more-ic')+'<span>ดูข้อมูลและขั้นคำนวณ</span></button>'+
+      '<div hidden>'+
+        '<div class="apb-kv"><div class="apb-lab">ข้อมูลที่ใช้</div>'+(WE.inputs||[]).map(function(x){return '<div class="apb-row"><span>'+apbEsc(x.label)+'</span><span>'+apbEsc(x.value)+(x.refs&&x.refs.length?apbRefs(x.refs):'')+'</span></div>';}).join('')+'</div>'+
+        '<div class="apb-kv"><div class="apb-lab">คำนวณทีละขั้น</div>'+WE.calc_steps.map(function(s){return '<div class="apb-calc">'+apbEsc(s)+'</div>';}).join('')+'</div>'+
+      '</div>'+
+      (WE.takeaway?'<div class="apb-take"><div class="apb-lab">สรุปจากตัวอย่าง</div><div class="apb-txt">'+apbTxt(WE.takeaway)+'</div></div>':'')+
+      (WE.disclaimer?'<div class="lib-stub" style="margin-top:var(--sp-stack)">'+ic('lc-info')+'<span>'+apbEsc(WE.disclaimer)+'</span></div>':''));
+  }
+  if(hasMap){
+    var MAPST=apbMapLoad(D.id),nCk=(TH.checklist||[]).length,nDone=0;
+    (TH.checklist||[]).forEach(function(c,i){if(MAPST.c[i])nDone++;});
+    mapHTML=sec('map',apbEsc(TH.title),'เขียนกติกาของตัวเอง',
+      '<div class="apb-map-note">'+ic('lc-lock')+'<span>ข้อมูลที่กรอกเก็บไว้ในเครื่องนี้เท่านั้น ไม่ส่งออกไปที่ใด ล้างเบราว์เซอร์แล้วจะหาย</span></div>'+
+      '<div class="apb-lab">ช่องให้กรอก</div>'+
+      TH.fields.map(function(f,fi){return '<div class="apb-fld">'+apbFieldHTML(f,fi,MAPST)+'</div>';}).join('')+
+      ((TH.checklist||[]).length?'<div class="apb-prog" id="apbProg">เช็กลิสต์ ติ๊กแล้ว '+nDone+'/'+nCk+'</div>'+
+        TH.checklist.map(function(c,ci){return '<label class="apb-ck"><input type="checkbox" data-ck="'+ci+'"'+(MAPST.c[ci]?' checked':'')+'><span>'+apbEsc(String(c).replace(/^\s*□\s*/,''))+'</span></label>';}).join(''):'')+
+      (TH.final_question?'<div class="apb-fq"><div class="apb-lab">คำถามสุดท้ายก่อนตัดสินใจ</div><div class="apb-q">'+apbEsc(TH.final_question)+'</div></div>':'')+
+      '<button class="ag-more apb-more" type="button" id="apbMapClear">'+ic('lc-delete')+'<span>ล้างข้อมูลที่กรอกในแผนที่นี้</span></button>');
+  }
+  if(hasEv){
+    evHTML=sec('ev','ที่งาน BetterTrade 2026','ไปลองต่อที่ไหน',
+      AE.map(function(e){return '<div class="apb-item"><div class="apb-q">'+apbEsc(e.title)+'</div><div class="apb-txt">'+apbTxt(e.text)+'</div></div>';}).join(''));
+  }
+  var body=
+    '<section class="card scroll-reveal"><div class="s-pad">'+
+      '<div class="s-ey">'+ic(D.icon)+'<span class="apb-hd-en">'+apbEn(D.name_en)+'</span><span class="apb-bn">เล่ม '+D.n+'/'+IX.books.length+'</span></div>'+
+      '<h2 class="s-h">'+apbEsc(D.headline)+'</h2>'+
+      '<p class="s-sub" style="margin-bottom:0">'+apbEsc(D.tagline)+'</p>'+
+      '<div class="apb-kv"><div class="apb-lab">เหมาะกับใคร</div><div class="apb-txt">'+apbTxt(D.who_for)+'</div></div>'+
+      '<div class="apb-kv"><div class="apb-lab">อ่านจบแล้วได้อะไร</div><div class="apb-txt">'+apbTxt(D.outcome)+'</div></div>'+
+      '<div class="apb-meta"><span>'+ic('lc-calendar')+'ข้อมูล ณ '+apbDate(D.data_asof)+'</span><span>'+ic('lc-file-text')+D.sources.length+' แหล่งอ้างอิง</span><span id="apbReadMeta">'+ic('lc-check-circle')+'อ่านแล้ว '+Math.min(READ0.s.length,D.steps.length)+'/'+D.steps.length+' ขั้นตอน</span></div>'+
+      '<div class="lib-stub" style="margin-top:var(--sp-stack)">'+ic('lc-info')+'<span>เอกสารเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุนหรือภาษีเฉพาะบุคคล · ข้อมูลที่เปลี่ยนตามเวลาระบุวันที่กำกับไว้</span></div>'+
+      '<div class="apb-toc" aria-label="ในเล่มนี้">'+toc.map(function(t){return '<button type="button" data-jump="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>'+
+    '</div></section>'+
+    sec('kq','คำถามหลัก','ตอบให้ได้ก่อนลงมือ',D.key_questions.map(function(k){return qa(apbEsc(k.q),k.short,k.a,'',k.refs);}).join(''),shortsHere)+
+    sec('basics','ศัพท์พื้นฐาน','คำที่จะเจอบนหน้าจอจริง',D.basics.map(function(b){
+      return qa(apbEsc(b.term),b.short,b.plain,b.analogy?'<div class="apb-analogy">เปรียบเทียบ: '+apbEsc(b.analogy)+'</div>':'',b.refs);
+    }).join(''),shortsHere)+
+    sec('steps',D.steps.length+' ขั้นตอน','ทำตามลำดับ',D.steps.map(function(s,i){
+      return '<div class="apb-step'+(READ0.s.indexOf(i)>-1?' seen':'')+'" data-step="'+i+'"><button class="apb-st" type="button" aria-expanded="false"><span class="apb-num">'+s.n+'</span>'+
+        '<span><span class="apb-code">'+apbEsc(s.code)+'</span><span class="apb-t" style="display:block">'+apbEsc(s.title)+'</span></span>'+ic('lc-chevron-down','lib-cat-cv')+'</button>'+
+        '<div class="apb-sb" hidden>'+
+          (s.goal?'<div><div class="apb-lab">ขั้นนี้ได้อะไร</div><div class="apb-txt">'+apbTxt(s.goal)+'</div></div>':'')+
+          (s.actions&&s.actions.length?'<div><div class="apb-lab">ทำอะไร</div><ul class="apb-ul">'+s.actions.map(function(a){return '<li>'+apbTxt(a,true)+'</li>';}).join('')+'</ul></div>':'')+
+          (s.ask_yourself&&s.ask_yourself.length?'<div><div class="apb-lab">ถามตัวเอง</div><ul class="apb-ul">'+s.ask_yourself.map(function(a){return '<li>'+apbEsc(a)+'</li>';}).join('')+'</ul></div>':'')+
+          (s.tools&&s.tools.length?'<div><div class="apb-lab">เครื่องมือ</div>'+s.tools.map(function(t){return '<div class="apb-tool">'+(t.url?'<a href="'+apbEsc(t.url)+'" target="_blank" rel="noopener">'+apbEsc(t.name)+'</a>':'<b>'+apbEsc(t.name)+'</b>')+(t.use_for?'<div>'+apbEsc(t.use_for)+'</div>':'')+'</div>';}).join('')+'</div>':'')+
+          (s.pitfall?'<div class="apb-warn"><div class="apb-lab">'+ic('lc-alert-triangle')+'กับดักที่พบบ่อย</div><div class="apb-txt">'+apbTxt(s.pitfall)+'</div></div>':'')+
+          apbRefs(s.refs)+
+        '</div></div>';
+    }).join(''),false)+
+    mmHTML+exHTML+mapHTML+evHTML+
+    sec('flags','สัญญาณอันตราย','เห็นแบบนี้ ให้หยุดก่อน',D.red_flags.map(function(f){
+      return '<div class="apb-warn apb-flag"><div class="apb-lab">'+ic('lc-alert-triangle')+'สัญญาณ</div><div class="apb-q">'+apbEsc(f.sign)+'</div>'+
+        '<div class="apb-txt"><b>ทำไม:</b> '+apbEsc(f.why)+'</div><div class="apb-txt"><b>ทำอย่างไร:</b> '+apbEsc(f.what_to_do)+'</div>'+apbRefs(f.refs)+'</div>';
+    }).join(''),false)+
+    '<section class="card scroll-reveal apb-sec" id="apb-src"><div class="s-pad"><div class="s-ey">แหล่งอ้างอิง</div>'+
+      '<button class="apb-st" type="button" id="apbSrcTg" aria-expanded="false" style="grid-template-columns:1fr auto;padding-top:0"><span class="apb-t">'+D.sources.length+' แหล่งที่เปิดอ่านจริงก่อนเขียน</span>'+ic('lc-chevron-down','lib-cat-cv')+'</button>'+
+      '<div id="apbSrcList" hidden>'+D.sources.map(function(s){
+        return '<div class="apb-src" id="apb-src-'+apbEsc(s.id)+'"><b>'+apbEsc(String(s.id).replace(/^S/,''))+'</b>'+apbEsc(s.publisher)+' — '+(s.url?'<a href="'+apbEsc(s.url)+'" target="_blank" rel="noopener">'+apbEsc(s.title)+'</a>':apbEsc(s.title))+(s.accessed?' <span class="apb-acc">(เข้าถึง '+apbDate(s.accessed)+')</span>':'')+'</div>';
+      }).join('')+'</div>'+
+    '</div></section>'+
+    '<div class="apb-pn">'+
+      (prev?'<button type="button" data-book="'+apbEsc(prev.id)+'"><span class="apb-lab">‹ เล่มก่อนหน้า</span><span class="apb-t">'+apbEsc(prev.name_th)+'</span></button>':'<span></span>')+
+    '</div>';
+  apbShell(apbEsc(D.name_th),'<span class="apb-hd-en">'+apbEn(D.name_en)+'</span>','assetpb',body);
+  var main=root.querySelector('main');
+  function openSrc(){var l=main.querySelector('#apbSrcList'),tg=main.querySelector('#apbSrcTg');l.hidden=false;tg.setAttribute('aria-expanded','true');}
+  if(hasMap){
+    main.oninput=function(e){var k=e.target.dataset&&e.target.dataset.fk;if(!k)return;MAPST.f[k]=e.target.value;apbMapSave(D.id,MAPST);};
+    main.onchange=function(e){var ci=e.target.dataset&&e.target.dataset.ck;if(ci==null)return;MAPST.c[ci]=e.target.checked;apbMapSave(D.id,MAPST);
+      var n=main.querySelectorAll('[data-ck]:checked').length,pg=main.querySelector('#apbProg');if(pg)pg.textContent='เช็กลิสต์ ติ๊กแล้ว '+n+'/'+main.querySelectorAll('[data-ck]').length;};
+  }
+  main.onclick=function(e){
+    var t=e.target.closest('button,a.apb-ref');if(!t||!main.contains(t))return;
+    if(t.hasAttribute('data-more')){var it=t.closest('.apb-item'),f=it.querySelector('.apb-full'),sh=it.querySelector('.apb-short');var show=f.hidden;f.hidden=!show;if(sh)sh.hidden=show;t.querySelector('span').textContent=show?'ย่อคำตอบ':'อ่านคำตอบทั้งหมด';t.querySelector('.ag-more-ic').classList.toggle('open',show);return;}
+    if(t.hasAttribute('data-rv')){var tg=t.nextElementSibling,op2=tg.hidden;tg.hidden=!op2;t.querySelector('span').textContent=op2?t.dataset.close:t.dataset.open;t.querySelector('.ag-more-ic').classList.toggle('open',op2);return;}
+    if(t.hasAttribute('data-mrow')){var mr=t.closest('.apb-step'),mb=mr.querySelector('.apb-sb'),mo=mb.hidden;mb.hidden=!mo;t.setAttribute('aria-expanded',mo?'true':'false');return;}
+    if(t.id==='apbMapClear'){if(t.dataset.arm){ // confirmed: clear in place (a render() here would also jump the page back to the top)
+        clearTimeout(+t.dataset.arm);delete t.dataset.arm;MAPST.f={};MAPST.c={};apbMapSave(D.id,MAPST);
+        main.querySelectorAll('[data-fk]').forEach(function(i){i.value='';});
+        main.querySelectorAll('[data-ck]').forEach(function(c){c.checked=false;});
+        var pg2=main.querySelector('#apbProg');if(pg2)pg2.textContent='เช็กลิสต์ ติ๊กแล้ว 0/'+main.querySelectorAll('[data-ck]').length;
+        t.querySelector('span').textContent='ล้างข้อมูลที่กรอกในแผนที่นี้';return;}t.querySelector('span').textContent='แตะอีกครั้งเพื่อยืนยันการล้าง';t.dataset.arm=setTimeout(function(){delete t.dataset.arm;if(t.isConnected)t.querySelector('span').textContent='ล้างข้อมูลที่กรอกในแผนที่นี้';},3500);return;}
+    if(t.classList.contains('apb-st')&&t.id!=='apbSrcTg'){var st0=t.closest('.apb-step'),b2=st0.querySelector('.apb-sb'),op=b2.hidden;b2.hidden=!op;st0.classList.toggle('open',op);t.setAttribute('aria-expanded',op?'true':'false');
+      if(op&&!st0.classList.contains('seen')){st0.classList.add('seen');var rd=apbReadMark(D.id,+st0.dataset.step,D.steps.length);var rm=main.querySelector('#apbReadMeta');if(rm)rm.lastChild.textContent='อ่านแล้ว '+Math.min(rd.s.length,D.steps.length)+'/'+D.steps.length+' ขั้นตอน';}
+      return;}
+    if(t.id==='apbSrcTg'){var l=main.querySelector('#apbSrcList');if(l.hidden)openSrc();else{l.hidden=true;t.setAttribute('aria-expanded','false');}return;}
+    if(t.hasAttribute('data-jump')){var j=main.querySelector('#apb-'+t.dataset.jump);if(j)j.scrollIntoView({behavior:'smooth',block:'start'});return;}
+    if(t.classList.contains('apb-ref')){e.preventDefault();openSrc();var el=main.querySelector('#apb-src-'+t.dataset.ref);if(el){main.querySelectorAll('.apb-src.hit').forEach(function(x){x.classList.remove('hit');});el.classList.add('hit');el.scrollIntoView({behavior:'smooth',block:'center'});}return;}
+    if(t.dataset.book){APB_CUR=t.dataset.book;render();return;}
+  };
 }
 function ddTabs(h){
   var tabs=h.assets.slice(0,4);
@@ -8574,6 +8993,11 @@ function renderPlaySummary(){
   // flat muted icon+text line, no card background) verbatim; still sits as the last line inside the
   // card, same position a closing stat/note occupies in every other .hero-in result card here.
   var saveNoteHTML=insights.length?'<div class="pe-report on pe-report-lg" style="margin-top:var(--sp-stack)">'+ic('lc-check-circle')+'<div><div class="pe-report-t">บันทึกเข้า Playbook แล้ว</div><div class="pe-report-s">เราได้ทำการบันทึกเรื่องที่เรียนรู้จากเกมนี้เข้า Playbook ของคุณแล้ว</div></div></div>':'';
+  /* Asset Knowleges deep link (2026-10-06, phase 2) — booth results only: "อ่านต่อ" opens that
+     booth's book (BOOTH_BOOK; สุขภาพ has none, หุ้นต่างประเทศ -> DR is provisional). Sits between the
+     save-note and หมายเหตุ so หมายเหตุ stays the last section on the page. */
+  var bookId=kind==='booth'?BOOTH_BOOK[BOOTHS[idx].asset]:null;
+  var bookLinkHTML=bookId?'<button class="apb-bl-link" type="button" id="playBookBtn">'+ic('lc-book-open')+'<span class="apb-t">อ่านเรื่อง'+apbEsc(BOOTHS[idx].asset)+'ต่อ<small>เล่มความรู้ใน Asset Knowleges · เพื่อการศึกษา</small></span>'+ic('lc-chevron-right','klib-cv')+'</button>':'';
   var backLabel=kind==='game'?'กลับหน้าเกมหลัก':'กลับหน้าเดินบูธ';
   // Title block — DNA quiz's own .q-head/.q-title header, finalized 2026-09-11 (per direction
   // "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย") — was briefly a DEMO.sumTitleVer-toggled choice between this
@@ -8593,6 +9017,7 @@ function renderPlaySummary(){
         titleHTML+
         mainSectionsHTML+
         saveNoteHTML+
+        bookLinkHTML+
         noteHTML+
       '</div></div></section>'+
       /* Icon moved AFTER the label AND flipped to a right-pointing arrow (2026-09-10, per direction
@@ -8612,6 +9037,8 @@ function renderPlaySummary(){
   var artImg=root.querySelector('.play-result-art img');
   if(artImg&&!artImg.complete)artImg.addEventListener('load',sizeHeroGlow,{once:true});
   root.querySelector('#playDoneBtn').onclick=completePlay;
+  var pbb=root.querySelector('#playBookBtn');
+  if(pbb)pbb.onclick=function(){APB_CUR=bookId;PLAY.returnPhase='assetbook';completePlay();}; // completePlay records the booth as done first, then lands on the book
 }
 /* ptsCountUp (2026-09-11, per direction "ต้องการเพิ่ม motion ที่ทำให้ตัวเลขขยับ...เหมือนการรันเลข
    counting...เพื่อให้ user ลุ้นแต้มสรุป") — animates #sumPtsNum from 0 up to the real point total on
