@@ -1568,6 +1568,16 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-en{font-family:var(--serif);font-size:var(--fs-eyebrow);letter-spacing:.06em;color:var(--muted);text-transform:uppercase;}
 .apb-s{font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin-top:var(--sp-stack-tight);}
 .apb-hd-en{font-family:var(--serif);letter-spacing:.06em;}
+/* English book name that titles each book's header card (e.g. "AI INVESTING"): violet (per direction). */
+.apb-ey-nm{color:var(--violet);}
+.apb-art{display:block;width:30px;height:30px;object-fit:contain;}
+.s-ey .apb-art{width:22px;height:22px;}
+/* 8 steps reuse the "6 ด้านที่วัดได้จากคุณ" classes (.side-*); only the open height needs room for real content. */
+.apb-sides .side-body.show{max-height:4000px;}
+.apb-sides .side-row:focus-visible{outline:2px solid var(--focus);outline-offset:-2px;border-radius:var(--r1);}
+.apb-sides .side-s.apb-code{font-family:var(--serif);letter-spacing:.06em;}
+.apb-sides .side-dl>*+*{margin-top:var(--sp-stack);}
+.apb-sides .apb-warn{margin-top:var(--sp-stack);}
 /* Top-bar English name 2px under the shared .tb-sub size (14 -> 12px), per direction 2026-10-06. */
 .tb-sub .apb-hd-en{font-size:calc(var(--fs-meta) - 2px);}
 /* "เล่ม n/14" pinned to the card's right edge. */
@@ -1606,13 +1616,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-panel .apb-li:first-child{padding-top:0;}
 /* phase 2 */
 /* phase 3: read-progress chips (violet = in progress, cyan = done, per the DNA status-tone ladder) */
-.apb-pc{display:inline-block;margin-top:var(--sp-list);font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--violet);background:var(--active-fill);padding:var(--sp-stack-tight) var(--sp-list);border-radius:var(--rpill);}
-.apb-pc.done{color:var(--ink);background:var(--done-fill);}
-.apb-rd{color:var(--violet);font-weight:var(--w-label);}
-.apb-step.seen .apb-num{background:var(--done-fill);border-color:var(--done-border);}
-.apb-step.seen.open .apb-num{background:var(--active-fill);border-color:var(--active-border);}
 .apb-pe{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.55;margin-bottom:var(--sp-stack);}
-.apb-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:var(--sp-inline);padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);font-size:var(--fs-label);line-height:1.5;}
+.apb-row{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--sp-stack-tight);padding:var(--sp-inline) 0;border-top:1px solid var(--line-soft);font-size:var(--fs-label);line-height:1.5;}
+.apb-row span:last-child{font-size:var(--fs-bodysm);color:var(--ink);}
+@media(min-width:560px){.apb-row{grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:var(--sp-inline);}}
 .apb-row:first-of-type{border-top:none;}
 .apb-row span:first-child{color:var(--muted);}
 .apb-calc{font-size:var(--fs-bodysm);line-height:1.6;padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);overflow-wrap:anywhere;}
@@ -1623,11 +1630,23 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-mc+.apb-mc{margin-top:var(--sp-stack);}
 .apb-map-note{display:flex;gap:var(--sp-list);align-items:flex-start;font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin-bottom:var(--sp-stack);}
 .apb-map-note svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;margin-top:3px;}
-.apb-fld{font-size:var(--fs-bodysm);line-height:2.1;padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);overflow-wrap:anywhere;}
-.apb-fld:first-of-type{border-top:none;}
-.apb-bl{font-family:var(--font);font-size:var(--fs-bodysm);color:var(--ink);background:var(--paper);border:1px solid var(--line-strong);border-radius:var(--r0);padding:2px var(--sp-list);width:5.5em;max-width:100%;min-height:44px;margin:0 2px;vertical-align:middle;}
-.apb-bl.w{width:100%;margin:var(--sp-glue) 0 0;display:block;}
+/* MY ___ MAP fields (see apbFieldHTML): group title, then labelled cells (label above, box + unit beside) */
+.apb-fld{padding:var(--sp-stack) 0;border-top:1px solid var(--line-soft);overflow-wrap:anywhere;}
+.apb-fld:first-of-type{border-top:none;padding-top:var(--sp-list);}
+.apb-gt{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.4;margin-bottom:var(--sp-list);}
+.apb-sub{font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin:calc(var(--sp-list) * -1 + 2px) 0 var(--sp-list);}
+.apb-cells{display:flex;flex-wrap:wrap;gap:var(--sp-inline);}
+.apb-cell{display:flex;flex-direction:column;justify-content:flex-end;gap:var(--sp-stack-tight);flex:1 1 130px;min-width:0;}
+.apb-cell.w{flex-basis:100%;}
+.apb-cl{font-size:var(--fs-label);color:var(--muted);line-height:1.4;}
+.apb-ci{display:flex;align-items:center;gap:var(--sp-list);}
+.apb-u{flex:0 0 auto;font-size:var(--fs-label);color:var(--muted);}
+.apb-bl{flex:1;min-width:0;width:100%;font-family:var(--font);font-size:var(--fs-bodysm);color:var(--ink);background:var(--paper);border:1px solid var(--line-strong);border-radius:var(--r0);padding:2px var(--sp-list);min-height:44px;}
 .apb-bl:focus{outline:2px solid var(--focus);outline-offset:1px;background:var(--white);}
+.apb-hint{font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin-top:var(--sp-list);}
+.apb-chips{display:flex;flex-wrap:wrap;gap:var(--sp-list);}
+.apb-chip{min-height:44px;padding:var(--sp-glue) var(--sp-stack);line-height:1.35;text-align:left;border-radius:var(--rpill);border:1px solid var(--line-strong);background:var(--white);font-family:var(--font);font-size:var(--fs-label);color:var(--ink);cursor:pointer;}
+.apb-chip.on{background:var(--active-fill);border-color:var(--active-border);color:var(--violet);font-weight:var(--w-label);}
 .apb-ck{display:flex;gap:var(--sp-inline);align-items:flex-start;min-height:44px;padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);font-size:var(--fs-bodysm);line-height:1.5;cursor:pointer;}
 .apb-ck:first-of-type{border-top:none;}
 .apb-ck input{width:20px;height:20px;margin-top:3px;flex:0 0 auto;accent-color:var(--ink);}
@@ -1642,8 +1661,6 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-ref{color:var(--muted);text-decoration:underline;text-underline-offset:2px;margin-left:4px;}
 .apb-step{border-top:1px solid var(--line-soft);}
 .apb-st{display:grid;grid-template-columns:34px 1fr auto;gap:var(--sp-inline);align-items:flex-start;width:100%;min-height:44px;padding:var(--sp-stack) 0;background:none;border:none;font-family:var(--font);text-align:left;cursor:pointer;color:var(--ink);}
-.apb-num{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:var(--fs-label);color:var(--ink);transition:background .18s var(--ease),border-color .18s var(--ease);}
-.apb-step.open .apb-num{background:var(--active-fill);border-color:var(--active-border);}
 .apb-code{font-family:var(--serif);font-size:var(--fs-eyebrow);letter-spacing:.06em;color:var(--muted);}
 .apb-st .lib-cat-cv{margin-top:var(--sp-list);}
 .apb-st[aria-expanded="true"] .lib-cat-cv{transform:rotate(180deg);}
@@ -1667,10 +1684,6 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-src a{color:var(--ink);word-break:break-word;}
 .apb-src .apb-acc{font-size:var(--fs-meta);color:var(--muted);}
 .apb-src.hit{background:var(--active-wash);}
-.apb-pn{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-inline);}
-.apb-pn button{display:flex;flex-direction:column;gap:2px;padding:var(--sp-stack);background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);font-family:var(--font);text-align:left;cursor:pointer;color:var(--ink);}
-.apb-pn button.nx{text-align:right;align-items:flex-end;}
-.apb-pn .apb-lab{margin:0;}
 .apb-load{display:flex;align-items:center;gap:var(--sp-inline);font-size:var(--fs-bodysm);color:var(--muted);}
 .rk-lab{fill:var(--muted);}
 .donut-track{stroke:var(--line-soft);}
@@ -6135,7 +6148,7 @@ function renderBook(){
       '<section class="card scroll-reveal"><div class="s-pad"><div class="list-row klib-row" id="klibRow"><div class="klib-ic">'+ic('lc-library')+'</div><div class="klib-tx"><div class="klib-t">คลังความรู้</div><div class="klib-s">41 บทความที่คัดมาสำหรับ '+h.th+'</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
       /* Asset Playbooks entry (2026-10-06, per direction "หน้าย่อยในแท็บ Playbook ถัดจากคลังความรู้")
          — same list-row shape as klibRow right above it; opens renderAssetIndex(). */
-      '<section class="card scroll-reveal"><div class="s-pad"><div class="list-row klib-row" id="apbRow"><div class="klib-ic">'+ic('lc-book-open')+'</div><div class="klib-tx"><div class="klib-t">Asset Knowleges</div><div class="klib-s">14 เล่ม รู้จักสินทรัพย์ ตั้งแต่หุ้น ทองคำ ไปจนถึงภาษีและกลโกง'+(function(){var p=apbReadSummary();return p.started?'<br><span class="apb-rd">เริ่มอ่านแล้ว '+p.started+' เล่ม · อ่านครบ '+p.done+' เล่ม</span>':'';})()+'</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
+      '<section class="card scroll-reveal"><div class="s-pad"><div class="list-row klib-row" id="apbRow"><div class="klib-ic">'+ic('lc-book-open')+'</div><div class="klib-tx"><div class="klib-t">Asset Knowleges</div><div class="klib-s">14 เล่ม รู้จักสินทรัพย์ ตั้งแต่หุ้น ทองคำ ไปจนถึงภาษีและกลโกง</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
     '</div>'
     ))
     ))+
@@ -6380,34 +6393,17 @@ function renderLibrary(){
    Phase 1 shows: header, key questions (verified 1–2 line short first, full answer on tap), basics,
    the 8 steps as an accordion, red flags, sources. Deferred to phase 2 (already in the data, not
    rendered yet): worked_example, takehome (MY ___ MAP), method_matrix, at_event. */
+/* Per-book icon (icon audit, 2026-10-06): the app's own 3D asset art wherever one exists for that asset —
+   the same art the booths use — so each book's icon actually means its subject (gold = gold bars, not a
+   coin glyph). TAX / AI / ANTI-SCAM have no asset art in the icon set yet, so they keep a lucide glyph
+   (document / sparkles / warning) until art is supplied. */
+function apbIconSrc(id){
+  return {macro:ICON_COMPASS_PNG,stock:ICON_STOCK_TH_PNG,bond:ICON_BOND_PNG,fund:ICON_FUND_PNG,dr:ICON_STOCK_INTL_PNG,gold:ICON_GOLD_PNG,
+    realestate:ICON_REALESTATE_PNG,crypto:ICON_CRYPTO_PNG,collectible:ICON_COLLECTIBLE_PNG,insurance:ICON_INSURANCE_PNG,longevity:ICON_HOURGLASS_PNG}[id]||'';
+}
+function apbIcon(id,lucide){var s=apbIconSrc(id);return s?'<img class="apb-art" src="'+s+'" alt="">':ic(lucide);}
 var APB_CUR=null;
 var APB_TAB=0; // selected group tab on the index, kept across book -> back
-/* Read progress (phase 3, 2026-10-06): a step counts as read once opened. Kept per book in this
-   device's localStorage ('apbRead_<id>' = {s:[opened step indexes], n:total steps}) — same
-   device-only, try/catch'd storage rule as the MY ___ MAP state. In-progress reads violet, finished
-   reads cyan (the DNA status-tone ladder: violet = active, cyan = done). */
-var APB_IDS=['macro','stock','bond','fund','dr','gold','realestate','crypto','collectible','tax','insurance','longevity','ai','scam'];
-function apbReadLoad(id){
-  try{var r=JSON.parse(localStorage.getItem('apbRead_'+id)||'null');if(r&&Array.isArray(r.s))return {s:r.s.filter(function(x){return typeof x==='number';}),n:+r.n||8};}catch(e){}
-  return {s:[],n:8};
-}
-function apbReadMark(id,i,n){
-  var r=apbReadLoad(id);
-  if(r.s.indexOf(i)>-1)return r;
-  r.s.push(i);r.n=n||r.n;
-  try{localStorage.setItem('apbRead_'+id,JSON.stringify(r));}catch(e){}
-  return r;
-}
-function apbReadSummary(){ // {started, done} over all 14 books, for the Playbook-tab entry row
-  var st0=0,dn=0;
-  APB_IDS.forEach(function(id){var r=apbReadLoad(id);if(r.s.length)st0++;if(r.s.length>=r.n)dn++;});
-  return {started:st0,done:dn};
-}
-function apbReadChip(id,total){
-  var r=apbReadLoad(id),n=total||r.n;
-  if(!r.s.length)return '';
-  return r.s.length>=n?'<span class="apb-pc done">อ่านครบแล้ว</span>':'<span class="apb-pc">อ่านแล้ว '+r.s.length+'/'+n+' ขั้นตอน</span>';
-}
 /* Booth (BOOTHS[].asset) -> its Asset Knowleges book, for the "อ่านเรื่อง … ต่อ" row on the booth result screen.
    'หุ้นต่างประเทศ' -> dr is a provisional pairing (per direction "ให้ลิงก์ไป DR ก่อนได้"); 'สุขภาพ' has no book. */
 var BOOTH_BOOK={'หุ้นไทย':'stock','หุ้นต่างประเทศ':'dr','กองทุนรวม':'fund','ตราสารหนี้':'bond','ทองคำ':'gold','อสังหา/REIT':'realestate','ประกัน':'insurance','คริปโต':'crypto','ของสะสม':'collectible'};
@@ -6426,7 +6422,9 @@ function apbLoad(file,done){
 }
 /* English book names drop the trailing "PLAYBOOK" ("MACRO PLAYBOOK" -> "MACRO"), per direction 2026-10-06. */
 function apbEn(s){return apbEsc(String(s==null?'':s).replace(/\s*PLAYBOOK\s*$/i,''));}
-function apbEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+/* No em dashes anywhere in what the reader sees (per direction 2026-10-06): the source text uses " — "
+   as a pause, which here just becomes a single space (Thai uses a space as the pause). */
+function apbEsc(s){return String(s==null?'':s).replace(/\s*—\s*/g,' ').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 /* Source text conventions: **bold**, literal \n line breaks, and inline "(1) … (2) … (3) …" sub-items
    (the source's own full edition breaks those onto their own indented lines — same here, as a list). */
 function apbTxt(s,inLi){
@@ -6461,19 +6459,163 @@ function apbMapSave(id,s){
 /* A takehome field is free text with "____" blanks and " | " between sub-items. Blanks become inputs
    in place (short ones inline, long ones a full-width line); a field with no blank gets one input at
    the end so it can still be answered. */
-function apbFieldHTML(f,fi,state){
-  var parts=String(f).split(/(_{3,})/),j=0,out='';
-  var label=String(f).replace(/_{3,}/g,'').replace(/\s*\|\s*/g,' ').replace(/\s+/g,' ').trim().slice(0,60);
-  function inp(len){
-    var k=fi+'.'+(j++);
-    return '<input class="apb-bl'+(len>=6?' w':'')+'" type="text" data-fk="'+k+'" value="'+apbEsc(state.f[k]||'')+'" maxlength="200" autocomplete="off" aria-label="'+apbEsc(label)+'">';
+/* Rewritten 2026-10-06 (per direction: "input field หลายๆ ส่วนที่ไม่สมบูรณ์ ตรวจสอบ และแก้ไข") — the first
+   version dropped inputs into a running sentence, so a unit ("%", "บาท", "ปี") could wrap onto its own
+   line away from its box, a label could end up far from its input, and fields that only list options
+   ("Yes / No") got a lone empty box. Each field is now parsed into: an optional group title (text before
+   the first ":"), then one labelled cell per blank (label above the box, unit beside it), a trailing hint,
+   and option lists become tap-to-select chips. State keys stay '<field>.<blank#>' (same numbering as
+   before) so anything already typed still loads. */
+var APB_NUM_UNIT=/^\s*(%|บาททอง|ล้านบาท|บาท|ปี|เดือน|วัน|ครั้ง|ข้อ|เท่า|ตัว|กรัม|หุ้น|เปอร์เซ็นต์|ล้าน|กอง|แห่ง|คน|องศา)(?![ก-๙])/;
+function apbCleanLabel(s){
+  s=String(s||'').replace(/\s+/g,' ').trim();
+  for(var i=0;i<4;i++){
+    // a "(...)" cut in half by a blank ("(แหล่งข้อมูล ____ วันที่ ____)") must not leave a lone bracket behind
+    var op=(s.match(/\(/g)||[]).length,cl=(s.match(/\)/g)||[]).length;
+    if(op>cl)s=s.replace(/\(\s*([^()]*)$/,'$1');else if(cl>op)s=s.replace(/^([^()]*?)\s*\)/,'$1');
+    s=s.replace(/^[:：/+,;|=−–·×→-]+\s*/,'').replace(/\s*[:：/+,;|=−–·×→-]+$/,'').replace(/^(และ|หรือ)\s+/,'').replace(/^(และ|หรือ)$/,'').trim();
   }
-  parts.forEach(function(p){
-    if(/^_{3,}$/.test(p))out+=inp(p.length);
-    else out+=apbEsc(p).replace(/\s*\|\s*/g,'<br>');
+  return s;
+}
+function apbFieldHTML(f,fi,state,bid){
+  var raw=String(f).replace(/\s+/g,' ').trim(),j=0;
+  var ov=APB_FIELD_OV[bid+':'+fi];
+  if(ov&&raw.indexOf(ov.m)===0)return apbRenderField({title:ov.title||'',cells:ov.cells.map(function(c){return Object.assign({},c);}),hint:ov.hint||''},state,fi);
+  function val(k){return apbEsc(state.f[k]||'');}
+  // 1) no blank at all: an option list becomes chips, anything else a single answer line
+  if(!/_{3,}/.test(raw)){
+    var ci=raw.indexOf(':'),ttl=ci>-1?raw.slice(0,ci):raw,rest=ci>-1?raw.slice(ci+1).trim():'',hint='';
+    var hm=/\s*\(([^)]*)\)\s*$/.exec(rest);if(hm){hint=hm[1];rest=rest.slice(0,hm.index);}
+    var opts=rest.split(/\s+\/\s+/).map(function(o){return o.trim();}).filter(Boolean),k0=fi+'.0';
+    if(opts.length>=2&&opts.length<=6&&opts.every(function(o){return o.length<=30;})){
+      return '<div class="apb-g"><div class="apb-gt">'+apbEsc(apbCleanLabel(ttl))+'</div><div class="apb-chips" role="group" aria-label="'+apbEsc(apbCleanLabel(ttl))+'">'+
+        opts.map(function(o){var on=state.f[k0]===o;return '<button type="button" class="apb-chip'+(on?' on':'')+'" data-chip="'+k0+'" data-v="'+apbEsc(o)+'" aria-pressed="'+(on?'true':'false')+'">'+apbEsc(o)+'</button>';}).join('')+'</div>'+
+        (hint?'<div class="apb-hint">'+apbEsc(hint)+'</div>':'')+'</div>';
+    }
+    return '<div class="apb-g"><label class="apb-cell w"><span class="apb-cl">'+apbEsc(apbCleanLabel(raw))+'</span><span class="apb-ci"><input class="apb-bl" type="text" data-fk="'+k0+'" value="'+val(k0)+'" maxlength="200" autocomplete="off" aria-label="'+apbEsc(apbCleanLabel(raw).slice(0,60))+'"></span></label></div>';
+  }
+  // 2) blanks: items split on " | " (and on " / " when every piece has its own blank)
+  var items=raw.split(/\s*\|\s*/);
+  if(items.length===1){var sl=raw.split(/\s+\/\s+/);if(sl.length>1&&sl.every(function(p){return /_{3,}/.test(p);}))items=sl;}
+  var title='',cells=[],hintTail='',nChip=0;
+  // When several pieces each carry their own "label: ____", the first colon is that piece's label, not a
+  // title shared by the others ("อายุวันนี้: __ / อายุที่จะเกษียณ: __") — so no group title in that case.
+  var colonItems=items.filter(function(it){var b=it.indexOf('_');return (b>-1?it.slice(0,b):it).indexOf(':')>-1;}).length,allowTitle=colonItems<2;
+  items.forEach(function(it,ii){
+    if(ii>0&&!/_{3,}/.test(it)){ // a piece with no blank of its own ("Core / Satellite"): option chips (or just a hint)
+      var c1=it.indexOf(':'),t1=c1>-1?it.slice(0,c1):'',r1=(c1>-1?it.slice(c1+1):it).trim();
+      var os=r1.split(/\s+\/\s+/).map(function(o){return o.trim();}).filter(Boolean);
+      if(os.length>=2&&os.length<=6&&os.every(function(o){return o.length<=30;})){cells.push({k:fi+'.c'+(nChip++),label:apbCleanLabel(t1),chips:os,wide:true});return;}
+      var hh=apbCleanLabel(it);if(hh)hintTail+=(hintTail?' · ':'')+hh;return;
+    }
+    var tk=it.split(/(_{3,})/); // text, blank, text, blank, ... text
+    if(ii===0&&!title&&allowTitle){var c0=tk[0].indexOf(':');if(c0>-1){title=apbCleanLabel(tk[0].slice(0,c0));tk[0]=tk[0].slice(c0+1);}}
+    var carry=tk[0];
+    if(ii===0&&tk.length===1){ // first piece has no blank ("บทบาทในพอร์ต: Core / Satellite | …"): its text after the title is an option list
+      var cc0=tk[0].indexOf(':'),lab0=cc0>-1?apbCleanLabel(tk[0].slice(0,cc0)):'',os0=(cc0>-1?tk[0].slice(cc0+1):tk[0]).split(/\s+\/\s+/).map(function(o){return o.trim();}).filter(Boolean);
+      if(os0.length>=2&&os0.length<=6&&os0.every(function(o){return o.length<=30;})){cells.push({k:fi+'.c'+(nChip++),label:lab0,chips:os0,wide:true});return;}
+    }
+    for(var q=1;q<tk.length;q+=2){
+      var blankLen=tk[q].length,after=tk[q+1]||'',unit='';
+      var um=APB_NUM_UNIT.exec(after);if(um){unit=um[1];after=after.slice(um[0].length);}
+      var label=apbCleanLabel(carry),k=fi+'.'+(j++);
+      cells.push({k:k,label:label,unit:unit,wide:(!unit&&blankLen>=6)});
+      carry=after;
+    }
+    if(carry&&carry.trim()){var h=apbCleanLabel(carry);if(h)hintTail+=(hintTail?' · ':'')+h;}
   });
-  if(!j)out+=inp(6);
-  return out;
+  // single cell with no group title: its label is the title
+  if(!title&&cells.length===1&&cells[0].label){title=cells[0].label;cells[0].label='';}
+  return apbRenderField({title:title,cells:cells,hint:hintTail},state,fi);
+}
+/* Fields whose sentence the generic parser can't label correctly (a blank with no label of its own, or a
+   unit/label pair split across a "·"), described by hand: keyed 'bookId:fieldIndex', applied only while the
+   field still starts with `m` (so if the content team rewrites that field, the generic parser takes over
+   instead of showing stale labels). Wording stays within what the field itself says; "=" results get their
+   formula as a hint. Blank order = key order (same '<field>.<n>' / '<field>.c<n>' numbering as the parser). */
+var APB_FIELD_OV={
+  /* second audit pass (2026-10-06): option lists + a reason line, "x จาก y ข้อ" results, several-things-in-one-
+     sentence fields. Option lists become chips; chips and boxes keep the source's own wording. */
+  'stock:6':{m:'กติกาซื้อของฉัน',title:'กติกาซื้อของฉัน',hint:'และไม่เกินเพดานเงินต่อหุ้น',cells:[{label:'ผ่านอย่างน้อย',unit:'จาก 9 ข้อ'},{label:'P/E ไม่เกิน',unit:'เท่า'}]},
+  'stock:8':{m:'จุดทบทวน',title:'จุดทบทวน',hint:'ทบทวนเมื่อ: งบไตรมาส · 56-1 One Report · สัดส่วนเกินเพดาน · ชีวิตเปลี่ยน',cells:[{label:'ขาดทุนเกิน',unit:'%'},{label:'ตัวเร่งไม่เกิดภายใน',wide:true}]},
+  'stock:9':{m:'ผลการตรวจ',title:'ผลการตรวจ',cells:[{label:'ตรงเกณฑ์',unit:'จาก 9 ข้อ'},{label:'ข้อที่ต้องทบทวน',wide:true},{label:'วันที่'},{label:'ราคา'}]},
+  'bond:0':{m:'งานของเงินก้อนนี้',cells:[{label:'งานของเงินก้อนนี้',chips:['รักษาเงินต้น','รับดอกเบี้ยเป็นงวด','ยอมรับความเสี่ยงเครดิตเพื่อดอกเบี้ยที่สูงขึ้น']},{label:'รายละเอียด',wide:true}]},
+  'bond:3':{m:'เรตติ้งต่ำสุดที่ฉันรับ',cells:[{label:'เรตติ้งต่ำสุดที่ฉันรับ',wide:true},{label:"หุ้นกู้ที่ชื่อมีคำว่า 'เสี่ยงสูง'",chips:['รับ','ไม่รับ']}]},
+  'bond:4':{m:'ลำดับสิทธิที่รับได้',title:'ลำดับสิทธิที่รับได้',cells:[{label:'',chips:['มีประกัน','ไม่มีประกัน','ด้อยสิทธิ','คล้ายทุน (perpetual)']}]},
+  'bond:7':{m:'Duration',cells:[{label:'Duration โดยประมาณ'},{label:'ถ้าดอกเบี้ยขึ้น 1 จุด ราคาลดราว',unit:'%'}]},
+  'bond:8':{m:'ชื่อรุ่น / ผู้ออก',title:'บันทึกรุ่นที่ดู',hint:'ชื่อรุ่น / ผู้ออก / ผู้แทนผู้ถือหุ้นกู้ / วันจ่ายดอกเบี้ย / วันครบอายุ',cells:[{label:'',wide:true}]},
+  'bond:9':{m:'ผลตรวจ',title:'ผลตรวจ',cells:[{label:'ตรงเกณฑ์ที่ฉันตั้ง',unit:'ข้อ'},{label:'จากทั้งหมด',unit:'ข้อ'},{label:'ข้อที่ต้องทบทวน',wide:true}]},
+  'fund:1':{m:'Time Horizon',cells:[{label:'Time Horizon (ต้องใช้เงินเมื่อไร)',wide:true},{label:'เลื่อนได้ไหม',chips:['Yes','No']}]},
+  'fund:2':{m:'วิธีลงทุนของฉัน',cells:[{label:'วิธีลงทุนของฉัน',chips:['A ก้อนเดียว','B DCA ถือยาว','C ดูแลเองและสลับ']},{label:'เหตุผล',wide:true}]},
+  'fund:6':{m:'Need Liquidity',cells:[{label:'Need Liquidity',chips:['Yes','No']},{label:'ต้องได้เงินคืนภายใน',unit:'วัน'}]},
+  'fund:9':{m:'Fee Limit',title:'Fee Limit',cells:[{label:'TER ไม่เกิน',unit:'% ต่อปี'},{label:'ค่าธรรมเนียมซื้อ/ขายไม่เกิน',unit:'%'}]},
+  'dr:1':{m:'บทบาทในพอร์ต',cells:[{label:'บทบาทในพอร์ต',chips:['Core','Satellite','Diversifier']},{label:'สัดส่วนหุ้นนอกรวมสูงสุดของฉัน',unit:'%'}]},
+  'dr:2':{m:'หลักทรัพย์อ้างอิง',title:'หลักทรัพย์อ้างอิง',cells:[{label:'ชื่อ',wide:true},{label:'ตลาด'},{label:'สกุลเงิน'},{label:'ประเภท',chips:['หุ้นรายตัว','ETF']}]},
+  'dr:7':{m:'ราคาอ้างอิง',title:'Premium / Discount',cells:[{label:'ราคาอ้างอิง'},{label:'ราคาตลาด'},{label:'Premium/Discount',unit:'%'},{label:'ณ วันที่/เวลา'}]},
+  'dr:8':{m:'Spread',cells:[{label:'Spread',unit:'%'},{label:'มูลค่าซื้อขายเฉลี่ย'},{label:'มีผู้ดูแลสภาพคล่อง',chips:['ใช่','ไม่ใช่']}]},
+  'dr:9':{m:'รอบซื้อขาย',cells:[{label:'รอบซื้อขาย',chips:['Day','Day+Night']},{label:'เวลาที่ตลาดแม่เปิด (เวลาไทย)',wide:true}]},
+  'dr:10':{m:'ปันผล',title:'ปันผล',hint:'ภาษีไทย 10%',cells:[{label:'ภาษีต่างประเทศ',unit:'%'},{label:'ค่าใช้จ่ายตามสัญญา',wide:true}]},
+  'dr:12':{m:'ยอมรับความเสี่ยงค่าเงินได้',cells:[{label:'ยอมรับความเสี่ยงค่าเงินได้',chips:['ใช่','ไม่ใช่']},{label:'เพดาน Premium ของฉัน',unit:'%'},{label:'เหตุที่จะกลับมาทบทวน',wide:true}]},
+  'gold:1':{m:'รูปแบบที่เลือก',cells:[{label:'รูปแบบที่เลือก',chips:['ทองแท่ง','ทองรูปพรรณ','ออมทอง','กองทุน','ETF','DR','ฟิวเจอร์ส']},{label:'เหตุผล',wide:true}]},
+  'realestate:0':{m:'บทบาทของเงินก้อนนี้',cells:[{label:'บทบาทของเงินก้อนนี้',chips:['ที่อยู่','รายได้','กระจายความเสี่ยง','หวังราคาขึ้น']},{label:'รายละเอียด',wide:true}]},
+  'realestate:2':{m:'เส้นทางที่เลือก',cells:[{label:'เส้นทางที่เลือก',chips:['ซื้อเอง','REIT-กองทุนในตลาด','กองทุนรวมที่ลงทุน REIT ต่างประเทศ']},{label:'เพราะ',wide:true}]},
+  'realestate:4':{m:'เงินที่ควักวันโอน',cells:[{label:'เงินที่ควักวันโอน (ดาวน์ + ค่าโอน + จำนอง + ตกแต่ง)',unit:'บาท',wide:true},{label:'โอนภายในช่วงมาตรการถึง 30 มิ.ย. 2570',chips:['Yes','No']}]},
+  'realestate:6':{m:'Gross yield',hint:'Net yield คิดหลังห้องว่าง ค่าส่วนกลาง ค่าซ่อม ภาษี',cells:[{label:'Gross yield',unit:'%'},{label:'Net yield',unit:'%'}]},
+  'realestate:7':{m:'REIT/กองที่ดู',title:'REIT/กองที่ดู',cells:[{label:'ประเภททรัพย์',wide:true},{label:'สิทธิในที่ดิน',chips:['Freehold','Leasehold']},{label:'Leasehold เหลือ',unit:'ปี'},{label:'อัตราการเช่า',unit:'%'},{label:'หนี้ต่อสินทรัพย์',unit:'%'},{label:'ปันผลต่อราคา',unit:'%'},{label:'ในนั้นเป็นเงินลดทุน',unit:'%'}]},
+  'realestate:9':{m:'ผลตรวจ',title:'ผลตรวจ',cells:[{label:'ตรงเกณฑ์ที่ฉันตั้ง',unit:'ข้อ'},{label:'จากทั้งหมด',unit:'ข้อ'},{label:'ข้อที่ต้องทบทวน',wide:true}]},
+  'crypto:2':{m:'ขาดทุนจากคริปโต',cells:[{label:'ขาดทุนจากคริปโตสูงสุดที่ฉันรับได้',unit:'% ของพอร์ต'}]},
+  'crypto:7':{m:'วิธีเก็บรักษา',cells:[{label:'วิธีเก็บรักษา',chips:['ฝากผู้ได้รับอนุญาต','wallet ของตัวเอง']},{label:'สำรองกุญแจที่',wide:true}]},
+  'collectible:3':{m:'กติกาของฉัน',cells:[{label:'กติกาของฉัน: เพดานของสะสมเพื่อการลงทุนรวม',unit:'% ของสินทรัพย์ลงทุน'}]},
+  'insurance:9':{m:'ผลตรวจ',title:'ผลตรวจ',cells:[{label:'ตรงเกณฑ์ที่ฉันตั้ง',unit:'ข้อ'},{label:'จากทั้งหมด',unit:'ข้อ'},{label:'ข้อที่ต้องทบทวน',wide:true}]},
+  'longevity:1':{m:'อายุที่วางแผนให้เงินพอ',title:'อายุที่วางแผนให้เงินพอ',cells:[{label:'ฐาน (เช่น 90)'},{label:'เผื่ออายุยืน (เช่น 100)'}]},
+  'scam:2':{m:'กติกาเวลารอ',title:'กติกาเวลารอ',cells:[{label:'เงินก้อนเกิน',unit:'บาท'},{label:'ต้องรออย่างน้อย',unit:'ชั่วโมงก่อนโอน'}]},
+  'scam:3':{m:'วงเงินโอนต่อวัน',cells:[{label:'วงเงินโอนต่อวันในแอปที่ฉันตั้ง',unit:'บาท'},{label:'ล็อกวงเงินออนไลน์ไว้',chips:['Yes','No']}]},
+  'scam:8':{m:'เบอร์ฉุกเฉิน',title:'เบอร์ฉุกเฉิน',hint:'1441 (กด 1 ระงับบัญชี) · ก.ล.ต. 1207 กด 22 · ธปท. 1213 · ETDA 1212 · คปภ. 1186',cells:[{label:'ธนาคารของฉัน',wide:true}]},
+  'macro:8':{m:'พอร์ตของฉันกระจุกในประเทศ/สกุล',cells:[{label:'พอร์ตของฉันกระจุกในประเทศ/สกุล',wide:true},{label:'สินทรัพย์ต่างประเทศที่ไม่ป้องกันค่าเงิน',unit:'% ของพอร์ต'}]},
+  'stock:1':{m:'บทบาทในพอร์ต',cells:[{label:'บทบาทในพอร์ต',chips:['Core','Satellite']},{label:'เพดานต่อหุ้นตัวนี้',unit:'บาท'},{label:'หรือคิดเป็น',unit:'%'}]},
+  'bond:1':{m:'ต้องใช้เงินวันที่',cells:[{label:'ต้องใช้เงินวันที่',wide:true},{label:'ถ้าต้องขายก่อนครบ ยอมขาดทุนได้ไม่เกิน',unit:'%'}]},
+  'bond:5':{m:'เพดานต่อผู้ออก 1 ราย',title:'เพดานต่อผู้ออก 1 ราย (กติกาของฉันเอง)',cells:[{label:'ไม่เกิน',unit:'บาท'},{label:'หรือไม่เกิน',unit:'% ของเงินลงทุนทั้งหมด'}]},
+  'fund:3':{m:'ถ้า DCA',cells:[{label:'ถ้า DCA ลงเดือนละ',unit:'บาท/เดือน'},{label:'วันที่หัก'},{label:'จุดลดความเสี่ยง: เหลือ',unit:'ปี'},{label:'และ',unit:'ปีก่อนใช้เงิน'}]},
+  'fund:5':{m:'Max Loss I Can Accept',title:'Max Loss I Can Accept (ขาดทุนชั่วคราวสูงสุดที่รับได้)',cells:[{label:'คิดเป็น',unit:'%'},{label:'เท่ากับ',unit:'บาท'}]},
+  'dr:4':{m:'แหล่งข้อมูลต้นทาง',cells:[{label:'แหล่งข้อมูลต้นทาง (รายงาน/เว็บ IR/ตลาดแม่)',wide:true},{label:'สกุลเงินที่รายงาน'},{label:'มาตรฐานบัญชี'},{label:'รอบปีบัญชี'}]},
+  'dr:11':{m:'ผลตอบแทนเป็นบาทถ้าบาทแข็ง',title:'ผลตอบแทนเป็นบาท',cells:[{label:'ถ้าบาทแข็ง',unit:'%'},{label:'เท่ากับ',unit:'%'},{label:'ถ้าบาทอ่อน',unit:'%'},{label:'เท่ากับ',unit:'%'},{label:'ต้นทุนซื้อแล้วขายทันทีจาก Spread',unit:'%',wide:true}]},
+  'gold:2':{m:'พอร์ตลงทุนรวม',cells:[{label:'พอร์ตลงทุนรวม (ไม่รวมเงินฉุกเฉิน)',unit:'บาท'},{label:'ทองที่มีอยู่แล้วทุกแบบรวม',unit:'บาท'}]},
+  'gold:3':{m:'ขาดทุนจากทองที่ฉันรับได้',hint:'อดีต: −39% และ −62% บนราคาเฉลี่ยรายเดือนในสกุลดอลลาร์',cells:[{label:'ขาดทุนจากทองที่ฉันรับได้',unit:'% ของพอร์ต'},{label:'สมมติฐานทองร่วง',unit:'%'}]},
+  'gold:4':{m:'เพดานสัดส่วนทองที่ฉันตั้งเอง',title:'เพดานสัดส่วนทองที่ฉันตั้งเอง',hint:'= ขาดทุนที่รับได้ ÷ สมมติฐานร่วง',cells:[{label:'คิดเป็น',unit:'%'},{label:'เท่ากับ',unit:'บาท'}]},
+  'gold:5':{m:'ต้นทุนไป-กลับที่คำนวณแล้ว',hint:'ต้นทุนไป-กลับคิดจากส่วนต่าง ค่ากำเหน็จ และค่าใช้จ่ายกองต่อปี',cells:[{label:'ต้นทุนไป-กลับที่คำนวณแล้ว',unit:'%'},{label:'ค่าใช้จ่ายกองต่อปี × จำนวนปีที่ถือ',unit:'ปี'},{label:'ราคาต้องขึ้น จึงเท่าทุน',unit:'%'}]},
+  'realestate:1':{m:'ระยะเวลาถือขั้นต่ำ',cells:[{label:'ระยะเวลาถือขั้นต่ำ',unit:'ปี'},{label:'เงินที่อาจต้องใช้ก่อนนั้น',unit:'บาท'}]},
+  'realestate:3':{m:'สัดส่วนอสังหาฯ ทั้งหมด',cells:[{label:'สัดส่วนอสังหาฯ ทั้งหมดในทรัพย์สินของฉัน (รวมบ้านที่อยู่)',unit:'%',wide:true},{label:'เพดานที่ฉันตั้งเอง',unit:'%'}]},
+  'realestate:5':{m:'ค่างวดต่อเดือน',cells:[{label:'ค่างวดต่อเดือน',unit:'บาท'},{label:'คิดเป็นสัดส่วนของรายได้',unit:'%'},{label:'ถ้าห้องว่าง 3 เดือน ฉันจ่ายเองไหว',chips:['Yes','No']}]},
+  'crypto:4':{m:'เพดานสัดส่วนคริปโต',title:'เพดานสัดส่วนคริปโต',hint:'= (ขาดทุนที่รับได้ ÷ ค่าร่วงถ่วงน้ำหนัก)',cells:[{label:'คิดเป็น',unit:'%'},{label:'เท่ากับ',unit:'บาท'}]},
+  'collectible:6':{m:'ช่องทางขายออก 2 ทาง',title:'ช่องทางขายออก 2 ทาง + ค่าธรรมเนียมผู้ขายที่ได้เป็นลายลักษณ์อักษร',cells:[{label:'ช่องทางขายออก',wide:true},{label:'ค่าธรรมเนียมผู้ขาย',unit:'%'}]},
+  'collectible:7':{m:'ราคาคุ้มทุนที่ต้องขายได้',hint:'= (เงินที่จ่าย + ค่าถือครองสะสม) ÷ (1 − ค่าคอมผู้ขาย)',cells:[{label:'ราคาคุ้มทุนที่ต้องขายได้ในปีที่'},{label:'ราคาคุ้มทุนที่ต้องขายได้',unit:'บาท'}]},
+  'tax:1':{m:'เงินได้สุทธิโดยประมาณ',cells:[{label:'เงินได้สุทธิโดยประมาณ',unit:'บาท'},{label:'ขั้นภาษีสูงสุดของฉัน',unit:'%'}]},
+  'tax:7':{m:'ภาษีที่คาดว่าจะประหยัด',title:'ภาษีที่คาดว่าจะประหยัด',hint:'= ยอดลดหย่อน × อัตราภาษี',cells:[{label:'อัตราภาษี',unit:'%'},{label:'ภาษีที่ประหยัดได้',unit:'บาท'}]},
+  'insurance:4':{m:'ช่องว่างชีวิต วิธีละเอียด',title:'ช่องว่างชีวิต วิธีละเอียด',hint:'= ความจำเป็น − ทรัพยากร',cells:[{label:'ความจำเป็น',unit:'บาท'},{label:'ทรัพยากร',unit:'บาท'},{label:'ช่องว่าง',unit:'บาท'}]},
+  'longevity:2':{m:'ค่าใช้จ่ายต่อเดือนวันนี้',cells:[{label:'ค่าใช้จ่ายต่อเดือนวันนี้',unit:'บาท'},{label:'หลังเกษียณจะใช้',unit:'% ของวันนี้'}]},
+  'longevity:3':{m:'เงินเฟ้อที่ฉันใช้',title:'เงินเฟ้อที่ฉันใช้',hint:'อ้างอิงกรอบ ธปท. 1–3%',cells:[{label:'ค่าที่ 1',unit:'%'},{label:'ค่าที่ 2',unit:'%'}]},
+  'longevity:6':{m:'เงินที่ต้องออมต่อเดือน',title:'เงินที่ต้องออมต่อเดือน',cells:[{label:'ต้องออมเดือนละ',unit:'บาท'},{label:'ที่ผลตอบแทนสมมติ',unit:'%'},{label:'และอีกกรณี',unit:'%'}]},
+  'longevity:7':{m:'PROTECTION GAP',title:'PROTECTION GAP',hint:'= ค่ารักษา/ค่าดูแลที่อาจเกิด − ความคุ้มครองที่มี',cells:[{label:'ค่ารักษา/ค่าดูแลที่อาจเกิด'},{label:'ความคุ้มครองที่มี'},{label:'ช่องว่างที่เหลือ'}]},
+  'scam:4':{m:'อารมณ์ที่ทำให้ฉันพลาดง่ายที่สุด',cells:[{label:'อารมณ์ที่ทำให้ฉันพลาดง่ายที่สุด',chips:['ตกใจ','โลภ','รัก','กลัว']},{label:'เมื่อรู้สึกแบบนี้ ฉันจะ',wide:true}]}
+};
+function apbRenderField(def,state,fi){
+  var title=def.title||'',cells=def.cells,hintTail=(def.hint||'').replace(/^\((.*)\)$/,'$1'),nB=0,nC=0,sub='';
+  fi=fi==null?def.fi:fi;
+  // "Goal (เงินก้อนนี้มีไว้ทำอะไร)": the bracketed part is a prompt, not the title — show it small under the title
+  var pm=/^(.*?)\s*\(([^()]*)\)\s*(.*)$/.exec(title);
+  if(pm&&pm[2]&&(pm[1]||pm[3])){title=apbCleanLabel((pm[1]+' '+pm[3]).trim());sub=pm[2].trim();}
+  cells.forEach(function(c){if(/^\d+$/.test(c.label||''))c.label='ข้อ '+c.label;});
+  var val=function(k){return apbEsc(state.f[k]||'');};
+  cells.forEach(function(c){if(!c.k)c.k=fi+(c.chips?'.c'+(nC++):'.'+(nB++));});
+  var numUnit=function(u){return /^(%|บาท|ล้านบาท|ปี|เดือน|วัน|ครั้ง|ข้อ|เท่า|ตัว|กรัม|เปอร์เซ็นต์|ล้าน|องศา)/.test(u||'');};
+  return '<div class="apb-g">'+(title?'<div class="apb-gt">'+apbEsc(title)+'</div>':'')+(sub?'<div class="apb-sub">'+apbEsc(sub)+'</div>':'')+
+    '<div class="apb-cells">'+cells.map(function(c){
+      if(c.chips)return '<div class="apb-cell w">'+(c.label?'<span class="apb-cl">'+apbEsc(c.label)+'</span>':'')+'<div class="apb-chips" role="group" aria-label="'+apbEsc(c.label||title)+'">'+
+        c.chips.map(function(o){var on=state.f[c.k]===o;return '<button type="button" class="apb-chip'+(on?' on':'')+'" data-chip="'+c.k+'" data-v="'+apbEsc(o)+'" aria-pressed="'+(on?'true':'false')+'">'+apbEsc(o)+'</button>';}).join('')+'</div></div>';
+      var al=(c.label||title||'').slice(0,60);
+      return '<label class="apb-cell'+(c.wide?' w':'')+'">'+(c.label?'<span class="apb-cl">'+apbEsc(c.label)+'</span>':'')+
+        '<span class="apb-ci"><input class="apb-bl" type="text"'+(numUnit(c.unit)?' inputmode="decimal"':'')+' data-fk="'+c.k+'" value="'+val(c.k)+'" maxlength="200" autocomplete="off" aria-label="'+apbEsc(al)+'">'+(c.unit?'<span class="apb-u">'+apbEsc(c.unit)+'</span>':'')+'</span></label>';
+    }).join('')+'</div>'+(hintTail?'<div class="apb-hint">'+apbEsc(hintTail)+'</div>':'')+'</div>';
 }
 function apbRefs(refs){
   if(!refs||!refs.length)return '';
@@ -6514,8 +6656,8 @@ function renderAssetIndex(){
     var books=IX.books.filter(function(b){return b.group===g;});
     return '<div class="apb-panel" data-apbp="'+i+'"'+(i===APB_TAB?'':' style="display:none"')+'><div class="apb-list">'+
       books.map(function(b){
-        return '<button class="apb-li" type="button" data-book="'+apbEsc(b.id)+'"><div class="klib-ic">'+ic(b.icon)+'</div>'+
-          '<div><div class="apb-en">'+apbEn(b.name_en)+'</div><div class="apb-t">'+apbEsc(b.name_th)+'</div><div class="apb-s">'+apbEsc(b.tagline)+'</div>'+apbReadChip(b.id,b.steps)+'</div>'+
+        return '<button class="apb-li" type="button" data-book="'+apbEsc(b.id)+'"><div class="klib-ic">'+apbIcon(b.id,b.icon)+'</div>'+
+          '<div><div class="apb-en">'+apbEn(b.name_en)+'</div><div class="apb-t">'+apbEsc(b.name_th)+'</div><div class="apb-s">'+apbEsc(b.tagline)+'</div>'+'</div>'+
           ic('lc-chevron-right','klib-cv')+'</button>';
       }).join('')+'</div></div>';
   }).join('');
@@ -6537,22 +6679,20 @@ function renderAssetBook(){
   if(!APB_CUR){st.phase='assetpb';render();return;}
   if(!IX){apbAwait('index','assetbook','Asset Knowleges','เพื่อการศึกษา','assetpb');return;}
   if(!D){var meta=IX.books.filter(function(b){return b.id===APB_CUR;})[0]||{};apbAwait(APB_CUR,'assetbook',apbEsc(meta.name_th||''),'<span class="apb-hd-en">'+apbEn(meta.name_en||'')+'</span>','assetpb');return;}
-  var pos=IX.books.map(function(b){return b.id;}).indexOf(D.id);
-  var prev=IX.books[pos-1],next=IX.books[pos+1];
-  var shortsHere=(D.key_questions||[]).some(function(k){return k.short;})||(D.basics||[]).some(function(k){return k.short;});
-  /* Expandable answer: verified short first, full answer behind "อ่านคำตอบเต็ม" (source's own pattern). */
-  function qa(head,short,full,extra,refs){
+  /* Expandable answer: verified short first, full answer behind a toggle (source's own pattern).
+     Key questions say "อ่านคำตอบทั้งหมด"/"ย่อคำตอบ"; ศัพท์พื้นฐาน says "อ่านต่อ"/"ย่อ" (per direction). */
+  function qa(head,short,full,extra,refs,lab){
     var hasShort=!!short;
+    lab=lab||{open:'อ่านคำตอบทั้งหมด',close:'ย่อคำตอบ'};
     return '<div class="apb-item"><div class="apb-q">'+head+'</div>'+
       (hasShort?'<div class="apb-txt apb-short">'+apbTxt(short)+'</div>':'')+
       '<div class="apb-full"'+(hasShort?' hidden':'')+'><div class="apb-txt">'+apbTxt(full)+'</div>'+(extra||'')+apbRefs(refs)+'</div>'+
-      (hasShort?'<button class="ag-more apb-more" type="button" data-more>'+ic('lc-chevron-down','ag-more-ic')+'<span>อ่านคำตอบทั้งหมด</span></button>':'')+
+      (hasShort?'<button class="ag-more apb-more" type="button" data-more data-open="'+lab.open+'" data-close="'+lab.close+'">'+ic('lc-chevron-down','ag-more-ic')+'<span>'+lab.open+'</span></button>':'')+
     '</div>';
   }
   function sec(id,ey,title,inner){
     return '<section class="card scroll-reveal apb-sec" id="apb-'+id+'"><div class="s-pad"><div class="s-ey"><span>'+ey+'</span></div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">'+title+'</h2>'+inner+'</div></section>';
   }
-  var READ0=apbReadLoad(D.id);
   var WE=D.worked_example,TH=D.takehome,MM=D.method_matrix,AE=D.at_event;
   var hasMM=!!(MM&&MM.rows&&MM.rows.length),hasEx=!!(WE&&WE.calc_steps&&WE.calc_steps.length),hasMap=!!(TH&&TH.fields&&TH.fields.length),hasEv=!!(AE&&AE.length);
   var toc=[['kq','คำถามหลัก'],['basics','ศัพท์พื้นฐาน'],['steps',D.steps.length+' ขั้นตอน']]
@@ -6585,7 +6725,7 @@ function renderAssetBook(){
     mapHTML=sec('map',apbEsc(TH.title),'เขียนกติกาของตัวเอง',
       '<div class="apb-map-note">'+ic('lc-lock')+'<span>ข้อมูลที่กรอกเก็บไว้ในเครื่องนี้เท่านั้น ไม่ส่งออกไปที่ใด ล้างเบราว์เซอร์แล้วจะหาย</span></div>'+
       '<div class="apb-lab">ช่องให้กรอก</div>'+
-      TH.fields.map(function(f,fi){return '<div class="apb-fld">'+apbFieldHTML(f,fi,MAPST)+'</div>';}).join('')+
+      TH.fields.map(function(f,fi){return '<div class="apb-fld">'+apbFieldHTML(f,fi,MAPST,D.id)+'</div>';}).join('')+
       ((TH.checklist||[]).length?'<div class="apb-prog" id="apbProg">เช็กลิสต์ ติ๊กแล้ว '+nDone+'/'+nCk+'</div>'+
         TH.checklist.map(function(c,ci){return '<label class="apb-ck"><input type="checkbox" data-ck="'+ci+'"'+(MAPST.c[ci]?' checked':'')+'><span>'+apbEsc(String(c).replace(/^\s*□\s*/,''))+'</span></label>';}).join(''):'')+
       (TH.final_question?'<div class="apb-fq"><div class="apb-lab">คำถามสุดท้ายก่อนตัดสินใจ</div><div class="apb-q">'+apbEsc(TH.final_question)+'</div></div>':'')+
@@ -6597,71 +6737,87 @@ function renderAssetBook(){
   }
   var body=
     '<section class="card scroll-reveal"><div class="s-pad">'+
-      '<div class="s-ey">'+ic(D.icon)+'<span class="apb-hd-en">'+apbEn(D.name_en)+'</span><span class="apb-bn">เล่ม '+D.n+'/'+IX.books.length+'</span></div>'+
+      '<div class="s-ey">'+apbIcon(D.id,D.icon)+'<span class="apb-hd-en apb-ey-nm">'+apbEn(D.name_en)+'</span><span class="apb-bn">เล่ม '+D.n+'/'+IX.books.length+'</span></div>'+
       '<h2 class="s-h">'+apbEsc(D.headline)+'</h2>'+
       '<p class="s-sub" style="margin-bottom:0">'+apbEsc(D.tagline)+'</p>'+
       '<div class="apb-kv"><div class="apb-lab">เหมาะกับใคร</div><div class="apb-txt">'+apbTxt(D.who_for)+'</div></div>'+
       '<div class="apb-kv"><div class="apb-lab">อ่านจบแล้วได้อะไร</div><div class="apb-txt">'+apbTxt(D.outcome)+'</div></div>'+
-      '<div class="apb-meta"><span>'+ic('lc-calendar')+'ข้อมูล ณ '+apbDate(D.data_asof)+'</span><span>'+ic('lc-file-text')+D.sources.length+' แหล่งอ้างอิง</span><span id="apbReadMeta">'+ic('lc-check-circle')+'อ่านแล้ว '+Math.min(READ0.s.length,D.steps.length)+'/'+D.steps.length+' ขั้นตอน</span></div>'+
+      '<div class="apb-meta"><span>'+ic('lc-calendar')+'ข้อมูล ณ '+apbDate(D.data_asof)+'</span><span>'+ic('lc-file-text')+D.sources.length+' แหล่งอ้างอิง</span></div>'+
       '<div class="lib-stub" style="margin-top:var(--sp-stack)">'+ic('lc-info')+'<span>เอกสารเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุนหรือภาษีเฉพาะบุคคล · ข้อมูลที่เปลี่ยนตามเวลาระบุวันที่กำกับไว้</span></div>'+
       '<div class="apb-toc" aria-label="ในเล่มนี้">'+toc.map(function(t){return '<button type="button" data-jump="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>'+
     '</div></section>'+
-    sec('kq','คำถามหลัก','ตอบให้ได้ก่อนลงมือ',D.key_questions.map(function(k){return qa(apbEsc(k.q),k.short,k.a,'',k.refs);}).join(''),shortsHere)+
+    sec('kq','คำถามหลัก','ตอบให้ได้ก่อนลงมือ',D.key_questions.map(function(k){return qa(apbEsc(k.q),k.short,k.a,'',k.refs);}).join(''))+
     sec('basics','ศัพท์พื้นฐาน','คำที่จะเจอบนหน้าจอจริง',D.basics.map(function(b){
-      return qa(apbEsc(b.term),b.short,b.plain,b.analogy?'<div class="apb-analogy">เปรียบเทียบ: '+apbEsc(b.analogy)+'</div>':'',b.refs);
-    }).join(''),shortsHere)+
-    sec('steps',D.steps.length+' ขั้นตอน','ทำตามลำดับ',D.steps.map(function(s,i){
-      return '<div class="apb-step'+(READ0.s.indexOf(i)>-1?' seen':'')+'" data-step="'+i+'"><button class="apb-st" type="button" aria-expanded="false"><span class="apb-num">'+s.n+'</span>'+
-        '<span><span class="apb-code">'+apbEsc(s.code)+'</span><span class="apb-t" style="display:block">'+apbEsc(s.title)+'</span></span>'+ic('lc-chevron-down','lib-cat-cv')+'</button>'+
-        '<div class="apb-sb" hidden>'+
-          (s.goal?'<div><div class="apb-lab">ขั้นนี้ได้อะไร</div><div class="apb-txt">'+apbTxt(s.goal)+'</div></div>':'')+
-          (s.actions&&s.actions.length?'<div><div class="apb-lab">ทำอะไร</div><ul class="apb-ul">'+s.actions.map(function(a){return '<li>'+apbTxt(a,true)+'</li>';}).join('')+'</ul></div>':'')+
-          (s.ask_yourself&&s.ask_yourself.length?'<div><div class="apb-lab">ถามตัวเอง</div><ul class="apb-ul">'+s.ask_yourself.map(function(a){return '<li>'+apbEsc(a)+'</li>';}).join('')+'</ul></div>':'')+
-          (s.tools&&s.tools.length?'<div><div class="apb-lab">เครื่องมือ</div>'+s.tools.map(function(t){return '<div class="apb-tool">'+(t.url?'<a href="'+apbEsc(t.url)+'" target="_blank" rel="noopener">'+apbEsc(t.name)+'</a>':'<b>'+apbEsc(t.name)+'</b>')+(t.use_for?'<div>'+apbEsc(t.use_for)+'</div>':'')+'</div>';}).join('')+'</div>':'')+
-          (s.pitfall?'<div class="apb-warn"><div class="apb-lab">'+ic('lc-alert-triangle')+'กับดักที่พบบ่อย</div><div class="apb-txt">'+apbTxt(s.pitfall)+'</div></div>':'')+
-          apbRefs(s.refs)+
-        '</div></div>';
-    }).join(''),false)+
+      return qa(apbEsc(b.term),b.short,b.plain,b.analogy?'<div class="apb-analogy">เปรียบเทียบ: '+apbEsc(b.analogy)+'</div>':'',b.refs,{open:'อ่านต่อ',close:'ย่อ'});
+    }).join(''))+
+    /* 8 steps = the "6 ด้านที่วัดได้จากคุณ" list DNA (sidesHTML): .side-item rows with the 34px number
+       circle, .side-t title + .side-s sub line (the step's English code), a status .sc pill and a
+       chevron; body in .side-body > .side-bi > .side-dl. Status here = read state (opened once):
+       unread = grey circle/pill (.lck), read = ink circle with a check + green "อ่านแล้ว" (.done).
+       One step open at a time, like togSide. */
+    '<section class="card mb-lg scroll-reveal apb-sec apb-sides" id="apb-steps"><div class="sides-hd"><div class="s-ey">'+D.steps.length+' ขั้นตอน</div><h2 class="s-h">ทำตามลำดับ</h2><p class="s-sub" style="margin-bottom:2px">แตะแต่ละขั้นเพื่อดูสิ่งที่ต้องทำ</p></div>'+
+      D.steps.map(function(s,i){
+        return '<article class="side-item" data-step="'+i+'"><div class="list-row side-row" role="button" tabindex="0" aria-expanded="false"><div class="side-num lck">'+s.n+'</div>'+
+          '<div class="side-cx"><div class="side-t">'+apbEsc(s.title)+'</div><div class="side-s apb-code">'+apbEsc(s.code)+'</div></div>'+
+          '<div class="side-r">'+ic('lc-chevron-down','s-cv')+'</div></div>'+
+          '<div class="side-body"><div class="side-bi"><div class="side-dl">'+
+            (s.goal?'<div class="apb-blk"><div class="apb-lab">ขั้นนี้ได้อะไร</div><div class="apb-txt">'+apbTxt(s.goal)+'</div></div>':'')+
+            (s.actions&&s.actions.length?'<div class="apb-blk"><div class="apb-lab">ทำอะไร</div><ul class="apb-ul">'+s.actions.map(function(a){return '<li>'+apbTxt(a,true)+'</li>';}).join('')+'</ul></div>':'')+
+            (s.ask_yourself&&s.ask_yourself.length?'<div class="apb-blk"><div class="apb-lab">ถามตัวเอง</div><ul class="apb-ul">'+s.ask_yourself.map(function(a){return '<li>'+apbEsc(a)+'</li>';}).join('')+'</ul></div>':'')+
+            (s.tools&&s.tools.length?'<div class="apb-blk"><div class="apb-lab">เครื่องมือ</div>'+s.tools.map(function(t){return '<div class="apb-tool">'+(t.url?'<a href="'+apbEsc(t.url)+'" target="_blank" rel="noopener">'+apbEsc(t.name)+'</a>':'<b>'+apbEsc(t.name)+'</b>')+(t.use_for?'<div>'+apbEsc(t.use_for)+'</div>':'')+'</div>';}).join('')+'</div>':'')+
+            (s.pitfall?'<div class="apb-blk apb-warn"><div class="apb-lab">'+ic('lc-alert-triangle')+'กับดักที่พบบ่อย</div><div class="apb-txt">'+apbTxt(s.pitfall)+'</div></div>':'')+
+            apbRefs(s.refs)+
+          '</div></div></div></article>';
+      }).join('')+'</section>'+
     mmHTML+exHTML+mapHTML+evHTML+
     sec('flags','สัญญาณอันตราย','เห็นแบบนี้ ให้หยุดก่อน',D.red_flags.map(function(f){
       return '<div class="apb-warn apb-flag"><div class="apb-lab">'+ic('lc-alert-triangle')+'สัญญาณ</div><div class="apb-q">'+apbEsc(f.sign)+'</div>'+
         '<div class="apb-txt"><b>ทำไม:</b> '+apbEsc(f.why)+'</div><div class="apb-txt"><b>ทำอย่างไร:</b> '+apbEsc(f.what_to_do)+'</div>'+apbRefs(f.refs)+'</div>';
     }).join(''),false)+
-    '<section class="card scroll-reveal apb-sec" id="apb-src"><div class="s-pad"><div class="s-ey">แหล่งอ้างอิง</div>'+
-      '<button class="apb-st" type="button" id="apbSrcTg" aria-expanded="false" style="grid-template-columns:1fr auto;padding-top:0"><span class="apb-t">'+D.sources.length+' แหล่งที่เปิดอ่านจริงก่อนเขียน</span>'+ic('lc-chevron-down','lib-cat-cv')+'</button>'+
+    /* แหล่งอ้างอิง: same section shape as every other section here (eyebrow + .s-h heading) with the
+       .ag-more open/collapse button (per direction), instead of its own one-off toggle row. */
+    '<section class="card scroll-reveal apb-sec" id="apb-src"><div class="s-pad"><div class="s-ey"><span>แหล่งอ้างอิง</span></div>'+
+      '<h2 class="s-h" style="margin-bottom:var(--sp-stack)">'+D.sources.length+' แหล่งที่เปิดอ่านจริงก่อนเขียน</h2>'+
+      '<button class="ag-more apb-more" type="button" id="apbSrcTg" aria-expanded="false" style="margin-top:0">'+ic('lc-chevron-down','ag-more-ic')+'<span>ดูรายการแหล่งอ้างอิง</span></button>'+
       '<div id="apbSrcList" hidden>'+D.sources.map(function(s){
-        return '<div class="apb-src" id="apb-src-'+apbEsc(s.id)+'"><b>'+apbEsc(String(s.id).replace(/^S/,''))+'</b>'+apbEsc(s.publisher)+' — '+(s.url?'<a href="'+apbEsc(s.url)+'" target="_blank" rel="noopener">'+apbEsc(s.title)+'</a>':apbEsc(s.title))+(s.accessed?' <span class="apb-acc">(เข้าถึง '+apbDate(s.accessed)+')</span>':'')+'</div>';
+        return '<div class="apb-src" id="apb-src-'+apbEsc(s.id)+'"><b>'+apbEsc(String(s.id).replace(/^S/,''))+'</b>'+apbEsc(s.publisher)+' · '+(s.url?'<a href="'+apbEsc(s.url)+'" target="_blank" rel="noopener">'+apbEsc(s.title)+'</a>':apbEsc(s.title))+(s.accessed?' <span class="apb-acc">(เข้าถึง '+apbDate(s.accessed)+')</span>':'')+'</div>';
       }).join('')+'</div>'+
-    '</div></section>'+
-    '<div class="apb-pn">'+
-      (prev?'<button type="button" data-book="'+apbEsc(prev.id)+'"><span class="apb-lab">‹ เล่มก่อนหน้า</span><span class="apb-t">'+apbEsc(prev.name_th)+'</span></button>':'<span></span>')+
-    '</div>';
+    '</div></section>';
   apbShell(apbEsc(D.name_th),'<span class="apb-hd-en">'+apbEn(D.name_en)+'</span>','assetpb',body);
   var main=root.querySelector('main');
-  function openSrc(){var l=main.querySelector('#apbSrcList'),tg=main.querySelector('#apbSrcTg');l.hidden=false;tg.setAttribute('aria-expanded','true');}
+  function setSrc(open){var l=main.querySelector('#apbSrcList'),tg=main.querySelector('#apbSrcTg');l.hidden=!open;tg.setAttribute('aria-expanded',open?'true':'false');tg.querySelector('span').textContent=open?'ย่อรายการ':'ดูรายการแหล่งอ้างอิง';tg.querySelector('.ag-more-ic').classList.toggle('open',open);}
+  function openSrc(){setSrc(true);}
+  function toggleStep(row){ // .side-row accordion, one open at a time (togSide's behavior)
+    var item=row.parentElement,body=item.querySelector('.side-body'),isOpen=body.classList.contains('show');
+    main.querySelectorAll('.apb-sides .side-body.show').forEach(function(b){b.classList.remove('show');b.parentElement.querySelector('.side-row').setAttribute('aria-expanded','false');b.parentElement.querySelector('.s-cv').classList.remove('open');});
+    if(isOpen)return;
+    body.classList.add('show');row.setAttribute('aria-expanded','true');row.querySelector('.s-cv').classList.add('open');
+  }
+  main.addEventListener('keydown',function(e){var r=e.target.closest&&e.target.closest('.apb-sides .side-row');if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();toggleStep(r);}});
   if(hasMap){
     main.oninput=function(e){var k=e.target.dataset&&e.target.dataset.fk;if(!k)return;MAPST.f[k]=e.target.value;apbMapSave(D.id,MAPST);};
     main.onchange=function(e){var ci=e.target.dataset&&e.target.dataset.ck;if(ci==null)return;MAPST.c[ci]=e.target.checked;apbMapSave(D.id,MAPST);
       var n=main.querySelectorAll('[data-ck]:checked').length,pg=main.querySelector('#apbProg');if(pg)pg.textContent='เช็กลิสต์ ติ๊กแล้ว '+n+'/'+main.querySelectorAll('[data-ck]').length;};
   }
   main.onclick=function(e){
-    var t=e.target.closest('button,a.apb-ref');if(!t||!main.contains(t))return;
-    if(t.hasAttribute('data-more')){var it=t.closest('.apb-item'),f=it.querySelector('.apb-full'),sh=it.querySelector('.apb-short');var show=f.hidden;f.hidden=!show;if(sh)sh.hidden=show;t.querySelector('span').textContent=show?'ย่อคำตอบ':'อ่านคำตอบทั้งหมด';t.querySelector('.ag-more-ic').classList.toggle('open',show);return;}
+    var t=e.target.closest('button,a.apb-ref,.apb-sides .side-row');if(!t||!main.contains(t))return;
+    if(t.classList.contains('side-row')){toggleStep(t);return;}
+    if(t.hasAttribute('data-chip')){ // option chip in MY ___ MAP: tap to select, tap again to clear
+      var ck0=t.dataset.chip,vv=t.dataset.v,was=MAPST.f[ck0]===vv;MAPST.f[ck0]=was?'':vv;apbMapSave(D.id,MAPST);
+      t.parentElement.querySelectorAll('.apb-chip').forEach(function(c){var on=!was&&c===t;c.classList.toggle('on',on);c.setAttribute('aria-pressed',on?'true':'false');});return;}
+    if(t.hasAttribute('data-more')){var it=t.closest('.apb-item'),f=it.querySelector('.apb-full'),sh=it.querySelector('.apb-short');var show=f.hidden;f.hidden=!show;if(sh)sh.hidden=show;t.querySelector('span').textContent=show?t.dataset.close:t.dataset.open;t.querySelector('.ag-more-ic').classList.toggle('open',show);return;}
     if(t.hasAttribute('data-rv')){var tg=t.nextElementSibling,op2=tg.hidden;tg.hidden=!op2;t.querySelector('span').textContent=op2?t.dataset.close:t.dataset.open;t.querySelector('.ag-more-ic').classList.toggle('open',op2);return;}
     if(t.hasAttribute('data-mrow')){var mr=t.closest('.apb-step'),mb=mr.querySelector('.apb-sb'),mo=mb.hidden;mb.hidden=!mo;t.setAttribute('aria-expanded',mo?'true':'false');return;}
     if(t.id==='apbMapClear'){if(t.dataset.arm){ // confirmed: clear in place (a render() here would also jump the page back to the top)
         clearTimeout(+t.dataset.arm);delete t.dataset.arm;MAPST.f={};MAPST.c={};apbMapSave(D.id,MAPST);
         main.querySelectorAll('[data-fk]').forEach(function(i){i.value='';});
         main.querySelectorAll('[data-ck]').forEach(function(c){c.checked=false;});
+        main.querySelectorAll('.apb-chip').forEach(function(c){c.classList.remove('on');c.setAttribute('aria-pressed','false');});
         var pg2=main.querySelector('#apbProg');if(pg2)pg2.textContent='เช็กลิสต์ ติ๊กแล้ว 0/'+main.querySelectorAll('[data-ck]').length;
         t.querySelector('span').textContent='ล้างข้อมูลที่กรอกในแผนที่นี้';return;}t.querySelector('span').textContent='แตะอีกครั้งเพื่อยืนยันการล้าง';t.dataset.arm=setTimeout(function(){delete t.dataset.arm;if(t.isConnected)t.querySelector('span').textContent='ล้างข้อมูลที่กรอกในแผนที่นี้';},3500);return;}
-    if(t.classList.contains('apb-st')&&t.id!=='apbSrcTg'){var st0=t.closest('.apb-step'),b2=st0.querySelector('.apb-sb'),op=b2.hidden;b2.hidden=!op;st0.classList.toggle('open',op);t.setAttribute('aria-expanded',op?'true':'false');
-      if(op&&!st0.classList.contains('seen')){st0.classList.add('seen');var rd=apbReadMark(D.id,+st0.dataset.step,D.steps.length);var rm=main.querySelector('#apbReadMeta');if(rm)rm.lastChild.textContent='อ่านแล้ว '+Math.min(rd.s.length,D.steps.length)+'/'+D.steps.length+' ขั้นตอน';}
-      return;}
-    if(t.id==='apbSrcTg'){var l=main.querySelector('#apbSrcList');if(l.hidden)openSrc();else{l.hidden=true;t.setAttribute('aria-expanded','false');}return;}
+    if(t.id==='apbSrcTg'){setSrc(main.querySelector('#apbSrcList').hidden);return;}
     if(t.hasAttribute('data-jump')){var j=main.querySelector('#apb-'+t.dataset.jump);if(j)j.scrollIntoView({behavior:'smooth',block:'start'});return;}
     if(t.classList.contains('apb-ref')){e.preventDefault();openSrc();var el=main.querySelector('#apb-src-'+t.dataset.ref);if(el){main.querySelectorAll('.apb-src.hit').forEach(function(x){x.classList.remove('hit');});el.classList.add('hit');el.scrollIntoView({behavior:'smooth',block:'center'});}return;}
-    if(t.dataset.book){APB_CUR=t.dataset.book;render();return;}
   };
 }
 function ddTabs(h){
