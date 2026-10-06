@@ -1573,7 +1573,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-art{display:block;width:30px;height:30px;object-fit:contain;}
 .s-ey .apb-art{width:22px;height:22px;}
 /* 8 steps reuse the "6 ด้านที่วัดได้จากคุณ" classes (.side-*); only the open height needs room for real content. */
-.apb-sides .side-body.show{max-height:4000px;}
+/* closed step bodies stay out of the tab order (links inside would otherwise still be focusable) */
+.apb-sides .side-body:not(.show){visibility:hidden;transition:max-height .28s var(--ease),visibility 0s .28s;}
+/* a focused field/chip/checkbox row scrolls into view clear of the sticky 54px top bar and the on-screen keyboard */
+.apb-bl,.apb-chip,.apb-ck{scroll-margin-top:96px;scroll-margin-bottom:160px;}
+.apb-chip{max-width:100%;}
 .apb-sides .side-row:focus-visible{outline:2px solid var(--focus);outline-offset:-2px;border-radius:var(--r1);}
 .apb-sides .side-s.apb-code{font-family:var(--serif);letter-spacing:.06em;}
 .apb-sides .side-dl>*+*{margin-top:var(--sp-stack);}
@@ -4054,6 +4058,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 <symbol id="lc-landmark" viewBox="0 0 24 24"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></symbol>
 <symbol id="lc-building-2" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></symbol>
 <symbol id="lc-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+<symbol id="lc-gold-bars" viewBox="0 0 24 24"><path d="M2 20l1.5-5h7L12 20Z"/><path d="M12 20l1.5-5h7L22 20Z"/><path d="M7 15l1.5-5h7L17 15Z"/></symbol>
 <symbol id="lc-gem" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></symbol>
 <symbol id="lc-bitcoin" viewBox="0 0 24 24"><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 4.26m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727"/></symbol>
 <symbol id="lc-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
@@ -5202,6 +5207,19 @@ function revealTick(){
     if(el.style.transform)el.style.transform='';
     var rect=el.getBoundingClientRect();
     if(rect.width===0&&rect.height===0)return; // display:none (e.g. an inactive book2 tab panel)
+    /* Scroll-motion audit (2026-10-06): a card with form fields opts out (data-no-motion) — a tilted/scaled
+       3D ancestor makes tapping and the caret/selection handles in an <input> unreliable, and the fields
+       must stay put while someone is typing. */
+    if(el.hasAttribute('data-no-motion')){el.style.transform='';el.style.transformOrigin='';return;}
+    /* Same audit: the entry transform is anchored at the card's BOTTOM (transform-origin 50% 100%) so it
+       scales 5% toward its bottom edge. On a card taller than the screen that pushes its TOP edge down by
+       5% of its height (3600px card = ~180px) plus the tilt's foreshortening: measured on a 3600px
+       Asset Knowleges section, the card painted ~440-560px lower than its layout position while it
+       entered, so it stayed off-screen and then caught up faster than the scroll. For a tall card
+       anchor at the TOP instead and keep the entry subtle (2% shrink, 16px rise, 4deg tilt): the top edge
+       stays where the layout puts it and the long text below is barely distorted. */
+    var tall=rect.height>vh*1.2;
+    el.style.transformOrigin=tall?'50% 0%':'';
     var start=vh*0.92,end=vh*0.42; // enters the reveal ~92% down the viewport, settles flat by ~42%
     var p=atBottom?1:Math.max(0,Math.min(1,(start-rect.top)/(start-end)));
     // Bug fix (2026-09-11 responsive audit): a fully-settled element (p>=1) used to still get an
@@ -5218,6 +5236,7 @@ function revealTick(){
     // context once there's nothing left to animate.
     if(p>=1){el.style.transform='';return;}
     var persp=Math.max(1000,rect.height*2.2);
+    if(tall){el.style.transform='perspective('+Math.round(persp)+'px) rotateX('+((1-p)*4).toFixed(2)+'deg) translateY('+((1-p)*16).toFixed(1)+'px) scale('+(0.98+p*0.02).toFixed(3)+')';return;}
     el.style.transform='perspective('+Math.round(persp)+'px) rotateX('+((1-p)*12).toFixed(2)+'deg) translateY('+((1-p)*26).toFixed(1)+'px) scale('+(0.95+p*0.05).toFixed(3)+')';
   });
 }
@@ -6393,15 +6412,10 @@ function renderLibrary(){
    Phase 1 shows: header, key questions (verified 1–2 line short first, full answer on tap), basics,
    the 8 steps as an accordion, red flags, sources. Deferred to phase 2 (already in the data, not
    rendered yet): worked_example, takehome (MY ___ MAP), method_matrix, at_event. */
-/* Per-book icon (icon audit, 2026-10-06): the app's own 3D asset art wherever one exists for that asset —
-   the same art the booths use — so each book's icon actually means its subject (gold = gold bars, not a
-   coin glyph). TAX / AI / ANTI-SCAM have no asset art in the icon set yet, so they keep a lucide glyph
-   (document / sparkles / warning) until art is supplied. */
-function apbIconSrc(id){
-  return {macro:ICON_COMPASS_PNG,stock:ICON_STOCK_TH_PNG,bond:ICON_BOND_PNG,fund:ICON_FUND_PNG,dr:ICON_STOCK_INTL_PNG,gold:ICON_GOLD_PNG,
-    realestate:ICON_REALESTATE_PNG,crypto:ICON_CRYPTO_PNG,collectible:ICON_COLLECTIBLE_PNG,insurance:ICON_INSURANCE_PNG,longevity:ICON_HOURGLASS_PNG}[id]||'';
-}
-function apbIcon(id,lucide){var s=apbIconSrc(id);return s?'<img class="apb-art" src="'+s+'" alt="">':ic(lucide);}
+/* Back to the original line-icon style (per direction 2026-10-06, "icon style เดิม"): every book uses a
+   lucide glyph from this file's sprite. Gold has no lucide equivalent (lc-coins reads as a dollar
+   coin), so it uses a hand-drawn stacked-ingots glyph, lc-gold-bars, in the same 24px/2px-stroke style. */
+function apbIcon(id,lucide){return ic(lucide);}
 var APB_CUR=null;
 var APB_TAB=0; // selected group tab on the index, kept across book -> back
 /* Booth (BOOTHS[].asset) -> its Asset Knowleges book, for the "อ่านเรื่อง … ต่อ" row on the booth result screen.
@@ -6662,7 +6676,7 @@ function renderAssetIndex(){
       }).join('')+'</div></div>';
   }).join('');
   var body=
-    '<div class="efin-banner apb-banner scroll-reveal"><div class="efin-hd"><img class="efin-logo" src="'+ICON_BOOK_PNG+'" alt=""><div class="efin-t"><span class="lib-num">'+IX.books.length+'</span> Asset Knowleges สินทรัพย์</div></div>'+
+    '<div class="efin-banner apb-banner scroll-reveal"><div class="efin-hd"><img class="efin-logo" src="'+ICON_BOOK_PNG+'" alt=""><div class="efin-t"><span class="lib-num">'+IX.books.length+'</span> Asset Knowleges</div></div>'+
       '<div class="efin-d" style="margin-bottom:0">เลือกเล่มที่สนใจ แต่ละเล่มพาตั้งแต่รู้จักตัวเอง ตรวจข้อมูลจากแหล่งทางการ จนเขียนกติกาของตัวเองได้ ✦ เอกสารเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุนหรือภาษีเฉพาะบุคคล</div></div>'+
     '<section class="card scroll-reveal"><div class="s-pad">'+
       '<div class="bt-tabs bt-tabs--primary dd-tablist apb-tabs" id="apbTabs" role="tablist" aria-label="หมวดสินทรัพย์">'+tablist+'</div>'+panels+
@@ -6785,13 +6799,25 @@ function renderAssetBook(){
     '</div></section>';
   apbShell(apbEsc(D.name_th),'<span class="apb-hd-en">'+apbEn(D.name_en)+'</span>','assetpb',body);
   var main=root.querySelector('main');
+  var mapSec=main.querySelector('#apb-map');if(mapSec)mapSec.setAttribute('data-no-motion',''); // the form card never scroll-animates (see revealTick)
   function setSrc(open){var l=main.querySelector('#apbSrcList'),tg=main.querySelector('#apbSrcTg');l.hidden=!open;tg.setAttribute('aria-expanded',open?'true':'false');tg.querySelector('span').textContent=open?'ย่อรายการ':'ดูรายการแหล่งอ้างอิง';tg.querySelector('.ag-more-ic').classList.toggle('open',open);}
   function openSrc(){setSrc(true);}
   function toggleStep(row){ // .side-row accordion, one open at a time (togSide's behavior)
     var item=row.parentElement,body=item.querySelector('.side-body'),isOpen=body.classList.contains('show');
-    main.querySelectorAll('.apb-sides .side-body.show').forEach(function(b){b.classList.remove('show');b.parentElement.querySelector('.side-row').setAttribute('aria-expanded','false');b.parentElement.querySelector('.s-cv').classList.remove('open');});
+    /* Open/close animates max-height between 0 and the body's REAL height (the shared .side-body rule caps
+       at 400px, far shorter than these step bodies, and a flat 4000px cap would make the 0.28s ease look
+       instant); once open it's released to 'none' so a resize/reflow can't clip it. */
+    function closeBody(b){
+      b.style.maxHeight=b.scrollHeight+'px';
+      void b.offsetHeight; // commit the starting height so the drop to 0 animates (no rAF: it must still close when frames are throttled)
+      b.style.maxHeight='0px';b.classList.remove('show');
+      b.parentElement.querySelector('.side-row').setAttribute('aria-expanded','false');b.parentElement.querySelector('.s-cv').classList.remove('open');
+    }
+    main.querySelectorAll('.apb-sides .side-body.show').forEach(closeBody);
     if(isOpen)return;
-    body.classList.add('show');row.setAttribute('aria-expanded','true');row.querySelector('.s-cv').classList.add('open');
+    body.classList.add('show');body.style.maxHeight=body.scrollHeight+'px';
+    setTimeout(function(){if(body.classList.contains('show'))body.style.maxHeight='none';},320);
+    row.setAttribute('aria-expanded','true');row.querySelector('.s-cv').classList.add('open');
   }
   main.addEventListener('keydown',function(e){var r=e.target.closest&&e.target.closest('.apb-sides .side-row');if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();toggleStep(r);}});
   if(hasMap){

@@ -34,7 +34,7 @@ const GROUPS = [
 ];
 const ICON = {
   macro: 'lc-compass', stock: 'lc-trending-up', bond: 'lc-landmark', fund: 'lc-pie-chart',
-  dr: 'lc-globe', gold: 'lc-coins', realestate: 'lc-building-2', crypto: 'lc-bitcoin',
+  dr: 'lc-globe', gold: 'lc-gold-bars', realestate: 'lc-building-2', crypto: 'lc-bitcoin',
   collectible: 'lc-gem', tax: 'lc-file-text', insurance: 'lc-shield', longevity: 'lc-hourglass',
   ai: 'lc-sparkles', scam: 'lc-alert-triangle',
 };
