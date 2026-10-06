@@ -6148,7 +6148,7 @@ function renderBook(){
       '<section class="card scroll-reveal"><div class="s-pad"><div class="list-row klib-row" id="klibRow"><div class="klib-ic">'+ic('lc-library')+'</div><div class="klib-tx"><div class="klib-t">คลังความรู้</div><div class="klib-s">41 บทความที่คัดมาสำหรับ '+h.th+'</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
       /* Asset Playbooks entry (2026-10-06, per direction "หน้าย่อยในแท็บ Playbook ถัดจากคลังความรู้")
          — same list-row shape as klibRow right above it; opens renderAssetIndex(). */
-      '<section class="card scroll-reveal"><div class="s-pad"><div class="list-row klib-row" id="apbRow"><div class="klib-ic">'+ic('lc-book-open')+'</div><div class="klib-tx"><div class="klib-t">Asset Knowleges</div><div class="klib-s">14 เล่ม รู้จักสินทรัพย์ ตั้งแต่หุ้น ทองคำ ไปจนถึงภาษีและกลโกง</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
+      '<section class="card scroll-reveal"><div class="s-pad"><div class="list-row klib-row" id="apbRow"><div class="klib-ic">'+ic('lc-book-open')+'</div><div class="klib-tx"><div class="klib-t">Asset Knowleges</div><div class="klib-s">14 ความรู้เรื่องสินทรัพย์ ตั้งแต่หุ้น ทองคำ ไปจนถึงภาษี และกลโกง</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
     '</div>'
     ))
     ))+
@@ -6667,7 +6667,7 @@ function renderAssetIndex(){
     '<section class="card scroll-reveal"><div class="s-pad">'+
       '<div class="bt-tabs bt-tabs--primary dd-tablist apb-tabs" id="apbTabs" role="tablist" aria-label="หมวดสินทรัพย์">'+tablist+'</div>'+panels+
     '</div></section>';
-  apbShell('Asset Knowleges',IX.books.length+' เล่ม ✦ '+IX.groups.length+' หมวด','book',body);
+  apbShell('Asset Knowleges',IX.books.length+' เรื่อง ✦ '+IX.groups.length+' หมวดหมู่','book',body);
   initBtTabs(root.querySelector('#apbTabs'),function(value){
     APB_TAB=+value;
     root.querySelectorAll('.apb-panel').forEach(function(p){p.style.display=(p.dataset.apbp===value)?'':'none';});
