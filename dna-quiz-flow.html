@@ -10212,7 +10212,8 @@ function buildDemo(){
        Default stays "1 ใบ" — the single-ticket case is the real/active one. */
     '<div class="demo-lbl">จำนวนบัตร</div>'+seg('segTicketCount',[{v:'1',t:'บัตร 1 ใบ'},{v:'2',t:'บัตร 2 ใบ (ตัวอย่าง)'}],DEMO.multiTicket?'2':'1')+
     '<div class="demo-stub">* พรีวิว Home + โปรไฟล์ เท่านั้น ไม่กระทบสิทธิ์ของคุณด้านบน</div>'+
-    '<div class="demo-lbl">องค์ประกอบโปสเตอร์ (Home)</div>'+seg('segHeroProps',[{v:'on',t:'มี asset element'},{v:'off',t:'เฉพาะท้องฟ้า'}],DEMO.heroProps?'on':'off')+
+    /* "องค์ประกอบโปสเตอร์ (Home)" toggle removed 2026-10-09, per direction — the "มี asset element" version is chosen, so
+       DEMO.heroProps stays true (its default) and the sky-only branch in renderHome is now unreachable from the UI. */
     '<div class="demo-lbl">การ์ดตัวตน</div><select class="demo-sel" id="demoPersona"><option value="">— เลือกเพื่อดูการ์ด —</option>'+personaOpts+'</select>'+
     '<div class="demo-lbl">สถานะ</div><div class="demo-row"><span class="rl">'+ic('lc-book-open')+'ทำแบบทดสอบตัวตนแล้ว</span><span class="sw'+(DEMO.quizDone?' on':'')+'" id="demoQuiz"></span></div>'+
     /* การลงทะเบียน (2026-09-04) — separate preview toggle for a quiz-taker who never went through the
@@ -10225,11 +10226,8 @@ function buildDemo(){
        (2026-08-26, per direction "อยากให้จำลองเคส...ไว้ด้วย กรณีครบเงื่อนไขแล้ว และกรณียังขาด") —
        'auto' keeps the real boothCheckinCount()/boothActivityCount() math; see renderBooth. */
     '<div class="demo-lbl">รางวัลใหญ่ (เดินบูธ)</div>'+seg('segDraw',[{v:'auto',t:'อัตโนมัติ'},{v:'ok',t:'ครบเงื่อนไขแล้ว'},{v:'need',t:'ยังขาด'}],DEMO.draw)+
-    /* หน้าเดินบูธ (2026-09-03) — separate preview toggle for the Booth Journey UX v2: v1 is the shipped
-       page, v2 layers numbered semantic markers + Step↔Map sync onto the SAME layout. Affects the
-       เดินบูธ tab only (renderBooth's `v2` flag); nothing else in the app reads DEMO.boothVer. */
-    '<div class="demo-lbl">หน้าเดินบูธ (พรีวิว)</div>'+seg('segBoothVer',[{v:'v1',t:'v1 เดิม'},{v:'v2',t:'v2 แผนที่ Sync'}],DEMO.boothVer)+
-    '<div class="demo-stub">* v2 = แผนที่มีหมุดเลขตรงกับ Step + แตะ Step/หมุดเพื่อโฟกัสกัน</div>'+
+    /* "หน้าเดินบูธ (พรีวิว)" v1/v2 toggle removed 2026-10-09, per direction — v2 (numbered map markers + Step↔Map sync) is
+       chosen, so DEMO.boothVer stays 'v2' (its default); renderBooth's `v2` flag is always true from here. */
     /* "หน้า Splash (พรีวิวการ์ด)" toggle removed 2026-09-18, per direction "preview card เอา v1 ออก" —
        same reasoning as the "พรีวิวคู่มือ"/"Poster หน้าหลัก" rows above: v3/v5 were already removed
        earlier the same session (เอา v3, v5 ออก), leaving only v1/v4; with v1 gone too, the "การ์ดมีชีวิต"
@@ -10288,8 +10286,6 @@ function buildDemo(){
   };});
   document.getElementById('segView').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.view=b.dataset.v;document.querySelectorAll('#segView button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');applyView();};});
   document.getElementById('segDraw').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.draw=b.dataset.v;document.querySelectorAll('#segDraw button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
-  document.getElementById('segBoothVer').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.boothVer=b.dataset.v;BOOTH_SEL=null;document.querySelectorAll('#segBoothVer button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
-  document.getElementById('segHeroProps').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.heroProps=(b.dataset.v==='on');document.querySelectorAll('#segHeroProps button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.multiTicket=(b.dataset.v==='2');document.querySelectorAll('#segTicketCount button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segRegistered').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.registered=(b.dataset.v==='yes');document.querySelectorAll('#segRegistered button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='book')render();};});
   document.getElementById('segEfin').querySelectorAll('button').forEach(function(b){b.onclick=function(){EFIN_CHECKED_IN=(b.dataset.v==='yes');document.querySelectorAll('#segEfin button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='games')render();};});
