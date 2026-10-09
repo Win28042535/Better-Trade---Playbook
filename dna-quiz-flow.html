@@ -1616,6 +1616,22 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    (หุ้นรายตัว…) and the book page's own titles keep their original ink style (2026-10-06, per direction). */
 .apb-li .apb-en{color:var(--violet);}
 .apb-tabs{margin-top:calc(var(--sp-stack-tight) * -1);}
+/* Playbook ความรู้ tab (2026-10-09): #knowEdu is only a mount point (display:contents), so the sub-tab bar and each sub-tab's
+   cards keep .b2-panel's own --sp-section rhythm; a sub-tab's cards stack with that same gap. */
+#knowEdu{display:contents;}
+.know-tabs{padding-bottom:0;}
+.know-panel{display:flex;flex-direction:column;gap:var(--sp-section);}
+/* .bt-tabs--segment (2026-10-09) — segmented control, the 3rd tab level: "switch the view inside a section" (between the
+   .bt-tabs--secondary pill row = page sections and the in-card .bt-tabs--primary underline = topics inside a card). A soft
+   track, the chosen segment a raised white chip; works on the grey page or inside a card; for 2–3 options, equal widths.
+   First use: the Playbook ความรู้ tab (คลังความรู้ | Asset Knowleges). */
+.bt-tabs.bt-tabs--segment{display:flex;gap:4px;padding:4px;background:var(--accent);border:1px solid var(--line-soft);border-radius:var(--rpill);}
+.bt-tabs--segment .bt-tab{flex:1 1 0;min-width:0;min-height:44px;padding:var(--sp-list) var(--sp-inline);border-radius:var(--rpill);font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--muted);transition:background-color .15s var(--ease),color .15s var(--ease),box-shadow .15s var(--ease);}
+.bt-tabs--segment .bt-tab[aria-selected="true"]{background:var(--white);color:var(--ink);font-weight:var(--w-label);box-shadow:var(--shadow-action);}
+.bt-tabs--segment .bt-tab-label{overflow:hidden;text-overflow:ellipsis;}
+.bt-tabs--segment .bt-tab-icon svg{width:var(--ic-sm);height:var(--ic-sm);}
+@media(max-width:360px){.bt-tabs--segment .bt-tab{padding-left:6px;padding-right:6px;}.bt-tabs--segment .bt-tab-icon{display:none;}} /* 320px: "Asset Knowleges" needs the icon's room */
+.know-panel[hidden]{display:none;}
 .apb-panel .apb-list{margin-top:var(--sp-stack);}
 .apb-panel .apb-li:first-child{padding-top:0;}
 /* phase 2 */
@@ -1663,6 +1679,12 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-bl-link small{display:block;font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);}
 .apb-refs{margin-top:var(--sp-list);font-size:var(--fs-meta);color:var(--muted);}
 .apb-ref{color:var(--muted);text-decoration:underline;text-underline-offset:2px;margin-left:4px;}
+/* the sources row at the end of a block: one marker per source. inline-block gives each its own line-break opportunity
+   (adjacent <a>s with no space between them are one unbreakable word — measured 21 markers = 299px in a 234px box, clipped by
+   the step body), and a 28px box (WCAG 2.2 AA minimum is 24px) makes each one tappable. In-sentence markers are unchanged. */
+.apb-refs{overflow-wrap:anywhere;}
+.apb-refs .apb-ref{display:inline-block;min-width:28px;line-height:28px;text-align:center;margin:0 2px;text-decoration:none;}
+.apb-refs .apb-ref:first-of-type{margin-left:var(--sp-glue);}
 .apb-step{border-top:1px solid var(--line-soft);}
 .apb-st{display:grid;grid-template-columns:34px 1fr auto;gap:var(--sp-inline);align-items:flex-start;width:100%;min-height:44px;padding:var(--sp-stack) 0;background:none;border:none;font-family:var(--font);text-align:left;cursor:pointer;color:var(--ink);}
 .apb-code{font-family:var(--serif);font-size:var(--fs-eyebrow);letter-spacing:.06em;color:var(--muted);}
@@ -1740,12 +1762,25 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pe-lvt td b,.pe-cmp tr.you td{font-weight:var(--w-label);}
 .pe-pick .apb-chip,.pe-amt .apb-chip,.pe-in .apb-bl,.pe-amt-in{font-weight:var(--w-body);line-height:1.35;}
 .pe-pick .apb-chip.on,.pe-amt .apb-chip.on{font-weight:var(--w-label);}
+@media(min-width:600px){.pe-pick.apb-chips{justify-content:flex-start;}.pe-pick.apb-chips .apb-chip{flex:0 0 72px;}} /* 1-5 buttons were 128px wide each on tablet/PC */
+.pe-lvt td{height:44px;} /* the rows are tappable too: 39px -> 44px */
 .pe-num{font-family:var(--serif);letter-spacing:-0.01em;}
 .pe-big{line-height:1.2;} /* display tier; mixes Thai ("วันนี้ ≈") with the serif amount, so not the 1.0 stat-numeral tier */
 .pe-banner{padding:var(--sp-card-pad-sm);border-radius:var(--r2);} /* same box as the other tabs' top banner (.efin-banner) */
 .pe-banner .apb-lab{align-items:flex-start;font-weight:var(--w-body);line-height:1.5;margin:0;}
 .pe-banner .apb-lab svg{margin-top:3px;flex:0 0 auto;}
 .pe-gap{margin-top:var(--sp-stack);}
+/* title row = the zone-activity header (title left, .howto-btn pill right). The title may wrap onto 2+ lines beside
+   the pill, so it shrinks (min-width:0) instead of pushing the pill to its own row. */
+.pe-hd{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:var(--sp-list);}
+/* each phrase is unbreakable, so the title's min-content = its widest phrase: beside the pill while that fits (375px and up),
+   and when it doesn't (360px and under) the pill drops under the title, right-aligned, rather than splitting a phrase */
+.pe-ph{display:inline-block;white-space:nowrap;}
+.pe-hd .s-h{flex:1 1 0;min-width:min-content;margin:0;}
+.pe-info-btn{flex:0 0 auto;margin-left:auto;}
+.trait-hd.pe-hd{margin-bottom:var(--sp-stack);}
+.pe-info-p{margin:0;font-weight:var(--w-body);}
+.pe-info-p+.pe-info-p{margin-top:var(--sp-list);}
 /* Spacing audit (2026-10-08): sub-sections use Book's .trait-sec (full-bleed hairline, --sp-block/--sp-card-pad padding,
    .trait-hd + .s-h heading) like the ความสนใจ tab, and a heading -> its body is --sp-stack, the same rung as
    .s-sub's margin under a card title. */
@@ -1754,11 +1789,6 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pe-note{font-size:var(--fs-meta);color:var(--muted);line-height:1.55;margin-top:var(--sp-list);}
 .pe-line{font-size:var(--fs-bodysm);color:var(--ink);line-height:1.55;margin-top:var(--sp-inline);}
 .pe-big{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);margin-top:var(--sp-inline);}
-.pe-more{margin-top:var(--sp-list);font-size:var(--fs-label);color:var(--muted);line-height:1.6;}
-.pe-more summary{display:inline-flex;align-items:center;gap:var(--sp-glue);min-height:44px;cursor:pointer;color:var(--ink);font-weight:var(--w-head);list-style:none;}
-.pe-more summary::-webkit-details-marker{display:none;}
-.pe-more summary svg{width:var(--ic-sm);height:var(--ic-sm);}
-.pe-more>div{padding:var(--sp-list) var(--sp-inline);background:var(--paper);border-radius:var(--r1);}
 .pe-cta{margin-top:var(--sp-inline);padding:var(--sp-inline) var(--sp-stack);border-radius:var(--r1);background:var(--done-wash);border:1px solid var(--done-border);font-size:var(--fs-label);line-height:1.55;color:var(--ink);}
 .pe-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:var(--sp-glue);vertical-align:middle;flex:0 0 auto;}
 /* mirror: 3-step said/did line */
@@ -3183,10 +3213,20 @@ html.pdfv-open,html.pdfv-open body{overflow:hidden;}
 .pdfv-go:disabled{opacity:1;background:var(--done-fill);color:var(--ink);box-shadow:none;cursor:default;}
 .pdfv-go svg{width:var(--ic-sm);height:var(--ic-sm);}
 @media(min-width:768px){.pdfv-bar{flex-direction:row;align-items:center;justify-content:space-between;gap:var(--sp-stack);}.pdfv-go{width:auto;flex:0 0 auto;}}
+/* short viewport (landscape phone, 375px tall): top bar and confirm bar each become one slim row — measured frame 192px -> ~265px */
+@media(max-height:520px){
+  .pdfv-top{padding:4px var(--sp-edge);}
+  .pdfv-ttl{display:flex;align-items:center;gap:var(--sp-inline);}
+  .pdfv-s{margin-top:0;}
+  .pdfv-t{font-size:var(--fs-bodysm);}
+  .pdfv-bar{flex-direction:row;align-items:center;gap:var(--sp-inline);padding:6px var(--sp-edge);}
+  .pdfv-hint{flex:1;}
+  .pdfv-go{width:auto;flex:0 0 auto;}
+}
 .howto-modal{position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;padding:22px;}
 .howto-modal.show{display:flex;}
 .howto-scrim{position:absolute;inset:0;background:rgba(17,19,24,.6);}
-.howto-card{position:relative;width:100%;max-width:360px;background:var(--white);border-radius:var(--r2);padding:var(--sp-card-pad-sm);box-shadow:var(--shadow-lg);}
+.howto-card{position:relative;width:100%;max-width:360px;max-height:calc(100vh - 44px);max-height:calc(100dvh - 44px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--white);border-radius:var(--r2);padding:var(--sp-card-pad-sm);box-shadow:var(--shadow-lg);}
 .howto-x{position:absolute;right:12px;top:12px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--ink);border:none;cursor:pointer;}
 .howto-x svg{width:var(--ic-md);height:var(--ic-md);}
 .howto-hd{padding-right:30px;margin-bottom:var(--sp-stack);}
@@ -6126,7 +6166,10 @@ function openPdfPreview(opts){
   go.onclick=function(){if(PDF_DONE)return;PDF_DONE=true;paint();if(opts.onConfirm)opts.onConfirm();};
   v.querySelector('.pdfv-x').onclick=closePdfPreview;
   var f=v.querySelector('.pdfv-iframe');
-  f.onload=function(){v.classList.add('ready');pdfFit();};
+  f.onload=function(){
+    try{var d=f.contentDocument;d.documentElement.style.overflowX='hidden';d.body.style.overflowX='hidden';}catch(e){} // same-origin local copy
+    v.classList.add('ready');pdfFit();
+  };
   window.addEventListener('resize',pdfFit);
   pdfFit();
   go.focus({preventScroll:true});
@@ -6171,7 +6214,10 @@ var BOOK2_TABS=[
      พอร์ต label/pie icon moved to the new Education Edition tab ('port', see portEduPanelHTML). */
   {k:'interest',icon:'lc-heart',label:'ความสนใจ'},
   {k:'port',icon:'lc-pie-chart',label:'พอร์ต'},
-  {k:'journey',icon:'lc-route',label:'เส้นทาง'}
+  {k:'journey',icon:'lc-route',label:'เส้นทาง'},
+  /* ความรู้ (2026-10-09): คลังความรู้ + Asset Knowleges moved out of เส้นทาง into their own tab, with a sub-tab for each
+     (knowShellHTML). Same visibility as เส้นทาง: On-Event + registered only (book2Tabs). */
+  {k:'know',icon:'lc-library',label:'ความรู้'}
 ];
 /* Content-nav position note (2026-08-16 decision, still applies): moved to the TOP, right under the
    (since-removed) คู่มือ/คู่มือ 2 version pill, reusing v1's OWN .toc position + exact style (.bt-tabs
@@ -6197,6 +6243,7 @@ function bindBook2Nav(){
     root.querySelectorAll('.b2-panel').forEach(function(p){p.classList.toggle('show',p.dataset.panel===k);});
     root.querySelectorAll('.toc .bt-tab').forEach(function(x){x.setAttribute('aria-selected',x===b?'true':'false');});
     if(k==='port')mountPortEdu(); // data file loads on first open of the tab, not with the page
+    if(k==='know')mountKnow();
     book2NavReveal();
     window.scrollTo(0,0);
     requestRevealTick(); // the newly shown panel's cards were display:none; sync them now (scrollTo fires no event when already at the top)
@@ -6459,11 +6506,10 @@ function renderBook(){
          .hero-gw glow frame with the compare-reveal/redeem-card content — that frame is reserved for
          the persona card itself, and .card's own border would read as a card-inside-a-card there. */
       learnedLedgerHTML()+
-      '<section class="card scroll-reveal"><div class="s-pad"><div class="list-row klib-row" id="klibRow"><div class="klib-ic">'+ic('lc-library')+'</div><div class="klib-tx"><div class="klib-t">คลังความรู้</div><div class="klib-s">41 บทความที่คัดมาสำหรับ '+h.th+'</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
-      /* Asset Playbooks entry (2026-10-06, per direction "หน้าย่อยในแท็บ Playbook ถัดจากคลังความรู้")
-         — same list-row shape as klibRow right above it; opens renderAssetIndex(). */
-      '<section class="card scroll-reveal"><div class="s-pad"><div class="list-row klib-row" id="apbRow"><div class="klib-ic">'+ic('lc-book-open')+'</div><div class="klib-tx"><div class="klib-t">Asset Knowleges</div><div class="klib-s">14 ความรู้เรื่องสินทรัพย์ ตั้งแต่หุ้น ทองคำ ไปจนถึงภาษี และกลโกง</div></div>'+ic('lc-chevron-right','klib-cv')+'</div></div></section>'+
-    '</div>'
+      /* คลังความรู้ / Asset Knowleges rows moved to the ความรู้ tab (2026-10-09). */
+      ''+
+    '</div>'+
+    '<div class="b2-panel'+(tab==='know'?' show':'')+'" data-panel="know"><div id="knowEdu">'+knowShellHTML()+'</div></div>'
     ))
     ))+
   '</main>'+
@@ -6507,6 +6553,7 @@ function renderBook(){
      before/after crossing handler has nothing to bind to, so skip setting it up. */
   if(unreg)return;
   if(tab==='port')mountPortEdu();
+  if(tab==='know')mountKnow();
   var emptyDetailHTML='<div class="ev-empty"><div class="ev-empty-ic">'+ic('lc-hourglass')+'</div>'+
     '<div class="ev-empty-t">ยังไม่มีข้อมูลจากในงาน</div>'+
     '<div class="ev-empty-s">เล่นเกมและเดินบูธในงานก่อน แล้วค่อยกลับมาดูว่าตัวตนที่ "ทำจริง" ตรงกับที่ DNA Quiz บอกไหม</div>'+
@@ -6542,8 +6589,6 @@ function renderBook(){
   initBtTabs(root.querySelector('#ddTabs'),function(value){root.querySelectorAll('.dd-panel').forEach(function(p){p.style.display=(p.dataset.ddp===value)?'':'none';});});
   root.querySelectorAll('.side-row').forEach(function(rw){rw.onclick=function(){togSide(rw);};});
   mountSideCtaBtn();
-  var kr=root.querySelector('#klibRow');if(kr)kr.onclick=function(){LIB_OPEN=null;st.phase='library';render();};
-  var apr=root.querySelector('#apbRow');if(apr)apr.onclick=function(){st.phase='assetpb';render();};
   var confPlayBtn2=root.querySelector('#confPlayBtn');if(confPlayBtn2)confPlayBtn2.onclick=function(){st.phase='games';render();};
   /* unreg: no qr-cta-slot in the header to mount into (see the header markup above) — bindHeaderLogo()
      moved up above the `if(unreg)return;` (2026-09-10) since the logo itself IS clickable in every
@@ -6669,16 +6714,54 @@ var LIBRARY_CATS=[
   {t:'เครื่องมือและการติดตาม',n:5,icon:'lc-sliders'}
 ];
 var LIB_OPEN=null;
-function renderLibrary(){
-  // Same defensive guard as renderBook (the only other screen this reachable from) — see the
-  // comment there for why RESULT can theoretically be null when a render lands here.
-  if(!RESULT){st.phase='splash';render();return;}
+/* ══ PLAYBOOK "ความรู้" TAB (2026-10-09) ══ two sub-tabs, same .bt-tabs--primary tab bar as the Asset Knowleges groups:
+   คลังความรู้ (libraryCardHTML) and Asset Knowleges (assetIndexHTML — its index file loads on first open, apbLoad). Picking a book
+   still opens the book screen; its back button returns here with the Asset Knowleges sub-tab selected (KNOW_TAB). */
+var KNOW_TAB='lib';
+var KNOW_SUBS=[['lib','lc-library','คลังความรู้'],['asset','lc-book-open','Asset Knowleges']];
+/* Sub-tab bar = segmented control (.bt-tabs--segment, 2026-10-09, per direction "ใช้แบบ B" after an A/B/D preview on the
+   real page): the underline bar sat straight on the grey page and read as text, not a control. Same role="tablist" +
+   initBtTabs keyboard/aria as every other tab bar. */
+function knowTabsHTML(){
+  return '<div class="bt-tabs bt-tabs--segment know-tabs" id="knowTabs" role="tablist" aria-label="ความรู้">'+KNOW_SUBS.map(function(t){
+    var on=KNOW_TAB===t[0];
+    return '<button class="bt-tab" type="button" role="tab" aria-selected="'+on+'" tabindex="'+(on?0:-1)+'" data-value="'+t[0]+'"><span class="bt-tab-icon">'+ic(t[1])+'</span><span class="bt-tab-label">'+t[2]+'</span></button>';
+  }).join('')+'</div>';
+}
+function knowShellHTML(){
+  var IX=window.ASSET_PB_INDEX;
+  return knowTabsHTML()+
+    '<div class="know-panel" data-know="lib"'+(KNOW_TAB==='lib'?'':' hidden')+'>'+libraryCardHTML()+'</div>'+
+    '<div class="know-panel" data-know="asset"'+(KNOW_TAB==='asset'?'':' hidden')+'>'+(IX?assetIndexHTML(IX):apbLoadingCard(false))+'</div>';
+}
+function knowAssetPaint(host){
+  var p=host.querySelector('[data-know="asset"]');if(!p)return;
+  if(window.ASSET_PB_INDEX){if(!p.dataset.ready){p.innerHTML=assetIndexHTML(window.ASSET_PB_INDEX);p.dataset.ready='1';bindAssetIndex(p);revealTick();}return;}
+  apbLoad('index',function(ok){
+    var h2=root.querySelector('#knowEdu');if(!h2||h2!==host)return; // tab left / re-rendered meanwhile
+    if(ok){knowAssetPaint(host);return;}
+    p.innerHTML=apbLoadingCard(true,'index');
+    var r=p.querySelector('#apbRetry');if(r)r.onclick=function(){p.innerHTML=apbLoadingCard(false);knowAssetPaint(host);};
+  });
+}
+function mountKnow(){
+  var host=root.querySelector('#knowEdu');if(!host||host.dataset.bound)return;
+  host.dataset.bound='1';
+  bindLibraryCats(host);
+  initBtTabs(host.querySelector('#knowTabs'),function(v){
+    KNOW_TAB=v;
+    host.querySelectorAll('.know-panel').forEach(function(p){p.hidden=p.dataset.know!==v;});
+    requestRevealTick();
+  });
+  knowAssetPaint(host); // the small index file loads straight away, so switching sub-tab is instant
+}
+/* คลังความรู้ (2026-10-09, per direction "แยกออกไปจากแท่ปเส้นทาง ... แท่ปใหม่ ความรู้"): no longer its own screen — the card
+   below is the คลังความรู้ sub-tab of the Playbook ความรู้ tab (knowShellHTML). renderLibrary stays only as a redirect for the
+   old 'library' phase. */
+function libraryCardHTML(){
   var h=RESULT.hero;
   var total=LIBRARY_CATS.reduce(function(n,c){return n+c.n;},0);
-  root.innerHTML=
-  '<header class="topbar"><button class="tb-ic" id="libBack" type="button" aria-label="ย้อนกลับ">'+ic('lc-arrow-left')+'</button><div style="flex:1"><div class="tb-title">คลังความรู้</div><div class="tb-sub">41 บทความ ✦ จัดเป็น 8 หมวด</div></div></header>'+
-  '<main class="scroll fade">'+
-    '<section class="card scroll-reveal"><div class="s-pad">'+
+  return '<section class="card scroll-reveal"><div class="s-pad">'+
       '<div class="s-ey">สำหรับ '+h.th+'</div>'+
       '<h2 class="s-h"><span class="lib-num">'+total+'</span> เรื่องที่คุณเก็บได้ตลอดงาน</h2>'+
       '<p class="s-sub">แตะหมวดเพื่อดูรายการ ✦ เนื้อหาเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน</p>'+
@@ -6688,18 +6771,17 @@ function renderLibrary(){
           '<div class="lib-cat-body'+(open?' show':'')+'"><div class="lib-cat-bi"><div class="lib-stub">'+ic('lc-info')+'<span>เนื้อหาเต็มของ '+c.n+' บทความในหมวดนี้ยังไม่ได้ใส่ในตัวต้นแบบนี้ — ชื่อหมวดและจำนวนบทความเป็นข้อมูลจริงจากต้นฉบับ</span></div></div></div>'+
         '</div>';
       }).join('')+'</div>'+
-    '</div></section>'+
-  '</main>';
-  appTabbar('book');
-  bindTabbar();
-  root.querySelector('#libBack').onclick=function(){st.phase='book';render();};
-  root.querySelectorAll('.lib-cat-hd').forEach(function(b){b.onclick=function(){
+    '</div></section>';
+}
+function bindLibraryCats(scope){
+  scope.querySelectorAll('.lib-cat-hd').forEach(function(b){b.onclick=function(){
     var i=+b.dataset.i,cat=b.closest('.lib-cat'),body=cat.querySelector('.lib-cat-body');
     var isOpen=cat.classList.contains('open');
-    root.querySelectorAll('.lib-cat.open').forEach(function(c){c.classList.remove('open');var cb=c.querySelector('.lib-cat-body');if(cb)cb.classList.remove('show');});
+    scope.querySelectorAll('.lib-cat.open').forEach(function(c){c.classList.remove('open');var cb=c.querySelector('.lib-cat-body');if(cb)cb.classList.remove('show');});
     if(!isOpen){cat.classList.add('open');body.classList.add('show');LIB_OPEN=i;}else{LIB_OPEN=null;}
   };});
 }
+function renderLibrary(){BOOK2_TAB='know';KNOW_TAB='lib';st.phase='book';renderBook();}
 /* ══ ASSET PLAYBOOKS (2026-10-06, phase 1) ══ 14-book index (renderAssetIndex, phase 'assetpb') +
    read-only book page (renderAssetBook, phase 'assetbook'). Data = assets/playbooks/index.js and
    <id>.js, generated by tools/build-asset-playbooks.js from the content team's verified source and
@@ -6768,15 +6850,51 @@ var peEsc=apbEsc; // same reader rules as Asset Knowleges (no em dashes, HTML-es
 /* Like peFill, but returns HTML: the template's Thai text stays escaped FC Minimal and only the filled-in
    numbers get .pe-num (Baskervville) — Thai never goes into the serif (TYPOGRAPHY-DNA §1). */
 function peFillNum(t,v){return peEsc(t).replace(/\{(\w+)\}/g,function(m,k){return k in v?peNum(v[k]):m;});}
-/* ฿ sits in the Thai Unicode block and Baskervville has no glyph for it, so a leading ฿ stays in FC Minimal. */
-function peNum(s){var m=/^([฀-๿]*)(.*)$/.exec(String(s));return peEsc(m[1])+'<span class="pe-num">'+peEsc(m[2])+'</span>';}
+/* The unit "บาท" is Thai, so it stays in FC Minimal after the serif number: "147,176 บาท" (2026-10-09, replaces the ฿ prefix). */
+function peNum(s){var m=/^(.*?)(\s*[\u0E00-\u0E7F].*)?$/.exec(String(s));return '<span class="pe-num">'+peEsc(m[1])+'</span>'+peEsc(m[2]||'');}
 function peFill(t,v){return String(t==null?'':t).replace(/\{(\w+)\}/g,function(m,k){return k in v?v[k]:m;});}
 function pePct(v){v=+v;return Number.isInteger(v)?String(v):v.toFixed(1);}
 function peSigned(v){v=+v;return (v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(1)+'%';}
-function peBaht(n){return '฿'+Math.round(n).toLocaleString('en-US');}
+function peBaht(n){return Math.round(n).toLocaleString('en-US')+' บาท';}
 var PE_MON=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function peMonth(ym){var p=String(ym||'').split('-').map(Number);return p[0]?PE_MON[p[1]-1]+' '+(p[0]+543):'';}
-function peMore(txt){return txt?'<details class="pe-more"><summary>'+ic('lc-info')+'อ่านเพิ่ม</summary><div>'+peEsc(txt)+'</div></details>':'';}
+/* "อ่านเพิ่ม" (2026-10-09, per direction "ใช้ style และตำแหน่งเดียวกับ วิธีเล่น (section กิจกรรมประจำโซน)"): the same pill
+   (.howto-btn, ⓘ + label) at the right of the card title, opening the same DNA modal (.howto-modal / .howto-card), instead of
+   an inline <details>. One modal element is reused; it lives on <body>, not inside a card, because a scroll-motion card's
+   transform would turn position:fixed into position-relative-to-the-card. */
+/* Title beside the อ่านเพิ่ม pill: each space-separated phrase is kept whole (inline-block), so a 2-line title breaks
+   between phrases ("พอร์ต 5 ระดับ" / "แบ่งเงินกันแบบไหน"), not inside one ("แบ่ง" / "เงินกัน…"). A phrase wider than the
+   space left still wraps inside itself as before. */
+function peTitleHTML(t){
+  // a number on its own ("5", "3") is glued to the words either side of it, so "พอร์ต 5 ระดับ" / "ดูจาก 3 เรื่อง" stay together
+  var units=[],glue=false;
+  String(t).split(' ').forEach(function(w){
+    var num=/^[0-9]+$/.test(w);
+    if(units.length&&(num||glue))units[units.length-1]+=' '+w;else units.push(w);
+    glue=num;
+  });
+  return units.map(function(u){return '<span class="pe-ph">'+peEsc(u)+'</span>';}).join(' ');
+}
+function peInfoBtn(key){return '<button class="howto-btn pe-info-btn" type="button" data-pe-info="'+key+'">'+ic('lc-info')+'อ่านเพิ่ม</button>';}
+function peInfoText(d,key){
+  var T=d.table;
+  if(key==='table')return {t:T.title,p:[T.intro_more,T.derived_note]};
+  return {t:T.how.title,p:[T.how.more]};
+}
+function closePeInfo(){var m=document.getElementById('peInfo');if(m&&m.parentNode)m.parentNode.removeChild(m);document.removeEventListener('keydown',peInfoKey);}
+function peInfoKey(e){if(e.key==='Escape')closePeInfo();}
+function openPeInfo(key){
+  var d=window.PORT_EDU_DATA;if(!d)return;
+  var c=peInfoText(d,key);closePeInfo();
+  var m=document.createElement('div');m.className='howto-modal show';m.id='peInfo';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');m.setAttribute('aria-labelledby','peInfoT');
+  m.innerHTML='<div class="howto-scrim"></div><div class="howto-card"><button class="howto-x" type="button" aria-label="ปิด">'+ic('lc-x')+'</button>'+
+    '<div class="howto-hd"><div class="howto-t" id="peInfoT">'+peEsc(c.t)+'</div></div>'+
+    '<div class="zh-in">'+c.p.filter(Boolean).map(function(x){return '<p class="zh-li pe-info-p">'+peEsc(x)+'</p>';}).join('')+'</div></div>';
+  document.body.appendChild(m);
+  m.querySelector('.howto-scrim').onclick=closePeInfo;
+  var x=m.querySelector('.howto-x');x.onclick=closePeInfo;x.focus({preventScroll:true});
+  document.addEventListener('keydown',peInfoKey);
+}
 function peAt(d,F,lv){var b=d.history.by_foreign[String(F)];return b&&b[String(lv)]||null;}
 var PE_BKT=['cash','bond','equity','alt'];
 
@@ -6823,8 +6941,8 @@ function pePickBodyHTML(d){
 }
 function peTableHTML(d){
   var T=d.table,S=d.texts.bucket_short;
-  return '<div class="s-pad"><h2 class="s-h">'+peEsc(T.title)+'</h2>'+
-    '<p class="s-sub">'+peEsc(T.intro)+'</p>'+peMore(T.intro_more+' '+T.derived_note)+
+  return '<div class="s-pad"><div class="hcard-hd pe-hd"><h2 class="s-h">'+peTitleHTML(T.title)+'</h2>'+peInfoBtn('table')+'</div>'+
+    '<p class="s-sub">'+peEsc(T.intro)+'</p>'+
     '<div class="pe-tw"><table class="pe-lvt"><thead><tr><th>'+peEsc(T.level_col)+'</th>'+PE_BKT.map(function(b){return '<th><i class="pe-dot b-'+b+'"></i>'+peEsc(S[b])+'</th>';}).join('')+'</tr></thead><tbody>'+
       T.levels.map(function(lv){return '<tr data-pe-row="'+lv.value+'"'+(lv.value===PE.pick?' class="on"':'')+'><td><b>'+lv.value+'</b></td>'+lv.ranges.map(function(r){return '<td>'+peEsc(r.range_text)+'</td>';}).join('')+'</tr>';}).join('')+
     '</tbody></table></div>'+
@@ -6832,8 +6950,8 @@ function peTableHTML(d){
     '<div class="apb-chips pe-pick" role="group" aria-label="'+peEsc(T.pick.label)+'">'+T.levels.map(function(lv){
       return '<button type="button" class="apb-chip'+(lv.value===PE.pick?' on':'')+'" data-pe-pick="'+lv.value+'" aria-pressed="'+(lv.value===PE.pick)+'">'+lv.value+'</button>';}).join('')+'</div>'+
     '<div id="pePickBody" class="pe-viz">'+pePickBodyHTML(d)+'</div>'+
-    '</div><div class="trait-sec"><div class="trait-hd"><h3 class="s-h" style="margin-bottom:0">'+peEsc(T.how.title)+'</h3></div>'+
-      '<ol class="apb-ol apb-txt pe-sec-body">'+T.how.items.map(function(x){return '<li>'+peEsc(x)+'</li>';}).join('')+'</ol>'+peMore(T.how.more)+
+    '</div><div class="trait-sec"><div class="trait-hd pe-hd"><h3 class="s-h">'+peTitleHTML(T.how.title)+'</h3>'+peInfoBtn('how')+'</div>'+
+      '<ol class="apb-ol apb-txt pe-sec-body">'+T.how.items.map(function(x){return '<li>'+peEsc(x)+'</li>';}).join('')+'</ol>'+
       '<p class="pe-cta">'+peEsc(T.how.cta)+'</p></div>';
 }
 
@@ -6892,7 +7010,7 @@ function peGrowthBodyHTML(d){
     '<p class="pe-note">'+peEsc(T.disclaimer)+'</p>'+
     '<p class="pe-note">'+peEsc(peFill(T.source,{from:peMonth(d.history.period.from),to:peMonth(d.history.period.to)}))+'</p>';
 }
-function peGrowthTitle(d){return peFill(d.texts.growth_title_amount,{amount:peBaht(PE.amt),level:PE.pick});}
+function peGrowthTitle(d){return peFill(d.texts.growth_title_amount,{amount:peBaht(PE.amt),level:PE.pick}).replace(/ (\d+)$/,' $1');} // no-break space: the level number never wraps alone onto a 2nd line
 function peGrowthHTML(d){
   var T=d.texts,custom=T.amounts.indexOf(PE.amt)<0;
   return '<div class="s-pad"><h2 class="s-h" id="peGrowthTitle">'+peEsc(peGrowthTitle(d))+'</h2>'+
@@ -6990,6 +7108,7 @@ function bindPortEdu(){
   var d=window.PORT_EDU_DATA,host=root.querySelector('#portEdu');if(!d||!host)return;
   host.dataset.bound='1';
   var q=function(s){return host.querySelector(s);},qa=function(s){return host.querySelectorAll(s);};
+  qa('[data-pe-info]').forEach(function(b){b.onclick=function(){openPeInfo(b.dataset.peInfo);};});
   /* Motion (2026-10-08 audit): a tap (level, amount chip) replays the chart's reveal like a first view;
      dragging the Thai/foreign slider morphs the bars and lines to the new values instead (peLadderMorph,
      peGrowthMorph), so a continuous drag never restarts the animation. */
@@ -7018,11 +7137,22 @@ function bindPortEdu(){
   /* Scroll motion like every other tab (2026-10-08 fix — these three cards used to carry data-no-motion permanently,
      so half the tab never moved). A card only drops out of the motion once someone actually touches/focuses one of its
      sliders or fields, so dragging and typing never happen on a tilted card (same reason as the Asset Knowleges map). */
-  var freeze=function(e){var t=e.target;if(!t||!t.closest||!t.closest("input,select,textarea"))return;var c=t.closest("section.card");
-    if(c&&!c.hasAttribute("data-no-motion")){c.setAttribute("data-no-motion","");c.style.transform="";c.style.transformOrigin="";}};
-  host.addEventListener("pointerdown",freeze,true);host.addEventListener("focusin",freeze);
+  freezeMotionOnInput(host);
   initCharts(host);
   revealTick();
+}
+/* Scroll motion vs form fields (2026-10-09, shared by the พอร์ต tab and the Asset Knowleges "MY ___ MAP" card): a card that
+   holds inputs keeps the normal scroll motion until someone actually touches or focuses one of its fields; from then on that
+   card (and only that card) stays flat (data-no-motion), so dragging a slider or typing never happens on a tilted card.
+   Was a permanent data-no-motion on the whole card, which left it standing still while every other card moved. */
+function freezeMotionOnInput(host){
+  if(!host||host.__mfz)return;host.__mfz=1;
+  var freeze=function(e){
+    var t=e.target;if(!t||!t.closest||!t.closest('input,select,textarea'))return;
+    var c=t.closest('section.card');
+    if(c&&!c.hasAttribute('data-no-motion')){c.setAttribute('data-no-motion','');c.style.transform='';c.style.transformOrigin='';}
+  };
+  host.addEventListener('pointerdown',freeze,true);host.addEventListener('focusin',freeze);
 }
 /* Replays a chart's one-time reveal after its content was swapped (only if it was already revealed;
    one not yet scrolled into view still waits for initCharts' observer). */
@@ -7295,7 +7425,10 @@ function apbShell(title,sub,backPhase,body){
     '<main class="scroll fade">'+body+'</main>';
   appTabbar('book');
   bindTabbar();
-  root.querySelector('#apbBack').onclick=function(){st.phase=backPhase;render();};
+  root.querySelector('#apbBack').onclick=function(){
+    if(backPhase==='know'){BOOK2_TAB='know';KNOW_TAB='asset';st.phase='book';}else st.phase=backPhase; // 'know' = Playbook ความรู้ tab
+    render();
+  };
 }
 function apbLoadingCard(failed,retryFile){
   return '<section class="card"><div class="s-pad"><div class="apb-load">'+ic(failed?'lc-alert-triangle':'lc-hourglass')+
@@ -7311,9 +7444,9 @@ function apbAwait(file,phase,title,sub,backPhase){
     var r=root.querySelector('#apbRetry');if(r)r.onclick=function(){render();};
   });
 }
-function renderAssetIndex(){
-  var IX=window.ASSET_PB_INDEX;
-  if(!IX){apbAwait('index','assetpb','Asset Knowleges','เพื่อการศึกษา','book');return;}
+/* Asset Knowleges index (2026-10-09): now the Asset Knowleges sub-tab of the Playbook ความรู้ tab (knowShellHTML) instead of
+   its own 'assetpb' screen; renderAssetIndex is kept only as a redirect for that old phase. Book pages are still a screen. */
+function assetIndexHTML(IX){
   /* Header = the "ให้ AI ช่วยแนะนำแบบคุณ" banner's shape (.efin-banner) with the spectrum-book icon
      (ICON_BOOK_PNG) in a pink->yellow tint. The 3 groups are a .bt-tabs--primary tab bar — the same
      tab DNA as "สรุปไว้คุยกับผู้แนะนำการลงทุน" (ddTabs) — instead of 3 stacked cards. */
@@ -7335,18 +7468,21 @@ function renderAssetIndex(){
     '<section class="card scroll-reveal"><div class="s-pad">'+
       '<div class="bt-tabs bt-tabs--primary dd-tablist apb-tabs" id="apbTabs" role="tablist" aria-label="หมวดสินทรัพย์">'+tablist+'</div>'+panels+
     '</div></section>';
-  apbShell('Asset Knowleges',IX.books.length+' เรื่อง ✦ '+IX.groups.length+' หมวดหมู่','book',body);
-  initBtTabs(root.querySelector('#apbTabs'),function(value){
-    APB_TAB=+value;
-    root.querySelectorAll('.apb-panel').forEach(function(p){p.style.display=(p.dataset.apbp===value)?'':'none';});
-  });
-  root.querySelectorAll('.apb-li[data-book]').forEach(function(b){b.onclick=function(){APB_CUR=b.dataset.book;st.phase='assetbook';render();};});
+  return body;
 }
+function bindAssetIndex(scope){
+  initBtTabs(scope.querySelector('#apbTabs'),function(value){
+    APB_TAB=+value;
+    scope.querySelectorAll('.apb-panel').forEach(function(p){p.style.display=(p.dataset.apbp===value)?'':'none';});
+  });
+  scope.querySelectorAll('.apb-li[data-book]').forEach(function(b){b.onclick=function(){APB_CUR=b.dataset.book;st.phase='assetbook';render();};});
+}
+function renderAssetIndex(){BOOK2_TAB='know';KNOW_TAB='asset';st.phase='book';renderBook();}
 function renderAssetBook(){
   var IX=window.ASSET_PB_INDEX,D=window.ASSET_PB_DATA&&window.ASSET_PB_DATA[APB_CUR];
-  if(!APB_CUR){st.phase='assetpb';render();return;}
-  if(!IX){apbAwait('index','assetbook','Asset Knowleges','เพื่อการศึกษา','assetpb');return;}
-  if(!D){var meta=IX.books.filter(function(b){return b.id===APB_CUR;})[0]||{};apbAwait(APB_CUR,'assetbook',apbEsc(meta.name_th||''),'<span class="apb-hd-en">'+apbEn(meta.name_en||'')+'</span>','assetpb');return;}
+  if(!APB_CUR){renderAssetIndex();return;}
+  if(!IX){apbAwait('index','assetbook','Asset Knowleges','เพื่อการศึกษา','know');return;}
+  if(!D){var meta=IX.books.filter(function(b){return b.id===APB_CUR;})[0]||{};apbAwait(APB_CUR,'assetbook',apbEsc(meta.name_th||''),'<span class="apb-hd-en">'+apbEn(meta.name_en||'')+'</span>','know');return;}
   /* Expandable answer: verified short first, full answer behind a toggle (source's own pattern).
      Key questions say "อ่านคำตอบทั้งหมด"/"ย่อคำตอบ"; ศัพท์พื้นฐาน says "อ่านต่อ"/"ย่อ" (per direction). */
   function qa(head,short,full,extra,refs,lab){
@@ -7451,9 +7587,9 @@ function renderAssetBook(){
         return '<div class="apb-src" id="apb-src-'+apbEsc(s.id)+'"><b>'+apbEsc(String(s.id).replace(/^S/,''))+'</b>'+apbEsc(s.publisher)+' · '+(s.url?'<a href="'+apbEsc(s.url)+'" target="_blank" rel="noopener">'+apbEsc(s.title)+'</a>':apbEsc(s.title))+(s.accessed?' <span class="apb-acc">(เข้าถึง '+apbDate(s.accessed)+')</span>':'')+'</div>';
       }).join('')+'</div>'+
     '</div></section>';
-  apbShell(apbEsc(D.name_th),'<span class="apb-hd-en">'+apbEn(D.name_en)+'</span>','assetpb',body);
+  apbShell(apbEsc(D.name_th),'<span class="apb-hd-en">'+apbEn(D.name_en)+'</span>','know',body);
   var main=root.querySelector('main');
-  var mapSec=main.querySelector('#apb-map');if(mapSec)mapSec.setAttribute('data-no-motion',''); // the form card never scroll-animates (see revealTick)
+  freezeMotionOnInput(main); // the MY ___ MAP form card moves with the others until a field in it is touched (see freezeMotionOnInput)
   function setSrc(open){var l=main.querySelector('#apbSrcList'),tg=main.querySelector('#apbSrcTg');l.hidden=!open;tg.setAttribute('aria-expanded',open?'true':'false');tg.querySelector('span').textContent=open?'ย่อรายการ':'ดูรายการแหล่งอ้างอิง';tg.querySelector('.ag-more-ic').classList.toggle('open',open);}
   function openSrc(){setSrc(true);}
   function toggleStep(row){ // .side-row accordion, one open at a time (togSide's behavior)
@@ -8014,11 +8150,6 @@ var BOOTH_CHK={},BOOTH_ACT={},BOOTH_HOWTO=false,DRAW_JOINED=false; // BOOTH_CHK[
    already defaults to 2 games played, which couldn't have happened without this being true first;
    reset to false alongside GAME_PLAYED/BOOTH_CHK at every "fresh arrival"/reset point instead. */
 var EFIN_CHECKED_IN=true;
-/* COLLECT_CHECKED_IN (2026-10-02, per direction) — one extra stamp check-in at the Pavilion Zone's
-   collectible-card-game point (SD BOOTH, ของสะสม — NOT the character-card redemption). Its own flag,
-   like EFIN_CHECKED_IN: not a BOOTH_CHK index, so it does not count toward CHECKIN_NEED (5) or the
-   draw gate. Shown as the last stop of the booth route; set via confirmScan's SCAN.bi==='collect'. */
-var COLLECT_CHECKED_IN=false;
 var BOOTH_ANSWERS={}; // BOOTH_ANSWERS[assetIdx] = the real answers given in that booth's mini-game (see BOOTH_Q/openPlay below) — captured but not yet read by any scoring logic (still persona-based, see [[games-questions-dna]] memory "Phase 3")
 /* Booth v2 preview only (DEMO.boothVer==='v2', see renderBooth): the route step / map marker the
    user has focused via the two-way Step↔Map sync. null = nothing focused. Persists across the
@@ -8377,8 +8508,6 @@ function confirmScan(){
   if(!SCAN)return;
   if(SCAN.bi==='efin'){
     EFIN_CHECKED_IN=true;
-  } else if(SCAN.bi==='collect'){
-    COLLECT_CHECKED_IN=true;
   } else if(SCAN.bi!=null){
     var bi=SCAN.bi,ci=SCAN.ci;
     if(!BOOTH_CHK[bi])BOOTH_CHK[bi]=new Set();
@@ -8404,7 +8533,6 @@ function confirmScan(){
 function scanTitle(){
   if(!SCAN)return '';
   if(SCAN.bi==='efin')return 'เช็คอิน · efin.finance';
-  if(SCAN.bi==='collect')return 'เช็คอิน · โซนการ์ดเกม ของสะสม';
   if(SCAN.bi==null)return 'สแกน QR ในงาน';
   var name=(ZONE_BOOTHS[SCAN.bi]||[])[SCAN.ci]||'';
   var already=BOOTH_CHK[SCAN.bi]&&BOOTH_CHK[SCAN.bi].has(SCAN.ci);
@@ -8413,7 +8541,6 @@ function scanTitle(){
 function scanSubText(){
   if(!SCAN)return '';
   if(SCAN.bi==='efin')return 'ปลดล็อกเกมหลักทั้ง 6 เกม + รับของรางวัล';
-  if(SCAN.bi==='collect')return 'Pavilion Zone · SD Booth · สแตมป์เช็คอิน 1 จุด';
   if(SCAN.bi==null)return 'สแกน QR ที่จุดใดก็ได้ในงาน — ระบบจะเช็คอินบูธถัดไปที่ยังไม่ได้ทำให้อัตโนมัติ';
   var b=BOOTHS[SCAN.bi];
   return b?(b.asset+' · '+BOOTH_ZONES[b.zone].chip):'';
@@ -8482,14 +8609,16 @@ function buildRoute(){
   // reset (DEMO.eventPhase → 'on', see buildDemo's segPhase handler) couldn't show a genuinely
   // fresh/zero-visited map. Now reflects the real checked-in zone count (2026-08-28).
   var visited=Math.min(boothCheckinCount(),stops.length);
-  /* last stop — Pavilion collectible-card-game point; visited state is its own flag, not the count */
-  stops.push({name:'โซนการ์ดเกม · ของสะสม',zone:'Pavilion Zone · SD Booth · สแตมป์เช็คอิน',icon:'lc-gem',topPick:false,newAngle:false,featured:false,color:'var(--violet)',own:true});
+  /* last stop — Pavilion collectible-card-game point. Info stop (2026-10-09, per direction "เอาปุ่ม สแกนเช็คอิน ออก"):
+     the in-app scan button is gone and nothing in the app checks this point in (staff handle it at the zone), so it
+     has no visited state — it is not counted in "x/6 จุด", not part of the current/next logic, and shows no status. */
+  stops.push({name:'โซนการ์ดเกม · ของสะสม',zone:'Pavilion Zone · SD Booth',icon:'lc-gem',topPick:false,newAngle:false,featured:false,color:'var(--violet)',info:true});
   return stops.map(function(z,i){
-    var isV=z.own?COLLECT_CHECKED_IN:i<visited;
+    var isV=z.info?false:i<visited;
     var pos=BOOTH_MAP_POS[z.name]||{x:50,y:50,s:z.name}; // mx/my/short for the v2 map markers (see BOOTH_MAP_POS)
     return {name:z.name,zone:z.zone,icon:z.icon,topPick:z.topPick,newAngle:z.newAngle,featured:z.featured,color:z.color,
-      mx:pos.x,my:pos.y,short:pos.s,more:pos.more||[],isV:isV,own:!!z.own,
-      status:isV?'✓ แวะแล้ว':(z.topPick?'แนะนำอันดับ 1 สำหรับคุณ':(z.newAngle?'แนะนำให้ลอง (มุมใหม่)':'ยังไม่แวะ')),
+      mx:pos.x,my:pos.y,short:pos.s,more:pos.more||[],isV:isV,info:!!z.info,
+      status:z.info?'':isV?'✓ แวะแล้ว':(z.topPick?'แนะนำอันดับ 1 สำหรับคุณ':(z.newAngle?'แนะนำให้ลอง (มุมใหม่)':'ยังไม่แวะ')),
       dotColor:isV?'var(--cyan)':(z.topPick?'var(--violet)':(z.featured?'var(--amber-text)':(z.newAngle?'var(--violet)':'var(--muted)')))};
   });
 }
@@ -8546,7 +8675,7 @@ function renderBooth(){
      first stop as the start ("เริ่มที่นี่") — the numbered sequence + shared colors carry the rest. */
   var semState=pre
     ? function(i){return i===0?'start':'up';}
-    : function(i){if(route[i].isV)return 'done';var open=[];route.forEach(function(r,j){if(!r.isV)open.push(j);});var k=open.indexOf(i);return k===0?'cur':(k===1?'next':'up');};
+    : function(i){if(route[i].info)return 'up';if(route[i].isV)return 'done';var open=[];route.forEach(function(r,j){if(!r.isV&&!r.info)open.push(j);});var k=open.indexOf(i);return k===0?'cur':(k===1?'next':'up');};
   var semLegend=v2?(pre
     ? '<div class="booth-legend bmk-legend"><span><span class="lg-sw" style="background:var(--violet)"></span>เริ่มที่นี่</span><span><span class="lg-sw" style="background:var(--muted)"></span>จุดต่อไปตามลำดับ</span></div>'
     : '<div class="booth-legend bmk-legend"><span><span class="lg-sw" style="background:var(--cyan)"></span>เสร็จแล้ว</span><span><span class="lg-sw" style="background:var(--violet)"></span>อยู่ตรงนี้</span><span><span class="lg-sw" style="background:var(--amber-text)"></span>ถัดไป</span><span><span class="lg-sw" style="background:var(--muted)"></span>ยังไม่ถึง</span></div>'):'';
@@ -8601,7 +8730,7 @@ function renderBooth(){
          (so the existing zoom-lightbox binding below still works unchanged) minus every "personalized
          journey" element, none of which an Explorer ticket is meant to see. */
       ? '<section class="home-card scroll-reveal"><div class="map-ph has-img"><img class="mp-img" src="'+MAP_IMG+'" alt="ผังงาน BetterTrade 2026 · Samyan Mitrtown ชั้น 5"><span class="mp-cap">ผังงาน · Samyan Mitrtown ชั้น 5</span><button class="mp-zoom" id="mapZoomBtn" aria-label="ดูแผนที่แบบเต็มจอ">'+ic('lc-maximize-2')+'<span>ดูแบบเต็มจอ</span></button></div></section>'
-      : '<section class="home-card scroll-reveal"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline)"><div class="s-h" style="margin-bottom:0">'+(mapPersonalized?'แผนที่เดินบูธเฉพาะคุณ':'แผนที่เดินบูธ (เส้นทางแนะนำ)')+'</div><span class="route-badge">'+visited+'/'+route.length+' จุด</span></div>'+
+      : '<section class="home-card scroll-reveal"><div class="hcard-hd" style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-inline)"><div class="s-h" style="margin-bottom:0">'+(mapPersonalized?'แผนที่เดินบูธเฉพาะคุณ':'แผนที่เดินบูธ (เส้นทางแนะนำ)')+'</div><span class="route-badge">'+visited+'/'+route.filter(function(r){return !r.info;}).length+' จุด</span></div>'+
       '<div class="map-ph has-img'+(v2?' v2':'')+'"><img class="mp-img" src="'+MAP_IMG+'" alt="ผังงาน BetterTrade 2026 · Samyan Mitrtown ชั้น 5">'+
         /* v2 markers — one per route stop, numbered to match its step, placed at BOOTH_MAP_POS % and
            colored by the shared semantic state. Number shows by default; the short label reveals on
@@ -8617,9 +8746,9 @@ function renderBooth(){
         if(v2){
           var s=semState(i);
           var stChip=s==='cur'?'<span class="rt-state cur">'+ic('lc-map-pin')+'อยู่ตรงนี้</span>':(s==='start'?'<span class="rt-state start">'+ic('lc-map-pin')+'เริ่มที่นี่</span>':(s==='next'?'<span class="rt-state next">'+ic('lc-arrow-right')+'ถัดไป</span>':(s==='done'?'<span class="rt-state done">'+ic('lc-check')+'เสร็จแล้ว</span>':'')));
-          return '<div class="rt-row v2 '+s+(BOOTH_SEL===i?' sel':'')+'" data-i="'+i+'"><div class="rt-rail"><div class="rt-dot rt-num" style="background:'+semColor[s]+'">'+(i+1)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+stChip+'</div><div class="rt-meta">'+p.zone+' · '+p.status+'</div>'+(p.own&&!p.isV&&!pre?'<button type="button" class="btn btn-secondary rt-scan" data-collect="1" style="margin-top:var(--sp-glue)">'+ic('lc-qr-code')+'สแกนเช็คอิน</button>':'')+'</div></div>';
+          return '<div class="rt-row v2 '+s+(BOOTH_SEL===i?' sel':'')+'" data-i="'+i+'"><div class="rt-rail"><div class="rt-dot rt-num" style="background:'+semColor[s]+'">'+(i+1)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+stChip+'</div><div class="rt-meta">'+p.zone+(p.status?' · '+p.status:'')+'</div>'+'</div></div>';
         }
-        return '<div class="rt-row'+(p.topPick?' top':'')+'"><div class="rt-rail"><div class="rt-dot" style="background:'+p.dotColor+'">'+ic(p.icon)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+'</div><div class="rt-meta">'+p.zone+' · '+p.status+'</div></div></div>';
+        return '<div class="rt-row'+(p.topPick?' top':'')+'"><div class="rt-rail"><div class="rt-dot" style="background:'+p.dotColor+'">'+ic(p.icon)+'</div>'+(i<route.length-1?'<div class="rt-line"></div>':'')+'</div><div class="rt-body"><div class="rt-name">'+p.name+badge+'</div><div class="rt-meta">'+p.zone+(p.status?' · '+p.status:'')+'</div></div></div>';
       }).join('')+'</div>'+
     '</section>')+
     (pre?'':(
@@ -8731,7 +8860,6 @@ function renderBooth(){
       else{var rr=root.querySelector('.rt-row.v2[data-i="'+i+'"]');if(rr&&rr.scrollIntoView)rr.scrollIntoView({behavior:'smooth',block:'center'});}
     };
     root.querySelectorAll('.rt-row.v2').forEach(function(r){r.onclick=function(){selectStop(+r.dataset.i,'step');};});
-    root.querySelectorAll('.rt-scan[data-collect]').forEach(function(b){b.onclick=function(e){e.stopPropagation();openScan('collect',null);};});
     root.querySelectorAll('.map-ph .bmk').forEach(function(m){m.onclick=function(e){e.stopPropagation();selectStop(+m.dataset.i,'map');};});
   }
   mountHeaderQR();
@@ -10020,7 +10148,7 @@ function seedPersonaResult(key){
   RESULT={hero:h,heroKey:key,declared:h.riskLevel,revealed:Math.max(1,Math.min(10,h.riskLevel+simGap)),gap:simGap,
     conf:74,confLevel:'สูง - สอดคล้องดี',
     subs:{identity:16,behavior:16,riskAlign:18,discipline:15},knowledge:'intermediate',horizon:'mid',votes:{},interests:[0,2,4]};
-  GAME_PLAYED={0:true,1:true,2:true,3:true};GAME_ANSWERS={};BOOTH_CHK={0:new Set([0])};BOOTH_ACT={0:true};BOOTH_ANSWERS={};EFIN_CHECKED_IN=true;COLLECT_CHECKED_IN=false;
+  GAME_PLAYED={0:true,1:true,2:true,3:true};GAME_ANSWERS={};BOOTH_CHK={0:new Set([0])};BOOTH_ACT={0:true};BOOTH_ANSWERS={};EFIN_CHECKED_IN=true;
 }
 function forcePersona(key){seedPersonaResult(key);st.phase='book';stopSplashTimer();render();}
 
@@ -10118,7 +10246,7 @@ function buildDemo(){
     var v=b.dataset.v;if(v===DEMO.eventPhase)return;
     DEMO.eventPhase=v;
     document.querySelectorAll('#segPhase button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
-    if(v==='on'){BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};GAME_PLAYED={};GAME_ANSWERS={};DRAW_JOINED=false;EFIN_CHECKED_IN=false;COLLECT_CHECKED_IN=false;} // fresh arrival — see DEMO.eventPhase comment above
+    if(v==='on'){BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};GAME_PLAYED={};GAME_ANSWERS={};DRAW_JOINED=false;EFIN_CHECKED_IN=false;} // fresh arrival — see DEMO.eventPhase comment above
     // Switching to Pre-Event goes back to Splash (2026-09-10, per direction) — the symmetric
     // counterpart of On-Event's "fresh arrival" reset above: Pre-Event is where the quiz-taking
     // flow (splash → consent → quiz → reveal → cardreveal) actually lives, so picking it in the
@@ -10145,7 +10273,7 @@ function buildDemo(){
     // promised a played-state reset, but the code never actually touched GAME_PLAYED/BOOTH_ACT (only
     // resetQuiz()'s quiz-taking state st/RESULT). Now genuinely clears every game/booth back to
     // unplayed so all 6 เกมหลัก + 10 บูธ can be replayed from scratch for testing.
-    GAME_PLAYED={};GAME_ANSWERS={};BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};DRAW_JOINED=false;EFIN_CHECKED_IN=false;COLLECT_CHECKED_IN=false;
+    GAME_PLAYED={};GAME_ANSWERS={};BOOTH_CHK={};BOOTH_ACT={};BOOTH_ANSWERS={};DRAW_JOINED=false;EFIN_CHECKED_IN=false;
     // Bug fix (2026-09-10, reported: "กด รีเซ็ตเกมหลักที่เล่น แล้วกดเข้าคู่มือไม่ได้") — this handler
     // used to ALSO reset the quiz identity (DEMO.quizDone=false + cleared demoPersona + resetQuiz(),
     // which sets RESULT=null), even though the label/comment above only ever promised a games/booths

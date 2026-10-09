@@ -269,8 +269,17 @@ the section `.ex-tag` "ตัวอย่าง" (§8) or don't ship the bar at 
 
 ### 7.5 Navigation
 - `.book-tabbar` — the app-shell bottom tab bar (5 tabs: หน้าหลัก/คู่มือของคุณ/เดินบูธ/เกมหลัก/โปรไฟล์).
-- `.bt-tabs--secondary` (pill row) — Book v2's in-page sub-nav (ตัวตน/วิเคราะห์/พอร์ต/เส้นทาง).
-- `.bt-tabs--primary` — asset drill-down tabs ("เจาะรายสินทรัพย์").
+- `.bt-tabs--secondary` (pill row) — Book v2's in-page sub-nav (ตัวตน · วิเคราะห์ · ความสนใจ · พอร์ต · เส้นทาง · ความรู้).
+- `.bt-tabs--segment` (segmented control, 2026-10-09) — switch the view *inside* a section, on the page or in a card: soft
+  `--accent` track with a `--line-soft` border and `--rpill` radius, 4px inset; the chosen segment is a white chip
+  (`--ink`, `--w-label`, `--shadow-action`), the rest `--muted`. Equal-width segments, 2–3 options, 44px tall; at ≤360px
+  the icons drop out. First use: the Playbook ความรู้ tab (คลังความรู้ | Asset Knowleges).
+- `.bt-tabs--primary` — underline tabs for topics **inside a white card** (asset drill-down "เจาะรายสินทรัพย์", Asset Knowleges
+  groups, agenda days, scan method). Don't put it straight on the grey page — it reads as text there (that is why
+  `.bt-tabs--segment` exists).
+
+**Tab hierarchy:** `.book-tabbar` (whole app) → `.bt-tabs--secondary` (sections of a page) → `.bt-tabs--segment` (views
+inside a section) → `.bt-tabs--primary` (topics inside a card).
 
 ---
 

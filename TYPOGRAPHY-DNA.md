@@ -146,5 +146,5 @@ Measured on the rendered tab (169 text nodes): sizes 14/16/18/24/28 only (all on
 - **Card / sub-section titles** — `.s-h` 28/700 (same as the other Book tabs; sub-sections use `.trait-sec` + `.s-h` like "คะแนนพฤติกรรม").
 - **Tables** (`.pe-lvt`, `.pe-cmp`) — 16/500, line-height 1.35, headers 14/700; set explicitly because of quirks mode (§9).
 - **Data numerals in serif** — `.pe-num` = `--serif` + `-0.01em`, applied to: the range values ("50–60%"), the ladder averages ("+4.0%"), the growth headline amount, the compare-table results, the mix-bar legend values. The 5-level reference table stays FC Minimal (a reading/compare table, not a data callout).
-- **Mixed Thai + number** — wrap the number only (`peFillNum` / `peNum`): "วันนี้ ≈ ฿**147,176**" keeps "วันนี้ ≈" and the **฿ sign** in FC Minimal — ฿ (U+0E3F) is in the Thai block and Baskervville has no glyph for it.
+- **Mixed Thai + number** — wrap the number only (`peFillNum` / `peNum`): "วันนี้ ≈ **147,176** บาท" keeps "วันนี้ ≈" and the unit "บาท" in FC Minimal (money is written as number + บาท, not with a ฿ prefix — ฿ (U+0E3F) is in the Thai block and Baskervville has no glyph for it).
 - **Headline amount** (`.pe-big`) — 24/700 at line-height 1.2 (display tier), not the 1.0 stat tier, because Thai sits on the same line.
