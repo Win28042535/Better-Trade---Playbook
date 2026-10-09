@@ -1300,6 +1300,26 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .efin-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);}
 .efin-d{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.55;margin-bottom:var(--sp-stack);}
 .efin-acts{display:flex;flex-direction:column;gap:var(--sp-list);}
+/* Tab Header (2026-10-09, per direction "ให้ทุก tab มีการ์ดสี"): the one header every Playbook tab / sub-tab opens with —
+   .efin-banner's box (tint, border, radius, padding) + a 3D spectrum icon, optional .s-ey eyebrow, title with an optional
+   serif number (.lib-num), a description of 1–2 lines and an optional small note (disclaimers live there, never in the
+   description). Only the hue pair changes per tab (.tab-hd--*), always 2 neighbours from --cyan/--violet/--pink/--yellow;
+   yellow is mixed stronger (16%) because it is the lightest. Built by tabHeadHTML(). */
+.tab-hd{--hd-a:var(--cyan);--hd-b:var(--violet);--hd-ap:10%;--hd-bp:10%;background:linear-gradient(135deg,color-mix(in srgb,var(--hd-a) var(--hd-ap),transparent),color-mix(in srgb,var(--hd-b) var(--hd-bp),transparent));border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad-sm);}
+.tab-hd--interest{--hd-a:var(--violet);--hd-b:var(--pink);}
+.tab-hd--port{--hd-a:var(--yellow);--hd-b:var(--cyan);--hd-ap:16%;}
+.tab-hd--journey{--hd-a:var(--violet);--hd-b:var(--yellow);--hd-bp:16%;}
+.tab-hd--know{--hd-a:var(--pink);--hd-b:var(--yellow);--hd-bp:16%;}
+/* 2 columns (2026-10-09, per direction "ไอคอน และรายละเอียด ... ให้ alignment กับ title text"): the icon owns the left
+   column; eyebrow, title, description and note all start on the title's left edge. The icon sits on the title's
+   first line (not the card's middle), so a long description never leaves it floating. Absent parts leave empty rows. */
+.tab-hd{display:grid;grid-template-columns:40px minmax(0,1fr);grid-template-areas:". ey" "ic t" ". d" ". n";column-gap:var(--sp-inline);}
+.tab-hd-ic{grid-area:ic;align-self:start;width:40px;height:40px;margin-top:-3px;object-fit:contain;display:block;} /* -3px: centres 40px on the title's 34px first line */
+.tab-hd .s-ey{grid-area:ey;margin-bottom:2px;}
+.tab-hd-t{grid-area:t;font-size:var(--fs-heading);font-weight:var(--w-label);color:var(--ink);line-height:1.2;margin:0;text-wrap:balance;} /* balance: no lone "งาน" on line 2 */
+.tab-hd-d{grid-area:d;font-size:var(--fs-bodysm);color:var(--muted);line-height:1.55;margin:var(--sp-list) 0 0;}
+.tab-hd-note{grid-area:n;display:flex;align-items:flex-start;gap:var(--sp-glue);font-size:var(--fs-meta);color:var(--muted);line-height:1.5;margin:var(--sp-list) 0 0;}
+.tab-hd-note svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;margin-top:2px;}
 /* Brand blue reserved for efin.finance-specific CTAs only (2026-08-20, per direction "ให้เป็นสีกรณี
    เกี่ยวกับ efin.finance เท่านั้น") — scoped to .efin-acts so this never leaks onto any other
    .btn-primary in the app (Book's PDF/route CTAs etc. keep the default ink primary). */
@@ -1534,6 +1554,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* ══ LIBRARY (คลังความรู้ sub-screen) ══ real category names/counts, accordion-per-category */
 .lib-num{font-family:var(--serif);}
 .lib-cats{display:flex;flex-direction:column;gap:var(--sp-inline);margin-top:var(--sp-stack);}
+.lib-cats:first-child{margin-top:0;} /* its heading moved out to the คลังความรู้ .tab-hd (2026-10-09) */
 .lib-cat{border:1px solid var(--line-soft);border-radius:var(--r1);overflow:hidden;}
 .lib-cat-hd{width:100%;display:flex;align-items:center;gap:var(--sp-inline);padding:var(--sp-stack) var(--sp-stack);background:var(--white);border:none;cursor:pointer;font-family:var(--font);text-align:left;}
 .lib-cat-ic{width:18px;height:18px;color:var(--muted);flex:0 0 auto;}
@@ -1608,10 +1629,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    N รายการ") verbatim — same open/collapse behavior, same chevron that flips on open (2026-10-06, per
    direction). Only the spacing under the answer text is set here. */
 .apb-more{margin-top:var(--sp-list);}
-/* Asset Knowleges header card = .efin-banner's own shape (icon+title row, description under it) in
-   another hue pair: pink->yellow from the same --spectrum instead of cyan->violet (2026-10-06). */
-.efin-banner.apb-banner{background:linear-gradient(135deg,color-mix(in srgb,var(--pink) 10%,transparent),color-mix(in srgb,var(--yellow) 16%,transparent));}
-.apb-banner .efin-logo{height:32px;}
+/* Asset Knowleges header card: now the shared .tab-hd (pink->yellow, .tab-hd--know) — the old .apb-banner rules are gone. */
 /* English serif book names (MACRO, STOCK…) on the Asset Knowleges index: violet text. The Thai names
    (หุ้นรายตัว…) and the book page's own titles keep their original ink style (2026-10-06, per direction). */
 .apb-li .apb-en{color:var(--violet);}
@@ -1766,9 +1784,6 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pe-lvt td{height:44px;} /* the rows are tappable too: 39px -> 44px */
 .pe-num{font-family:var(--serif);letter-spacing:-0.01em;}
 .pe-big{line-height:1.2;} /* display tier; mixes Thai ("วันนี้ ≈") with the serif amount, so not the 1.0 stat-numeral tier */
-.pe-banner{padding:var(--sp-card-pad-sm);border-radius:var(--r2);} /* same box as the other tabs' top banner (.efin-banner) */
-.pe-banner .apb-lab{align-items:flex-start;font-weight:var(--w-body);line-height:1.5;margin:0;}
-.pe-banner .apb-lab svg{margin-top:3px;flex:0 0 auto;}
 .pe-gap{margin-top:var(--sp-stack);}
 /* title row = the zone-activity header (title left, .howto-btn pill right). The title may wrap onto 2+ lines beside
    the pill, so it shrinks (min-width:0) instead of pushing the pill to its own row. */
@@ -6016,6 +6031,15 @@ function heroDetailBody(hero,previewOnly){
    all — both CTAs always rendered regardless of tier. Locked branch keeps the header/description (no
    identity leak beyond what the rest of the card already shows) but swaps the 2 action buttons for
    the same dashed "locked" row .pe-locked already uses elsewhere, so this doesn't invent a new look. */
+/* Tab Header (see the .tab-hd CSS note): o = {tone, icon (3D PNG), ey?, num?, title, desc?, note?}. Every Playbook tab /
+   sub-tab opens with one; the persona tabs use "สำหรับ <persona>" as the eyebrow so the set reads as one series. */
+function tabHeadHTML(o){
+  return '<header class="tab-hd'+(o.tone?' tab-hd--'+o.tone:'')+' scroll-reveal"><img class="tab-hd-ic" src="'+o.icon+'" alt="">'+
+    (o.ey?'<div class="s-ey">'+o.ey+'</div>':'')+'<h2 class="tab-hd-t">'+(o.num!=null?'<span class="lib-num">'+o.num+'</span> ':'')+o.title+'</h2>'+
+    (o.desc?'<p class="tab-hd-d">'+o.desc+'</p>':'')+
+    (o.note?'<p class="tab-hd-note">'+ic('lc-info')+'<span>'+o.note+'</span></p>':'')+
+  '</header>';
+}
 function efinBannerHTML(h){
   var unlocked=curTier().name==='Master Class'||curTier().name==='Ultimate';
   return '<div class="efin-banner scroll-reveal"><div class="efin-hd"><img class="efin-logo" src="'+LOGO_IMG.aiSymbol+'" alt="efin AI"><div class="efin-t">ให้ AI ช่วยแนะนำแบบคุณ</div></div>'+
@@ -6482,13 +6506,17 @@ function renderBook(){
          direction calls for holding this specific promo back until the event opens regardless.
          bindEfinBanner(h) below stays unconditional — its #efinCopyBtn/#efinOpenBtn lookups are
          already null-safe when the banner isn't in the DOM. */
-      (pre?'':efinBannerHTML(h))+
+      /* Tab Header first (2026-10-09); the efin AI banner moved below the AI Insight card so two tinted cards don't
+         stack at the top — it's the "take this further" CTA after reading the result. */
+      tabHeadHTML({icon:ICON_DIAMOND_PNG,ey:'สำหรับ '+h.th,title:'ผลวิเคราะห์ของคุณ',desc:'เทียบความเสี่ยงที่คุณบอกกับพฤติกรรมจริง และดูว่าผลนี้มั่นใจได้แค่ไหน'})+
       insightHTML(r,h,matchOk)+
+      (pre?'':efinBannerHTML(h))+
     '</div>'+
     /* radar (was here as its own "พอร์ตลงทุนที่ถนัด" card) moved into the merged radarInterestHTML()
        below, 2026-08-19 per direction — the "วิเคราะห์" tab now ends with just AI Insight. */
     (pre?'':(
     '<div class="b2-panel'+(tab==='interest'?' show':'')+'" data-panel="interest">'+
+      tabHeadHTML({tone:'interest',icon:ICON_STOCK_INTL_PNG,ey:'สำหรับ '+h.th,title:'ความสนใจของคุณ',desc:'สินทรัพย์ที่คุณถนัด คะแนนพฤติกรรม และสิ่งที่คุณดูก่อนตัดสินใจ'})+
       '<section class="card scroll-reveal">'+radarInterestHTML(h,r)+
         '<div class="trait-sec"><div class="trait-hd"><div class="s-h" style="margin-bottom:0">คะแนนพฤติกรรม</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">วัดจากกิจกรรมในงาน</p>'+traitBars()+'</div>'+
         '<div class="alloc-sec"><div class="trait-hd"><div class="s-h" style="margin-bottom:0">เวลาตัดสินใจคุณดูอะไรก่อน</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนเริ่มต้นที่เหมาะกับ '+h.th+'</p>'+allocBars()+'</div></section>'+
@@ -6496,6 +6524,7 @@ function renderBook(){
     '</div>'+
     '<div class="b2-panel'+(tab==='port'?' show':'')+'" data-panel="port"><div id="portEdu">'+portEduShellHTML()+'</div></div>'+
     '<div class="b2-panel'+(tab==='journey'?' show':'')+'" data-panel="journey">'+
+      tabHeadHTML({tone:'journey',icon:ICON_COMPASS_PNG,ey:'สำหรับ '+h.th,title:'เส้นทางในงานของคุณ',desc:'ด้านที่วัดได้แล้ว ขั้นต่อไป และเรื่องที่คุณเข้าใจจากการเล่นเกม'})+
       sidesHTML(r)+
       '<section class="card scroll-reveal"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2></div>'+
         '<div class="route-steps">'+routeStep('done','','ทำ DNA Quiz','ตอบครบ 10 ข้อ เสร็จแล้ว — ได้ตัวตน '+h.th)+routeStep('act','2','ทำครบ 6 ด้าน','เสร็จแล้ว 2 จาก 6 — เหลืออีก 4 ด้านในบูธ')+routeStep('fut','3','รับ Playbook ส่วนตัวสมบูรณ์','เมื่อครบ 6 ด้าน รับกลยุทธ์เฉพาะตัวตน')+routeStep('fut','4','ติดตามบน efin.finance','Playbook sync ขึ้นแอปหลังงาน')+'</div></section>'+
@@ -6761,10 +6790,9 @@ function mountKnow(){
 function libraryCardHTML(){
   var h=RESULT.hero;
   var total=LIBRARY_CATS.reduce(function(n,c){return n+c.n;},0);
-  return '<section class="card scroll-reveal"><div class="s-pad">'+
-      '<div class="s-ey">สำหรับ '+h.th+'</div>'+
-      '<h2 class="s-h"><span class="lib-num">'+total+'</span> เรื่องที่คุณเก็บได้ตลอดงาน</h2>'+
-      '<p class="s-sub">แตะหมวดเพื่อดูรายการ ✦ เนื้อหาเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน</p>'+
+  return tabHeadHTML({tone:'know',icon:ICON_COLLECTIBLE_PNG,ey:'สำหรับ '+h.th,num:total,title:'เรื่องที่คุณเก็บได้ตลอดงาน',
+      desc:'แตะหมวดเพื่อดูรายการในแต่ละหมวด'})+
+    '<section class="card scroll-reveal"><div class="s-pad">'+
       '<div class="lib-cats">'+LIBRARY_CATS.map(function(c,i){
         var open=(LIB_OPEN===i);
         return '<div class="lib-cat'+(open?' open':'')+'"><button class="lib-cat-hd" data-i="'+i+'">'+ic(c.icon,'lib-cat-ic')+'<span class="lib-cat-t">'+c.t+'</span><span class="lib-cat-n">'+c.n+'</span>'+ic('lc-chevron-down','lib-cat-cv')+'</button>'+
@@ -7086,7 +7114,10 @@ function portEduShellHTML(){
   if(PE.pick==null)PE.pick=d.table.pick.default;
   if(PE.F==null)PE.F=d.history.default_foreign;
   if(!PE.hold){PE.hold={};Object.keys(d.port.inputs).forEach(function(k){PE.hold[k]=0;});}
-  return '<div class="apb-warn pe-banner scroll-reveal"><div class="apb-lab">'+ic('lc-info')+peEsc(d.banner)+'</div></div>'+
+  /* Tab Header (2026-10-09) replaces the amber .pe-banner; its compliance text (d.banner) is no longer shown in this tab
+     (removed per direction, same day). */
+  return tabHeadHTML({tone:'port',icon:ICON_FUND_PNG,ey:'เพื่อการศึกษา',num:5,title:'ระดับพอร์ตลงทุน',
+      desc:'แต่ละระดับแบ่งเงินกันอย่างไร เคยขึ้นลงแค่ไหน แล้วลองเทียบกับพอร์ตของคุณเอง'})+
     '<section class="card scroll-reveal">'+peMirrorHTML(d)+'</section>'+
     '<section class="card scroll-reveal" id="peTable">'+peTableHTML(d)+'</section>'+
     '<section class="card scroll-reveal">'+peLadderHTML(d)+'</section>'+
@@ -7463,8 +7494,8 @@ function assetIndexHTML(IX){
       }).join('')+'</div></div>';
   }).join('');
   var body=
-    '<div class="efin-banner apb-banner scroll-reveal"><div class="efin-hd"><img class="efin-logo" src="'+ICON_BOOK_PNG+'" alt=""><div class="efin-t"><span class="lib-num">'+IX.books.length+'</span> Asset Knowleges</div></div>'+
-      '<div class="efin-d" style="margin-bottom:0">เลือกเรื่องที่คุณสนใจ แต่ละเรื่องจะเริ่มต้นตั้งแต่พาคุณไปรู้จักตัวเอง ตรวจข้อมูลจากแหล่งทางการ จนเขียนกติกาของตัวเองได้ ✦ เอกสารนี้มีไว้เพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน หรือภาษีเฉพาะบุคคล</div></div>'+
+    tabHeadHTML({tone:'know',icon:ICON_BOOK_PNG,ey:IX.groups.length+' กลุ่มสินทรัพย์',num:IX.books.length,title:'Asset Knowleges',
+      desc:'เลือกเรื่องที่สนใจ แต่ละเรื่องพาคุณรู้จักตัวเอง ตรวจข้อมูลจากแหล่งทางการ จนเขียนกติกาของตัวเองได้'})+
     '<section class="card scroll-reveal"><div class="s-pad">'+
       '<div class="bt-tabs bt-tabs--primary dd-tablist apb-tabs" id="apbTabs" role="tablist" aria-label="หมวดสินทรัพย์">'+tablist+'</div>'+panels+
     '</div></section>';

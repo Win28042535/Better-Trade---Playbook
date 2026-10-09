@@ -245,6 +245,28 @@ since this SPA replaces `root.innerHTML` wholesale on every render (see §9.2).
   §9.1. `.side-num.done`/`.sc.done` (ink circle, the ladder's own green "complete" chip) both already
   mean "settled/valid," reused as-is for "ใช้งานได้"; no expand/collapse, since a ticket has nothing
   further to reveal the way a 6-ด้าน row's body does.
+- **Tab Header — `.tab-hd` / `tabHeadHTML(o)`** (2026-10-09) — the one header every Playbook tab and
+  ความรู้ sub-tab opens with (ตัวตน excluded: its character card is its header). `.efin-banner`'s box
+  (2-hue 135° tint, `--line-soft` border, `--r2`, `--sp-card-pad-sm`), laid out as 2 grid columns: a 40px
+  3D spectrum icon alone on the left, sitting on the title's first line; on the right, all on the
+  title's left edge, an optional `.s-ey` eyebrow, a `--fs-heading` title (optional serif `.lib-num`
+  number first, `text-wrap:balance`), a `--fs-bodysm` muted description (1–2 lines) and an optional
+  `.tab-hd-note` (`--fs-meta` + info icon).
+  Rules: disclaimers go in the note, never in the description; persona tabs use "สำหรับ <persona>" as
+  the eyebrow; only the hue pair changes per tab — always 2 neighbours from `--cyan/--violet/--pink/
+  --yellow`, yellow mixed at 16% (others 10%).
+
+  | Tab | Tone | Icon | Eyebrow |
+  |---|---|---|---|
+  | วิเคราะห์ | default cyan→violet | `ICON_DIAMOND_PNG` | สำหรับ persona |
+  | ความสนใจ | `--interest` violet→pink | `ICON_STOCK_INTL_PNG` | สำหรับ persona |
+  | พอร์ต | `--port` yellow→cyan | `ICON_FUND_PNG` | เพื่อการศึกษา (no note; the old disclaimer banner was removed) |
+  | เส้นทาง | `--journey` violet→yellow | `ICON_COMPASS_PNG` | สำหรับ persona |
+  | ความรู้ › คลังความรู้ | `--know` pink→yellow | `ICON_COLLECTIBLE_PNG` (treasure chest = "เรื่องที่คุณเก็บได้") | สำหรับ persona |
+  | ความรู้ › Asset Knowleges | `--know` pink→yellow | `ICON_BOOK_PNG` | N กลุ่มสินทรัพย์ |
+
+  Replaced `.apb-banner` and the amber `.pe-banner` (both deleted). The efin AI banner moved below the
+  AI Insight card on วิเคราะห์ so two tinted cards never stack at the top of a tab.
 
 ### 7.3 Bars & charts — three idioms, one reveal mechanism
 All three share the `.viz-bar` reveal (§6.2) and a `grid-template-columns:1fr auto` row shape
@@ -333,6 +355,12 @@ for the next time a version A/B is needed, not as a pointer to live code.
 
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
+
+**2026-10-09 — One Tab Header for every Playbook tab.** Per direction "ให้ทุก tab มีการ์ดสี" +
+"คลังความรู้ควรมี icon + การ์ดเหมือน Asset Knowleges". New `.tab-hd` / `tabHeadHTML()` (see §7.2) now
+opens วิเคราะห์, ความสนใจ, พอร์ต, เส้นทาง and both ความรู้ sub-tabs; คลังความรู้'s heading moved out of
+its category card into its own header. The "เพื่อการศึกษา / ไม่ใช่คำแนะนำการลงทุน" disclaimer lines on พอร์ต, คลังความรู้ and
+Asset Knowleges were then removed from the headers per direction (`.tab-hd-note` stays available).
 
 **2026-09-29 (2nd same-day follow-up) — Fixed a real gray-fringing artifact baked into
 hero-prop-gold.webp; grouped the decorative props with the text column on tablet/pc instead of
