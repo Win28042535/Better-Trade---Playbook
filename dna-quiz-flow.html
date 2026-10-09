@@ -2501,7 +2501,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .pe-vt{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);}
 .pe-vs{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:1px;}
 .pe-vplay{width:22px;height:22px;flex:0 0 auto;color:var(--violet);}
-.pe-track{margin-top:var(--sp-stack);}
+/* .pe-trk (renamed from .pe-track 2026-10-09): the post-event track box shared its class with the พอร์ต tab's slider rail
+   (.pe-track, height:12px), so it collapsed to 12px and its header/locked row spilled over the upgrade button below. */
+.pe-trk{margin-top:var(--sp-stack);}
 .pe-track-hd{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-list);margin-bottom:var(--sp-list);}
 .pe-track-lbl{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);}
 .pe-track-badge{font-size:var(--fs-label);font-weight:var(--w-head);color:var(--ink);background:var(--accent);padding:var(--sp-stack-tight) var(--sp-list);border-radius:var(--rpill);white-space:nowrap;}
@@ -7895,7 +7897,7 @@ function postEventState(){
 function postEventHTML(){
   var s=postEventState();
   var trackHTML=function(tr){
-    return '<div class="pe-track"><div class="pe-track-hd"><span class="pe-track-lbl">'+tr.label+'</span><span class="pe-track-badge'+(tr.allLocked?' locked':(tr.badge==='เปิดครบ'?' full':''))+'">'+tr.badge+'</span></div>'+
+    return '<div class="pe-trk"><div class="pe-track-hd"><span class="pe-track-lbl">'+tr.label+'</span><span class="pe-track-badge'+(tr.allLocked?' locked':(tr.badge==='เปิดครบ'?' full':''))+'">'+tr.badge+'</span></div>'+
       (tr.allLocked
         ? '<div class="pe-locked">'+ic('lc-lock')+'<span>'+tr.lockedLine+'</span></div>'
         : '<div class="pe-items">'+tr.items.map(function(it){
