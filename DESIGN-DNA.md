@@ -263,7 +263,7 @@ since this SPA replaces `root.innerHTML` wholesale on every render (see §9.2).
   | พอร์ต | `--port` yellow→cyan | `ICON_FUND_PNG` | เพื่อการศึกษา (no note; the old disclaimer banner was removed) |
   | เส้นทาง | `--journey` violet→yellow | `ICON_COMPASS_PNG` | สำหรับ persona |
   | ความรู้ › คลังความรู้ | `--know` pink→yellow | `ICON_COLLECTIBLE_PNG` (treasure chest = "เรื่องที่คุณเก็บได้") | สำหรับ persona |
-  | ความรู้ › Asset Knowleges | `--know` pink→yellow | `ICON_BOOK_PNG` | N กลุ่มสินทรัพย์ |
+  | ความรู้ › Asset Knowledge | `--know` pink→yellow | `ICON_BOOK_PNG` | N กลุ่มสินทรัพย์ |
 
   Replaced `.apb-banner` and the amber `.pe-banner` (both deleted). The efin AI banner moved below the
   AI Insight card on วิเคราะห์ so two tinted cards never stack at the top of a tab.
@@ -295,8 +295,8 @@ the section `.ex-tag` "ตัวอย่าง" (§8) or don't ship the bar at 
 - `.bt-tabs--segment` (segmented control, 2026-10-09) — switch the view *inside* a section, on the page or in a card: soft
   `--accent` track with a `--line-soft` border and `--rpill` radius, 4px inset; the chosen segment is a white chip
   (`--ink`, `--w-label`, `--shadow-action`), the rest `--muted`. Equal-width segments, 2–3 options, 44px tall; at ≤360px
-  the icons drop out. First use: the Playbook ความรู้ tab (คลังความรู้ | Asset Knowleges).
-- `.bt-tabs--primary` — underline tabs for topics **inside a white card** (asset drill-down "เจาะรายสินทรัพย์", Asset Knowleges
+  the icons drop out. First use: the Playbook ความรู้ tab (คลังความรู้ | Asset Knowledge).
+- `.bt-tabs--primary` — underline tabs for topics **inside a white card** (asset drill-down "เจาะรายสินทรัพย์", Asset Knowledge
   groups, agenda days, scan method). Don't put it straight on the grey page — it reads as text there (that is why
   `.bt-tabs--segment` exists).
 
@@ -357,10 +357,10 @@ For quick orientation on what's newest and least battle-tested — worth a close
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
 **2026-10-09 — One Tab Header for every Playbook tab.** Per direction "ให้ทุก tab มีการ์ดสี" +
-"คลังความรู้ควรมี icon + การ์ดเหมือน Asset Knowleges". New `.tab-hd` / `tabHeadHTML()` (see §7.2) now
+"คลังความรู้ควรมี icon + การ์ดเหมือน Asset Knowledge". New `.tab-hd` / `tabHeadHTML()` (see §7.2) now
 opens วิเคราะห์, ความสนใจ, พอร์ต, เส้นทาง and both ความรู้ sub-tabs; คลังความรู้'s heading moved out of
 its category card into its own header. The "เพื่อการศึกษา / ไม่ใช่คำแนะนำการลงทุน" disclaimer lines on พอร์ต, คลังความรู้ and
-Asset Knowleges were then removed from the headers per direction (`.tab-hd-note` stays available).
+Asset Knowledge were then removed from the headers per direction (`.tab-hd-note` stays available).
 
 **2026-09-29 (2nd same-day follow-up) — Fixed a real gray-fringing artifact baked into
 hero-prop-gold.webp; grouped the decorative props with the text column on tablet/pc instead of

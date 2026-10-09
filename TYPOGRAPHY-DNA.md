@@ -73,7 +73,7 @@ The system is meant to render **exactly two weights** (500 / 700), collapsed dow
 
 - **Headlines/titles/labels default to `letter-spacing:0`** — zero tracking is a DNA signature carried over from the original marketing-site design system.
 - **Display-serif numerals/names** get slight **negative** tracking, `-0.01em` to `-0.015em` — tightens the letterforms at large sizes. Actually applied on `.conf-sc`, `.pcE-en`, `.cr-en`, `.pe-num` (and the dead `.sp-h`); `.pcb-en` has none. No sans headline carries tracking (`.consent-h` went -0.01em → 0 on 2026-09-21).
-- **Serif codes/English labels in Asset Knowleges** (`.apb-en`, `.apb-hd-en`, `.apb-code`) use **positive** `0.06em` — they are small uppercase-style labels, so they follow the eyebrow rule, not the display rule.
+- **Serif codes/English labels in Asset Knowledge** (`.apb-en`, `.apb-hd-en`, `.apb-code`) use **positive** `0.06em` — they are small uppercase-style labels, so they follow the eyebrow rule, not the display rule.
 - **Uppercase eyebrow/kicker labels** get generous **positive** tracking, typically `0.02em`–`0.12em` (tuned per component, not one fixed value — e.g. `.rc-kicker` 0.08em, `.hero-en` 0.1em, `.pass-ey`/`.ns-ey` 0.08–0.12em).
 
 ---
@@ -111,7 +111,7 @@ English display text + numerals only — confirmed no Thai-text usage:
 - `.trait-v`, `.alloc-p`, `.int-bar-v`, `.lib-num` — stat/data numerals
 - `.cr-en` — character-card reveal English name (48px)
 - `.pcE-en`, `.pcb-en`, `.pcb-leg b` — persona card display name (front + back) and legend name
-- `.apb-en`, `.apb-hd-en`, `.apb-code`, `.apb-src b` — Asset Knowleges English book names, step codes, source numbers
+- `.apb-en`, `.apb-hd-en`, `.apb-code`, `.apb-src b` — Asset Knowledge English book names, step codes, source numbers
 - `.pe-num` — Playbook พอร์ต tab data numerals (§10)
 - *(dead)* `.sp-h` — splash hero display headline: the rule is still in the CSS but no markup uses it any more
 

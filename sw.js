@@ -1,7 +1,7 @@
 // Service worker. Two jobs:
 //  1. Exists so Chrome/Android treat the app as "installable" (its criteria require an active SW with a
 //     fetch handler, not just a manifest).
-//  2. (2026-10-06, Asset Knowleges phase 3) Keeps the Asset Knowleges book files readable when the
+//  2. (2026-10-06, Asset Knowledge phase 3) Keeps the Asset Knowledge book files readable when the
 //     signal drops mid-event: index.js + the 14 <id>.js files under assets/playbooks/ are pre-cached
 //     on install and served cache-first, refreshed in the background (stale-while-revalidate).
 //     Same for the Playbook พอร์ต tab's data file, assets/port/edu.js (2026-10-08), and the PDF preview's A4 mockup

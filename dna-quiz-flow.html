@@ -1629,8 +1629,8 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    N รายการ") verbatim — same open/collapse behavior, same chevron that flips on open (2026-10-06, per
    direction). Only the spacing under the answer text is set here. */
 .apb-more{margin-top:var(--sp-list);}
-/* Asset Knowleges header card: now the shared .tab-hd (pink->yellow, .tab-hd--know) — the old .apb-banner rules are gone. */
-/* English serif book names (MACRO, STOCK…) on the Asset Knowleges index: violet text. The Thai names
+/* Asset Knowledge header card: now the shared .tab-hd (pink->yellow, .tab-hd--know) — the old .apb-banner rules are gone. */
+/* English serif book names (MACRO, STOCK…) on the Asset Knowledge index: violet text. The Thai names
    (หุ้นรายตัว…) and the book page's own titles keep their original ink style (2026-10-06, per direction). */
 .apb-li .apb-en{color:var(--violet);}
 .apb-tabs{margin-top:calc(var(--sp-stack-tight) * -1);}
@@ -1642,13 +1642,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* .bt-tabs--segment (2026-10-09) — segmented control, the 3rd tab level: "switch the view inside a section" (between the
    .bt-tabs--secondary pill row = page sections and the in-card .bt-tabs--primary underline = topics inside a card). A soft
    track, the chosen segment a raised white chip; works on the grey page or inside a card; for 2–3 options, equal widths.
-   First use: the Playbook ความรู้ tab (คลังความรู้ | Asset Knowleges). */
+   First use: the Playbook ความรู้ tab (คลังความรู้ | Asset Knowledge). */
 .bt-tabs.bt-tabs--segment{display:flex;gap:4px;padding:4px;background:var(--accent);border:1px solid var(--line-soft);border-radius:var(--rpill);}
 .bt-tabs--segment .bt-tab{flex:1 1 0;min-width:0;min-height:44px;padding:var(--sp-list) var(--sp-inline);border-radius:var(--rpill);font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--muted);transition:background-color .15s var(--ease),color .15s var(--ease),box-shadow .15s var(--ease);}
 .bt-tabs--segment .bt-tab[aria-selected="true"]{background:var(--white);color:var(--ink);font-weight:var(--w-label);box-shadow:var(--shadow-action);}
 .bt-tabs--segment .bt-tab-label{overflow:hidden;text-overflow:ellipsis;}
 .bt-tabs--segment .bt-tab-icon svg{width:var(--ic-sm);height:var(--ic-sm);}
-@media(max-width:360px){.bt-tabs--segment .bt-tab{padding-left:6px;padding-right:6px;}.bt-tabs--segment .bt-tab-icon{display:none;}} /* 320px: "Asset Knowleges" needs the icon's room */
+@media(max-width:360px){.bt-tabs--segment .bt-tab{padding-left:6px;padding-right:6px;}.bt-tabs--segment .bt-tab-icon{display:none;}} /* 320px: "Asset Knowledge" needs the icon's room */
 .know-panel[hidden]{display:none;}
 .apb-panel .apb-list{margin-top:var(--sp-stack);}
 .apb-panel .apb-li:first-child{padding-top:0;}
@@ -1721,7 +1721,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-warn .apb-lab svg{width:var(--ic-sm);height:var(--ic-sm);}
 /* ══ PLAYBOOK "พอร์ต" TAB (2026-10-08, Education Edition phase 1) ══ see portEduShellHTML. Re-skinned
    onto this file's tokens (the demo's dark navy/gold theme is not carried over) and reuses the Asset
-   Knowleges parts (.apb-chip picker = violet "the one you're looking at", .apb-bl inputs, .apb-warn
+   Knowledge parts (.apb-chip picker = violet "the one you're looking at", .apb-bl inputs, .apb-warn
    amber notice, .apb-lab/.apb-gt/.apb-ol/.apb-kv). The 4 asset buckets get one fixed hue each, taken
    from the existing --spectrum stops + muted ink for cash; amber (never red, per the DNA) marks the
    drop/"ขาย" moments. */
@@ -5482,7 +5482,7 @@ function revealTick(){
     /* Same audit: the entry transform is anchored at the card's BOTTOM (transform-origin 50% 100%) so it
        scales 5% toward its bottom edge. On a card taller than the screen that pushes its TOP edge down by
        5% of its height (3600px card = ~180px) plus the tilt's foreshortening: measured on a 3600px
-       Asset Knowleges section, the card painted ~440-560px lower than its layout position while it
+       Asset Knowledge section, the card painted ~440-560px lower than its layout position while it
        entered, so it stayed off-screen and then caught up faster than the scroll. For a tall card
        anchor at the TOP instead and keep the entry subtle (2% shrink, 16px rise, 4deg tilt): the top edge
        stays where the layout puts it and the long text below is barely distorted. */
@@ -6241,7 +6241,7 @@ var BOOK2_TABS=[
   {k:'interest',icon:'lc-heart',label:'ความสนใจ'},
   {k:'port',icon:'lc-pie-chart',label:'พอร์ต'},
   {k:'journey',icon:'lc-route',label:'เส้นทาง'},
-  /* ความรู้ (2026-10-09): คลังความรู้ + Asset Knowleges moved out of เส้นทาง into their own tab, with a sub-tab for each
+  /* ความรู้ (2026-10-09): คลังความรู้ + Asset Knowledge moved out of เส้นทาง into their own tab, with a sub-tab for each
      (knowShellHTML). Same visibility as เส้นทาง: On-Event + registered only (book2Tabs). */
   {k:'know',icon:'lc-library',label:'ความรู้'}
 ];
@@ -6537,7 +6537,7 @@ function renderBook(){
          .hero-gw glow frame with the compare-reveal/redeem-card content — that frame is reserved for
          the persona card itself, and .card's own border would read as a card-inside-a-card there. */
       learnedLedgerHTML()+
-      /* คลังความรู้ / Asset Knowleges rows moved to the ความรู้ tab (2026-10-09). */
+      /* คลังความรู้ / Asset Knowledge rows moved to the ความรู้ tab (2026-10-09). */
       ''+
     '</div>'+
     '<div class="b2-panel'+(tab==='know'?' show':'')+'" data-panel="know"><div id="knowEdu">'+knowShellHTML()+'</div></div>'
@@ -6745,11 +6745,11 @@ var LIBRARY_CATS=[
   {t:'เครื่องมือและการติดตาม',n:5,icon:'lc-sliders'}
 ];
 var LIB_OPEN=null;
-/* ══ PLAYBOOK "ความรู้" TAB (2026-10-09) ══ two sub-tabs, same .bt-tabs--primary tab bar as the Asset Knowleges groups:
-   คลังความรู้ (libraryCardHTML) and Asset Knowleges (assetIndexHTML — its index file loads on first open, apbLoad). Picking a book
-   still opens the book screen; its back button returns here with the Asset Knowleges sub-tab selected (KNOW_TAB). */
+/* ══ PLAYBOOK "ความรู้" TAB (2026-10-09) ══ two sub-tabs, same .bt-tabs--primary tab bar as the Asset Knowledge groups:
+   คลังความรู้ (libraryCardHTML) and Asset Knowledge (assetIndexHTML — its index file loads on first open, apbLoad). Picking a book
+   still opens the book screen; its back button returns here with the Asset Knowledge sub-tab selected (KNOW_TAB). */
 var KNOW_TAB='lib';
-var KNOW_SUBS=[['lib','lc-library','คลังความรู้'],['asset','lc-book-open','Asset Knowleges']];
+var KNOW_SUBS=[['lib','lc-library','คลังความรู้'],['asset','lc-book-open','Asset Knowledge']];
 /* Sub-tab bar = segmented control (.bt-tabs--segment, 2026-10-09, per direction "ใช้แบบ B" after an A/B/D preview on the
    real page): the underline bar sat straight on the grey page and read as text, not a control. Same role="tablist" +
    initBtTabs keyboard/aria as every other tab bar. */
@@ -6826,7 +6826,7 @@ function renderLibrary(){BOOK2_TAB='know';KNOW_TAB='lib';st.phase='book';renderB
 function apbIcon(id,lucide){return ic(lucide);}
 var APB_CUR=null;
 var APB_TAB=0; // selected group tab on the index, kept across book -> back
-/* Booth (BOOTHS[].asset) -> its Asset Knowleges book, for the "อ่านเรื่อง … ต่อ" row on the booth result screen.
+/* Booth (BOOTHS[].asset) -> its Asset Knowledge book, for the "อ่านเรื่อง … ต่อ" row on the booth result screen.
    'หุ้นต่างประเทศ' -> dr is a provisional pairing (per direction "ให้ลิงก์ไป DR ก่อนได้"); 'สุขภาพ' has no book. */
 var BOOTH_BOOK={'หุ้นไทย':'stock','หุ้นต่างประเทศ':'dr','กองทุนรวม':'fund','ตราสารหนี้':'bond','ทองคำ':'gold','อสังหา/REIT':'realestate','ประกัน':'insurance','คริปโต':'crypto','ของสะสม':'collectible'};
 var APB_LOADING={};
@@ -6876,7 +6876,7 @@ function portEduLoad(done){
   s.onerror=function(){fin(false);};
   document.head.appendChild(s);
 }
-var peEsc=apbEsc; // same reader rules as Asset Knowleges (no em dashes, HTML-escaped)
+var peEsc=apbEsc; // same reader rules as Asset Knowledge (no em dashes, HTML-escaped)
 /* Like peFill, but returns HTML: the template's Thai text stays escaped FC Minimal and only the filled-in
    numbers get .pe-num (Baskervville) — Thai never goes into the serif (TYPOGRAPHY-DNA §1). */
 function peFillNum(t,v){return peEsc(t).replace(/\{(\w+)\}/g,function(m,k){return k in v?peNum(v[k]):m;});}
@@ -7169,12 +7169,12 @@ function bindPortEdu(){
   bindPePort(d,host);
   /* Scroll motion like every other tab (2026-10-08 fix — these three cards used to carry data-no-motion permanently,
      so half the tab never moved). A card only drops out of the motion once someone actually touches/focuses one of its
-     sliders or fields, so dragging and typing never happen on a tilted card (same reason as the Asset Knowleges map). */
+     sliders or fields, so dragging and typing never happen on a tilted card (same reason as the Asset Knowledge map). */
   freezeMotionOnInput(host);
   initCharts(host);
   revealTick();
 }
-/* Scroll motion vs form fields (2026-10-09, shared by the พอร์ต tab and the Asset Knowleges "MY ___ MAP" card): a card that
+/* Scroll motion vs form fields (2026-10-09, shared by the พอร์ต tab and the Asset Knowledge "MY ___ MAP" card): a card that
    holds inputs keeps the normal scroll motion until someone actually touches or focuses one of its fields; from then on that
    card (and only that card) stays flat (data-no-motion), so dragging a slider or typing never happens on a tilted card.
    Was a permanent data-no-motion on the whole card, which left it standing still while every other card moved. */
@@ -7477,7 +7477,7 @@ function apbAwait(file,phase,title,sub,backPhase){
     var r=root.querySelector('#apbRetry');if(r)r.onclick=function(){render();};
   });
 }
-/* Asset Knowleges index (2026-10-09): now the Asset Knowleges sub-tab of the Playbook ความรู้ tab (knowShellHTML) instead of
+/* Asset Knowledge index (2026-10-09): now the Asset Knowledge sub-tab of the Playbook ความรู้ tab (knowShellHTML) instead of
    its own 'assetpb' screen; renderAssetIndex is kept only as a redirect for that old phase. Book pages are still a screen. */
 function assetIndexHTML(IX){
   /* Header = the "ให้ AI ช่วยแนะนำแบบคุณ" banner's shape (.efin-banner) with the spectrum-book icon
@@ -7496,7 +7496,7 @@ function assetIndexHTML(IX){
       }).join('')+'</div></div>';
   }).join('');
   var body=
-    tabHeadHTML({tone:'know',icon:ICON_BOOK_PNG,ey:IX.groups.length+' กลุ่มสินทรัพย์',num:IX.books.length,title:'Asset Knowleges',
+    tabHeadHTML({tone:'know',icon:ICON_BOOK_PNG,ey:IX.groups.length+' กลุ่มสินทรัพย์',num:IX.books.length,title:'Asset Knowledge',
       desc:'เลือกเรื่องที่สนใจ แต่ละเรื่องพาคุณรู้จักตัวเอง ตรวจข้อมูลจากแหล่งทางการ จนเขียนกติกาของตัวเองได้'})+
     '<section class="card scroll-reveal"><div class="s-pad">'+
       '<div class="bt-tabs bt-tabs--primary dd-tablist apb-tabs" id="apbTabs" role="tablist" aria-label="หมวดสินทรัพย์">'+tablist+'</div>'+panels+
@@ -7514,7 +7514,7 @@ function renderAssetIndex(){BOOK2_TAB='know';KNOW_TAB='asset';st.phase='book';re
 function renderAssetBook(){
   var IX=window.ASSET_PB_INDEX,D=window.ASSET_PB_DATA&&window.ASSET_PB_DATA[APB_CUR];
   if(!APB_CUR){renderAssetIndex();return;}
-  if(!IX){apbAwait('index','assetbook','Asset Knowleges','เพื่อการศึกษา','know');return;}
+  if(!IX){apbAwait('index','assetbook','Asset Knowledge','เพื่อการศึกษา','know');return;}
   if(!D){var meta=IX.books.filter(function(b){return b.id===APB_CUR;})[0]||{};apbAwait(APB_CUR,'assetbook',apbEsc(meta.name_th||''),'<span class="apb-hd-en">'+apbEn(meta.name_en||'')+'</span>','know');return;}
   /* Expandable answer: verified short first, full answer behind a toggle (source's own pattern).
      Key questions say "อ่านคำตอบทั้งหมด"/"ย่อคำตอบ"; ศัพท์พื้นฐาน says "อ่านต่อ"/"ย่อ" (per direction). */
@@ -9990,11 +9990,11 @@ function renderPlaySummary(){
   // flat muted icon+text line, no card background) verbatim; still sits as the last line inside the
   // card, same position a closing stat/note occupies in every other .hero-in result card here.
   var saveNoteHTML=insights.length?'<div class="pe-report on pe-report-lg" style="margin-top:var(--sp-stack)">'+ic('lc-check-circle')+'<div><div class="pe-report-t">บันทึกเข้า Playbook แล้ว</div><div class="pe-report-s">เราได้ทำการบันทึกเรื่องที่เรียนรู้จากเกมนี้เข้า Playbook ของคุณแล้ว</div></div></div>':'';
-  /* Asset Knowleges deep link (2026-10-06, phase 2) — booth results only: "อ่านต่อ" opens that
+  /* Asset Knowledge deep link (2026-10-06, phase 2) — booth results only: "อ่านต่อ" opens that
      booth's book (BOOTH_BOOK; สุขภาพ has none, หุ้นต่างประเทศ -> DR is provisional). Sits between the
      save-note and หมายเหตุ so หมายเหตุ stays the last section on the page. */
   var bookId=kind==='booth'?BOOTH_BOOK[BOOTHS[idx].asset]:null;
-  var bookLinkHTML=bookId?'<button class="apb-bl-link" type="button" id="playBookBtn">'+ic('lc-book-open')+'<span class="apb-t">อ่านเรื่อง'+apbEsc(BOOTHS[idx].asset)+'ต่อ<small>เล่มความรู้ใน Asset Knowleges · เพื่อการศึกษา</small></span>'+ic('lc-chevron-right','klib-cv')+'</button>':'';
+  var bookLinkHTML=bookId?'<button class="apb-bl-link" type="button" id="playBookBtn">'+ic('lc-book-open')+'<span class="apb-t">อ่านเรื่อง'+apbEsc(BOOTHS[idx].asset)+'ต่อ<small>เล่มความรู้ใน Asset Knowledge · เพื่อการศึกษา</small></span>'+ic('lc-chevron-right','klib-cv')+'</button>':'';
   var backLabel=kind==='game'?'กลับหน้าเกมหลัก':'กลับหน้าเดินบูธ';
   // Title block — DNA quiz's own .q-head/.q-title header, finalized 2026-09-11 (per direction
   // "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย") — was briefly a DEMO.sumTitleVer-toggled choice between this
