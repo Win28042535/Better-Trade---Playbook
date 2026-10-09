@@ -1,0 +1,1250 @@
+<meta charset="utf-8">
+<!-- charset MUST be the very first thing in the file (WHATWG pre-scan reads it from the raw bytes
+     before any parsing) — this file has no <!DOCTYPE>/<html>/<head> wrapper (the HTML5 parser
+     auto-supplies them), so nothing else was declaring an encoding. Without it, correct rendering
+     of every Thai string here depended entirely on the HTTP server sending a charset in its
+     Content-Type header; any host/local server/tool that doesn't (many static preview servers
+     don't) falls back to a legacy 8-bit encoding and every non-ASCII character — all the Thai
+     copy, "→", "×", "✦" — renders as mojibake. -->
+<title>DNA Quiz → Playbook ลงทุนของคุณ</title>
+<!-- FIXED LAYOUT (2026-09-21, per direction "ไม่ต้องมีกรณี responsive"): the page is laid out at exactly the A4 sheet width
+     (794px) on every device; a phone's browser scales the whole page to fit — there are no breakpoints or resize logic. -->
+<meta name="viewport" content="width=794">
+<link rel="icon" href="assets/bt.png">
+<style>
+@font-face{font-family:'FC Minimal';src:url(assets/fc-minimal-100-500.ttf) format('truetype');font-weight:100 500;font-style:normal;font-display:swap;}
+@font-face{font-family:'FC Minimal';src:url(assets/fc-minimal-600-900.ttf) format('truetype');font-weight:600 900;font-style:normal;font-display:swap;}
+@font-face{font-family:'Pinyon Script';src:url(assets/pinyon-script-sub.woff2) format('woff2');font-weight:400;font-style:normal;font-display:swap;} /* Latin letters, digits and a few marks only (24 KB, OFL) */
+@font-face{font-family:'Cinzel';src:url(assets/cinzel-caps-sub.woff2) format('woff2');font-weight:500;font-style:normal;font-display:swap;} /* capitals + digits, weight pinned to 500 (9 KB, OFL) */
+@font-face{font-family:'Sarabun';src:url(assets/sarabun-400.ttf) format('truetype');font-weight:400;font-style:normal;font-display:swap;}
+@font-face{font-family:'Sarabun';src:url(assets/sarabun-500.ttf) format('truetype');font-weight:500;font-style:normal;font-display:swap;}
+@font-face{font-family:'Sarabun';src:url(assets/sarabun-700.ttf) format('truetype');font-weight:700;font-style:normal;font-display:swap;}
+/* ── BetterTrade 2026 Playbook · Ver.2 (Minimalism-book DNA) ── */
+:root{
+  --ink:#111318; --muted:#5a6168;
+  --paper:#f7f8f7; --white:#ffffff;
+  --sheet:#fafafc;             /* the printed sheet: near-white cool grey (reference: Torino) */
+  --sheet-ink:78,92,118;       /* r,g,b of the blue-grey used for the edge vignette */
+  --pbx-grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='m' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.024' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .34 0 0 0 0 .42 .12 0 0 0 -.043'/%3E%3C/filter%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .18 0 0 0 0 .2 0 0 0 0 .26 .23 0 0 0 -.095'/%3E%3C/filter%3E%3Crect width='360' height='360' filter='url(%23m)'/%3E%3Crect width='360' height='360' filter='url(%23g)'/%3E%3C/svg%3E");  /* seamless 360px tile: a faint blue-grey fibre mottle + fine grain, both feTurbulence */
+  --line:rgba(16,20,24,0.08);  /* hairline track under the data rules; the screen sheet's outline */
+  --rule:#bcc2cc;              /* every divider rule: a cool hairline */
+  --rule-w:1px;
+  --focus:#2b6cff;             /* keyboard focus ring */
+  --shadow-page:0 6px 24px rgba(17,19,24,0.08);  /* an A4 sheet resting on the screen */
+  --cover-paper:#e9e3da;       /* fallback tint behind the cover art */
+  /* reading column: long-form text in a ~59%-of-sheet measure, so lines land near 60 characters */
+  --read-measure:470px;
+  --read-fs:16px;
+  --read-lh:1.7;
+  /* sheet geometry, read off the Minimalism-book reference as % of the 794 x 1123 sheet: side margins
+     ~9.6%, footer hairline ~97% down (34px from the bottom edge), footer label ~95% */
+  --pbx-pad-x:76px;
+  --pbx-pad-top:96px;
+  --pbx-pad-bottom:34px;
+  --pbx-fs-ft:11px;
+  /* opener ("SECTION 1" page): text column starts 19.7% from the left and is ~59% wide (= --read-measure);
+     kicker at ~31.5% down */
+  --pbx-col-x:156px;
+  --pbx-plumb-h:246px;         /* length of the opener's plumb line, diamond included (the lockup starts at 266px) */
+  --pbx-open-y:354px;
+  --pbx-fs-open:44px;
+  --pbx-fs-kicker:13px;
+  /* feature page ("MINIMALISM BOOK MOCKUP"): title from ~14% down, full-width hairline at ~41% */
+  --pbx-feat-y:157px;
+  --pbx-feat-rule:460px;
+  --pbx-fs-feat:56px;
+  /* spacing scale */
+  --sp-glue:6px; --sp-list:8px; --sp-inline:12px; --sp-stack:16px; --sp-block:22px; --sp-section:20px;
+  /* type: FC Minimal for UI and headings (the embedded file covers Thai AND Latin, so headings never fall back to a system face); Sarabun, a
+     looped Thai text face, for long reading text */
+  --font:'FC Minimal','Noto Sans Thai','Thonburi','DB Helvethaica X',system-ui,-apple-system,'Segoe UI',sans-serif;
+  /* Latin lettering (reference: "CHAPTER / Three"): tracked capitals over a formal script, for English words only; Thai never uses these */
+  --font-script:'Pinyon Script','Snell Roundhand','Apple Chancery',cursive;
+  --font-caps:'Cinzel','Times New Roman',serif;
+  --pbx-lock-h:88px;
+  --font-read:'Sarabun','Noto Sans Thai','Thonburi','DB Helvethaica X',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --fs-heading:32px; --fs-sub:24px; --fs-sig:22px; --fs-bodysm:18px; --fs-label:16px;
+  --w-body:500; --w-label:700;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
+body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weight:var(--w-body);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;min-height:100dvh;display:flex;justify-content:flex-start;}
+.shell{width:794px;max-width:none;margin:0 auto;min-height:100vh;min-height:100dvh;background:var(--paper);position:relative;display:flex;flex-direction:column;}
+.scroll{flex:1;padding:var(--sp-inline) 0 var(--sp-stack);display:flex;flex-direction:column;gap:var(--sp-section);}
+/* ══ A4 sheets ══ authored at 794 x 1123.1 CSS px (A4 @96dpi, ratio 2480:3508). pbBuild() (JS) packs
+   each chapter's blocks onto sheets; @media print renders the same sheets 1:1 on @page A4, so print /
+   "Save as PDF" matches the screen page for page. */
+.pb-doc{display:flex;flex-direction:column;align-items:center;gap:var(--sp-inline);}
+.pb-fit{width:794px;height:calc(794px*3508/2480);flex:0 0 auto;position:relative}
+.pb-page{position:absolute;left:0;top:0;width:794px;height:calc(794px*3508/2480);box-sizing:border-box;background:var(--white);border:1px solid var(--line);box-shadow:var(--shadow-page);display:flex;flex-direction:column;overflow:hidden;}
+.pb-cover{padding:0;border:0;background-color:var(--cover-paper);background-size:100% 100%;background-repeat:no-repeat;}
+.pb-pn-n{font-weight:var(--w-label);color:var(--ink);}
+/* the templates own their vertical rhythm with padding (.pb-body>* margins are zeroed) */
+.pb-body{flex:1 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;}
+.pb-body>*{flex:0 0 auto;margin:0;}
+/* ── sheet chrome ── */
+.pb-page.pbx{padding:var(--pbx-pad-top) var(--pbx-pad-x) var(--pbx-pad-bottom);}
+/* paper (reference: Torino): near-white cool grey with a soft edge vignette and a faint grain tile. The texture is
+   one inline SVG tile (feTurbulence, seamless), so it costs no asset. No spine shade: every sheet reads the same. */
+.pb-page.pbx{isolation:isolate;background-color:var(--sheet);background-image:radial-gradient(ellipse 88% 82% at 50% 46%,rgba(var(--sheet-ink),0) 58%,rgba(var(--sheet-ink),.16) 100%),var(--pbx-grain);background-size:100% 100%,360px 360px;}
+/* running header: the chapter name, small and centred, between two short hairlines (reference: Maguss) */
+.pbx-hd{position:absolute;top:42px;left:var(--pbx-pad-x);right:var(--pbx-pad-x);display:flex;justify-content:center;align-items:center;gap:14px;font-size:var(--pbx-fs-kicker);font-weight:var(--w-label);line-height:1.4;color:var(--muted);}
+.pbx-hd:not(:has(span:not(:empty))){display:none;}
+.pbx-hd::before,.pbx-hd::after{content:'';width:44px;height:var(--rule-w);background:var(--rule);}
+/* corner sprigs, mirrored left/right: feature sheets and the สารบัญ only (openers hang a plumb line and carry their chapter drawing instead) */
+.pbx-cn{display:none;position:absolute;top:22px;width:118px;height:90px;background:url(assets/orn-corner.svg) center/contain no-repeat;pointer-events:none;}
+.pbx-cn.r{right:28px;}
+.pbx-cn.l{left:28px;transform:scaleX(-1);}
+/* bottom contour field (see pbxIllustrate): faint lines rising from the bottom edge, fading upward, only where the sheet has room */
+.pbx-bt{position:absolute;left:0;right:0;z-index:-1;background:url(assets/topo-b.svg) center bottom/100% auto no-repeat;opacity:.11;pointer-events:none;-webkit-mask-image:linear-gradient(to top,#000 22%,transparent 100%);mask-image:linear-gradient(to top,#000 22%,transparent 100%);}
+/* line-art drawings placed by pbxIllustrate() (position + size inline) */
+.pbx-ill{position:absolute;display:block;background:center/contain no-repeat;pointer-events:none;}
+.pbx-float{position:absolute;display:block;object-fit:contain;pointer-events:none;filter:saturate(1.3) drop-shadow(0 12px 16px rgba(17,19,24,.16));} /* placed by pbxIllustrate (PBX_FLOAT) */
+/* two articles on a sheet: a small asterism in the gap above the second (reference: Maguss' section breaks) */
+.pbx .pb-body>article.pbx-unit+article.pbx-unit{position:relative;}
+.pbx .pb-body>article.pbx-unit+article.pbx-unit::before{content:'';position:absolute;left:50%;top:-27px;width:60px;height:14px;transform:translateX(-50%);background:url(assets/orn-asterism.svg) center/contain no-repeat;}
+/* the persona card as a plate: a double hairline frame around it (reference: Maguss' framed illustration) */
+.pbx-card{position:relative;}
+.pbx-card::before,.pbx-card::after{content:'';position:absolute;border:var(--rule-w) solid var(--rule);pointer-events:none;}
+.pbx-card::before{inset:-16px;}
+.pbx-card::after{inset:-22px;}
+.pb-page.pbx:has(.pbx-card) .pb-body{overflow:visible;} /* the frame reaches 22px past the column; sheet fit is still measured by scrollHeight */
+.pb-page.pbx:has(.pbx-feat)>.pbx-cn,.pb-toc>.pbx-cn{display:block;}
+/* contour lines (reference: "Chapter Three"): a faint ink field behind the top of opener, feature and สารบัญ sheets */
+.pb-page.pbx:has(.pbx-open)::after,.pb-page.pbx:has(.pbx-feat)::after,.pb-toc::after{content:'';position:absolute;left:0;right:0;top:0;height:46%;z-index:-1;background:url(assets/topo.svg) center top/100% auto no-repeat;opacity:.11;pointer-events:none;-webkit-mask-image:linear-gradient(to bottom,#000 28%,transparent 100%);mask-image:linear-gradient(to bottom,#000 28%,transparent 100%);}
+/* opener */
+/* plumb line: hangs from the top edge on the text column's left edge (x = --pbx-col-x) and ends in a hollow diamond, clear above the lockup */
+.pb-page.pbx:has(.pbx-open)::before{content:'';position:absolute;top:0;left:calc(var(--pbx-col-x) - 6px);width:12px;height:var(--pbx-plumb-h);background:linear-gradient(rgba(17,19,24,.62),rgba(17,19,24,.62)) 50% 0/var(--rule-w) calc(100% - 11px) no-repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 .8 11.2 6 6 11.2 .8 6Z' fill='none' stroke='%23111318' stroke-opacity='.7'/%3E%3C/svg%3E") 50% 100%/12px 12px no-repeat;pointer-events:none;}
+.pbx .pbx-open{padding:calc(var(--pbx-open-y) - var(--pbx-pad-top)) 0 0 calc(var(--pbx-col-x) - var(--pbx-pad-x));}
+.pbx .pbx-open:has(.pbx-lock){padding-top:calc(var(--pbx-open-y) - var(--pbx-pad-top) - var(--pbx-lock-h));} /* the lockup takes the room above the kicker, so the title stays where it was */
+.pbx-lock{display:block;position:relative;height:var(--pbx-lock-h);}
+.pbx-lock-c,.pbx-lock-s{position:absolute;white-space:nowrap;color:var(--ink);} /* left/top are set inline from measured ink (see pbxLockPos) */
+.pbx-lock-c{font-family:var(--font-caps);font-weight:500;font-size:17px;letter-spacing:.42em;line-height:20px;}
+.pbx-lock-s{font-family:var(--font-script);font-weight:400;font-size:52px;line-height:60px;}
+.pbx-kicker{font-size:var(--pbx-fs-kicker);font-weight:var(--w-label);color:var(--ink);line-height:1.4;margin-bottom:var(--sp-block);}
+.pbx .pbx-open-t{display:inline-block;margin:0;font-size:var(--pbx-fs-open);font-weight:var(--w-label);line-height:1.15;color:var(--ink);padding-bottom:calc(var(--sp-inline) + 5px);} /* 17px under the text: the room the underline used to take, so nothing below moves */
+.pbx-lede{max-width:var(--read-measure);margin-top:56px;font-family:var(--font-read);font-size:var(--read-fs);line-height:var(--read-lh);color:var(--ink);text-wrap:pretty;}
+/* opener extras: a one-line meta and a plain ruled list in the lower half (library opener) */
+.pbx-meta{margin-top:var(--sp-inline);font-size:var(--fs-label);line-height:1.5;color:var(--muted);}
+.pbx-meta b{font-weight:var(--w-label);color:var(--ink);}
+.pbx-cats{max-width:var(--read-measure);margin-top:48px;border-top:var(--rule-w) solid var(--rule);}
+.pbx-cats>div{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-stack);padding:var(--sp-inline) 0;border-bottom:var(--rule-w) solid var(--rule);font-size:var(--fs-label);line-height:1.4;}
+.pbx-cats>div>span:first-child{font-weight:var(--w-label);color:var(--ink);}
+.pbx-cats>div>span:last-child{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;}
+/* text page: heading hangs from a full-width hairline; rows read in a term | definition grid whose
+   definition column is the reading measure (148 + 24 + 470 = the 642px content width) */
+.pbx .pbx-gt{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);padding:32px 0 var(--sp-list);border-bottom:var(--rule-w) solid var(--rule);margin-bottom:var(--sp-list);}
+.pbx .pb-body>.pbx-gl-grp:first-child>.pbx-gt{padding-top:0;}
+.pbx-gl-cols{column-count:2;column-gap:36px;}
+.pbx-gl-row{break-inside:avoid;padding:var(--sp-list) 0;}
+.pbx-gl-term{font-size:var(--fs-label);font-weight:var(--w-label);color:var(--ink);line-height:1.4;}
+.pbx-gl-def{margin-top:2px;font-family:var(--font-read);font-size:calc(var(--read-fs) - 2px);line-height:var(--read-lh);color:var(--ink);text-wrap:pretty;}
+/* library text page: category name heads the sheet; up to two articles, the first holding at least the
+   top half so the second starts mid-sheet (option B, top half / bottom half) */
+.pbx .pbx-cat{padding:0 0 36px;}
+.pbx .pbx-cat .pb-cat-t{display:block;font-size:var(--fs-heading);font-weight:var(--w-label);line-height:1.2;color:var(--ink);}
+.pbx .pbx-cat{position:relative;}
+.pbx-cic{position:absolute;right:-60px;top:-34px;width:148px;height:141px;pointer-events:none;} /* the category's engraved drawing at the right of its header, whole on the page, lifted between the running head and the first article's title rule (it overlaps no text, so the sheet fit is unchanged) */
+.pb-page.pbx:has(.pbx-cic) .pb-body{overflow:visible;}
+.pbx .pb-body>article.pbx-unit:first-of-type{min-height:50%;}
+/* vertical rule between two equal columns, a small diamond on it (footer ornament's twin); the container
+   needs 36px of column gap and position:relative */
+.pbx-vr{position:relative;}
+.pbx-vr::before{content:'';position:absolute;top:0;bottom:0;left:50%;border-left:var(--rule-w) solid var(--rule);}
+.pbx-vr::after{content:'';position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;transform:rotate(45deg);background:var(--sheet);border:var(--rule-w) solid rgba(17,19,24,.5);box-sizing:border-box;}
+.pbx-art{padding:0 0 40px;}
+.pbx-art-t{font-size:var(--fs-sig);font-weight:var(--w-label);line-height:1.35;color:var(--ink);padding-bottom:var(--sp-inline);border-bottom:var(--rule-w) solid var(--rule);}
+.pbx-art-s{max-width:var(--read-measure);margin-top:var(--sp-stack);font-size:14px;font-weight:var(--w-body);line-height:1.6;color:var(--muted);}
+/* pull-quote: a big hanging opening mark, ink text in the reading face, a closing mark inline */
+.pbx-art-s.pbx-quote{position:relative;padding-left:36px;font-family:var(--font-read);font-size:calc(var(--read-fs) + 1px);font-weight:var(--w-label);line-height:1.6;color:var(--ink);text-wrap:pretty;}
+.pbx-art-s.pbx-quote::before{content:'\201C';position:absolute;left:-2px;top:-6px;font-family:Georgia,'Times New Roman',serif;font-size:56px;font-weight:400;line-height:1;color:var(--muted);}
+.pbx-art-s.pbx-quote::after{content:'\201D';font-family:Georgia,'Times New Roman',serif;font-size:40px;font-weight:400;line-height:0;vertical-align:-.28em;color:var(--muted);margin-left:4px;}
+.pbx-art-p{max-width:var(--read-measure);margin-top:var(--sp-stack);font-family:var(--font-read);font-size:calc(var(--read-fs) - 2px);line-height:var(--read-lh);color:var(--ink);text-wrap:pretty;}
+.pbx-cols{display:grid;grid-template-columns:1fr 1fr;column-gap:36px;margin-top:var(--sp-stack);}
+.pbx-cols>.pbx-art-p{margin:0;padding-top:var(--sp-list);}
+.pbx-art-side>.pbx-note+.pbx-note{margin-top:var(--sp-inline);}
+.pbx-note{border-top:var(--rule-w) solid var(--rule);padding-top:var(--sp-list);font-size:14px;line-height:1.6;color:var(--muted);text-wrap:pretty;}
+.pbx-note b{font-weight:var(--w-label);color:var(--ink);}
+/* journey: measured sides (text-page items) + section heading + ruled ledger rows */
+.pbx-side-row{display:grid;grid-template-columns:1fr 1fr;column-gap:36px;}
+.pbx-side{padding:0 0 36px;}
+.pbx-side-hd{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-stack);padding-bottom:var(--sp-inline);border-bottom:var(--rule-w) solid var(--rule);}
+.pbx-side-t{font-family:var(--font-read);font-size:calc(var(--fs-sig) - 2px);font-weight:var(--w-label);line-height:1.35;color:var(--ink);}
+.pbx-side-st{font-size:var(--pbx-fs-kicker);line-height:1.4;color:var(--muted);white-space:nowrap;}
+/* journey sides: each carries an engraved drawing in the outer page margin (left column off the left edge, right
+   column off the right edge), a quarter of it cut by the page; the text gives way a little on that side */
+.pbx-side{position:relative;}
+.pbx-side-fig{position:absolute;top:52px;width:110px;height:105px;pointer-events:none;}
+.pbx-side.fig-l .pbx-side-fig{left:-105px;}
+.pbx-side.fig-r .pbx-side-fig{right:-105px;}
+.pbx-side.fig-l .pbx-side-b{padding-left:8px;}
+.pbx-side.fig-r .pbx-side-b{padding-right:8px;}
+.pb-page.pbx:has(.pbx-side-fig) .pb-body{overflow:visible;}
+.pbx-side-b{margin-top:var(--sp-stack);font-family:var(--font-read);font-size:var(--read-fs);line-height:var(--read-lh);color:var(--ink);text-wrap:pretty;}
+.pbx-side .pbx-side-b{font-size:calc(var(--read-fs) - 2px);}
+.pbx-side .pbx-art-s{font-size:12px;}
+.pbx-side .pbx-side-t{font-size:calc(var(--fs-sig) - 4px);}
+.pbx-side-b ul{margin:var(--sp-inline) 0 0;padding:0 0 0 1.2em;list-style:disc;}
+.pbx-side-b li::marker{color:var(--muted);}
+.pbx-side-b li+li{margin-top:2px;}
+.pbx-side-b p+ul,.pbx-side-b ul+p{margin-top:var(--sp-inline);}
+.pbx-side-b p+p{margin-top:var(--sp-inline);}
+.pbx-side-b b{font-weight:700;}
+.pbx .pbx-sec{padding:0 0 28px;}
+.pbx .pbx-sec-t{margin:0;font-size:var(--fs-heading);font-weight:var(--w-label);line-height:1.2;color:var(--ink);}
+.pbx-sec-sub{margin-top:var(--sp-inline);font-size:var(--fs-label);line-height:1.5;color:var(--muted);}
+/* "เรื่องที่คุณเข้าใจแล้ว" as book notes: the first insight is a pull-quote (numeral in the margin column, lead clause large,
+   any further " · " clause as a reading line, its game once under it), an asterism, then the rest as numbered notes grouped under
+   the game they came from, hanging in the reading column (numerals in a 34px gutter left of it). Each piece is its own block so
+   pbBuild can break between notes; group headings are .pb-keep so they never end a sheet. */
+.pbx-lg-q{display:grid;grid-template-columns:calc(var(--pbx-col-x) - var(--pbx-pad-x)) 1fr;padding:12px 0 32px;}
+.pbx-lg-qn{font-family:var(--font-caps);font-weight:500;font-size:34px;line-height:1;color:var(--ink);padding-top:6px;}
+.pbx-lg-qt{max-width:var(--read-measure);font-size:30px;font-weight:var(--w-label);line-height:1.4;color:var(--ink);text-wrap:balance;}
+.pbx-lg-q2{max-width:var(--read-measure);margin-top:var(--sp-stack);font-family:var(--font-read);font-size:var(--read-fs);line-height:var(--read-lh);color:var(--ink);}
+.pbx-lg-src{margin-top:var(--sp-block);font-size:var(--pbx-fs-kicker);line-height:1.4;color:var(--muted);}
+.pbx-lg-src::before{content:'';display:inline-block;width:28px;height:var(--rule-w);background:var(--rule);vertical-align:middle;margin-right:10px;}
+.pbx-lg-br{height:40px;background:url(assets/orn-asterism.svg) center top/60px 14px no-repeat;}
+.pbx-lg-gt,.pbx-lg-i{width:calc(var(--read-measure) + 34px);margin-left:calc(var(--pbx-col-x) - var(--pbx-pad-x) - 34px)!important;}
+.pbx-lg-gt{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-stack);padding:12px 0 var(--sp-list);border-bottom:var(--rule-w) solid var(--rule);font-size:var(--pbx-fs-kicker);font-weight:var(--w-label);line-height:1.4;color:var(--ink);}
+.pbx-lg-gt+.pbx-lg-i{padding-top:var(--sp-stack);}
+.pbx-lg-br+.pbx-lg-gt{padding-top:0;}
+.pbx-lg-gt span{font-weight:var(--w-body);color:var(--muted);}
+.pbx-lg-i{display:grid;grid-template-columns:34px 1fr;padding-bottom:10px;}
+.pbx-lg-in{font-family:var(--font-caps);font-weight:500;font-size:12px;line-height:24px;letter-spacing:.06em;color:var(--muted);}
+.pbx-lg-it{font-family:var(--font-read);font-size:15px;line-height:1.6;color:var(--ink);text-wrap:pretty;}
+.pbx-lg-c2{display:block;margin-top:2px;color:var(--muted);} /* a further " · " point: its own line, quieter */
+/* data page: blocks separated by air; label | value rows with the share as a thin ink rule on a hairline
+   track (muted = categories not touched yet) */
+.pbx .pbx-block{padding-top:56px;}
+.pbx .pbx-ints{padding-left:calc(var(--pbx-col-x) - var(--pbx-pad-x));} /* same column as the radar opener it follows */
+.pbx .pb-body>.pbx-block:first-child{padding-top:0;}
+/* heading tiers: 44px page title (openers, contents) / 32px section head over titled items (library category, journey ledger,
+   the "เจาะราย สินทรัพย์" section) / 22px block, article and side heading, always with a 1px hairline under it / 18px sub-group
+   (glossary group). .pbx-blk-t is the block tier. */
+.pbx .pbx-blk-t{margin:0;padding-bottom:var(--sp-inline);font-size:var(--fs-sig);font-weight:var(--w-label);line-height:1.35;color:var(--ink);border-bottom:var(--rule-w) solid var(--rule);}
+.pbx-conf-hd .pbx-blk-t{padding-bottom:0;border-bottom:0;} /* the Confidence header already carries its own hairline */
+.pbx-data{max-width:var(--read-measure);margin-top:var(--sp-stack);}
+.pbx-open .pbx-data{margin-top:40px;}
+.pbx-dr{display:grid;grid-template-columns:1fr auto;column-gap:var(--sp-stack);align-items:baseline;padding:10px 0 6px;}
+.pbx-dr.has-ic{grid-template-columns:26px 1fr auto;align-items:center;}
+.pbx-dic{display:block;width:26px;height:26px;object-fit:contain;}
+.pbx-tic{width:26px;height:26px;object-fit:contain;margin-right:8px;vertical-align:-6px;} /* icon set inline before a title */
+.pbx-dl{font-size:var(--fs-label);line-height:1.4;color:var(--ink);}
+.pbx-dv{font-size:var(--fs-label);line-height:1.4;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.pbx-dv b,.pbx-open .pbx-dv,.pbx-dr:not(.muted) .pbx-dv:not(:has(b)){font-weight:var(--w-label);color:var(--ink);}
+.pbx-db{grid-column:1/-1;display:block;height:3px;margin-top:8px;background:linear-gradient(to right,var(--ink) var(--v),var(--line) var(--v));}
+.pbx-dr.muted .pbx-dl{color:var(--muted);}
+.pbx-dr.muted .pbx-db{background:linear-gradient(to right,var(--rule) var(--v),var(--line) var(--v));}
+.pbx-data-cap{max-width:var(--read-measure);font-size:var(--fs-label);line-height:1.5;color:var(--muted);}
+.pbx-data-note{max-width:var(--read-measure);margin-top:var(--sp-inline);font-size:14px;line-height:1.6;color:var(--muted);text-wrap:pretty;}
+.pbx-data-note b{font-weight:var(--w-label);color:var(--ink);}
+.pbx-open .pbx-data-note{margin-top:var(--sp-stack);font-size:var(--fs-label);color:var(--ink);}
+/* เจาะรายสินทรัพย์: asset name on a hairline, its three lines in the reading column */
+.pbx-dd{position:relative;padding:0 0 32px;}
+/* the article's illustration: a line drawing in the margin beside the text, turned a little and cut by the page edge,
+   alternating sides; the text column gives way on that side */
+.pbx-dd.has-fig.r{padding-right:190px;}
+.pbx-dd.has-fig.l{padding-left:190px;}
+.pbx-dd-fig{position:absolute;top:0;object-fit:contain;pointer-events:none;} /* engraved drawings stand upright on their own ground shadow */
+
+/* .pbx-dd-fig side offset (the 77px page margin plus a quarter of the piece, so that quarter is cut by the page edge) is set inline */
+.pb-page.pbx:has(.pbx-dd-fig) .pb-body{overflow:visible;} /* the pieces reach past the column to the page edge; sheet fit is still measured by scrollHeight */
+.pbx-dd-l{max-width:var(--read-measure);margin:var(--sp-stack) 0 0;padding:0 0 0 1.2em;list-style:disc;font-family:var(--font-read);font-size:calc(var(--read-fs) - 2px);line-height:var(--read-lh);color:var(--ink);}
+.pbx-dd-l li::marker{color:var(--muted);}
+.pbx-dd-l li+li{margin-top:var(--sp-list);}
+/* analysis: risk comparison as two big numerals under hairlines; Confidence Score header = level as the
+   heading with the big score beside it */
+.pbx-open .pbx-risk{max-width:var(--read-measure);margin-top:24px;}
+.pbx-open .pbx-conf{margin-top:24px;}
+.pbx-conf .pbx-dl,.pbx-conf .pbx-dv{font-size:calc(var(--fs-label) + 2px);} /* the sheet is shrunk to fit, so the rows are drawn 2px up to read like the radar rows */
+.pbx .pbx-open:has(.pbx-conf){padding-bottom:32px;} /* the fit-shrink fills the sheet to the footer, so this keeps the rows off it */
+.pbx-open .pbx-conf .pbx-data{margin-top:var(--sp-stack);} /* the rows sit close under the note, so the group clears the footer */
+.pbx-pair{display:grid;grid-template-columns:1fr 1fr;column-gap:var(--sp-block);margin-top:var(--sp-block);}
+.pbx-pair>div{display:flex;flex-direction:column;gap:6px;border-top:var(--rule-w) solid var(--rule);padding-top:var(--sp-inline);}
+.pbx-big{font-size:44px;font-weight:var(--w-label);line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;}
+.pbx-big.pbx-was{color:var(--muted);text-decoration:line-through;text-decoration-thickness:2px;}
+.pbx-pair span{font-size:var(--fs-label);line-height:1.4;color:var(--muted);}
+.pbx-conf-hd{display:flex;justify-content:space-between;align-items:flex-end;gap:var(--sp-block);max-width:var(--read-measure);padding-bottom:var(--sp-inline);border-bottom:var(--rule-w) solid var(--rule);}
+.pbx-conf-hd .pbx-kicker{margin-bottom:var(--sp-list);}
+.pbx-score{white-space:nowrap;font-size:var(--fs-label);color:var(--muted);}
+.pbx-score b{font-size:44px;font-weight:var(--w-label);line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;}
+.pbx-conf .pbx-data-note{margin-top:var(--sp-stack);}
+/* identity feature page: lighter, larger title than the openers (the reference's light display vs its heavy
+   section title); the title box runs down to the hairline so the rule lands at ~41% whatever the line count;
+   split row = narrow text column (262px ≈ 33%) + the card (the reference's photo), flat, no shadow */
+.pbx .pbx-feat{padding-top:calc(var(--pbx-feat-y) - var(--pbx-pad-top));}
+.pbx .pbx-feat-t{box-sizing:border-box;margin:0;min-height:calc(var(--pbx-feat-rule) - var(--pbx-feat-y));font-size:var(--pbx-fs-feat);font-weight:var(--w-body);line-height:1.1;color:var(--ink);border-bottom:var(--rule-w) solid var(--rule);text-wrap:balance;}
+.pbx-feat-row{display:grid;grid-template-columns:262px minmax(0,1fr);column-gap:38px;align-items:start;margin-top:34px;} /* the gap and top margin leave room for the card's double frame (-22px) clear of the text column and the title hairline */
+.pbx-feat-fam{font-size:var(--pbx-fs-kicker);font-weight:var(--w-label);line-height:1.4;color:var(--ink);}
+.pbx-feat-fam-s{display:block;font-family:var(--font-script);font-weight:400;font-size:52px;line-height:1.05;white-space:nowrap;}
+.pbx-feat-fam-t{display:block;margin-top:2px;}
+.pbx-feat-phase{margin-bottom:var(--sp-inline);font-size:var(--pbx-fs-kicker);font-weight:var(--w-label);line-height:1.4;color:var(--muted);}
+.pbx-feat-row .pbx-data-note{margin-top:var(--sp-stack);}
+/* post-event sheet (pbxPostHTML) */
+.pbx .pbx-post-t{margin:0;padding-bottom:var(--sp-inline);font-size:var(--pbx-fs-open);font-weight:var(--w-label);line-height:1.15;color:var(--ink);border-bottom:var(--rule-w) solid var(--rule);}
+.pbx-post-row{display:grid;grid-template-columns:minmax(0,1fr) 240px;column-gap:48px;align-items:start;margin-top:44px;}
+.pbx-post .pbx-tags{margin-top:var(--sp-block);}
+.pbx-post .pbx-split{margin-top:64px;}
+.pbx-feat-sig{margin-top:var(--sp-inline);font-family:var(--font-read);font-size:var(--read-fs);line-height:var(--read-lh);color:var(--ink);text-wrap:pretty;}
+.pbx-card img{display:block;width:100%;height:auto;border-radius:5.8% / 4.15%;}
+/* identity follow-up blocks */
+.pbx-side-hd .s-h{margin:0;}
+.pbx-tags{display:flex;flex-wrap:wrap;align-items:center;list-style:none;padding:0;margin:var(--sp-stack) 0 0;font-size:var(--fs-label);font-weight:var(--w-label);line-height:1.5;color:var(--ink);}
+.pbx-tags li+li::before{content:'';display:inline-block;width:6px;height:6px;margin:0 16px;transform:rotate(45deg);border:var(--rule-w) solid rgba(17,19,24,.5);vertical-align:middle;}
+/* SKILL as three 0-10 scales: a hairline with ten ticks, inked up to the value and closed by a small diamond (the book's own ornament) */
+.pbx-sks{max-width:var(--read-measure);margin-top:var(--sp-block);}
+.pbx-sk{padding:12px 0 8px;}
+.pbx-sk-h{display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-label);line-height:1.4;color:var(--ink);}
+.pbx-sk-v{color:var(--muted);font-variant-numeric:tabular-nums;}
+.pbx-sk-v b{font-weight:var(--w-label);color:var(--ink);}
+.pbx-sk-s{position:relative;height:16px;margin-top:6px;background:repeating-linear-gradient(to right,rgba(17,19,24,.5) 0 1px,transparent 1px 10%) 0 0/calc(100% + 1px) 7px no-repeat;border-right:1px solid rgba(17,19,24,.5);}
+.pbx-sk-s::before{content:'';position:absolute;left:0;right:0;top:8px;height:1px;background:linear-gradient(to right,var(--ink) var(--v),var(--rule) var(--v));}
+.pbx-sk-s i{position:absolute;left:var(--v);top:8px;width:9px;height:9px;margin:-4px 0 0 -4px;background:var(--ink);transform:rotate(45deg);}
+.pbx-reg-a{display:inline-block;margin-top:var(--sp-block);padding-bottom:11px;border-bottom:var(--rule-w) solid var(--ink);font-size:var(--fs-label);font-weight:var(--w-label);line-height:1.4;color:var(--ink);text-decoration:none;}
+.pbx .pbx-split{display:grid;grid-template-columns:1fr 1fr;column-gap:36px;}
+.pbx-list{margin:var(--sp-inline) 0 0;padding:0;list-style:none;font-family:var(--font-read);font-size:calc(var(--read-fs) - 2px);line-height:var(--read-lh);color:var(--ink);}
+/* every line of both columns sits on one pitch (line + the old item gap), so rows line up across the rule even when one column wraps */
+.pbx-list li{line-height:calc((var(--read-fs) - 2px) * var(--read-lh) + var(--sp-list));}
+.pbx-ft{flex:0 0 auto;display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-stack);position:relative;padding:var(--sp-stack) 0 calc(var(--sp-list) + var(--rule-w));font-size:var(--pbx-fs-ft);line-height:1.4;color:var(--muted);}
+.pbx-ft::before,.pbx-ft::after{content:'';position:absolute;bottom:0;height:var(--rule-w);width:calc(50% - 26px);background:var(--rule);}
+.pbx-ft::before{left:0;}
+.pbx-ft::after{right:0;}
+.pbx-ft-r::after{content:'';position:absolute;left:50%;bottom:-5px;width:34px;height:11px;transform:translateX(-50%);background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 11'%3E%3Cg fill='none' stroke='%23111318' stroke-opacity='.62'%3E%3Cpath d='M17 1.5 22 5.5 17 9.5 12 5.5Z'/%3E%3C/g%3E%3Cg fill='%23111318' fill-opacity='.62'%3E%3Ccircle cx='6' cy='5.5' r='1'/%3E%3Ccircle cx='28' cy='5.5' r='1'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;}
+.pbx-ft-brand{text-transform:uppercase;letter-spacing:.14em;} /* Latin only — Thai has no case and tracking hurts it */
+.pbx-ft-brand b{font-weight:var(--w-label);color:var(--ink);}
+.pbx-ft-r{display:flex;align-items:baseline;gap:var(--sp-stack);}
+.pb-page .pbx-ft .pb-pn{color:inherit;text-decoration:none;pointer-events:auto;cursor:pointer!important;} /* out-ranks the journey sheets' print-like cursor:default!important */
+/* ── สารบัญ (Ver.2 reset step 9): a Ver.2 text page — white sheet, no frame / glow / decorations, the
+   same footer as every other sheet. Title hangs from a full-width hairline; each chapter is one row of
+   the glossary's grid (chapter name in the narrow left column, its entries in the reading column),
+   set apart by a hairline — type and rules only. ── */
+.pbx .pbx-toc-t{margin:0 0 var(--sp-block);padding-bottom:var(--sp-inline);font-size:var(--pbx-fs-open);font-weight:var(--w-label);line-height:1.15;color:var(--ink);border-bottom:var(--rule-w) solid var(--rule);}
+.toc-list{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;}
+.toc-grp{display:grid;grid-template-columns:148px minmax(0,var(--read-measure));column-gap:var(--sp-block);align-items:baseline;padding:var(--sp-list) 0;border-bottom:var(--rule-w) solid var(--rule);}
+.toc-ch{font-size:calc(var(--pbx-fs-kicker) + 4px);font-weight:var(--w-label);line-height:1.4;color:var(--ink);}
+.toc-rows{display:flex;flex-direction:column;}
+.toc-row{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-stack);padding:var(--sp-glue) 0;text-decoration:none;color:var(--ink);}
+.toc-t{font-size:calc(var(--pbx-fs-kicker) + 4px);font-weight:var(--w-body);line-height:1.5;}
+.toc-n{font-size:var(--pbx-fs-kicker);color:var(--muted);font-variant-numeric:tabular-nums;flex:0 0 auto;}
+/* หน้า "เส้นทาง" (journey) is print-like: nothing on it reacts to hover / tap */
+.pb-page[data-sect="journey"]{pointer-events:none;}
+.pb-page[data-sect="journey"] *{cursor:default!important;}
+/* print / Save as PDF: one sheet per A4 page, no screen chrome */
+@page{size:A4;margin:0;}
+@media print{
+  html,body{background:#fff!important;display:block!important;min-height:0!important;height:auto!important;}
+  .shell,#root{display:block!important;max-width:none!important;width:auto!important;height:auto!important;min-height:0!important;overflow:visible!important;background:#fff!important;}
+  main.scroll{display:block!important;padding:0!important;max-width:none!important;width:auto!important;}
+  .pb-doc{display:block!important;}
+  .pb-fit{width:210mm!important;height:297mm!important;break-after:page;page-break-after:always;overflow:hidden;margin:0!important;}
+  .pb-page{width:100%!important;height:100%!important;border:0!important;box-shadow:none!important;}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+
+<div class="shell" id="root"></div>
+
+<!-- Liquid Metal CTA module loading removed 2026-09-27 (asset-weight audit) — mountLiquidMetalCta/
+     mountLiquidMetalButtonInto were exposed on window but never called anywhere in the classic
+     script below (verified: zero call sites for either name, and #cta-slot/.lmb never get a real
+     element). Was costing every real page load an unconditional fetch+parse of js/liquid-metal-cta.js
+     (6.5K) + its js/liquid-metal-button.js import (14.6K) for a feature with no consumer. Removing
+     the script tags does not touch js/liquid-metal-*.js themselves (left in place, just unreferenced
+     from here) in case a future screen wants them back — see the corresponding CSS removal note at
+     .lmb / #cta-slot for the same reasoning. -->
+<script src="js/library-data.js"></script>
+
+<script>
+/* Icon asset audit (2026-09-11, per direction "ไอคอน spectrum ทั้งหมดในระบบ audit เรื่อง size, item
+   type"): ~60 spectrum-style PNGs referenced across the app total ~2MB — reasonable, all correctly
+   PNG (not JPEG, needed for alpha transparency). The one real finding: 14 of these predated the
+   160x160/trim-to-content-bbox/~82%-fill convention every other icon in the file follows and were
+   still sitting at a legacy 96x96 canvas with the glyph filling ~94-96% of it — same root cause as
+   the ICON_COMPASS_PNG/ICON_GOLD_PNG mismatch fixed earlier this session (see SIDES' own comment),
+   just not yet caught for the rest of this older batch. At the shared 24px display size (.gr-ic/
+   .ns-ic/.pass-ey-ic/.bc-asset-ic all use object-fit:contain within a fixed box), a 96x96-canvas/96%-
+   fill glyph renders visibly LARGER than a 160x160/82%-fill one, even though both are "one icon in
+   one same-size slot" — the mismatch is in the source canvas, not the CSS. Re-cropped 11 of the 14
+   from their original ~1920px source art in Icon/ (ICON_BOND/COLLECTIBLE/CROWN/CRYPTO/DIAMOND/GIFT/
+   INSURANCE/JOYSTICK/REALESTATE/STOCK_INTL/STOCK_TH_PNG) to the same 160x160/~82%-fill recipe.
+   ICON_CARD_PNG/ICON_FUND_PNG/ICON_HEALTH_PNG have no matching high-res source found in Icon/ (a
+   plain-card search only turned up an unrelated trading-card mockup) — left at their existing 96px
+   art rather than guess at a replacement; flagged here for whenever real source art turns up.
+   Follow-up same day ("ไอคอนที่เพิ่งแก้...ยังทับกันอยู่" / bond icon spotted with a ₿ on it): the
+   re-crop made ICON_BOND_PNG's own source problem impossible to miss — Icon/ตราสารหนี้.png draws a
+   bank building with a currency note (stamped with a bitcoin glyph, of all things) overlapping its
+   base, present since before this session touched it, just easy to miss at the old tiny/96px size.
+   Briefly re-cropped to just the bank pediment (roof + columns only, dropping the note+₿ entirely —
+   the note visually overlaps the building's own right column in the source art, confirmed by
+   sampling its alpha channel, so there was no rectangle that kept "building + note minus just the
+   ₿" cleanly), then reverted the SAME day ("ใช้รูปแบบเดิม" → "ภาพเต็ม ตึก+ธนบัตร+₿ ตามต้นฉบับ") back
+   to the full original artwork through the same plain trim+~82%-fill recipe as the other 11 — the
+   mismatched ₿ stays, matching the source verbatim; only the canvas/proportion got fixed here, not
+   the content. */
+var RADAR_AXES=['หุ้นไทย','ต่างปท.','กองทุน','คริปโต','ทอง','สุขภาพ'];
+/* original-colour icons from the v1 asset set: radar rows (sheet 4), the six journey sides (sidesHTML order) */
+var pbxIc=function(k){return 'assets/ICON_'+k+'_PNG.webp';};
+var RADAR_IC=['STOCK_TH','STOCK_INTL','FUND','CRYPTO','GOLD','HEALTH'].map(pbxIc);
+/* "เจาะรายสินทรัพย์" illustrations, by persona asset name: a large ink line drawing beside each article (traced from the v1
+   glass art by an edge filter, so the book stays single-ink like the chapter drawings) (w x h drawn box,
+   h defaults to w; the two with only small source art are drawn smaller) */
+var DD_FIG={'หุ้นไทย':{src:'eng-stockth.svg',w:180,h:171},'หุ้นต่างประเทศ':{src:'eng-stockintl.svg',w:180,h:171},'กองทุนรวม':{src:'eng-fund.svg',w:180,h:171},
+  'ตราสารหนี้':{src:'eng-bond.svg',w:180,h:171},'ทองคำ':{src:'eng-gold.svg',w:180,h:171},'อสังหา/REIT':{src:'eng-house.svg',w:180,h:171},
+  'คริปโต':{src:'eng-bitcoin.svg',w:180,h:171},'ปันผล':{src:'eng-coin.svg',w:180,h:171},'เงินฝาก':{src:'eng-bank.svg',w:180,h:171}};
+var SIDE_FIG=['gauge','lens','hook','hourglass','heart','steps']; // engraved drawing per journey side (sidesHTML order): assets/eng-*.svg
+/* 2026-09-04: all 12 personas now have approved final photographed card art (replaces the earlier
+   3-card partial set — harvester/diamondhand/waverider — with the full set), so pcFrontInner's CSS
+   editorial-mockup branch is unreached for every real persona now; left in place as a safe fallback
+   only. Source files (12 fronts +
+   1 back, 1418×1985 PNG/WEBP originals) resized to 700px-wide JPEG q85 via sharp, matching this
+   file's existing compression convention for these photos (~100-116KB each). */
+var REAL_CARD_IMG={guardian:'assets/guardian.jpg',harvester:'assets/harvester.jpg',steadyhand:'assets/steadyhand.jpg',diamondhand:'assets/diamondhand.jpg',analyst:'assets/analyst.jpg',planner:'assets/planner.jpg',explorer:'assets/explorer.jpg',sage:'assets/sage.jpg',maverick:'assets/maverick.jpg',waverider:'assets/waverider.jpg',contrarian:'assets/contrarian.jpg',collector:'assets/collector.jpg'};
+
+/* Family umbrellas — accent hue only; persona content is what actually differs.
+   th/strengths/watchouts sourced verbatim from "Playbook Final.html" (BetterTrade 2026
+   event-companion app build, Aug 2026) — the canonical content baseline as of this build.
+   strengths/watchouts now live at family level only (matches source's own architecture). */
+var FAM={
+ G:{th:'Guardian ผู้พิทักษ์',icon:'lc-shield',accent:'#61e8ed',rgb:'97,232,237',
+   strengths:['ปกป้องเงินต้นได้ดี ไม่โลภตามกระแส','อดทน ถือยาว มีวินัยการออม'],
+   watchouts:['ระวังเกินไปจนอาจพลาดโอกาสเติบโต','เงินเฟ้ออาจกัดกินผลตอบแทนถ้าปลอดภัยจัด']},
+ N:{th:'Navigator นักเดินเรือ',icon:'lc-compass',accent:'#9c91ff',rgb:'156,145,255',
+   strengths:['วางแผนทั้งพอร์ต กระจายความเสี่ยงเก่ง','ตัดสินใจบนข้อมูล ไม่ใช้อารมณ์'],
+   watchouts:['วิเคราะห์นานจนพลาดจังหวะ (analysis paralysis) กระจายจนคุมยาก ต้องมีระบบติดตาม']},
+ V:{th:'Visionary ผู้มองการณ์ไกล',icon:'lc-sparkles',accent:'#f178d8',rgb:'241,120,216',
+   strengths:['กล้าได้กล้าเสีย มองหาการเติบโตสูง','จับเทรนด์ใหม่ได้ก่อนตลาด'],
+   watchouts:['พอร์ตเหวี่ยงแรง ต้องทนความผันผวนให้ไหว','กระจุกตัวสูง ควรมีแผนจำกัดขาดทุน']}
+};
+/* 12 personas. en/th/sig are the OFFICIAL name + definition from
+   "ชิ่อ+นิยาม_Investment_Personality_Character_BetterTrade_Concise_v2.pdf"
+   (its "ชื่อใหม่"/"คำอธิบายบุคลิกการลงทุน (ใหม่)" columns — the authoritative source,
+   verified verbatim 2026-08-11). Do NOT use that PDF's "ชื่อเก่า" column (e.g. "The Safe
+   Harbor", "The Dividend Farmer" …) — those are superseded names that "Playbook Final.html"
+   (a separate, newer event-companion app) still uses; a prior pass here briefly and
+   mistakenly copied those old names in from that file — reverted.
+   legend/legendWhy/assets/radar/skills are ported from "Playbook Final.html" (BetterTrade
+   2026 event-companion app build, Aug 2026) — the PDF doesn't cover those fields, so no
+   conflict; kept per user instruction to adopt that source's data. Key slugs, fam letter,
+   accent/rgb and card visuals stay as this quiz app's own IDs (S2 vote targets, PICON
+   glyphs, demo persona picker all key off these slugs, unaffected either way). Mapping used
+   for legend/assets/radar/skills (old slug → Playbook Final persona, matched by family +
+   legend): guardian→Safe Harbor, harvester→Dividend Farmer, steadyhand→Steady Tide,
+   diamondhand→Dragon Hoarder, analyst→Eagle Eye, planner→Chess Master,
+   explorer→Global Nomad, sage→Philosopher King, maverick→Rocket Rider,
+   waverider→Trend Surfer, contrarian→Contrarian, collector→Legacy Builder.
+   riskLevel = that source's skills[0] ("ใจกล้า"/boldness), clamped ≥1. radar[6] axis order
+   is [หุ้นไทย, ต่างประเทศ, กองทุน, คริปโต, ทอง, สุขภาพ] (see RADAR_AXES) — replaces the old
+   [หุ้น, ต่างปท., กองทุน, ตราสาร, ทอง, อสังหา] order. strengths/watchouts moved to FAM (below,
+   also from Playbook Final — the official PDF doesn't define per-persona strengths/watchouts). */
+var HEROES={
+ guardian:{fam:'G',en:'The Guardian',th:'นักลงทุนสายรักษาทุน',
+   sig:'ให้ความสำคัญกับความมั่นคง ชอบเตรียมพร้อม และหลีกเลี่ยงความเสี่ยงที่ไม่จำเป็น',
+   assets:[{icon:'lc-file-text',t:'ตราสารหนี้'},{icon:'lc-file-text',t:'เงินฝาก'},{icon:'lc-coins',t:'ทองคำ'},{icon:'lc-pie-chart',t:'กองทุนรวม'}],
+   legend:'Ray Dalio',legendWhy:'สมดุลทุกสภาวะ พอร์ตทนทานทุกพายุ',
+   skills:[1,9,6],riskLevel:1,radar:[40,20,70,10,80,55],motto:null},
+ harvester:{fam:'G',en:'The Harvester',th:'นักลงทุนสายเก็บเกี่ยว',
+   sig:'ชอบสร้างสิ่งที่ค่อยๆ เติบโต และให้ผลตอบแทนสม่ำเสมอในระยะยาว',
+   assets:[{icon:'lc-trending-up',t:'ปันผล'},{icon:'lc-building-2',t:'อสังหา/REIT'},{icon:'lc-landmark',t:'หุ้นไทย'}],
+   legend:'Benjamin Graham',legendWhy:'ลงทุนในคุณค่า เก็บกระแสเงินสดสม่ำเสมอ',
+   skills:[3,9,6],riskLevel:3,radar:[75,15,55,10,45,50],motto:null},
+ steadyhand:{fam:'G',en:'The Steady Hand',th:'นักลงทุนสายสม่ำเสมอ',
+   sig:'เชื่อในวินัยและความสม่ำเสมอ มากกว่าการเร่งผลลัพธ์ในระยะสั้น',
+   assets:[{icon:'lc-pie-chart',t:'กองทุนรวม'},{icon:'lc-landmark',t:'หุ้นไทย'},{icon:'lc-file-text',t:'ตราสารหนี้'}],
+   legend:'John Bogle',legendWhy:'DCA ต้นทุนต่ำ ลงเรื่อยๆ อยู่ยาว',
+   skills:[3,10,8],riskLevel:3,radar:[55,30,85,15,40,55],motto:'DCA'},
+ diamondhand:{fam:'G',en:'The Diamond Hand',th:'นักลงทุนสายถือยาว',
+   sig:'เมื่อเชื่อมั่นแล้ว จะอดทนและให้เวลา ไม่หวั่นไหวง่ายกับความผันผวนระยะสั้น',
+   assets:[{icon:'lc-landmark',t:'หุ้นไทย'},{icon:'lc-pie-chart',t:'กองทุนรวม'},{icon:'lc-coins',t:'ทองคำ'}],
+   legend:'Warren Buffett',legendWhy:'ถือของดีไว้นานที่สุด ปล่อยให้ดอกเบี้ยทบต้นทำงาน',
+   skills:[3,10,7],riskLevel:3,radar:[80,25,40,10,50,45],motto:null},
+ analyst:{fam:'N',en:'The Analyst',th:'นักลงทุนสายหาข้อมูล',
+   sig:'ต้องเข้าใจข้อมูลและเหตุผลก่อนตัดสินใจ ไม่เชื่อตามคนอื่นง่ายๆ',
+   assets:[{icon:'lc-landmark',t:'หุ้นไทย'},{icon:'lc-pie-chart',t:'กองทุนรวม'},{icon:'lc-globe',t:'หุ้นต่างประเทศ'}],
+   legend:'Peter Lynch',legendWhy:'มองหาโอกาสจากธุรกิจที่เข้าใจลึก',
+   skills:[5,8,5],riskLevel:5,radar:[85,45,50,20,35,45],motto:null},
+ planner:{fam:'N',en:'The Planner',th:'นักลงทุนสายวางแผน',
+   sig:'มองภาพรวม วางแผนล่วงหน้า และเตรียมทางเลือกไว้หลายสถานการณ์',
+   assets:[{icon:'lc-pie-chart',t:'กองทุนรวม'},{icon:'lc-globe',t:'หุ้นต่างประเทศ'},{icon:'lc-file-text',t:'ตราสารหนี้'},{icon:'lc-coins',t:'ทองคำ'}],
+   legend:'David Swensen',legendWhy:'asset allocation ระดับกองทุนมหาวิทยาลัย',
+   skills:[5,9,10],riskLevel:5,radar:[60,70,80,30,55,60],motto:null},
+ explorer:{fam:'N',en:'The Explorer',th:'นักลงทุนสายสำรวจ',
+   sig:'เปิดรับสิ่งใหม่ ไม่ยึดติดกับความคุ้นเคย และชอบมองหาโอกาสใหม่ๆ',
+   assets:[{icon:'lc-globe',t:'หุ้นต่างประเทศ'},{icon:'lc-coins',t:'ทองคำ'},{icon:'lc-bitcoin',t:'คริปโต'}],
+   legend:'Jim Rogers',legendWhy:'มองหาของดีข้ามพรมแดน ไม่ยึดตลาดเดียว',
+   skills:[5,7,9],riskLevel:5,radar:[40,90,55,45,60,45],motto:null},
+ sage:{fam:'N',en:'The Sage',th:'นักลงทุนสายสมดุลชีวิต',
+   sig:'ให้คุณค่ากับชีวิต สุขภาพ ความรู้และความสัมพันธ์ไม่แพ้เรื่องเงิน',
+   assets:[{icon:'lc-pie-chart',t:'กองทุนรวม'},{icon:'lc-landmark',t:'หุ้นไทย'},{icon:'lc-coins',t:'ทองคำ'}],
+   legend:'Naval Ravikant',legendWhy:'ลงทุนทั้งเงิน สุขภาพ ความรู้ และเวลา',
+   skills:[4,9,5],riskLevel:4,radar:[55,55,60,35,45,90],motto:null},
+ maverick:{fam:'V',en:'The Maverick',th:'นักลงทุนสายบุกเบิก',
+   sig:'ชอบโอกาสใหม่ กล้าลองก่อนคนอื่น และพร้อมรับความไม่แน่นอนเพื่อผลลัพธ์ที่มากกว่า',
+   assets:[{icon:'lc-globe',t:'หุ้นต่างประเทศ'},{icon:'lc-bitcoin',t:'คริปโต'},{icon:'lc-landmark',t:'หุ้นไทย'}],
+   legend:'Cathie Wood',legendWhy:'ลงทุนในนวัตกรรมที่เปลี่ยนโลก',
+   skills:[9,5,3],riskLevel:9,radar:[45,75,30,80,25,35],motto:null},
+ waverider:{fam:'V',en:'The Wave Rider',th:'นักลงทุนสายโต้คลื่น',
+   sig:'ไวต่อการเปลี่ยนแปลง จับกระแสได้ดีและพร้อมปรับทิศตามสถานการณ์',
+   assets:[{icon:'lc-landmark',t:'หุ้นไทย'},{icon:'lc-bitcoin',t:'คริปโต'},{icon:'lc-globe',t:'หุ้นต่างประเทศ'}],
+   legend:'Paul Tudor Jones',legendWhy:'อ่านโมเมนตัม เข้า-ออกอย่างมีวินัย',
+   skills:[8,6,4],riskLevel:8,radar:[70,55,25,75,20,35],motto:null},
+ contrarian:{fam:'V',en:'The Contrarian',th:'นักลงทุนสายสวนกระแส',
+   sig:'ไม่ตามเสียงส่วนใหญ่ ตั้งคำถามกับกระแส และใช้เหตุผลของตัวเอง',
+   assets:[{icon:'lc-landmark',t:'หุ้นไทย'},{icon:'lc-globe',t:'หุ้นต่างประเทศ'},{icon:'lc-coins',t:'ทองคำ'}],
+   legend:'Howard Marks',legendWhy:'สวนตลาดในจังหวะที่คนอื่นกลัว',
+   skills:[7,8,4],riskLevel:7,radar:[65,60,35,55,55,40],motto:null},
+ collector:{fam:'V',en:'The Collector',th:'นักลงทุนสายสะสม',
+   sig:'สนใจเรื่องเฉพาะทาง และมองเห็นคุณค่าในสิ่งที่คนทั่วไปมองข้าม',
+   assets:[{icon:'lc-globe',t:'หุ้นต่างประเทศ'},{icon:'lc-pie-chart',t:'กองทุนรวม'},{icon:'lc-landmark',t:'หุ้นไทย'}],
+   legend:'Andrew Carnegie',legendWhy:'สร้างคุณค่าที่ยั่งยืน ส่งต่อโอกาสให้คนรุ่นต่อไป',
+   skills:[8,10,9],riskLevel:8,radar:[60,68,66,45,52,58],motto:null}
+};
+/* motto (2026-08-31, per direction to add the "SKILL ประจำการ์ด" section — see pbxIdentityHTML):
+   a persona's short signature keyword for the "คำประจำตัว" chip in that section, e.g. steadyhand's
+   "DCA". Only steadyhand's value is confirmed so far (matches the reference screenshot); the other
+   11 are left null pending the full set of 12 motto values the user is sending separately — the chip
+   simply doesn't render for a persona with no motto yet (see pbxIdentityHTML), so this is safe to ship
+   half-filled. */
+/* attach family display fields onto each persona (DRY: family visuals live in FAM only) */
+Object.keys(HEROES).forEach(function(k){var h=HEROES[k],f=FAM[h.fam];h.famTh=f.th;h.famIcon=f.icon;h.accent=f.accent;h.rgb=f.rgb;h.strengths=f.strengths;h.watchouts=f.watchouts;});
+
+/* SKILL ประจำการ์ด: the คู่มือ-facing labels for hero.skills[0..2], read as data rows by pbxIdentityHTML */
+var SKC_ROWS=['การรับความเสี่ยง','วินัยการลงทุน','การกระจายลงทุน'];
+var S3_OPTS=[
+ {icon:'lc-landmark',t:'หุ้นไทย'},
+ {icon:'lc-globe',t:'หุ้นต่างประเทศ'},
+ {icon:'lc-pie-chart',t:'กองทุนรวม'},
+ {icon:'lc-file-text',t:'ตราสารหนี้ และเงินฝาก'},
+ {icon:'lc-coins',t:'ทองคำ'},
+ {icon:'lc-building-2',t:'อสังหาฯ และกองทุนอสังหาฯ (REIT)'},
+ {icon:'lc-shield',t:'ประกัน'},
+ {icon:'lc-bitcoin',t:'คริปโต'},
+ {icon:'lc-gem',t:'ของสะสมและสินทรัพย์ทางเลือก'},
+ {icon:'lc-heart',t:'สุขภาพ'}
+]; /* S1(3) + S2(7) + S3(1 multi-select) */
+var st={phase:'splash',spidx:0,idx:0,s1:[null,null,null],s2:[null,null,null,null,null,null,null],s3:[]};
+var RESULT=null;
+var root=document.getElementById('root');
+
+/* On-Event gate (2026-09-01, per direction "เอา flow ส่วน dna quiz ออกทั้งหมด...เอา splash, หน้า 2
+   [consent], กำลังวิเคราะห์ [reveal] ออก — หน้าเหล่านี้จะใช้งานได้เฉพาะช่วง Pre-Event") — the whole
+   onboarding+quiz-taking flow (splash intro -> consent -> the 11 quiz questions -> the "กำลังวิเคราะห์"
+   reveal screen -> the Character Card Reveal) is Pre-Event only; once DEMO.eventPhase is 'on' nothing
+   should be able to reach any of these 5 phases. Single choke point in render() itself (every phase
+   change already funnels through here) rather than patching each of the ~6 call sites that can set one
+   of these phases — catches the quiz's own internal transitions (splash->consent->quiz->reveal->
+   cardreveal), the two "no RESULT yet" redirects-to-splash inside renderBook()/renderLibrary(), and the
+   demo panel's own resetQuiz() alike, with no risk of a new future entry point slipping through
+   unguarded. Redirects to 'book' if a RESULT already exists (nothing to re-take, just show what they
+   have) or 'home' otherwise — never leaves phase sitting on a blocked value, so this can't loop or
+   render blank.
+   Bug fix (found while investigating "fix bug"): 'cardreveal' itself was missing from this list —
+   added 2026-09-08, after this gate was already written, so it slipped through exactly the gap the
+   comment above promises can't happen. Concretely reachable via the demo panel's own "เล่นอนิเมชัน"/
+   "เล่นซ้ำ" buttons (removed 2026-09-18, per direction — they set st.phase='cardreveal' unconditionally,
+   with no event-phase check of their own — same pattern the demo's resetQuiz() already relies on this
+   gate for) or by switching the demo panel's ช่วงงาน toggle
+   to On-Event while a card reveal is already mid-play. Both left the Pre-Event-only reveal screen
+   showing during On-Event, same class of bug this gate exists to prevent — this gate itself still
+   matters even with the manual trigger gone, since the ช่วงงาน-toggle path is still live. */
+/* The app is now just the Playbook (2026-09-21, per direction "หน้าหลักหรือหน้าอื่นในแอป เอาออกให้หมด"):
+   home / booth / games / profile / play / quiz / splash / card reveal / library-screen were removed. The
+   library + glossary are chapters inside the Playbook itself. */
+function render(){
+  st.phase='book';
+  renderBook();
+  window.scrollTo(0,0);
+}
+
+/* Ver.2 analysis: chapter opener whose lower half holds the risk comparison as two big numerals (the
+   declared one struck through only when they differ), then Confidence Score as a data block —
+   big score, level as its heading, the 4 parts as ruled rows (value/max, share as a thin ink rule).
+   Same texts as insightHTML(); no boxes, glow or coloured bars. */
+function pbxAnalysisHTML(r,h,matchOk){
+  var cf=confidenceScore(r);
+  var risk='<div class="pbx-risk"><div class="pbx-side-hd"><div class="pbx-side-t">ความเสี่ยง "บอก" vs "จริง"</div><span class="pbx-side-st">'+(matchOk?'ตรงกัน':('ต่างกัน '+(r.gap>0?'+':'')+r.gap))+'</span></div>'+
+    '<p class="pbx-data-note">ระดับความเสี่ยง 1–10</p>'+
+    '<p class="pbx-side-b">'+(matchOk?'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน':'ความเสี่ยงที่คุณ "บอก" กับพฤติกรรมจริงต่างกันอยู่บ้าง รู้ gap นี้ช่วยให้วางแผนได้แม่นขึ้น')+'</p>'+
+    '<div class="pbx-pair"><div><b class="pbx-big'+(r.declared!==r.revealed?' pbx-was':'')+'">'+r.declared+'</b><span>ความเสี่ยงที่บอก</span></div><div><b class="pbx-big">'+r.revealed+'</b><span>ความเสี่ยงจริง</span></div></div></div>';
+  var parts=[['ความรู้',cf.subs.knowledge,35],['รู้จักตัวเอง',cf.subs.self,25],['ลงมือ',cf.subs.action,25],['ความกว้าง',cf.subs.breadth,15]];
+  var conf='<section class="pbx-block pbx-conf"><div class="pbx-conf-hd"><div><div class="pbx-kicker">Confidence Score</div><h3 class="pbx-blk-t">'+cf.level+'</h3></div><div class="pbx-score"><b>'+cf.conf+'</b><span>/100</span></div></div>'+
+    '<p class="pbx-data-note">บอกว่าระบบมีหลักฐานมากพอจะอ่านคุณแค่ไหน ไม่ใช่ผลตอบแทน — ยิ่งเล่นเกมและเดินบูธมาก คะแนนยิ่งเต็ม</p>'+
+    '<div class="pbx-data">'+parts.map(function(c){return pbxRow(c[0],'<b>'+c[1]+'</b>/'+c[2],Math.round(c[1]/c[2]*100));}).join('')+'</div></section>';
+  return pbxOpenHTML(['วิเคราะห์',['AI','Insight']],'คุณเป็น <span>นักลงทุน</span> แบบไหน','',risk+conf); // Confidence rides on the same sheet as the risk comparison
+}
+/* Ver.2 identity — the reference's feature page ("MINIMALISM BOOK MOCKUP"): the persona's name as the big
+   title from ~14% down to a full-width hairline at ~41%, then a split row: a narrow text column (family +
+   signature) beside the card, which plays the reference's photo. The rest follows on text pages:
+   preferred assets as a ruled list, strengths | watch-outs as two columns, SKILL as data rows + its note.
+   No brand-asset scatter, icons, grey panel, boxes or coloured bars. The title keeps .s-h, and its text
+   is the same persona name สารบัญ already used for this sheet. unreg (a visitor who never registered)
+   stops after strengths / watch-outs, as before, and gets the register call instead of SKILL — same
+   texts as the old CTA block, as a plain text block with the link underlined in the accent. */
+/* Pre-event vs post-event card (2026-10-08, per direction: the card from before the event and the one after it may
+   not be the same persona). Restores v1's evoCompute() decision: once there is enough on-event evidence (a game
+   played and 3 of 6 activity signals) AND the declared-vs-revealed risk gap is 2+ points, the persona moves to the
+   G family (did less risk than declared) or V (did more), shown by that family's flagship (EVO_REP). States:
+   'none' (no on-event activity yet: no post-event sheet at all), 'same' (a one-line note on the pre-event sheet),
+   'evolved' (its own post-event sheet after the identity chapter). DEMO.sampleEvolve swaps in an illustrative shift
+   when the real data does not move, tagged "ตัวอย่าง", so the sample book shows the sheet. */
+var EVO_REP={G:'diamondhand',N:'planner',V:'waverider'};
+function pbxEvo(r){
+  var played=gamesPlayedCount(),chk=0,act=boothActivityCount(),k;
+  for(k in BOOTH_CHK)if(BOOTH_CHK[k]&&BOOTH_CHK[k].size)chk++;
+  if(!played&&!chk&&!act)return {state:'none'};
+  var sig=[played>=1,chk>=1,act>=1,(r.interests||[]).length>=1,played>=4,act>=ACTIVITY_NEED].filter(Boolean).length;
+  var fam=r.hero.fam,to=(played>=1&&sig>=3&&Math.abs(r.gap)>=2)?(r.gap>=2?'V':'G'):fam,sample=false;
+  if(to===fam&&DEMO.sampleEvolve){to=fam==='V'?'G':'V';sample=true;}
+  if(to===fam)return {state:'same'};
+  return {state:'evolved',key:EVO_REP[to],hero:HEROES[EVO_REP[to]],up:to==='V',sample:sample};
+}
+function pbxFamHTML(h){return (function(m){return m?'<span class="pbx-feat-fam-s">'+m[1]+'</span><span class="pbx-feat-fam-t">'+m[2]+'</span>':h.famTh;})(h.famTh.match(/^([A-Za-z]+)\s+(.+)$/));}
+/* the post-event sheet: one sheet in the identity chapter, after SKILL — phase kicker, persona name over a hairline,
+   then family / signature / why it moved / preferred assets beside the card, and strengths | watch-outs below */
+function pbxPostHTML(ev){
+  var h=ev.hero,col=function(t,items){return '<div><div class="pbx-side-hd"><div class="pbx-side-t">'+t+'</div></div><ul class="pbx-list">'+items.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ul></div>';};
+  return ('<section class="pbx-post pb-keep pbx-break"><div class="pbx-kicker">หลังร่วมงาน (Post-event)'+(ev.sample?' · ตัวอย่าง':'')+'</div><h2 class="s-h pbx-post-t">'+h.th+'</h2>'+
+    '<div class="pbx-post-row"><div><div class="pbx-feat-fam">'+pbxFamHTML(h)+'</div><p class="pbx-feat-sig">'+h.sig+'</p>'+
+      '<p class="pbx-data-note">'+(ev.up?'พฤติกรรมจริงในงานรับความเสี่ยงได้มากกว่าที่คุณตอบไว้':'พฤติกรรมจริงในงานระมัดระวังกว่าที่คุณตอบไว้')+' การ์ดหลังร่วมงานจึงต่างจากก่อนร่วมงาน</p>'+
+      '<ul class="pbx-tags">'+h.assets.map(function(a){return '<li>'+a.t+'</li>';}).join('')+'</ul></div>'+
+    '<div class="pbx-card"><img src="'+REAL_CARD_IMG[ev.key]+'" alt="การ์ด '+h.en+'"></div></div>'+
+    '<div class="pbx-split pbx-vr">'+col('ความแข็งแกร่ง',h.strengths)+col('สิ่งที่ต้องระวัง',h.watchouts)+'</div></section>').replace(/\s*—\s*/g,' ');
+}
+function pbxIdentityHTML(h,key,unreg,ev){
+  var card='<img src="'+REAL_CARD_IMG[key]+'" alt="การ์ด '+h.en+'">'; // all 12 personas have photographed card art
+  ev=ev||{state:'none'};
+  var feat='<section class="pbx-feat pbx-solo"><h2 class="s-h pbx-feat-t">'+h.th+'</h2>'+
+    '<div class="pbx-feat-row"><div><div class="pbx-feat-phase">ก่อนร่วมงาน (Pre-event)</div><div class="pbx-feat-fam">'+pbxFamHTML(h)+'</div><p class="pbx-feat-sig">'+h.sig+'</p>'+
+    (ev.state==='same'?'<p class="pbx-data-note"><b>หลังร่วมงาน (Post-event)</b> ยังเป็นการ์ดใบเดิม พฤติกรรมในงานสอดคล้องกับที่ตอบไว้</p>':'')+
+    '</div><div class="pbx-card">'+card+'</div></div></section>';
+  /* rhythm 1 - 2 - 3: the preferred assets as ONE line (names split by small diamonds), strengths | watch-outs in two columns,
+     the three SKILL values as three dials; every block opens with the same heading (22px + hairline) */
+  var assets='<section class="pbx-block"><div class="pbx-side-hd"><h2 class="s-h pbx-side-t">สินทรัพย์ที่ <span>ถนัด</span></h2></div><ul class="pbx-tags">'+
+    h.assets.map(function(a){return '<li>'+a.t+'</li>';}).join('')+'</ul></section>';
+  var col=function(t,items){return '<div><div class="pbx-side-hd"><div class="pbx-side-t">'+t+'</div></div><ul class="pbx-list">'+items.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ul></div>';};
+  var str='<section class="pbx-block"><div class="pbx-split pbx-vr">'+col('ความแข็งแกร่ง',h.strengths)+col('สิ่งที่ต้องระวัง',h.watchouts)+'</div></section>';
+  var skill='<section class="pbx-block"><div class="pbx-side-hd"><h3 class="pbx-side-t">SKILL ประจำการ์ด</h3></div>'+(h.motto?'<p class="pbx-sec-sub">คำประจำตัว '+h.motto+'</p>':'')+
+    '<div class="pbx-sks">'+SKC_ROWS.map(function(l,i){var v=h.skills[i];return '<div class="pbx-sk"><div class="pbx-sk-h"><span>'+l+'</span><span class="pbx-sk-v"><b>'+v+'</b>/10</span></div><div class="pbx-sk-s" style="--v:'+v*10+'%" role="img" aria-label="'+v+' / 10"><i></i></div></div>';}).join('')+'</div>'+
+    '<p class="pbx-data-note"><b>ค่า SKILL บนการ์ด</b> สะท้อนความถนัดในแต่ละสไตล์ ไม่ใช่คำแนะนำการลงทุน</p></section>';
+  var reg='<section class="pbx-block"><div class="pbx-kicker">ผลลัพธ์นี้เป็นเพียง Preview ของ Investment DNA</div><h3 class="pbx-blk-t">Investment DNA ของคุณคือจุดเริ่มต้น</h3>'+
+    '<p class="pbx-side-b">ร่วมเดินทางต่อในวันงาน กับ <b>10 INVESTMENT EXPERIENCES</b> • <b>6 INVESTMENT GAMES</b> พร้อม efin AI • Speaker ชั้นนำ • PAVILION ZONE</p>'+
+    '<p class="pbx-side-b">รับ Playbook การลงทุนส่วนตัว เพื่อสแกนทุกโอกาสการลงทุนในโลกยุคใหม่</p>'+
+    '<a class="pbx-reg-a" href="'+REG_URL+'" target="_blank" rel="noopener">ลงทะเบียนเข้าร่วมงาน</a></section>';
+  return (feat+assets+str+(unreg?reg:skill)).replace(/\s*—\s*/g,' ')+(ev.state==='evolved'&&!unreg?pbxPostHTML(ev):''); // no em dashes on a sheet
+}
+function renderBook(){
+  if(!RESULT){st.phase='splash';render();return;}
+  /* pre = Pre-Event: identity + analysis only. unreg = a quiz-taker who never registered: identity
+     only, cut after strengths / watch-outs and closed by the register call (see pbxIdentityHTML). */
+  var pre=DEMO.eventPhase==='pre',unreg=!DEMO.registered;
+  var r=RESULT,h=r.hero,matchOk=Math.abs(r.gap)<=1.5;
+  root.innerHTML=
+  '<main class="scroll" style="padding-bottom:var(--sp-stack)">'+
+    '<div class="pb-src">'+
+    '<div class="b2-panel" data-panel="identity">'+pbxIdentityHTML(h,r.heroKey,unreg,pre||unreg?null:pbxEvo(r))+'</div>'+
+    (unreg?'':(
+    '<div class="b2-panel" data-panel="analysis">'+pbxAnalysisHTML(r,h,matchOk)+'</div>'+
+    (pre?'':(
+    '<div class="b2-panel" data-panel="portfolio">'+pbxPortfolioHTML(h,r)+'</div>'+
+    '<div class="b2-panel" data-panel="journey">'+sidesHTML(r)+learnedLedgerHTML()+'</div>'+
+    '<div class="b2-panel" data-panel="library">'+libraryBlocksHTML(h)+'</div>'+
+    '<div class="b2-panel" data-panel="glossary" data-sect="library">'+glossaryBlocksHTML()+'</div>'
+    ))
+    ))+
+  '</div></main>';
+  /* Playbook = the downloadable PDF's on-screen twin: no app header and no bottom tab bar */
+  pbBuild();
+}
+/* Registration site link (2026-08-19) — this app has no other way back to it once a visitor lands
+   here from that site's own link, and that site carries event details this app doesn't duplicate.
+   Started as a 6th item on THIS bar, then moved (same day) into its own header slot next to the QR
+   pill — see REG_CTA_HTML, near mountHeaderQR(). REG_URL stays a top-level const since that markup
+   is the only consumer now. */
+var REG_URL='https://dc1hw.efin.finance/events/better-trade/better-trade2026';
+/* ── deferred Book sections — populated with EXAMPLE data (booth games + analysis engine don't
+   exist yet); the .ex-tag "ตัวอย่าง" pill that used to mark these in the UI was dropped 2026-09-22
+   per direction (a real downloaded Playbook isn't sample data), so this comment is the only
+   remaining flag that the numbers below are illustrative, not measured. ── */
+/* example data for the portfolio data page (pbxPortfolioHTML) */
+var TRAIT_ROWS=[{l:'เก็บข้อมูลก่อนตัดสินใจ',v:31,m:35},{l:'ความมีวินัยการลงทุน',v:25,m:25},{l:'การกระจายความเสี่ยง',v:10,m:25},{l:'รับความผันผวนได้',v:11,m:15}];
+var TRAIT_SRC=[{t:'แบบทดสอบตัวตน 7 ข้อ',done:true},{t:'เกมย้อนเวลาพอร์ต',done:true},{t:'เกมบูธ 5/10',done:true}];
+var ALLOC_SEGS=[{l:'สินทรัพย์แกนหลัก (กองทุน/หุ้นใหญ่)',p:40},{l:'สินทรัพย์เติบโต',p:30},{l:'สินทรัพย์ทางเลือก / กระจาย',p:20},{l:'เงินสด / สภาพคล่อง',p:10}];
+/* Data page (the reference has none — designed under its DNA): every figure is a ruled label | value
+   row, its share drawn as one thin ink rule on a hairline track; no colour, no radar, no chips. */
+function pbxRow(label,valHTML,pct,muted,icon){
+  return '<div class="pbx-dr'+(muted?' muted':'')+(icon?' has-ic':'')+'">'+(icon?'<img class="pbx-dic" src="'+icon+'" alt="">':'')+'<span class="pbx-dl">'+label+'</span><span class="pbx-dv">'+valHTML+'</span><i class="pbx-db" style="--v:'+pct+'%"></i></div>';
+}
+function pbxPortfolioHTML(h,r){
+  // radar: ranked high → low; ties keep axis order
+  var ax=h.radar.map(function(v,i){return {i:i,v:v};}).sort(function(a,b){return b.v-a.v||a.i-b.i;});
+  var open=pbxOpenHTML(['พอร์ต',['YOUR','Portfolio']],'เรดาร์ ความสนใจ','ความถนัดต่อสินทรัพย์แต่ละประเภท และ 3 อันดับที่คุณสนใจ จากคำตอบ DNA Quiz ยิ่งเล่นกิจกรรมในงานครบ ยิ่งแม่นขึ้น',
+    '<div class="pbx-data">'+ax.map(function(a){return pbxRow(RADAR_AXES[a.i],''+a.v,a.v,false,RADAR_IC[a.i]);}).join('')+'</div>'+
+    '<p class="pbx-data-note">จุดที่คุณถนัดที่สุดคือ <b>'+RADAR_AXES[ax[0].i]+'</b> ('+ax[0].v+'/100) — ลองแวะโซนนี้ในบูธเป็นจุดแรก</p>');
+  /* interests: share of booth check-ins/activity per category (largest-remainder rounded to 100%);
+     an untouched category keeps a small base share but reads muted */
+  var raw=BOOTHS.map(function(b,i){var c=(BOOTH_CHK[i]&&BOOTH_CHK[i].size)||0,a=BOOTH_ACT[i]?1:0;return 2+c*3+a*6;});
+  var sum=raw.reduce(function(a,b){return a+b;},0),pct=roundPct(raw.map(function(v){return v/sum*100;}));
+  var order=S3_OPTS.map(function(o,i){return i;}).sort(function(a,b){return pct[b]-pct[a];});
+  var ints='<section class="pbx-block pbx-ints"><p class="pbx-data-cap">จากเกมและบูธที่คุณทำจริง · รวมทุกแท่ง = 100% ของข้อมูลที่เรามี · แท่งสีจางคือหมวดที่คุณยังไม่ได้แตะวันนี้</p><div class="pbx-data">'+
+    order.map(function(i){var touched=((BOOTH_CHK[i]&&BOOTH_CHK[i].size)>0)||!!BOOTH_ACT[i];return pbxRow(INT_SHORT_L[i],pct[i]+'%',pct[i],!touched);}).join('')+'</div></section>';
+  var trait='<section class="pbx-block"><h3 class="s-h pbx-blk-t">คะแนน <span>พฤติกรรม</span></h3><p class="pbx-sec-sub">วัดจากกิจกรรมในงาน</p><div class="pbx-data">'+
+    TRAIT_ROWS.map(function(t){return pbxRow(t.l,'<b>'+t.v+'</b>/'+t.m,Math.round(t.v/t.m*100));}).join('')+'</div>'+
+    '<p class="pbx-data-note">'+TRAIT_SRC.map(function(c){return '<span>'+c.t+'</span>';}).join(' · ')+'</p><p class="pbx-data-note">บอกว่าเรารู้จักคุณแค่ไหน ไม่ใช่คำทำนายผลตอบแทน</p></section>';
+  var alloc='<section class="pbx-block"><h3 class="s-h pbx-blk-t">เวลาตัดสินใจคุณดูอะไรก่อน</h3><p class="pbx-sec-sub">สัดส่วนเริ่มต้นที่เหมาะกับ '+h.th+'</p><div class="pbx-data">'+
+    ALLOC_SEGS.map(function(s){return pbxRow(s.l,s.p+'%',s.p);}).join('')+'</div></section>';
+  var dd='<section class="pbx-sec pb-keep pbx-break"><div class="pbx-kicker">สรุปไว้คุยกับผู้แนะนำการลงทุน</div><h2 class="s-h pbx-sec-t">เจาะราย <span>สินทรัพย์</span></h2></section>'+
+    h.assets.slice(0,4).map(function(a,i){var fg=DD_FIG[a.t],sd=i%2?'l':'r'; // illustration alternates right / left, bleeding off the page edge
+      return '<article class="pbx-dd'+(fg?' has-fig '+sd:'')+'">'+(fg?'<img class="pbx-dd-fig" src="assets/'+fg.src+'" alt="" style="width:'+fg.w+'px;height:'+(fg.h||fg.w)+'px;'+(sd==='r'?'right':'left')+':-'+Math.round(77+fg.w*.25)+'px">':'')+'<div class="pbx-art-t">'+a.t+'</div><ul class="pbx-dd-l"><li>'+a.t+' เข้ากับจุดแกร่งของ '+h.th+' — เป็นสินทรัพย์ที่คุณน่าจะเข้าใจได้เร็ว</li><li>เริ่มจากสัดส่วนเล็กก่อน แล้วค่อยเพิ่มเมื่อมั่นใจขึ้น</li><li>ตั้งเป้าหมายและกรอบความเสี่ยงให้ชัดก่อนลงเงินจริง</li></ul></article>';}).join('');
+  return open+ints+trait+alloc+dd;
+}
+/* ══ LIBRARY (คลังความรู้) ══ real category names + item counts extracted verbatim from the source
+   (playbook-final-extracted.html — see PLAYBOOK-2026-DATA-BASELINE.md §7): 8 categories, 41 items
+   total. The source's own sub-screen goes 3 levels deep (category → item → full myth/fact body);
+   the full 41 article titles/bodies weren't re-extracted for this pass (flagged in §7 as a future
+   content-parity gap), so this is a real, correctly-labeled category accordion — counts are real,
+   not fabricated — rather than a fake "browse the articles" experience with invented copy. */
+var LIBRARY_CATS=[
+  {t:'พื้นฐานการลงทุน',ic:'assets/eng-cat-basics.svg'},
+  {t:'สินทรัพย์แต่ละประเภท',ic:'assets/eng-cat-assets.svg'},
+  {t:'ต้นทุนและผลตอบแทน',ic:'assets/eng-cat-costs.svg'},
+  {t:'กลลวงและการป้องกันตัว',ic:'assets/eng-cat-scams.svg'},
+  {t:'วางแผนชีวิตและสุขภาพการเงิน',ic:'assets/eng-cat-planning.svg'},
+  {t:'ความเสี่ยงและการอ่านตัวเอง',ic:'assets/eng-cat-risk.svg'}
+]; // ic: engraved drawing (tools/engrave-assets-3.js) at the right of each category's header; the opener's list has none
+/* n (2026-09-21) — now counted from window.LIB_ITEMS (js/library-data.js: 71 real articles from the
+   BT2026 Dry-run's knowledge.js, each tagged c = index into this array) instead of hardcoded.
+   ภาษีและกฎเกณฑ์ / เครื่องมือและการติดตาม were dropped 2026-09-22 (no source articles exist yet and
+   a real Playbook shouldn't show a "coming soon" stub) — this is now a straight 6-category shelf. */
+var LIB_ITEMS=window.LIB_ITEMS||[],GLOSSARY=window.GLOSSARY||[];
+LIBRARY_CATS.forEach(function(c,i){c.n=LIB_ITEMS.filter(function(a){return a.c===i;}).length;});
+function libTotal(){return LIB_ITEMS.length;}
+function glossTotal(){return GLOSSARY.reduce(function(a,g){return a+g.i.length;},0);} // mirrors glossaryBlocksHTML's own inline count
+function libEsc(t){return String(t==null?'':t).replace(/[&<>]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m];});}
+/* Static (always-expanded) article block for the A4 ebook — see pbBuild(). */
+function pbArtHTML(a){
+  /* title hangs from a hairline, then the summary; the body sits in the left column and the example and
+     the "common mistake" in the right one, split by a vertical rule with a small diamond. An article with
+     neither note keeps its body in the reading column. .pbx-unit = at most two per sheet (see pbBuild). */
+  var body='<p class="pbx-art-p">'+libEsc(a.b)+'</p>';
+  return '<article class="pbx-art pbx-unit"><div class="pbx-art-t">'+libEsc(a.t)+'</div><div class="pbx-art-s pbx-quote">'+libEsc(a.s)+'</div>'+ // the summary line is a pull-quote
+    ((a.x||a.p)?'<div class="pbx-cols pbx-vr">'+body+'<div class="pbx-art-side">'+
+      (a.x?'<div class="pbx-note"><span>'+libEsc(a.x)+'</span></div>':'')+
+      (a.p?'<div class="pbx-note"><b>คนมักเข้าใจผิด</b> <span>'+libEsc(a.p)+'</span></div>':'')+
+    '</div></div>':body)+
+    '</article>';
+}
+/* Library as page blocks: intro, then per category a header (kept with its first article) + one block per article. */
+function libraryBlocksHTML(h){
+  /* opener: the stat pair as one small meta line and the 6 categories as a plain ruled list
+     (name | N บทความ) in its lower half */
+  var out=pbxOpenHTML(['สำหรับ '+libEsc(h.th),['THE','Library']],'<span>'+libTotal()+'</span> เรื่องที่คุณเก็บได้ตลอดงาน','จัดเป็น 6 หมวด · เนื้อหาเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน',
+    '<p class="pbx-meta"><b>'+libTotal()+'</b> <span>บทความ</span> <span>·</span> <b>'+glossTotal()+'</b> <span>ศัพท์</span></p>'+
+    '<div class="pbx-cats">'+LIBRARY_CATS.map(function(c){return '<div><span>'+c.t+'</span><span>'+c.n+' บทความ</span></div>';}).join('')+'</div>');
+  LIBRARY_CATS.forEach(function(c,i){
+    out+='<div class="pbx-cat pb-keep pbx-break c'+i+'"><span class="pb-cat-t">'+c.t+'</span><img class="pbx-cic" src='+JSON.stringify(c.ic)+' alt=""></div>'; // every category opens a fresh sheet; .pb-cat-t keeps its สารบัญ row
+    out+=LIB_ITEMS.filter(function(a){return a.c===i;}).map(pbArtHTML).join('');
+  });
+  return out;
+}
+/* Ver.2 opener (Minimalism-book "SECTION 1" page): a sheet of its own (.pbx-solo). Title keeps .s-h so
+   สารบัญ still picks it up. kicker / title / lede are plain text — no ornament, no gradient. */
+/* Lockup geometry (CAPS over a script word): both lines start on the column axis and the script's highest ink sits
+   LOCK_GAP px under the capitals' baseline whatever the word, so no swash can touch the capitals and every lockup has
+   the same rhythm. Positions come from canvas ink metrics (fonts are loaded before the book is built). */
+var LOCK={capsFs:17,capsLh:20,scrFs:52,scrLh:60,capsBase:12,gap:9,axis:1};
+function pbxLockPos(caps,word){
+  var cx=document.createElement('canvas').getContext('2d');if(!cx||cx.measureText('x').fontBoundingBoxAscent===undefined)return '';
+  cx.font='500 '+LOCK.capsFs+'px Cinzel';if('letterSpacing' in cx)cx.letterSpacing=(.42*LOCK.capsFs)+'px';
+  var mc=cx.measureText(caps),cM=cx.measureText('M');
+  var capsTop=LOCK.capsBase-((LOCK.capsLh-(cM.fontBoundingBoxAscent+cM.fontBoundingBoxDescent))/2+cM.fontBoundingBoxAscent);
+  cx.letterSpacing='0px';cx.font='400 '+LOCK.scrFs+'px "Pinyon Script"';
+  var ms=cx.measureText(word),sM=cx.measureText('M');
+  var scrBase=LOCK.capsBase+LOCK.gap+ms.actualBoundingBoxAscent;
+  var scrTop=scrBase-((LOCK.scrLh-(sM.fontBoundingBoxAscent+sM.fontBoundingBoxDescent))/2+sM.fontBoundingBoxAscent);
+  return {c:'left:'+(mc.actualBoundingBoxLeft+LOCK.axis).toFixed(1)+'px;top:'+capsTop.toFixed(1)+'px',s:'left:'+(ms.actualBoundingBoxLeft+LOCK.axis).toFixed(1)+'px;top:'+scrTop.toFixed(1)+'px'};
+}
+function pbxOpenHTML(kicker,titleHTML,lede,extra){
+  /* kicker may be [text,[CAPS,Script]]: the pair is drawn as a two-line lockup above the kicker (sample English words) */
+  var lock=Array.isArray(kicker)?kicker[1]:null;if(Array.isArray(kicker))kicker=kicker[0];
+  var pos=lock?pbxLockPos(lock[0],lock[1]):'';
+  return '<section class="pbx-open pbx-solo">'+(lock?'<div class="pbx-lock"><span class="pbx-lock-c"'+(pos?' style="'+pos.c+'"':'')+'>'+lock[0]+'</span><span class="pbx-lock-s"'+(pos?' style="'+pos.s+'"':'')+'>'+lock[1]+'</span></div>':'')+'<div class="pbx-kicker">'+kicker+'</div><h2 class="s-h pbx-open-t">'+titleHTML+'</h2>'+(lede?'<p class="pbx-lede">'+lede+'</p>':'')+(extra||'')+'</section>';
+}
+function glossaryBlocksHTML(){
+  /* one block per group (its title keeps .gl-gt for สารบัญ); the entries run in two columns split by a
+     vertical rule, each as term above definition, left-aligned (Thai has no word spaces to justify on) */
+  var n=GLOSSARY.reduce(function(a,g){return a+g.i.length;},0);
+  return pbxOpenHTML(['อ่านเล่มนี้ให้เข้าใจ',['THE','Glossary']],'<span>ศัพท์</span> ในเล่มนี้',n+' คำที่โผล่ในเล่ม — อธิบายให้อ่านเล่มนี้เข้าใจ ไม่ใช่คำแนะนำการลงทุน')+
+    GLOSSARY.map(function(g){
+      return '<section class="pbx-gl-grp"><div class="gl-gt pbx-gt">'+libEsc(g.g)+'</div><div class="pbx-gl-cols pbx-vr">'+
+        g.i.map(function(it){return '<div class="pbx-gl-row"><div class="pbx-gl-term">'+libEsc(it[0])+'</div><div class="pbx-gl-def">'+libEsc(it[1])+'</div></div>';}).join('')+'</div></section>';
+    }).join('');
+}
+/* pbSetZoom — the fit-shrink for a block taller than a whole sheet (never needed by today's content). */
+function pbSetZoom(el,k){el.style.zoom=k&&k!==1?k:'';}
+var PBX_CH={identity:'ตัวตน',analysis:'วิเคราะห์',portfolio:'พอร์ต',journey:'เส้นทาง',library:'คลังความรู้'}; // chapter labels: สารบัญ's group names and each sheet's running header
+var PBX_ORN='<i class="pbx-cn l" aria-hidden="true"></i><i class="pbx-cn r" aria-hidden="true"></i>'; // corner sprigs; CSS shows them only on feature sheets and the สารบัญ
+var PBX_UNITS=2; // .pbx-unit blocks (library articles) per sheet at most — option B, "top half / bottom half"
+/* Line-art illustrations (round 2, steps 3-4) and the bottom contour field (round 6): placed AFTER pagination as absolutely
+   positioned marks in space a sheet already has free, so no text moves and the page count never changes.
+   - opener sheets: the chapter's drawing in the upper right, opposite the plumb line;
+   - the identity feature sheet: the compass between the persona name and the hairline, when there is room;
+   - any sheet whose content ends high (>= PBX_BT_ROOM px free under it, 40px margin kept): a faint contour field rising from the
+     bottom edge, fading upward, so a short sheet is weighted at both ends instead of top-heavy (the opener's top has the same lines). */
+var PBX_ILL={identity:'compass',analysis:'scale',portfolio:'chart',journey:'path',library:'book',glossary:'quill'};
+var PBX_BT_ROOM=360;
+/* floating-asset clusters per panel opener: w/h box, r = gap from the page's right edge (negative = bleeds off it),
+   b = gap above the footer line, a = rotation */
+var PBX_FLOAT={journey:[
+  {src:'float-stock.png',w:250,h:250,r:-110,b:40,a:-26},
+  {src:'float-heart.png',w:110,h:160,r:170,b:0,a:14},
+  {src:'float-gold.png',w:64,h:96,r:150,b:240,a:22}
+],glossary:[
+  {src:'float-bitcoin.png',w:200,h:259,r:-80,b:30,a:18},
+  {src:'float-gold.png',w:96,h:144,r:200,b:10,a:-16},
+  {src:'float-heart.png',w:62,h:90,r:170,b:250,a:-10}
+]};
+/* the contents sheet: two small pieces right of the "สารบัญ" title, above its hairline and clear of the corner
+   sprig (x/y = absolute page position); kept small so the list stays the first read */
+var PBX_FLOAT_TOC=[{src:'float-stock.png',w:90,h:90,x:310,y:36,a:-18},{src:'float-gold.png',w:44,h:66,x:575,y:88,a:48}];
+function pbxIllustrate(pages){
+  function mark(pg,cls,img,x,y,w,h){
+    var i=document.createElement('i');i.className='pbx-ill '+cls;i.setAttribute('aria-hidden','true');
+    i.style.cssText='left:'+Math.round(x)+'px;top:'+Math.round(y)+'px;width:'+Math.round(w)+'px;height:'+Math.round(h)+'px;background-image:url(assets/'+img+'.svg)';
+    pg.appendChild(i);
+  }
+  var W=794,H=794*3508/2480,PADX=76;
+  pages.forEach(function(pg){
+    var P=pg.getBoundingClientRect(),k=P.width/W; // sheet px per CSS px (1 unless the view is scaled)
+    var y=function(v){return (v-P.top)/k;};
+    var body=pg.querySelector('.pb-body'),first=body.firstElementChild,ill=PBX_ILL[pg.dataset.panel];
+    if(!first)return;
+    if(first.classList.contains('pbx-open')){ // opener: upper right, above the kicker (~31.5%)
+      if(ill)mark(pg,'head','ill-'+ill,W-PADX-250,104,250,220);
+    }else if(first.classList.contains('pbx-feat')){ // feature sheet: the compass under the name, right-aligned
+      var t=first.querySelector('.pbx-feat-t'),r=document.createRange();r.selectNodeContents(t);
+      var textBottom=y(r.getBoundingClientRect().bottom),rule=y(t.getBoundingClientRect().bottom),free=rule-textBottom;
+      if(free>=170){var sz=Math.min(230,free-40);mark(pg,'feat','ill-'+PBX_ILL.identity,W-PADX-sz,textBottom+(free-sz)/2,sz,sz);}
+    }
+    // where the sheet's content really ends: text, images (+ the card's 22px frame), data bars and rule-split containers
+    var end=0,w=document.createTreeWalker(body,NodeFilter.SHOW_TEXT),n,rg=document.createRange(),j,rs;
+    while((n=w.nextNode())){if(!n.nodeValue.trim())continue;rg.selectNodeContents(n);rs=rg.getClientRects();for(j=0;j<rs.length;j++)end=Math.max(end,y(rs[j].bottom));}
+    [].forEach.call(body.querySelectorAll('img,.pbx-db,.pbx-vr,.pbx-card'),function(e){end=Math.max(end,y(e.getBoundingClientRect().bottom)+(e.matches('.pbx-card')?22:0));});
+    var avail=H-(end+40);
+    /* floating assets (journey + glossary openers, per the BT2026 site's hero): three original-colour objects
+       of very different sizes in the empty lower right, turned at odd angles, the biggest cut by the page edge.
+       Anchored to the footer; only when the free band clears the whole cluster. */
+    var ft=pg.querySelector('.pbx-ft'),fl=first.classList.contains('pbx-open')?PBX_FLOAT[pg.dataset.panel]:null;
+    if(fl&&ft){
+      var base=y(ft.getBoundingClientRect().top)-24,fTop=function(f){return f.y!=null?f.y:base-f.b-f.h;};
+      var topMost=Math.min.apply(null,fl.map(fTop)),lowest=Math.max.apply(null,fl.map(function(f){return fTop(f)+f.h;}));
+      if(topMost>=end+40&&lowest<=base+24)fl.forEach(function(f){
+        var im=document.createElement('img');im.className='pbx-float';im.src='assets/'+f.src;im.alt='';im.setAttribute('aria-hidden','true');
+        im.style.cssText='left:'+(f.x!=null?f.x:f.l!=null?f.l:W-f.r-f.w)+'px;top:'+fTop(f)+'px;width:'+f.w+'px;height:'+f.h+'px;transform:rotate('+f.a+'deg)';
+        pg.appendChild(im);
+      });
+    }
+    if(avail>=PBX_BT_ROOM){var hgt=Math.min(520,avail),bt=document.createElement('i');bt.className='pbx-bt';bt.setAttribute('aria-hidden','true');bt.style.cssText='top:'+Math.round(H-hgt)+'px;height:'+Math.round(hgt)+'px';pg.appendChild(bt);}
+  });
+}
+function pbBuild(){
+  var main=root.querySelector('main.scroll'),src=main&&main.querySelector('.pb-src');
+  if(!src)return;
+  /* em dashes read as a plain space on every sheet (2026-09-21, per direction) — done on the source text nodes
+     before packing so the measured heights already reflect it */
+  (function(w){var n;while((n=w.nextNode()))if(n.nodeValue.indexOf('\u2014')>-1)n.nodeValue=n.nodeValue.replace(/\s*\u2014\s*/g,' ');})(document.createTreeWalker(src,NodeFilter.SHOW_TEXT,null));
+  var doc=document.createElement('div');doc.className='pb-doc';
+  main.appendChild(doc);
+  var pages=[];
+  /* Sheet = the Minimalism-book page: no header, frame or decorations. Footer = small label left +
+     hairline under it (reference: label ~95%, line ~97% of the sheet); the folio sits at the footer's
+     right and is itself the link back to สารบัญ. */
+  function newPage(sect,pnl){
+    var fit=document.createElement('div');fit.className='pb-fit';
+    var pg=document.createElement('div');
+    pg.className='pb-page pbx';pg.dataset.sect=sect;pg.dataset.panel=pnl;
+    pg.innerHTML=PBX_ORN+'<div class="pbx-hd" aria-hidden="true"><span>'+(PBX_CH[sect]||'')+'</span></div><div class="pb-body"></div><div class="pbx-ft"><span class="pbx-ft-brand"><b>BetterTrade 2026</b> · Personalized Playbook</span><span class="pbx-ft-r"><span>เนื้อหาเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน</span><a class="pb-pn" href="#pb-toc"></a></span></div>';
+    pg.__pbPanel=pnl; // expando, not an attribute — lets tools/layout-audit.js group sheets without changing the DOM
+    fit.appendChild(pg);doc.appendChild(fit);pages.push(pg);
+    return pg.querySelector('.pb-body');
+  }
+  /* front / back cover (2026-09-21): full-bleed A4 images (assets/playbook-cover-*.webp, 842x1191 = A4), not counted in the page numbers */
+  function addCover(which){
+    var fit=document.createElement('div');fit.className='pb-fit';
+    var pg=document.createElement('div');pg.className='pb-page pb-cover';pg.dataset.sect='cover';
+    pg.style.backgroundImage='url(assets/playbook-cover-'+which+'.webp)';
+    pg.setAttribute('role','img');pg.setAttribute('aria-label',which==='front'?'ปกหน้า Investor Playbook · Better Trade 2026':'ปกหลัง Investor Playbook');
+    fit.appendChild(pg);doc.appendChild(fit);
+  }
+  addCover('front');
+  function over(body){return body.scrollHeight>body.clientHeight+1;}
+  [].slice.call(src.querySelectorAll(':scope>.b2-panel')).forEach(function(panel){
+    var pnl=panel.dataset.panel,sect=panel.dataset.sect||pnl,body=newPage(sect,pnl);
+    var solo=false; // the previous block asked for a sheet of its own
+    /* one type size throughout: an over-full sheet pushes its last block (plus any .pb-keep blocks
+       right before it) to a fresh sheet; nothing is shrunk unless a block is taller than a sheet */
+    function place(node){
+      body.appendChild(node);
+      if(over(body)&&body.children.length>1){
+        body.removeChild(node);
+        var move=[node];
+        while(body.lastElementChild&&body.lastElementChild.classList.contains('pb-keep')){move.unshift(body.lastElementChild);body.removeChild(body.lastElementChild);}
+        move.forEach(function(m){pbSetZoom(m,0);});
+        body=newPage(sect,pnl);
+        move.forEach(function(m){body.appendChild(m);});
+      }
+      if(over(body)&&body.children.length===1){
+        var k=Math.max(.6,body.clientHeight/body.scrollHeight),tries=0;
+        do{pbSetZoom(node,+k.toFixed(3));k-=.01;tries++;}while(over(body)&&k>=.6&&tries<20);
+      }
+    }
+    [].slice.call(panel.children).forEach(function(blk){
+      /* page breaks: .pbx-break starts a fresh sheet; .pbx-solo gets a sheet to itself (no block before
+         or after it on the same sheet); a .pbx-unit starts a fresh sheet once PBX_UNITS of them are on
+         the current one */
+      if(body.children.length&&(solo||blk.classList.contains('pbx-break')||blk.classList.contains('pbx-solo')||
+        (blk.classList.contains('pbx-unit')&&body.querySelectorAll(':scope>.pbx-unit').length>=PBX_UNITS)))body=newPage(sect,pnl);
+      solo=blk.classList.contains('pbx-solo');
+      place(blk);
+    });
+  });
+  addCover('back');
+  src.remove();
+  pages.forEach(function(pg,i){pg.id='pb-p'+(i+1);pg.querySelector('.pb-pn').innerHTML='หน้า <span class="pb-pn-n">'+(i+1)+'</span> / '+pages.length;});
+  pbxIllustrate(pages);
+  pbTOC(doc,pages);
+}
+/* สารบัญ (2026-09-22, per direction) — built AFTER pagination, from the sheets themselves, so every
+   row's page number is the real one; inserted right before sheet 1 (after the front cover). Each row
+   jumps to its sheet, and every sheet's folio links the other way. Since Ver.2 reset step 9 the page
+   is a Ver.2 text page (see .pbx-toc-t's CSS): no frame, backdrop glow or decorations. */
+function pbTOC(doc,pages){
+  /* one row per sheet that OPENS something: the first heading on it that hasn't been used yet.
+     Continuation sheets (no new heading of their own) fold into the row above them. */
+  var seen={},rows=[];
+  pages.forEach(function(pg,i){
+    var n=i+1,t='';
+    var h=pg.querySelector('.s-h,.pb-cat-t,.gl-gt');
+    if(h)t=(h.textContent||'').trim();
+    if(!t||seen[t])return;
+    seen[t]=true;rows.push({n:n,t:t,sect:pg.dataset.sect});
+  });
+  var CH=PBX_CH;
+  /* one .toc-grp per chapter: its name in the left column, its rows in the reading column */
+  var out='',lastCh=null;
+  rows.forEach(function(r){
+    var ch=CH[r.sect]||'';
+    if(lastCh===null||(ch&&ch!==lastCh)){out+=(lastCh===null?'':'</div></div>')+'<div class="toc-grp"><div class="toc-ch">'+ch+'</div><div class="toc-rows">';lastCh=ch;}
+    out+='<a class="toc-row" href="#pb-p'+r.n+'"><span class="toc-t">'+r.t+'</span><span class="toc-n">'+r.n+'</span></a>';
+  });
+  if(lastCh!==null)out+='</div></div>';
+  var fit=document.createElement('div');fit.className='pb-fit';
+  var pg=document.createElement('div');pg.className='pb-page pbx pb-toc';pg.id='pb-toc';pg.dataset.sect='toc';
+  /* same footer as the content sheets, minus the folio (สารบัญ itself is not numbered) */
+  pg.innerHTML=PBX_ORN+'<div class="pb-body"><h2 class="pbx-toc-t">สารบัญ</h2><div class="toc-list">'+out+'</div></div><div class="pbx-ft"><span class="pbx-ft-brand"><b>BetterTrade 2026</b> · Personalized Playbook</span><span class="pbx-ft-r"><span>เนื้อหาเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน</span></span></div>';
+  PBX_FLOAT_TOC.forEach(function(f){
+    var im=document.createElement('img');im.className='pbx-float';im.src='assets/'+f.src;im.alt='';im.setAttribute('aria-hidden','true');
+    im.style.cssText='left:'+f.x+'px;top:'+f.y+'px;width:'+f.w+'px;height:'+f.h+'px;transform:rotate('+f.a+'deg)';
+    pg.appendChild(im);
+  });
+  fit.appendChild(pg);
+  /* after the front cover, before sheet 1 */
+  var first=pages[0]?pages[0].parentNode:null;
+  if(first&&first.parentNode)first.parentNode.insertBefore(fit,first);else doc.appendChild(fit);
+  /* สารบัญ is one fixed page with no fallback sheet to spill onto (unlike pbBuild's paginated
+     content), so if the row/chapter count ever makes .toc-list taller than the space left under
+     toc-h, shrink its rows uniformly to fit — same zoom-balance idiom place() uses elsewhere —
+     rather than letting the last rows run into the page's bottom padding/frame (2026-09-23, found
+     after bumping .toc-t/.toc-ch: 16 rows no longer fit unshrunk at the larger sizes). */
+  var list=pg.querySelector('.toc-list');
+  if(list.scrollHeight>list.clientHeight+1){ // 19 rows end at ~84% today, so this is only the overflow guard
+    var kids=[].slice.call(list.children),q=list.scrollHeight/list.clientHeight,z=Math.floor(1000/q)/1000-.004,tries=0;
+    do{kids.forEach(function(c){pbSetZoom(c,z);});tries++;z-=.01;}while(list.scrollHeight>list.clientHeight+1&&tries<9);
+  }
+}
+/* confidenceScore (2026-09-21, per direction "สูตร Confidence — ใช้สูตรใหม่") — replaces the quiz-only
+   identity/behavior/riskAlign/discipline formula (compute()'s r.conf/r.subs/r.confLevel, now unused by
+   the UI) with the BT2026 Dry-run's 4-part evidence formula, weights 35/25/25/15 = 100:
+   ความรู้ (เก็บความรู้) · รู้จักตัวเอง · ลงมือ · ความกว้าง. The Dry-run computes this server-side, so the
+   per-part rules below are OUR design estimate from signals this app really has (like riskLevel/radar
+   elsewhere) — only the 4 parts + weights come from the source. It measures "how much evidence the
+   system has to read you", never investing skill or returns (see the glossary entry), so it is LOW
+   for a quiz-only visitor and rises as games/booths get played. Computed live (not frozen in RESULT)
+   because it moves with every game/booth. */
+var CONF_INSIGHT_TOTAL=null;
+function confInsightTotal(){
+  if(CONF_INSIGHT_TOTAL===null){var seen={},n=0;
+    function add(kind,idx){playSet(kind,idx).questions.forEach(function(q){if(q.insight&&!seen[q.insight]){seen[q.insight]=true;n++;}});}
+    for(var gi=0;gi<MINIGAME_Q.length;gi++)add('game',gi);
+    for(var bi=0;bi<BOOTH_Q.length;bi++)add('booth',bi);
+    CONF_INSIGHT_TOTAL=n||1;}
+  return CONF_INSIGHT_TOTAL;
+}
+function confidenceScore(r){
+  var knowledge=Math.round(35*Math.min(1,learnedInsights().length/confInsightTotal()));
+  // รู้จักตัวเอง: quiz done 10 + confirmed interests (up to 3 × 2) + declared-vs-revealed measured in game 1 (5) + that gap actually small (4)
+  var g0=!!GAME_ANSWERS[0];
+  var self=10+Math.min(3,(r.interests||[]).length)*2+(g0?5:0)+(g0&&Math.abs(r.gap)<=1.5?4:0);
+  // ลงมือ: games played (of 6) → 15, booth activities (of ACTIVITY_NEED) → 10
+  var action=Math.round(15*gamesPlayedCount()/SIDES.length)+Math.round(10*Math.min(1,boothActivityCount()/ACTIVITY_NEED));
+  // ความกว้าง: distinct booths touched (check-in or activity) of all booths → 15
+  var touched=0;for(var i=0;i<BOOTHS.length;i++){if((BOOTH_CHK[i]&&BOOTH_CHK[i].size>0)||BOOTH_ACT[i])touched++;}
+  var breadth=Math.round(15*touched/BOOTHS.length);
+  var conf=Math.min(100,knowledge+self+action+breadth);
+  var level=conf>=85?'สูงมาก - หลักฐานมากพอจะอ่านคุณ':(conf>=70?'สูง - หลักฐานค่อนข้างครบ':(conf>=55?'ปานกลาง - พอเห็นทิศทาง':'กำลังก่อตัว - ยังรู้จักคุณน้อย'));
+  return {conf:conf,level:level,subs:{knowledge:knowledge,self:self,action:action,breadth:breadth}};
+}
+/* Short display labels for the 10 interest bars below — same order/index as S3_OPTS/BOOTHS (both
+   already share one order), just trimmed to fit a "label ⋯ NN%" row (2026-08-26, per direction
+   "อยากให้แสดงผลเป็น visualize + %"). */
+var INT_SHORT_L=['หุ้นไทย','ต่างประเทศ','กองทุน','ตราสารหนี้','ทอง','อสังหา','ประกัน','คริปโต','ทางเลือก','สุขภาพ'];
+/* Largest-remainder rounding — turns an array of float shares (summing to ~100) into integer %
+   that still sum to EXACTLY 100, so "รวมทุกแท่ง = 100%" in the caption below is always literally true. */
+function roundPct(arr){
+  var floors=arr.map(Math.floor);
+  var total=floors.reduce(function(a,b){return a+b;},0);
+  var left=100-total;
+  var order=arr.map(function(v,i){return i;}).sort(function(a,b){return (arr[b]-floors[b])-(arr[a]-floors[a]);});
+  for(var k=0;k<left;k++)floors[order[k]]++;
+  return floors;
+}
+
+function sidesHTML(r){
+  var gapTxt=r.gap>0?('+'+r.gap):(''+r.gap);
+  /* Copy taken verbatim from the sample Playbook PDF (pages 2–3): the six measured sides of "ราชันนักปราชญ์". */
+  var sides=[
+   {chip:'เสร็จ',t:'ความเสี่ยง ที่คิด vs ที่ทำจริง',s:'ที่คุณบอกไว้ 2 · ที่คุณทำจริง 2 — สอดคล้อง (Aligned)',body:'<p>ที่คุณบอกไว้ <b>2</b> · ที่คุณทำจริง <b>2</b> — <b>สอดคล้อง (Aligned)</b></p><p>ถ้าคุณทำแบบเดิมทุกวิกฤต พอร์ตจะฟื้นได้ 0/100 — ขายที่จุดต่ำสุดทั้งสองครั้ง จึงไม่ได้ร่วมขาขึ้นเลย</p>'},
+   {chip:'เสร็จ',t:'เลนส์ที่คุณใช้ตัดสินใจ',s:'เลนส์หลักของคุณคือ สายเทคนิค',body:'<p>เลนส์หลักของคุณคือ <b>สายเทคนิค</b><br>วัดจากลำดับที่คุณเปิดเครื่องมือวิเคราะห์ ไม่ใช่จากที่คุณบอก</p><ul><li>พื้นฐาน (VI) 38%</li><li>เทคนิค (กราฟ) 63%</li><li>ปันผล (Yield) 0%</li><li>DCA / กองทุน 0%</li></ul>'},
+   {chip:'เสร็จ',t:'กับดัก FOMO และกลลวง',s:'ต้านได้ทั้งสองกับดัก · 2/2',body:'<p><b>ต้านได้ทั้งสองกับดัก · 2/2</b></p><ul><li>หุ้นพุ่งพุ่ง คนแห่ซื้อ ไม่ตามฝูง</li><li>ข้อความชวนลงทุน ไม่โอน</li></ul><p>กฎที่คุณเลือกพกติดตัว <b>ถ้ามันเร่งให้รีบ = สัญญาณอันตราย</b></p><p>วัดจาก 2 สถานการณ์เท่านั้น — นี่คือ “คุณในวันนี้” ไม่ใช่คำตัดสินว่าคุณเป็นคนแบบไหน</p>'},
+   {chip:'เสร็จ',t:'เป้าหมายเงินของคุณ ตามช่วงวัย',s:'สิ่งที่คุณเลือกให้ตัวเองในแต่ละช่วงชีวิต — ไม่มีคำตอบถูกผิด',body:'<ul><li>อายุ 25 สมดุล</li><li>อายุ 35 รักษาเงินต้น</li><li>อายุ 50 ลดเสี่ยงตามอายุ</li><li>อายุ 65 สร้างกระแสเงินสด</li></ul><p>เป้าหมายของคุณ<b>เปลี่ยนไปตามวัย</b> (4 แบบใน 4 ช่วง)</p>'},
+   {chip:'เสร็จ',t:'สินทรัพย์ที่ ๙ — สุขภาพ',s:'Health-Wealth 5.5/10',body:'<p>Health-Wealth <b>5.5</b>/10</p>'},
+   {chip:'เสร็จ',t:'ก้าวแรกของคุณ',s:'กำแพงที่คุณบอกว่าขวางอยู่ ไม่รู้จะเริ่มยังไง',body:'<p>กำแพงที่คุณบอกว่าขวางอยู่ <b>ไม่รู้จะเริ่มยังไง</b></p><p>3 ขั้น เปิดบัญชี → เลือกตัวเลือกแรกที่เข้าใจและกระจายความเสี่ยงในตัว → ตั้งอัตโนมัติ</p><p>สิ่งที่คุณบอกว่าจะทำ <b>จดรายรับ-รายจ่าย 7 วัน</b></p>'}
+  ];
+  /* chapter opener from the section's own heading, then each side as a text-page item — title
+     on a hairline, status as a small label on the right, body in the reading column. Icons/chevrons
+     dropped. A summary line identical to the body's first paragraph is not repeated (it printed twice
+     before, since every side is shown expanded). */
+  var plain=function(h){var d=document.createElement('div');d.innerHTML=h;return d.textContent.replace(/\s+/g,' ').trim();};
+  return pbxOpenHTML(['สิ่งที่ระบบวัดได้จากคุณ',['THE','Journey']],'<span>6 ด้าน</span> ที่วัดได้จากคุณ','แต่ละด้านมาจากสิ่งที่คุณทำจริงในงาน ไม่ใช่คำตอบจากแบบสอบถาม')+
+    sides.map(function(sd,i){
+      /* the grey sub-line repeats the body's first paragraph (or its opening words) on most sides — dropped there; where it is
+         new text (life-stage goals) it becomes the body's first paragraph, in the same Sarabun as the rest */
+      var first=(sd.body.match(/<p>([\s\S]*?)<\/p>/)||[])[1]||'',dup=plain(first).indexOf(plain(sd.s))===0;
+      var one='<article class="pbx-side fig-'+(i%2?'r':'l')+'"><img class="pbx-side-fig" src="assets/eng-'+SIDE_FIG[i]+'.svg" alt=""><div class="pbx-side-hd"><div class="pbx-side-t">'+sd.t+'</div></div>'+
+        '<div class="pbx-side-b">'+(dup?'':'<p>'+sd.s+'</p>')+sd.body+'</div></article>';
+      return i%2?one+'</div>':'<div class="pbx-side-row pbx-vr">'+one; // three rows of two, split by the vertical rule
+    }).join('');
+}
+/* REG_CTA_HTML (registration-site header link) removed 2026-09-27 (asset-weight audit) — defined
+   but never spliced into any live output; renderBook's real header markup doesn't reference it.
+   REG_URL itself stays (still used directly elsewhere). */
+/* ══ BOOTH / PASSPORT TAB ══ content ported from Playbook Final's Passport screen (BOOTHS/ZONES/
+   ZONE_BOOTHS + hero-route builder). Check-in/activity is real (toggled locally) so the top progress
+   bars and grand-prize gate react; the floorplan (MAP_IMG) is the real event floor plan asset. */
+var ACTIVITY_NEED=5; // CHECKIN_NEED (sibling constant) removed 2026-09-27 — never read anywhere
+var BOOTH_CHK={},BOOTH_ACT={}; // BOOTH_CHK[assetIdx]=Set(companyIdx); BOOTH_ACT[assetIdx]=bool
+/* BOOTH_HOWTO/DRAW_JOINED (booth-howto/lucky-draw flags) and EFIN_CHECKED_IN/BOOTH_ANSWERS removed
+   2026-09-27 (asset-weight audit) — all 4 were only ever written (declared here, reassigned in
+   seedPersonaResult), never read anywhere in the file. Leftover state from the pre-Playbook booth/
+   games screens; BOOTH_CHK/BOOTH_ACT above are the ones still live (read by confidenceScore() etc). */
+/* 10 booths — asset / gamified game name / icon (Material→Lucide) — verbatim from BOOTHS. */
+var BOOTHS=[
+  {asset:'หุ้นไทย',game:'สังเวียนเลือกหุ้น',icon:'lc-trending-up',zone:0},
+  {asset:'หุ้นต่างประเทศ',game:'พาสปอร์ตนักลงทุนโลก',icon:'lc-globe',zone:0},
+  {asset:'กองทุนรวม',game:'ดวลกองทุน',icon:'lc-pie-chart',zone:0},
+  {asset:'ตราสารหนี้',game:'สร้างตาข่ายกันตก',icon:'lc-landmark',zone:0},
+  {asset:'ทองคำ',game:'ทองคำ เพื่อนยามวิกฤต',icon:'lc-coins',zone:2},
+  {asset:'อสังหา/REIT',game:'ล่าผลตอบแทนค่าเช่า',icon:'lc-building-2',zone:2},
+  {asset:'ประกัน',game:'สแกนช่องโหว่ชีวิต',icon:'lc-shield',zone:0},
+  {asset:'คริปโต',game:'โต้คลื่นความผันผวน',icon:'lc-bitcoin',zone:1},
+  {asset:'ของสะสม',game:'นักตีราคาของสะสม',icon:'lc-gem',zone:3},
+  {asset:'สุขภาพ',game:'เช็คสุขภาพกับเงิน',icon:'lc-heart',zone:4}
+];
+/* ══ BOOTH_Q (2026-09-09) ══ real question content for the 10 asset-booth mini-games (เกมประจำ
+   Asset 10 เกม), sourced verbatim from GAMES-QUESTIONS-DNA.md Part B (itself from "คำถาม 6 ด้าน
+   กับ คำถาม 10 สินทรัพย์ 8-9-69.docx"). Index i matches BOOTHS[i] 1:1. Each question:
+   {q, sub?, opts:[text,...], insight?, locked?, timer?, multi?, skippable?, skipLabel?} — insight
+   is ONE line per question (shown after ANY answer, not per-option — matches the source's single
+   "→ ความรู้ที่ขึ้นหลังตอบ" line per question). `locked:true` marks a
+   "[ตัดสินใจแล้วย้อนกลับไม่ได้]" question — see openPlay/playGoNext below for how that disables
+   back-navigation for the rest of that play session. `points` is the "+N แต้ม" this booth awards
+   toward the "สะสมแต้มลุ้นรางวัลใหญ่" prize mechanic (display only for now — see [[games-questions-
+   dna]] memory, item #4, for the still-open prize-threshold decision). Booth 4 (ทองคำ) intentionally
+   duplicates MINIGAME_Q[5]'s content verbatim — confirmed intentional reuse, not a bug, see that
+   doc's own cross-reference note. */
+var BOOTH_Q=[{"questions":[{"insight":"ตัดสินใจจากข้อมูลของธุรกิจ ไม่ใช่จากคำบอกเล่า"},{"insight":"การแบ่งเงินไปหลายที่ ช่วยลดผลกระทบเวลาที่ใดที่หนึ่งไม่เป็นไปตามคาด"}]},{"questions":[{"insight":"คนส่วนใหญ่มักลงแต่ในประเทศที่คุ้นเคย ทั้งที่โลกมีตัวเลือกมากกว่านั้น"},{"insight":"เวลาลงทุนข้ามประเทศ กำไรขาดทุนขึ้นกับค่าเงินด้วย ไม่ใช่แค่ราคาหุ้น"}]},{"questions":[{"insight":"ค่าธรรมเนียมถูกหักทุกปี ระยะยาวส่วนต่างเล็กๆ กลายเป็นเงินก้อนใหญ่ได้"},{"insight":"ทั้งสองแบบมีที่ใช้ ต่างกันที่ค่าธรรมเนียมและวิธีทำงาน"}]},{"questions":[{"insight":"เงินสำรองเผื่อฉุกเฉินคือตาข่ายที่ทำให้เราไม่ต้องขายของตอนราคาแย่"},{"insight":"เงินสำรองต้องถอนออกมาใช้ได้เร็วเมื่อจำเป็น (สภาพคล่อง) สำคัญกว่าได้ผลตอบแทนสูง"}]},{"questions":[{"insight":"เงินสดตัวเลขเท่าเดิม แต่ซื้อของได้น้อยลงเพราะเงินเฟ้อ ส่วนทองมักขยับตามค่าของเงิน"},{"insight":"ในหลายวิกฤต ทองมักไม่ไปทางเดียวกับหุ้น จึงช่วยพยุงภาพรวมได้"},{"insight":"ทองไม่สร้างรายได้ระหว่างถือ จึงมักใช้เป็นส่วนหนึ่ง ไม่ใช่ทั้งหมด"}]},{"questions":[{"insight":"ตัวเลขที่โฆษณามักยังไม่หักค่าส่วนกลาง ค่าซ่อม ภาษี และช่วงที่ไม่มีคนเช่า"},{"insight":"ซื้อเองต้องดูแลเองและขายยากกว่า · กองทุนอสังหาฯ เริ่มเงินน้อยกว่าและซื้อขายง่ายกว่า"}]},{"questions":[{"insight":"ความเสี่ยงบางอย่างรับเองไม่ไหว จึงมีเครื่องมือช่วยรับความเสี่ยงนั้นแทน"},{"insight":"ประกันมีหน้าที่คุ้มครองเวลาเกิดเรื่อง ไม่ใช่เครื่องมือหลักในการทำให้เงินโต"}]},{"questions":[{"insight":"หลักง่ายๆ คือแบ่งเท่าที่เสียได้โดยไม่กระทบชีวิต"},{"insight":"ของที่ขึ้นลงแรงต้องมาพร้อมแผนที่ตั้งไว้ก่อน ไม่ใช่ตัดสินใจตอนใจสั่น"}]},{"questions":[{"insight":"ของสะสมขึ้นกับคนที่อยากได้ต่อ และเวลาจะขายอาจใช้เวลานาน"},{"insight":"ยิ่งเป็นของที่ขายยาก ยิ่งควรเป็นส่วนเล็กของภาพรวม"}]},{"questions":[{"insight":"สุขภาพเป็นสินทรัพย์ที่คนมักลืมนับ แต่เป็นตัวที่ปกป้องสินทรัพย์อื่นไว้"},{"insight":"ค่าดูแลตัวเองวันนี้มักถูกกว่าค่ารักษาในวันที่สายไปแล้ว"},{"insight":"การรู้ว่าเรามีวงเงินคุ้มครองเท่าไร สำคัญเท่ากับการมีประกัน"},{"insight":"ค่ารักษาที่มาแบบไม่ทันตั้งตัว คือเหตุผลที่ควรมีเงินสำรองและความคุ้มครอง"},{"insight":"ตรวจสุขภาพประจำปี ก็เหมือนการเปิดดูภาพรวมเงินลงทุนของเรา"}]}];
+function boothActivityCount(){var n=0;for(var k in BOOTH_ACT){if(BOOTH_ACT[k])n++;}return n;}
+
+/* ══ GAMES TAB ══ content ported from Playbook Final: SIDES (6 mini-games) + sideResult() narratives.
+   Games are playable here (toggle); playing fills a Playbook "side" and reveals its result. Started
+   with 2/6 played to stay consistent with the Book/Home "2/6 ด้าน" example state.
+   `title` fields renamed to the real GAME names (2026-09-10, per direction "ใช้ชื่อเกมส์ตามเอกสาร")
+   — verbatim from GAMES-QUESTIONS-DNA.md Part A ("เกมย้อนเวลาพอร์ต", "เกมเลือกเครื่องมือ", etc.);
+   this is now the primary heading everywhere SIDES[i].title is read (gameRow, the "เล่นเกมนี้ต่อ"
+   next-step card, and playLabel() — so the play-modal header + completion summary now read "ข้อ
+   1/3 · เกมย้อนเวลาพอร์ต" instead of the ด้าน name). M6's game name was previously the ด้าน name
+   verbatim ("เกมทองคำในพอร์ต") — corrected to the actual game name from the doc. The unlocked
+   "ด้าน" name (this app's own, unchanged — see PLAYBOOK-2026-DATA-BASELINE.md §8-C, only M6's ด้าน
+   name here doesn't match the newer doc's "มุมมองต่อที่หลบภัย", left as-is since only the GAME
+   names were asked for) moved to its own `side` field, shown in gameRow's fine print ("ปลดล็อกด้าน
+   X") instead of duplicating the game name right under the game name. Icons picked fresh to fit
+   each GAME's own meaning rather than the abstract ด้าน concept — see per-line notes. */
+/* `emoji`/`intro`/`rule` (2026-09-10, per direction) feed the new pre-game briefing screen
+   (renderPlayBrief) shown before each game's first question. `emoji` = the side's emoji from
+   GAMES-QUESTIONS-DNA.md Part A's "เปิดด้าน 🎭 …" headers (M6 has none in the doc — 🛡️ picked to
+   match its shield icon + "เพื่อนยามวิกฤต" refuge idea). `intro` = a one-line "what this game is
+   about / how to play" lead (M1's is the doc's own verbatim on-screen intro copy; the rest
+   paraphrase each game's stated mechanic). `rule` = the single standout house rule shown as the
+   briefing's 2nd info card. These REPLACE the old per-question q1 intro banner (MINIGAME_Q.intro,
+   now removed) — one intro surface, not two. */
+var SIDES=[
+  {icon:'lc-refresh-cw',img:'portfolio',title:'เกมย้อนเวลาพอร์ต',side:'ความเสี่ยงแท้จริง',emoji:'🎭',intro:'เรากำลังพาคุณย้อนไปเจอเหตุการณ์จริงที่เคยเกิดขึ้น ตอนนั้นไม่มีใครรู้ว่าพรุ่งนี้จะเป็นยังไง',rule:'ตอบแล้วไปต่อ ย้อนกลับไม่ได้',measures:'เทียบความเสี่ยงที่ "บอก" กับที่ "ทำจริง" ตอนวิกฤต'}, // refresh-cw = rewinding back through past crises
+  {icon:'lc-file-text',img:'document',title:'เกมเลือกเครื่องมือ',side:'สิ่งที่คุณดูก่อนตัดสินใจ',emoji:'🔍',intro:'ก่อนตัดสินใจ คุณจะเลือกดูข้อมูลแบบไหน เราดูจากสิ่งที่คุณเลือกดูจริง ไม่ใช่แค่คำตอบสุดท้าย',rule:'เลือกจากสิ่งที่คุณดูจริง',measures:'ลำดับเครื่องมือวิเคราะห์ที่คุณเปิดจริง'}, // file-text = the business/financial-statement tool you choose to open
+  {icon:'lc-alert-triangle',img:'warning',title:'เกมทนกระแส',side:'ภูมิคุ้มกันความกลัวตกขบวน',emoji:'🔥',intro:'เจอสถานการณ์ที่ยั่วให้รีบตัดสินใจ ลองดูว่าคุณจะทนกระแสและกับดักได้แค่ไหน',rule:'บางฉากมีเวลาจำกัด',measures:'วินัยภายใต้แรงกดดันจากกระแส'}, // alert-triangle = the FOMO/scam traps this game tests resistance to
+  {icon:'lc-calendar',img:'s1q2',title:'เกมเป้าหมายแต่ละวัย',side:'เป้าหมายตามวัย',emoji:'🗺️',intro:'สวมบทบาทในแต่ละช่วงวัย ตั้งแต่ 25 ถึง 65 ปี แล้วดูว่าเป้าหมายเงินของคุณเปลี่ยนไปไหม',rule:'ย้อนกลับแก้ไขได้ทุกข้อ',measures:'เป้าหมายเงินตั้งแต่วัย 25 ถึง 65'}, // calendar = goals across different ages/life-stages (25→65)
+  {icon:'lc-compass',img:'compass',title:'เกมก้าวแรก',side:'ก้าวแรก',emoji:'🚀',intro:'เกมนี้ไม่ตัดสินว่าคุณเป็นคนแบบไหน ปิดท้ายด้วย "ก้าวแรก" เล็กๆ ที่คุณเลือกเอง',rule:'เลือกก้าวแรกได้หลายข้อ',measures:'กำแพงที่ทำให้ยังไม่เริ่ม + ก้าวเล็กที่สุด'}, // compass = finding your direction/first step as a new investor
+  {icon:'lc-shield',img:'gold',title:'เกมทองคำ เพื่อนยามวิกฤต',side:'ทองคำในพอร์ต',emoji:'🛡️',intro:'ไม่ต้องทายราคาทอง เป้าหมายคือเข้าใจว่าทองคำมีไว้ทำอะไรในพอร์ตของคุณ',rule:'เดาจากความรู้สึกได้เลย',measures:'บทบาทของทองคำสำหรับคุณ — ตัวถ่วงความเสี่ยง หรือตัวทำกำไร'} // shield = "เพื่อนยามวิกฤต" — gold as a protective refuge during a crisis
+];
+/* SIDES[i].img (2026-09-11, per direction "หน้า เกมหลัก - การใช้ไอคอน...ด้านอื่นใน Playbook") — real
+   custom art for the เกมหลัก page's game-list icons (gameRow's .gr-ic + renderGames' nextCard .ns-ic
+   below), same q.img→ICON_IMG idea as MINIGAME_Q's per-question icons. First shipped 5 of 6 (เกม
+   เลือกเครื่องมือ wasn't part of that direction, still Lucide-only); completed same-day follow-up
+   direction added its own 'document' art, so all 6 now carry one — scoped to just this page's two
+   call sites per the same "Scoped to just this Games-page card" precedent already noted on nextCard
+   below; other SIDES[i].icon call sites (result-screen badge, pre-game briefing, journey
+   ledger) are untouched and still render the Lucide glyph. */
+/* ══ MINIGAME_Q (2026-09-09) ══ real question content for the 6 main games, index i matching
+   SIDES[i] 1:1 — sourced verbatim from GAMES-QUESTIONS-DNA.md Part A. Same shape as BOOTH_Q (see
+   its own comment above renderBooth's BOOTH_Q for the full field-by-field explanation). Game-level
+   `noBack:true` (M1 only) disables back-navigation for the WHOLE game from question 1 — "ปุ่ม
+   ย้อนกลับปิดโดยตั้งใจ เพื่อเก็บความรู้สึกแรก" in the source. (A per-game `intro` field used to
+   render a one-time banner on question 1; removed 2026-09-10 — the intro copy now lives on the
+   dedicated pre-game briefing screen, SIDES[i].intro, see renderPlayBrief.) `resultNote` is a
+   closing note shown on the summary screen (some games' insight
+   is written at the whole-game level in the source, not per-question — M1's 4-type/M3's 3-type
+   result-page categories and M4/M5's closing narratives all landed here, since the actual
+   answer→category mapping rule is still an open decision, see [[games-questions-dna]] item #1). */
+var MINIGAME_Q=[{"questions":[{},{},{}]},{"questions":[{"insight":"ข่าวและกระแสเป็นสิ่งล่อ ไม่ใช่ข้อมูลที่ใช้ตัดสินใจ · งบการเงินบอกสุขภาพของธุรกิจ"},{"insight":"ของที่พื้นฐานมั่นคงมักไม่หวือหวาและไม่เป็นข่าว · การซื้อผ่านกองทุนหรือทยอยซื้อ คือการกระจายแทนการเลือกตัวเดียว"}]},{"questions":[{"insight":"ความกลัวตกขบวนทำให้เราซื้อเพราะ \"คนอื่นซื้อ\" ไม่ใช่เพราะเข้าใจของ"},{"insight":"สัญญาณหลอกลงทุน 3 อย่าง การันตีผลตอบแทน · เร่งให้รีบตัดสินใจ · ไม่มีใบอนุญาต"},{}]},{"questions":[{"insight":"ยิ่งมีเวลานาน ยิ่งมีเวลารอให้ของฟื้นตัว"},{"insight":"เงินที่จะใช้เร็วกับเงินที่ใช้อีกนาน ควรเก็บคนละแบบ"},{"insight":"ยิ่งใกล้วันที่ต้องใช้เงิน ยิ่งเหลือเวลารอให้ฟื้นน้อยลง"},{"insight":"วิธีถอนเงินมาใช้หลังเกษียณ สำคัญไม่แพ้วิธีเก็บ"}]},{"questions":[{"insight":"ก่อนลงทุน ควรมีเงินสำรองเผื่อฉุกเฉินก่อน · แต่ถ้าเก็บเงินสดไว้เฉยๆ นานๆ ค่าของเงินก็ลดลงจากเงินเฟ้อ"},{"insight":"เวลาช่วยให้ดอกเบี้ยทบต้นทำงาน เริ่มเร็วมักได้เปรียบกว่าลงเยอะแต่เริ่มช้า"},{"insight":"ผลตอบแทนที่หวังได้มาก มักมาพร้อมการขึ้นลงที่แรงขึ้น"},{},{}]},{"questions":[{"insight":"เงินสดตัวเลขเท่าเดิม แต่ซื้อของได้น้อยลงเพราะเงินเฟ้อ ส่วนทองมักขยับตามค่าของเงิน"},{"insight":"ในหลายวิกฤต ทองมักไม่ไปทางเดียวกับหุ้น จึงช่วยพยุงภาพรวมได้"},{"insight":"ทองไม่สร้างรายได้ระหว่างถือ จึงมักใช้เป็นส่วนหนึ่งของภาพรวม ไม่ใช่ทั้งหมด"}]}];
+var GAME_PLAYED={0:true,1:true}; // GAME_OPEN (sibling) removed 2026-09-27 — never read anywhere
+var GAME_ANSWERS={};
+function gamesPlayedCount(){return SIDES.reduce(function(n,_,i){return n+(GAME_PLAYED[i]?1:0);},0);}
+function playSet(kind,idx){return kind==='game'?MINIGAME_Q[idx]:BOOTH_Q[idx];}
+function playLabel(kind,idx){return kind==='game'?SIDES[idx].title:BOOTHS[idx].game;}
+/* learnedInsights — every distinct question insight the player has picked up so far this session,
+   derived from GAME_PLAYED/BOOTH_ACT (the real committed-completion flags) rather than a separate
+   mutable log, same "derive from real state" convention sideResult()/boothPointsTotal() already use.
+   `inProgress` ({kind,idx}) lets a game/booth still on its OWN result screen count immediately —
+   completePlay() (which flips GAME_PLAYED/BOOTH_ACT true) only runs once the player taps the CTA to
+   leave that screen, but the running total should already reflect what they just saw, not lag one
+   screen behind. Text-deduped (a repeated insight across games only counts once), matching how the
+   knowledge ledger below also only lists each concept the first time it's learned. */
+function learnedInsights(inProgress){
+  var seen={},out=[];
+  function add(kind,idx){
+    playSet(kind,idx).questions.forEach(function(q){
+      if(q.insight&&!seen[q.insight]){seen[q.insight]=true;out.push({text:q.insight,kind:kind,idx:idx});}
+    });
+  }
+  for(var gi=0;gi<MINIGAME_Q.length;gi++)if(GAME_PLAYED[gi])add('game',gi);
+  for(var bi=0;bi<BOOTH_Q.length;bi++)if(BOOTH_ACT[bi])add('booth',bi);
+  if(inProgress&&!(inProgress.kind==='game'?GAME_PLAYED[inProgress.idx]:BOOTH_ACT[inProgress.idx]))add(inProgress.kind,inProgress.idx);
+  return out;
+}
+/* learnedLedgerHTML — "เรื่องที่คุณเข้าใจแล้ว" card for the Playbook's เส้นทาง (journey) tab: a
+   personal, dynamic recap of every distinct insight learnedInsights() has captured from mini-games
+   actually played, tagged by source game — NOT the same thing as คลังความรู้ (renderLibrary), which
+   is a static 41-article/8-category reference shelf (this card sits directly above that shelf in
+   renderBook, specific-before-general). Reuses ticketHistoryHTML's exact .card/.sides-hd/.s-ey/.s-h/
+   .s-sub header + .side-item/.list-row.side-row/.side-num/.side-cx/.side-t/.side-s row shape (2026-09-10)
+   rather than inventing a new list recipe — .side-num carries the source game/booth's own icon (done-
+   filled, same "this is settled" language .side-num.done already means everywhere else) instead of a
+   step number, .side-t is the insight text itself, .side-s names which game it came from. Empty state
+   (nothing played yet) mirrors ticketHistoryHTML's own row-less-section absence — this whole card is
+   simply omitted by its one call site (renderBook's journey panel) rather than rendering a hollow
+   card, so a visitor who hasn't reached the games yet sees no half-empty ledger. */
+function learnedLedgerHTML(){
+  var items=learnedInsights();
+  if(!items.length)return '';
+  /* section heading on a fresh sheet (kept with what follows), the first insight as a pull-quote, then the rest as roman-numbered
+     notes grouped under their game (heading once per run of the same game); see .pbx-lg-* */
+  var parts=items[0].text.split(' · '),n=1,game=null;
+  var out='<section class="pbx-sec pb-keep pbx-break"><div class="pbx-kicker">สะสมจากการเล่นเกมวันนี้</div><h2 class="s-h pbx-sec-t">เรื่องที่คุณ <span>เข้าใจแล้ว</span></h2>'+
+    '<p class="pbx-sec-sub">'+items.length+' เรื่อง · อัปเดตอัตโนมัติทุกครั้งที่เล่นเกมจบ</p></section>'+
+    '<blockquote class="pbx-lg-q"><div class="pbx-lg-qn">'+pbxRoman(n++)+'</div><div><p class="pbx-lg-qt">'+parts[0]+'</p>'+
+    (parts.length>1?'<p class="pbx-lg-q2">'+parts.slice(1).join(' · ')+'</p>':'')+'<p class="pbx-lg-src">จากเกม '+playLabel(items[0].kind,items[0].idx)+'</p></div></blockquote>';
+  if(items.length>1)out+='<div class="pbx-lg-br pb-keep" aria-hidden="true"></div>';
+  items.slice(1).forEach(function(l,i,rest){
+    var g=playLabel(l.kind,l.idx);
+    if(g!==game){game=g;var cnt=0;for(var j=i;j<rest.length&&playLabel(rest[j].kind,rest[j].idx)===g;j++)cnt++;
+      out+='<div class="pbx-lg-gt pb-keep">'+g+'<span>'+cnt+' เรื่อง</span></div>';}
+    out+='<div class="pbx-lg-i"><span class="pbx-lg-in">'+pbxRoman(n++)+'</span><span class="pbx-lg-it">'+
+      l.text.split(' · ').map(function(c,k){return k?'<span class="pbx-lg-c2">'+c+'</span>':c;}).join('')+'</span></div>';
+  });
+  return out;
+}
+function pbxRoman(n){var s='';[[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']].forEach(function(p){while(n>=p[0]){s+=p[1];n-=p[0];}});return s;}
+
+/* ── RESPONSIVE VIEW (mobile | tablet | pc) ── driven by window, overridable via demo panel ── */
+/* Both 'view' and 'draw' default to 'auto' (2026-08-26, per direction — "อัตโนมัติ default ไว้ที่
+   mobile size" / "...ไว้ที่ครบเงื่อนไขแล้ว") so the demo panel shows the neutral "อัตโนมัติ" option
+   selected, not a manually-forced one — but 'auto' itself is now hard-biased to resolve to mobile
+   (see applyView) and to eligible (see renderBooth) rather than reacting to real width/chk/act
+   counts. PC/แท็บเล็ต and ยังขาด remain available as explicit overrides. */
+/* eventPhase (2026-08-28, per direction "แยกเป็น ช่วง Pre-Event, ช่วง On-Event") — 'pre': the QR-scan
+   header pill is hidden (register takes its slot instead, see appHeader/mountHeaderQR) since there's
+   nothing at the (unopened) venue to scan yet. 'on': QR pill shows. Switching TO 'on' also resets BOOTH_CHK/BOOTH_ACT/GAME_PLAYED/DRAW_JOINED to empty (see
+   buildDemo's segPhase handler) — simulates a just-arrived attendee with zero real progress, so the
+   sections that are supposed to start locked at On-Event (home counters/next-step, booth zone
+   activities, game "ด้านอื่นในคู่มือ") actually render locked instead of this demo's old pre-seeded
+   "already done" mock defaults. Switching to 'pre' does NOT touch RESULT/quizDone — a pre-event
+   visitor may already have taken the quiz online, so identity content stays independently gated on
+   RESULT alone (see renderBook's empty state, buildRoute's personalized flag). */
+/* Defaults flipped 2026-09-10, per direction — On-Event is now the default preview (eventPhase),
+   with an identity already on file (quizDone, seeded at bootstrap via seedPersonaResult — see the
+   bottom of this file), the Booth Journey v2 map (boothVer), and the draw-status card genuinely
+   computed from that seeded state's real chk/act counts (which start below CHECKIN_NEED/
+   ACTIVITY_NEED, so it reads "ยังขาด" out of the box — see the 'auto' branch in renderBooth this
+   direction restored). Switching the ช่วงงาน segment to Pre-Event is the one way back to the
+   splash/quiz flow (RESULT/quizDone/boothVer aren't touched by that switch, same as before). */
+var DEMO={quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,boothVer:'v2',registered:true,sampleEvolve:true}; // sampleEvolve: see pbxEvo // draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. (splashVer removed 2026-09-18, per direction "preview card เอา v1 ออก" — the splash fan carousel's "การ์ดมีชีวิต" build (added 2026-09-09, promoted to shipped default 2026-09-11) is now the only splash preview; v1 the plain static carousel, v3/v5 the "3D Character Card Flow" field and its living-card variant, were all removed the same day/session — see renderSplash's own comment for that full history.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO. (sumTitleVer — a brief demo-panel toggle comparing 2 title treatments for renderPlaySummary's game-name — removed 2026-09-11, per direction "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย": v2, the DNA quiz's .q-icon-bare + .q-title header, is now just how renderPlaySummary always renders — see its own comment there.)
+
+/* synthesize a plausible RESULT for a forced persona and jump to the Book (demo shortcut).
+   gap:0 here used to mean the demo persona picker could NEVER show a real post-event difference —
+   evoCompute() only shifts family when |gap|>=2, so an always-aligned demo always rendered
+   'confirmed'/'gathering' (same card both tabs), which read as "the preview doesn't actually
+   change between before/after." Now simulates a real divergence (±4) in whichever direction moves
+   AWAY from the picked persona's own family, plus enough activity for evoCompute's evidence gate
+   (sig>=3) — so picking ANY of the 12 demo personas reliably lands on a genuine 'evolved' state,
+   and thanks to EVO_REP above, the post-event card is always real photographed art (diamondhand/
+   waverider), never the CSS mockup, on that side. */
+/* Build a plausible RESULT (+ demo activity) for a forced persona WITHOUT navigating — shared by the
+   demo persona picker (which then jumps to Book) and the demo Character-Animation Play button (which
+   jumps to the cardreveal instead). Splitting the seed from the navigation lets both entry points
+   reuse the exact same synthesized result. */
+function seedPersonaResult(key){
+  var h=HEROES[key];
+  var simGap=h.fam==='V'?-4:4;
+  RESULT={hero:h,heroKey:key,declared:h.riskLevel,revealed:Math.max(1,Math.min(10,h.riskLevel+simGap)),gap:simGap,
+    conf:74,confLevel:'สูง - สอดคล้องดี',
+    subs:{identity:16,behavior:16,riskAlign:18,discipline:15},knowledge:'intermediate',horizon:'mid',votes:{},interests:[0,2,4]};
+  GAME_PLAYED={0:true,1:true,2:true,3:true};GAME_ANSWERS={};BOOTH_CHK={0:new Set([0])};BOOTH_ACT={0:true};
+}
+
+/* Default demo state (2026-09-10, per direction): "ทำแบบทดสอบตัวตนแล้ว" out of the box — seed a
+   RESULT before the very first render/buildDemo so DEMO.eventPhase:'on''s render() gate (which
+   redirects splash/quiz/etc. to 'book' once RESULT exists, else 'home') lands on the Book page
+   immediately instead of the empty "no identity yet" state. Booth check-in/activity start at
+   seedPersonaResult's own baseline (booth 0 only) — below ACTIVITY_NEED — so the
+   Booth tab's draw-status card genuinely (not forced) reads "ยังขาด" by default too. */
+seedPersonaResult('sage');
+RESULT.revealed=RESULT.declared;RESULT.gap=0; // the PDF sample reads "สอดคล้อง (Aligned)": what they said = what they did
+/* Lay the sheets out only AFTER the webfonts are in (2026-09-21 bug fix): pbBuild() paginates by measuring text height, and with the
+   fallback font showing (font-display:swap) every measurement was wrong - the book came out as 43 loosely-packed sheets instead of the
+   ~36 the real font produces. document.fonts.load() forces the three faces to download even though nothing has used them yet; a 2.5s
+   timeout keeps the page from ever hanging on a blocked font. */
+(function(){
+  var done=false;function go(){if(done)return;done=true;render();}
+  setTimeout(go,2500);
+  if(!document.fonts||!document.fonts.load){go();return;}
+  Promise.all([document.fonts.load('500 16px "FC Minimal"'),document.fonts.load('700 16px "FC Minimal"'),document.fonts.load('500 16px "Sarabun"'),document.fonts.load('700 16px "Sarabun"'),document.fonts.load('400 20px "Pinyon Script"'),document.fonts.load('500 16px "Cinzel"')]).then(function(){return document.fonts.ready;}).then(go,go);
+})();
+</script>

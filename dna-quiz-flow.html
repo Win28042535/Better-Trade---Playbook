@@ -1679,6 +1679,185 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-warn{padding:var(--sp-inline) var(--sp-stack);border-radius:var(--r1);background:var(--amber-bg);border:1px solid var(--amber-border);}
 .apb-warn .apb-lab{display:flex;align-items:center;gap:var(--sp-glue);color:var(--amber-text);}
 .apb-warn .apb-lab svg{width:var(--ic-sm);height:var(--ic-sm);}
+/* ══ PLAYBOOK "พอร์ต" TAB (2026-10-08, Education Edition phase 1) ══ see portEduShellHTML. Re-skinned
+   onto this file's tokens (the demo's dark navy/gold theme is not carried over) and reuses the Asset
+   Knowleges parts (.apb-chip picker = violet "the one you're looking at", .apb-bl inputs, .apb-warn
+   amber notice, .apb-lab/.apb-gt/.apb-ol/.apb-kv). The 4 asset buckets get one fixed hue each, taken
+   from the existing --spectrum stops + muted ink for cash; amber (never red, per the DNA) marks the
+   drop/"ขาย" moments. */
+:root{--pe-cash:#b4bac3;--pe-bond:var(--cyan);--pe-equity:var(--violet);--pe-alt:var(--yellow);}
+.b-cash{background:var(--pe-cash);}.b-bond{background:var(--pe-bond);}.b-equity{background:var(--pe-equity);}.b-alt{background:var(--pe-alt);}
+/* #portEdu is only a mount point: display:contents lets its cards sit directly in .b2-panel's flex column, so the
+   spacing between them is the same --sp-section gap every other tab has (a plain block wrapper dropped it). */
+#portEdu{display:contents;}
+/* ══ พอร์ต chart motion (2026-10-08 motion audit) ══ the same primitives as CHART MOTION above, one-time reveal
+   per chart via initCharts() (.pe-viz -> .viz-in), transitions only (the global reduced-motion rule snaps them):
+   - bars/bands grow from 0 like .viz-bar (.7s, rows 0.06s apart): range bands, 1-year ladder, the mix bar;
+   - dots on those bars pop in after their bar (.rk-dot's opacity/scale .45s);
+   - the said-vs-did gauge markers travel out like the risk "บอก vs จริง" bars (2nd one .08s later);
+   - growth lines draw like the radar axes (stroke-dashoffset .45s), baseline fades like .rk-grid, low-point pops.
+   .pe-live = mid-drag on the Thai/foreign slider: short .25s morph to the new values, no stagger. */
+.pe-viz .pe-band,.pe-viz .pe-lad-band,.pe-viz.pe-stack>span{width:0;transition:width .7s var(--ease),left .7s var(--ease);}
+.pe-viz.viz-in .pe-band,.pe-viz.viz-in .pe-lad-band,.pe-viz.viz-in.pe-stack>span{width:var(--w);}
+.pe-range:nth-child(2) .pe-band,.pe-lad:nth-of-type(2) .pe-lad-band,.pe-stack>span:nth-child(2){transition-delay:.06s;}
+.pe-range:nth-child(3) .pe-band,.pe-lad:nth-of-type(3) .pe-lad-band,.pe-stack>span:nth-child(3){transition-delay:.12s;}
+.pe-range:nth-child(4) .pe-band,.pe-lad:nth-of-type(4) .pe-lad-band,.pe-stack>span:nth-child(4){transition-delay:.18s;}
+.pe-lad:nth-of-type(5) .pe-lad-band{transition-delay:.24s;}
+.pe-viz .pe-pt,.pe-viz .pe-lad-med{opacity:0;transform:scale(0);transition:opacity .3s var(--ease) .45s,transform .45s var(--ease) .45s,left .7s var(--ease);}
+.pe-viz.viz-in .pe-pt,.pe-viz.viz-in .pe-lad-med{opacity:1;transform:scale(1);}
+.pe-range:nth-child(2) .pe-pt,.pe-lad:nth-of-type(2) .pe-lad-med{transition-delay:.51s,.51s,0s;}
+.pe-range:nth-child(3) .pe-pt,.pe-lad:nth-of-type(3) .pe-lad-med{transition-delay:.57s,.57s,0s;}
+.pe-range:nth-child(4) .pe-pt,.pe-lad:nth-of-type(4) .pe-lad-med{transition-delay:.63s,.63s,0s;}
+.pe-lad:nth-of-type(5) .pe-lad-med{transition-delay:.69s,.69s,0s;}
+.pe-viz .pe-mark{left:0;transition:left .7s var(--ease);}
+.pe-viz.viz-in .pe-mark{left:var(--pos);}
+.pe-viz .pe-mark.did{transition-delay:.08s;}
+.pe-viz .pe-growth polyline{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .45s var(--ease);}
+.pe-viz.viz-in .pe-growth polyline{stroke-dashoffset:0;}
+.pe-viz .pe-growth .pe-g-l1{transition-delay:.08s;}.pe-viz .pe-growth .pe-g-l5{transition-delay:.13s;}.pe-viz .pe-growth .pe-g-me{transition-delay:.18s;}
+.pe-viz .pe-g-base{opacity:0;transition:opacity .3s var(--ease);}
+.pe-viz.viz-in .pe-g-base{opacity:1;}
+.pe-viz .pe-g-bot{opacity:0;transform:scale(0);transform-box:fill-box;transform-origin:center;transition:opacity .3s var(--ease) .6s,transform .45s var(--ease) .6s;}
+.pe-viz.viz-in .pe-g-bot{opacity:1;transform:scale(1);}
+.pe-reset,.pe-reset *{transition:none!important;}
+.pe-viz.pe-live .pe-lad-band,.pe-viz.pe-live .pe-lad-med{transition-duration:.25s;transition-delay:0s;}
+/* selected row/level tint changes at the same .15s as the pill tabs */
+.pe-lvt td,.pe-lad{transition:background-color .15s var(--ease),box-shadow .15s var(--ease),opacity .15s var(--ease);}
+/* desktop pointer only: the hovered row stays full, its siblings dim to .55 (same rule as .trait-row) */
+@media(hover:hover) and (pointer:fine){
+  .pe-range{transition:opacity .15s var(--ease);}
+  .pe-ranges:hover .pe-range,#peLadderBody:hover .pe-lad{opacity:.55;}
+  .pe-ranges .pe-range:hover,#peLadderBody .pe-lad:hover{opacity:1;}
+}
+/* ══ พอร์ต typography (2026-10-08, TYPOGRAPHY-DNA pass) ══
+   1) This file has no <!DOCTYPE> (quirks mode), so <table>/<td> don't inherit font from body and <button>/<input>
+      keep the browser's 400 / line-height:normal — measured 46 text nodes at 400 and 49 at "normal" in this tab.
+      Re-stated here for the tab's own tables, chips and inputs only (the shared .apb-chip is left alone).
+   2) Data numerals use the serif like .trait-v / .alloc-p / .int-bar-v: .pe-num wraps the number only, never Thai
+      (peFillNum), with the DNA's -0.01em serif tracking. */
+.pe-lvt,.pe-cmp{font-family:var(--font);font-weight:var(--w-body);line-height:1.35;color:var(--ink);}
+.pe-lvt td,.pe-cmp td{font-weight:var(--w-body);line-height:1.35;}
+.pe-lvt td b,.pe-cmp tr.you td{font-weight:var(--w-label);}
+.pe-pick .apb-chip,.pe-amt .apb-chip,.pe-in .apb-bl,.pe-amt-in{font-weight:var(--w-body);line-height:1.35;}
+.pe-pick .apb-chip.on,.pe-amt .apb-chip.on{font-weight:var(--w-label);}
+.pe-num{font-family:var(--serif);letter-spacing:-0.01em;}
+.pe-big{line-height:1.2;} /* display tier; mixes Thai ("วันนี้ ≈") with the serif amount, so not the 1.0 stat-numeral tier */
+.pe-banner{padding:var(--sp-card-pad-sm);border-radius:var(--r2);} /* same box as the other tabs' top banner (.efin-banner) */
+.pe-banner .apb-lab{align-items:flex-start;font-weight:var(--w-body);line-height:1.5;margin:0;}
+.pe-banner .apb-lab svg{margin-top:3px;flex:0 0 auto;}
+.pe-gap{margin-top:var(--sp-stack);}
+/* Spacing audit (2026-10-08): sub-sections use Book's .trait-sec (full-bleed hairline, --sp-block/--sp-card-pad padding,
+   .trait-hd + .s-h heading) like the ความสนใจ tab, and a heading -> its body is --sp-stack, the same rung as
+   .s-sub's margin under a card title. */
+.pe-sec-body{margin-top:var(--sp-stack);}
+.pe-warn-t{font-size:var(--fs-label);line-height:1.55;}
+.pe-note{font-size:var(--fs-meta);color:var(--muted);line-height:1.55;margin-top:var(--sp-list);}
+.pe-line{font-size:var(--fs-bodysm);color:var(--ink);line-height:1.55;margin-top:var(--sp-inline);}
+.pe-big{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);margin-top:var(--sp-inline);}
+.pe-more{margin-top:var(--sp-list);font-size:var(--fs-label);color:var(--muted);line-height:1.6;}
+.pe-more summary{display:inline-flex;align-items:center;gap:var(--sp-glue);min-height:44px;cursor:pointer;color:var(--ink);font-weight:var(--w-head);list-style:none;}
+.pe-more summary::-webkit-details-marker{display:none;}
+.pe-more summary svg{width:var(--ic-sm);height:var(--ic-sm);}
+.pe-more>div{padding:var(--sp-list) var(--sp-inline);background:var(--paper);border-radius:var(--r1);}
+.pe-cta{margin-top:var(--sp-inline);padding:var(--sp-inline) var(--sp-stack);border-radius:var(--r1);background:var(--done-wash);border:1px solid var(--done-border);font-size:var(--fs-label);line-height:1.55;color:var(--ink);}
+.pe-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:var(--sp-glue);vertical-align:middle;flex:0 0 auto;}
+/* mirror: 3-step said/did line */
+.pe-gauge{margin:var(--sp-inline) 0 0;padding:0 var(--sp-list);}
+.pe-gauge-track{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--cloud),var(--line-strong));margin:50px 0 42px;}
+/* track margins = room for the two absolutely-placed labels above/below the track (measured live), so heading -> top label = --sp-stack (16) and bottom label -> the ระวังมาก/กล้าเสี่ยงมาก row = --sp-list (8). */
+.pe-gauge-track>i{position:absolute;top:50%;width:2px;height:14px;margin:-7px 0 0 -1px;background:var(--line-strong);}
+.pe-mark{position:absolute;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;border:3px solid var(--white);box-shadow:var(--shadow-action);}
+.pe-mark.said{background:var(--muted);}
+.pe-mark.l em{left:-6px;transform:none;}.pe-mark.r em{left:auto;right:-6px;transform:none;}
+.pe-mark.did{background:var(--violet);}
+.pe-mark em{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;font-style:normal;font-size:var(--fs-meta);font-weight:var(--w-label);}
+.pe-mark.said em{bottom:22px;color:var(--muted);}
+.pe-mark.did em{top:22px;color:var(--violet);}
+.pe-gauge-ends{display:flex;justify-content:space-between;font-size:var(--fs-meta);color:var(--muted);margin:0 calc(var(--sp-list) * -1);}
+.pe-said{font-size:var(--fs-label);color:var(--ink);line-height:1.55;margin-top:var(--sp-stack);}
+.pe-crisis{margin-top:var(--sp-list);padding:var(--sp-list) var(--sp-inline);border-radius:var(--r1);font-size:var(--fs-label);line-height:1.5;background:var(--paper);border-left:3px solid var(--line-strong);}
+.pe-crisis.sell{background:var(--amber-bg);border-left-color:var(--amber-border);color:var(--amber-text);}
+.pe-crisis.buy_more{background:var(--active-wash);border-left-color:var(--active-border);}
+/* 5-level table */
+.pe-tw{overflow-x:auto;margin-top:var(--sp-stack);}
+.pe-lvt,.pe-cmp{width:100%;border-collapse:collapse;font-size:var(--fs-label);}
+.pe-lvt th,.pe-cmp th{font-size:var(--fs-meta);font-weight:var(--w-label);color:var(--muted);text-align:left;padding:var(--sp-glue) var(--sp-glue) var(--sp-list);vertical-align:bottom;line-height:1.3;}
+.pe-lvt th .pe-dot{display:block;margin:0 0 4px;}
+.pe-lvt td,.pe-cmp td{padding:var(--sp-list) var(--sp-glue);border-top:1px solid var(--line-soft);white-space:nowrap;}
+.pe-lvt tr[data-pe-row]{cursor:pointer;}
+.pe-lvt tr.on td{background:var(--active-wash);}
+.pe-lvt tr.on td:first-child{box-shadow:inset 3px 0 0 var(--violet);}
+.pe-pick{margin-top:var(--sp-list);}
+.pe-pick{flex-wrap:nowrap;}
+.pe-pick .apb-chip{flex:1 1 0;min-width:0;padding-left:0;padding-right:0;text-align:center;}
+.pe-picked{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);margin-top:var(--sp-stack);}
+.pe-ranges{margin-top:var(--sp-list);}
+.pe-range{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"l v" "t t";gap:4px var(--sp-list);align-items:center;padding:var(--sp-glue) 0;font-size:var(--fs-label);}
+.pe-range .pe-range-l{grid-area:l;}.pe-range .pe-range-v{grid-area:v;}.pe-range .pe-track{grid-area:t;}
+.pe-range-l{display:flex;align-items:center;min-width:0;color:var(--ink);}
+.pe-range-v{font-weight:var(--w-label);min-width:4.5em;text-align:right;}
+.pe-track{position:relative;height:12px;border-radius:6px;background:var(--cloud);}
+.pe-band{position:absolute;top:0;bottom:0;border-radius:6px;}
+.pe-pt{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--ink);border:2px solid var(--white);}
+/* ladder */
+.pe-split{margin-top:var(--sp-stack);padding:var(--sp-inline) var(--sp-stack);border-radius:var(--r1);background:var(--paper);}
+.pe-slider{-webkit-appearance:none;appearance:none;width:100%;height:32px;margin:0;background:transparent;cursor:pointer;}
+.pe-slider::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:var(--cloud);border:1px solid var(--line-soft);}
+.pe-slider::-moz-range-track{height:6px;border-radius:3px;background:var(--cloud);border:1px solid var(--line-soft);}
+.pe-slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;margin-top:-10px;border-radius:50%;background:var(--violet);border:3px solid var(--white);box-shadow:var(--shadow-action);}
+.pe-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--violet);border:3px solid var(--white);box-shadow:var(--shadow-action);}
+.pe-slider:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:var(--r0);}
+.pe-split-ends{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-list);font-size:var(--fs-meta);color:var(--muted);}
+.pe-split-now{font-size:var(--fs-label);font-weight:var(--w-label);color:var(--ink);text-align:center;margin-top:var(--sp-glue);}
+#peLadderBody{margin-top:var(--sp-stack);}
+.pe-lad{padding:var(--sp-glue) var(--sp-list);border-radius:var(--r1);}
+.pe-lad.on{background:var(--active-wash);}
+.pe-lad-hd{display:flex;justify-content:space-between;font-size:var(--fs-label);color:var(--muted);}
+.pe-lad.on .pe-lad-hd{color:var(--ink);font-weight:var(--w-label);}
+.pe-lad-tr{position:relative;height:16px;margin:4px 0 2px;}
+.pe-zero{position:absolute;top:-2px;bottom:-2px;width:0;border-left:1px dashed var(--line-strong);}
+.pe-lad-band{position:absolute;top:4px;height:8px;border-radius:4px;background:var(--line-strong);}
+.pe-lad.on .pe-lad-band{background:var(--violet);}
+.pe-lad-med{position:absolute;top:2px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--white);border:2px solid var(--ink);}
+.pe-lad-ax{position:relative;display:flex;justify-content:space-between;font-size:var(--fs-meta);color:var(--muted);padding:0 var(--sp-list);height:1.6em;}
+.pe-lad-ax span[style]{position:absolute;transform:translateX(-50%);}
+/* growth */
+.pe-amt{margin-top:var(--sp-list);align-items:center;}
+.pe-amt-in{flex:1 1 9em;min-width:8em;}
+.trait-sec>.pe-g-key:first-child{margin-top:0;}
+.pe-g-key{display:flex;flex-wrap:wrap;gap:var(--sp-glue) var(--sp-inline);font-size:var(--fs-meta);color:var(--muted);margin:var(--sp-list) 0;}
+.pe-g-key span{display:inline-flex;align-items:center;gap:var(--sp-glue);}
+.pe-g-key i{display:inline-block;width:16px;height:3px;border-radius:2px;}
+.pe-g-key .k-me{background:var(--violet);height:4px;}.pe-g-key .k-l5{background:var(--cyan);}.pe-g-key .k-l1{background:var(--pe-cash);}
+.pe-g-key .k-bot{width:10px;height:10px;border-radius:50%;border:2px solid var(--amber-text);}
+.pe-growth{display:block;}
+.pe-growth polyline{fill:none;stroke-linejoin:round;}
+.pe-g-me{stroke:var(--violet);stroke-width:3;}
+.pe-g-l5{stroke:var(--cyan);stroke-width:1.5;}
+.pe-g-l1{stroke:var(--pe-cash);stroke-width:1.5;}
+.pe-g-base{stroke:var(--line-strong);stroke-dasharray:3 3;}
+.pe-g-bot{fill:none;stroke:var(--amber-text);stroke-width:2;}
+.pe-g-ax{display:flex;justify-content:space-between;font-size:var(--fs-meta);color:var(--muted);margin-top:2px;}
+/* own portfolio */
+.pe-in{padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);}
+.pe-in:first-of-type{border-top:none;}
+.pe-in-l{display:block;font-size:var(--fs-label);color:var(--ink);line-height:1.4;}
+.pe-in-r{display:flex;align-items:center;gap:var(--sp-inline);}
+.pe-in-r .pe-slider{flex:1;min-width:0;}
+.pe-in-n{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-label);color:var(--muted);}
+.pe-in-n .apb-bl{width:4.2em;flex:0 0 auto;text-align:right;}
+.pe-sum{margin-top:var(--sp-stack);font-size:var(--fs-label);display:flex;align-items:center;gap:var(--sp-glue);}
+.pe-sum.ok{color:var(--green-text);}
+.pe-sum.bad{color:var(--amber-text);}
+.pe-sum svg{width:var(--ic-sm);height:var(--ic-sm);}
+.pe-go:disabled{opacity:.45;cursor:not-allowed;}
+.pe-stack{display:flex;height:28px;border-radius:var(--r1);overflow:hidden;margin-top:var(--sp-glue);}
+.pe-stack span{display:flex;align-items:center;justify-content:center;font-size:var(--fs-meta);font-weight:var(--w-label);color:var(--ink);}
+.pe-legend{display:flex;flex-wrap:wrap;gap:var(--sp-glue) var(--sp-inline);margin-top:var(--sp-list);font-size:var(--fs-meta);color:var(--muted);}
+.pe-legend span{display:inline-flex;align-items:center;}
+.pe-legend b{color:var(--ink);margin-left:4px;}
+.pe-cmp td+td,.pe-cmp th+th{text-align:right;}
+.pe-cmp tr.you td{background:var(--active-wash);font-weight:var(--w-label);}
 .apb-flag+.apb-flag{margin-top:var(--sp-inline);}
 .apb-flag .apb-q{margin-bottom:var(--sp-list);}
 .apb-flag .apb-txt+.apb-txt{margin-top:var(--sp-glue);}
@@ -2144,11 +2323,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    via getBoundingClientRect down to a real 320px viewport — "วิเคราะห์" (widest) renders at ~40px
    inside ~44-49px of available label room per pill, all 4 single-line, none clipped. 420px matches
    this same component's own existing narrow-phone breakpoint (the @media rules above/below). */
-@media(max-width:420px){
-  :root[data-view="mobile"] .toc.bt-tabs--secondary{padding-left:10px;padding-right:10px;gap:5px;}
-  :root[data-view="mobile"] .bt-tabs--secondary .bt-tab{padding:8px 3px;gap:3px;}
-  :root[data-view="mobile"] .bt-tabs--secondary .bt-tab-icon svg{width:14px;height:14px;}
-}
+/* (2026-10-08) The ≤420px compaction this comment describes — 14px icon, 3px pill padding, 5px gaps, built to
+   squeeze all 4 tabs into one phone row — was removed: per direction the row no longer has to fit. On a phone
+   the pills keep their normal size and the row scrolls sideways instead (see the 5-tab note below). */
 /* Tablet/pc had no override at all here — they fell through to the base space-between +
    flex:0 1 auto above, which (unlike mobile's flex:1 1 0 fix) was only ever tuned to stop pills
    clipping on a NARROW frame, not to look deliberate on a much wider ~760px row (see .toc's own
@@ -2183,7 +2360,21 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    case. Same fix here: flex:1 1 0 makes every remaining pill grow to fill the row evenly regardless
    of count (2, 4, or any future number), so this narrow-real-width fallback now matches the mobile
    rule's behavior exactly instead of only half of it. */
-@media(max-width:420px){:root[data-view="tablet"] .bt-tabs--secondary .bt-tab,:root[data-view="pc"] .bt-tabs--secondary .bt-tab{flex:1 1 0;}}
+/* (2026-10-08: the flex:1 1 0 squeeze that stood here became flex:1 0 auto — see the phone tab row note below.) */
+/* Phone tab row (2026-10-08, per direction "responsive audit ในส่วนของ tab ไม่จำเป็นต้องฟิ๊กให้ทุก tab item พอดี"):
+   with 5 tabs the row no longer has to fit. On a phone every pill keeps its normal size and a label that
+   never wraps (flex:1 0 auto = natural width as the floor, still grows to fill the row when there is room,
+   so Pre-Event's 2 tabs and the 1-tab unregistered case stay full-width); past the edge the row scrolls
+   sideways, with a soft fade on whichever side still has tabs hidden (.fade-l/.fade-r, set by book2NavFade).
+   Tablet/PC (real width above 420px) keep their centered row untouched. */
+:root[data-view="mobile"] .bt-tabs--secondary{overflow-x:auto;scrollbar-width:none;}
+:root[data-view="mobile"] .bt-tabs--secondary::-webkit-scrollbar{display:none;}
+:root[data-view="mobile"] .bt-tabs--secondary .bt-tab{flex:1 0 auto;}
+:root[data-view="mobile"] .bt-tabs--secondary .bt-tab-label{white-space:nowrap;}
+@media(max-width:420px){:root[data-view="tablet"] .bt-tabs--secondary .bt-tab,:root[data-view="pc"] .bt-tabs--secondary .bt-tab{flex:1 0 auto;}.bt-tabs--secondary .bt-tab-label{white-space:nowrap;}}
+.bt-tabs--secondary.fade-r{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);}
+.bt-tabs--secondary.fade-l{-webkit-mask-image:linear-gradient(90deg,transparent,#000 32px);mask-image:linear-gradient(90deg,transparent,#000 32px);}
+.bt-tabs--secondary.fade-l.fade-r{-webkit-mask-image:linear-gradient(90deg,transparent,#000 32px,#000 calc(100% - 32px),transparent);mask-image:linear-gradient(90deg,transparent,#000 32px,#000 calc(100% - 32px),transparent);}
 /* data-tooltip — CSS-only, no JS beyond what initBtTabs already wires for focus */
 .bt-tab[data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--ink);color:var(--cloud);font-size:var(--fs-label);font-weight:var(--w-body);padding:var(--sp-stack-tight) 9px;border-radius:var(--r0);white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .15s,transform .15s;pointer-events:none;z-index:20;}
 .bt-tab[data-tooltip]:hover::after,.bt-tab[data-tooltip]:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
@@ -2972,6 +3163,26 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* zone activity */
 /* "วิธีเล่น" modal — same family as .scan-modal/.share-modal (see those for the shared pattern
    rationale). Replaced the old .zone-howto inline max-height expand (2026-08-16). */
+/* ══ PLAYBOOK PDF preview (2026-10-09) ══ see openPdfPreview(). Full-screen sheet: title bar, the A4 mockup in an
+   iframe scaled to the screen, confirm bar. Chrome built from this file's own parts (.howto-x close, .ex-tag, .btn). */
+html.pdfv-open,html.pdfv-open body{overflow:hidden;}
+.pdfv{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;background:var(--cloud);}
+.pdfv-top{display:flex;align-items:center;gap:var(--sp-inline);padding:var(--sp-inline) var(--sp-edge);background:var(--white);border-bottom:1px solid var(--line-soft);}
+.pdfv-ttl{flex:1;min-width:0;}
+.pdfv-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);line-height:1.3;}
+.pdfv-s{display:flex;align-items:center;gap:var(--sp-list);margin-top:4px;font-size:var(--fs-meta);color:var(--muted);}
+.pdfv-x{position:static;flex:0 0 auto;width:44px;height:44px;}
+.pdfv-frame{flex:1;min-height:0;position:relative;overflow:hidden;}
+.pdfv-iframe{position:absolute;top:0;left:0;width:794px;border:0;transform-origin:0 0;background:var(--white);opacity:0;transition:opacity .3s var(--ease);}
+.pdfv.ready .pdfv-iframe{opacity:1;}
+.pdfv-load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:var(--fs-bodysm);color:var(--muted);}
+.pdfv.ready .pdfv-load{display:none;}
+.pdfv-bar{display:flex;flex-direction:column;gap:var(--sp-list);padding:var(--sp-inline) var(--sp-edge) calc(var(--sp-inline) + env(safe-area-inset-bottom));background:var(--white);border-top:1px solid var(--line-soft);}
+.pdfv-hint{font-size:var(--fs-meta);color:var(--muted);line-height:1.5;margin:0;}
+.pdfv-go{width:100%;justify-content:center;}
+.pdfv-go:disabled{opacity:1;background:var(--done-fill);color:var(--ink);box-shadow:none;cursor:default;}
+.pdfv-go svg{width:var(--ic-sm);height:var(--ic-sm);}
+@media(min-width:768px){.pdfv-bar{flex-direction:row;align-items:center;justify-content:space-between;gap:var(--sp-stack);}.pdfv-go{width:auto;flex:0 0 auto;}}
 .howto-modal{position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;padding:22px;}
 .howto-modal.show{display:flex;}
 .howto-scrim{position:absolute;inset:0;background:rgba(17,19,24,.6);}
@@ -5642,7 +5853,7 @@ function radarSVG(vals,hue){
    element (unobserve after firing) — re-scrolling past an already-revealed chart never re-plays it,
    matching the reference's "not a decorative loop" rule. */
 function initCharts(scope){
-  var boxes=(scope||root).querySelectorAll('.conf-box,.risk-box,.trait-sec,.alloc-sec,.radar-sec');
+  var boxes=(scope||root).querySelectorAll('.conf-box,.risk-box,.trait-sec,.alloc-sec,.radar-sec,.pe-viz');
   if(!boxes.length)return;
   if(!window.IntersectionObserver){boxes.forEach(function(b){b.classList.add('viz-in');});return;}
   var io=new IntersectionObserver(function(entries){
@@ -5865,7 +6076,60 @@ function mountPdfDlBtn(){
   // flex/justify-content:flex-end is what right-aligns it now. Icon swapped lock->book-open (per the
   // same direction, "ไอคอน Book") — the lock icon is gone, so the "Ultimate-gated" meaning now lives
   // only in the caption line below, not on the button itself.
-  window.mountLiquidMetalButtonInto('#pdf-dl-slot','compact',{label:'ดาวน์โหลด Playbook',icon:ic('lc-book-open'),onClick:function(){st.phase='profile';render();}});
+  // Ultimate -> the A4 mockup preview + confirm step (openPdfPreview, 2026-10-09); every other tier still goes to Profile to see how to unlock
+  window.mountLiquidMetalButtonInto('#pdf-dl-slot','compact',{label:'ดาวน์โหลด Playbook',icon:ic('lc-book-open'),onClick:function(){if(curTier().name==='Ultimate'){openPdfPreview();return;}st.phase='profile';render();}});
+}
+/* ══ PLAYBOOK PDF preview (2026-10-09, per direction "ใช้ pdf ตัวนี้เป็น mockup preview ไม่ต้องวาดขึ้นมาใหม่ ...
+   ที่ต้องการทำคือ interaction ก่อนการดาวน์โหลด หรือยืนยันดาวน์โหลดเฉยๆ") ══ Both ดาวน์โหลด Playbook buttons (Book tab:
+   Ultimate only; เกมหลัก tab: after its own played-games check) open this full-screen preview. It shows the design
+   team's A4 mockup as-is in an iframe — a local copy in mockup/playbook-pdf/ (tools/sync-pdf-mockup.js), so it works
+   without signal — tagged "ตัวอย่าง" because it is a sample book, not the player's own. "ยืนยันดาวน์โหลด PDF" only
+   acknowledges in place ("จะพร้อมหลังงาน"), the same no-real-file idiom as gamesDlDone() / [data-pe-dl]: there is no
+   PDF to serve yet, and printing the sample would read as the player's own Playbook.
+   The mockup is a fixed 794px-wide page (A4 @96dpi): the iframe stays 794px wide and is scaled down to the screen,
+   its height compensated so it still fills the frame. */
+var PDF_SRC='mockup/playbook-pdf/index.html',PDF_W=794,PDF_PAGES=56,PDF_DONE=false;
+function pdfFit(){
+  var v=document.getElementById('pdfv');if(!v)return;
+  var box=v.querySelector('.pdfv-frame'),f=v.querySelector('.pdfv-iframe');
+  var s=Math.min(1,box.clientWidth/PDF_W);
+  f.style.transform='scale('+s.toFixed(4)+')';
+  f.style.height=Math.ceil(box.clientHeight/s)+'px';
+  f.style.left=Math.max(0,(box.clientWidth-PDF_W*s)/2)+'px';
+}
+function closePdfPreview(){
+  var v=document.getElementById('pdfv');if(v)v.parentNode.removeChild(v);
+  document.documentElement.classList.remove('pdfv-open');
+  window.removeEventListener('resize',pdfFit);
+}
+/* opts.onConfirm — what the launching screen does once confirmed (e.g. gamesDlDone() flips its own button). */
+function openPdfPreview(opts){
+  opts=opts||{};
+  closePdfPreview();
+  var v=document.createElement('div');v.className='pdfv';v.id='pdfv';
+  v.setAttribute('role','dialog');v.setAttribute('aria-modal','true');v.setAttribute('aria-labelledby','pdfvT');
+  v.innerHTML='<div class="pdfv-top"><div class="pdfv-ttl"><div class="pdfv-t" id="pdfvT">ตัวอย่าง Playbook PDF</div>'+
+      '<div class="pdfv-s"><span class="ex-tag">ตัวอย่าง</span><span>'+PDF_PAGES+' หน้า · A4</span></div></div>'+
+      '<button class="howto-x pdfv-x" type="button" aria-label="ปิด">'+ic('lc-x')+'</button></div>'+
+    '<div class="pdfv-frame"><div class="pdfv-load">กำลังเตรียมตัวอย่าง…</div>'+
+      '<iframe class="pdfv-iframe" src="'+PDF_SRC+'" title="ตัวอย่าง Playbook PDF" loading="eager"></iframe></div>'+
+    '<div class="pdfv-bar"><p class="pdfv-hint"></p><button class="btn btn-primary pdfv-go" type="button"></button></div>';
+  document.body.appendChild(v);
+  document.documentElement.classList.add('pdfv-open');
+  var go=v.querySelector('.pdfv-go'),hint=v.querySelector('.pdfv-hint');
+  var paint=function(){
+    go.disabled=PDF_DONE;
+    go.innerHTML=PDF_DONE?ic('lc-check-circle')+'ยืนยันแล้ว · จะพร้อมหลังงาน':ic('lc-download')+'ยืนยันดาวน์โหลด PDF';
+    hint.textContent=PDF_DONE?'เราจะส่ง Playbook ฉบับเต็มของคุณให้หลังจบงาน':'ด้านบนเป็นตัวอย่างหน้าตาเล่ม · ฉบับของคุณจะใช้ข้อมูลจากแบบทดสอบ เกม และบูธที่คุณเล่น';
+  };
+  paint();
+  go.onclick=function(){if(PDF_DONE)return;PDF_DONE=true;paint();if(opts.onConfirm)opts.onConfirm();};
+  v.querySelector('.pdfv-x').onclick=closePdfPreview;
+  var f=v.querySelector('.pdfv-iframe');
+  f.onload=function(){v.classList.add('ready');pdfFit();};
+  window.addEventListener('resize',pdfFit);
+  pdfFit();
+  go.focus({preventScroll:true});
 }
 /* "ไปเล่นกิจกรรม" CTA on the "ทัศนคติต่อความกลัวและ FOMO" side-item (2026-08-29, per direction
    "ใช้ style เดียวกับ สแกน QR") — same 'compact' preset as the header QR pill and mountPdfDlBtn
@@ -5902,7 +6166,11 @@ var BOOK2_TAB='identity';
 var BOOK2_TABS=[
   {k:'identity',icon:'lc-user',label:'ตัวตน'},
   {k:'analysis',icon:'lc-sparkles',label:'วิเคราะห์'},
-  {k:'portfolio',icon:'lc-pie-chart',label:'พอร์ต'},
+  /* 2026-10-08, per direction "tab พอร์ต เปลี่ยนชื่อเป็น ความสนใจ" + "เพิ่ม tab ... ใช้คำว่า พอร์ต": the old
+     พอร์ต tab (interest radar + behavior scores) is now ความสนใจ (key 'interest', same content), and the
+     พอร์ต label/pie icon moved to the new Education Edition tab ('port', see portEduPanelHTML). */
+  {k:'interest',icon:'lc-heart',label:'ความสนใจ'},
+  {k:'port',icon:'lc-pie-chart',label:'พอร์ต'},
   {k:'journey',icon:'lc-route',label:'เส้นทาง'}
 ];
 /* Content-nav position note (2026-08-16 decision, still applies): moved to the TOP, right under the
@@ -5928,8 +6196,34 @@ function bindBook2Nav(){
     var k=b.dataset.b2;BOOK2_TAB=k;
     root.querySelectorAll('.b2-panel').forEach(function(p){p.classList.toggle('show',p.dataset.panel===k);});
     root.querySelectorAll('.toc .bt-tab').forEach(function(x){x.setAttribute('aria-selected',x===b?'true':'false');});
+    if(k==='port')mountPortEdu(); // data file loads on first open of the tab, not with the page
+    book2NavReveal();
     window.scrollTo(0,0);
+    requestRevealTick(); // the newly shown panel's cards were display:none; sync them now (scrollTo fires no event when already at the top)
   };});
+  var nv=root.querySelector('.toc.bt-tabs--secondary');
+  if(nv){nv.addEventListener('scroll',function(){book2NavFade(nv);},{passive:true});}
+  book2NavReveal();
+}
+/* Keeps the selected pill fully visible when the 5-tab row scrolls sideways on a phone (see the
+   .bt-tabs--secondary 5-tab CSS note). Sets the row's own scrollLeft only, so the page never jumps. */
+function book2NavReveal(){
+  var nav=root.querySelector('.toc.bt-tabs--secondary'),b=nav&&nav.querySelector('.bt-tab[aria-selected="true"]');
+  if(!b||nav.scrollWidth<=nav.clientWidth){book2NavFade(nav);return;}
+  var l=b.getBoundingClientRect().left-nav.getBoundingClientRect().left+nav.scrollLeft,r=l+b.offsetWidth,pad=12;
+  if(b===nav.firstElementChild)nav.scrollLeft=0;
+  else if(b===nav.lastElementChild)nav.scrollLeft=nav.scrollWidth-nav.clientWidth; // end pills: flush to the row edge, past its own padding
+  else if(l-pad<nav.scrollLeft)nav.scrollLeft=Math.max(0,l-pad);
+  else if(r+pad>nav.scrollLeft+nav.clientWidth)nav.scrollLeft=r+pad-nav.clientWidth;
+  book2NavFade(nav);
+}
+window.addEventListener('resize',function(){book2NavFade(document.querySelector('.toc.bt-tabs--secondary'));},{passive:true});
+/* Soft edge fade on the tab row: .fade-r while tabs are still hidden to the right, .fade-l to the left. */
+function book2NavFade(nav){
+  if(!nav)return;
+  var max=nav.scrollWidth-nav.clientWidth;
+  nav.classList.toggle('fade-l',max>1&&nav.scrollLeft>1);
+  nav.classList.toggle('fade-r',max>1&&nav.scrollLeft<max-1);
 }
 /* AI Insight card (risk gap + confidence) — shared markup so v1 and v2 can't drift apart. */
 function insightHTML(r,h,matchOk){
@@ -6147,12 +6441,13 @@ function renderBook(){
     /* radar (was here as its own "พอร์ตลงทุนที่ถนัด" card) moved into the merged radarInterestHTML()
        below, 2026-08-19 per direction — the "วิเคราะห์" tab now ends with just AI Insight. */
     (pre?'':(
-    '<div class="b2-panel'+(tab==='portfolio'?' show':'')+'" data-panel="portfolio">'+
+    '<div class="b2-panel'+(tab==='interest'?' show':'')+'" data-panel="interest">'+
       '<section class="card scroll-reveal">'+radarInterestHTML(h,r)+
         '<div class="trait-sec"><div class="trait-hd"><div class="s-h" style="margin-bottom:0">คะแนนพฤติกรรม</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">วัดจากกิจกรรมในงาน</p>'+traitBars()+'</div>'+
         '<div class="alloc-sec"><div class="trait-hd"><div class="s-h" style="margin-bottom:0">เวลาตัดสินใจคุณดูอะไรก่อน</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนเริ่มต้นที่เหมาะกับ '+h.th+'</p>'+allocBars()+'</div></section>'+
       '<section class="card scroll-reveal"><div class="s-pad"><div class="s-ey" style="display:flex;justify-content:space-between;align-items:center"><span style="display:inline-flex;align-items:center;gap:var(--sp-glue)">สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">เจาะรายสินทรัพย์</h2>'+ddTabs(h)+'</div></section>'+
     '</div>'+
+    '<div class="b2-panel'+(tab==='port'?' show':'')+'" data-panel="port"><div id="portEdu">'+portEduShellHTML()+'</div></div>'+
     '<div class="b2-panel'+(tab==='journey'?' show':'')+'" data-panel="journey">'+
       sidesHTML(r)+
       '<section class="card scroll-reveal"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2></div>'+
@@ -6211,6 +6506,7 @@ function renderBook(){
   /* unreg has no slider at all (compareBlock is a single static card, no data-cr2) — this whole
      before/after crossing handler has nothing to bind to, so skip setting it up. */
   if(unreg)return;
+  if(tab==='port')mountPortEdu();
   var emptyDetailHTML='<div class="ev-empty"><div class="ev-empty-ic">'+ic('lc-hourglass')+'</div>'+
     '<div class="ev-empty-t">ยังไม่มีข้อมูลจากในงาน</div>'+
     '<div class="ev-empty-s">เล่นเกมและเดินบูธในงานก่อน แล้วค่อยกลับมาดูว่าตัวตนที่ "ทำจริง" ตรงกับที่ DNA Quiz บอกไหม</div>'+
@@ -6439,6 +6735,364 @@ function apbEn(s){return apbEsc(String(s==null?'':s).replace(/\s*PLAYBOOK\s*$/i,
 /* No em dashes anywhere in what the reader sees (per direction 2026-10-06): the source text uses " — "
    as a pause, which here just becomes a single space (Thai uses a space as the pause). */
 function apbEsc(s){return String(s==null?'':s).replace(/\s*—\s*/g,' ').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+/* ══ PLAYBOOK "พอร์ต" TAB (2026-10-08, Education Edition / ทาง ข, phase 1) ══ The content team's
+   chapter, ported from their standalone demo (BT2026_Playbook_EducationEdition_Demo, content
+   2026-09-30.2). Data = assets/port/edu.js (window.PORT_EDU_DATA), generated by
+   tools/build-port-education.js and loaded on first open (portEduLoad). Everything here stays in this
+   page: nothing is stored or sent.
+   The chapter never tells the player which level suits them (PO dropped the licensed planner
+   sign-off): the 5-level table is the same for everyone, the highlighted level is just the one the
+   player tapped to look at, and their own portfolio is compared against all 5 levels with no
+   over/under verdict.
+   The calculations are the demo's own (its BTMock: portfolioHistory / portfolioEducation, themselves
+   translated from the content team's backend), kept 1:1 apart from ES5 syntax.
+   Phase 1 shows: behavior mirror, 5-level table, 1-year ladder + Thai/foreign split, growth chart +
+   amount calculator, own portfolio over 10 years, the advisor card, disclaimer (9) + references.
+   Deferred: financial profile + 3 lights (phase 2: needs a storage decision; its consent copy
+   promises server storage), and the per-player market lessons / patterns A–E (the demo ships only
+   server output for 3 fictional players, not the rules that produce them). */
+var PE={pick:null,F:null,amt:100000,hold:null,res:null,err:false};
+var PE_LOADING=null;
+function portEduLoad(done){
+  if(window.PORT_EDU_DATA){done(true);return;}
+  if(PE_LOADING){PE_LOADING.push(done);return;}
+  PE_LOADING=[done];
+  var s=document.createElement('script');
+  s.src='assets/port/edu.js';
+  function fin(ok){var cbs=PE_LOADING||[];PE_LOADING=null;if(!ok&&s.parentNode)s.parentNode.removeChild(s);cbs.forEach(function(cb){cb(ok);});}
+  s.onload=function(){fin(!!window.PORT_EDU_DATA);};
+  s.onerror=function(){fin(false);};
+  document.head.appendChild(s);
+}
+var peEsc=apbEsc; // same reader rules as Asset Knowleges (no em dashes, HTML-escaped)
+/* Like peFill, but returns HTML: the template's Thai text stays escaped FC Minimal and only the filled-in
+   numbers get .pe-num (Baskervville) — Thai never goes into the serif (TYPOGRAPHY-DNA §1). */
+function peFillNum(t,v){return peEsc(t).replace(/\{(\w+)\}/g,function(m,k){return k in v?peNum(v[k]):m;});}
+/* ฿ sits in the Thai Unicode block and Baskervville has no glyph for it, so a leading ฿ stays in FC Minimal. */
+function peNum(s){var m=/^([฀-๿]*)(.*)$/.exec(String(s));return peEsc(m[1])+'<span class="pe-num">'+peEsc(m[2])+'</span>';}
+function peFill(t,v){return String(t==null?'':t).replace(/\{(\w+)\}/g,function(m,k){return k in v?v[k]:m;});}
+function pePct(v){v=+v;return Number.isInteger(v)?String(v):v.toFixed(1);}
+function peSigned(v){v=+v;return (v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(1)+'%';}
+function peBaht(n){return '฿'+Math.round(n).toLocaleString('en-US');}
+var PE_MON=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function peMonth(ym){var p=String(ym||'').split('-').map(Number);return p[0]?PE_MON[p[1]-1]+' '+(p[0]+543):'';}
+function peMore(txt){return txt?'<details class="pe-more"><summary>'+ic('lc-info')+'อ่านเพิ่ม</summary><div>'+peEsc(txt)+'</div></details>':'';}
+function peAt(d,F,lv){var b=d.history.by_foreign[String(F)];return b&&b[String(lv)]||null;}
+var PE_BKT=['cash','bond','equity','alt'];
+
+/* Behavior mirror — read from the real answers of เกมย้อนเวลาพอร์ต (GAME_ANSWERS[0]: [Q1 said 0..2,
+   2008 choice, covid choice], choices 0=ขาย 1=ถือ 2=ซื้อเพิ่ม, per MINIGAME_Q[0]). The demo puts both
+   on a 1–10 scale; this app's Q1 only has 3 answers, so (per direction 2026-10-08) the gauge is a
+   3-step ระวัง → กล้า line instead: "ที่บอก" sits on the Q1 step, "ที่ทำ" on the average of the two
+   crisis choices. It describes what was done, it is not a risk-level result. */
+var PE_CHOICE=['sell','hold','buy_more'];
+function peMirrorHTML(d){
+  var M=d.mirror,a=GAME_ANSWERS[0];
+  var head='<div class="s-pad"><h2 class="s-h">'+peEsc(M.title)+'</h2>';
+  if(!a||a[1]==null||a[2]==null)return head+'<p class="s-sub" style="margin:0">'+peEsc(M.not_played)+'</p></div>';
+  var said=a[0],did=(a[1]+a[2])/2,pos=function(v){return (v/2*100).toFixed(1);};
+  var edge=function(v){return v<=0?' l':v>=2?' r':'';}; // end markers: label hugs the inside of the line
+  var q1=MINIGAME_Q[0].questions[0].opts[said];
+  var row=function(id,c){return '<p class="pe-crisis '+PE_CHOICE[c]+'">'+peEsc(peFill(M.crisis_row,{crisis:M.crises[id],choice:M.choices[PE_CHOICE[c]]}))+'</p>';};
+  return head+
+    '<div class="pe-gauge pe-viz" role="img" aria-label="'+peEsc(M.said+' · '+M.did)+'">'+
+      '<div class="pe-gauge-track"><i style="left:0"></i><i style="left:50%"></i><i style="left:100%"></i>'+
+        (said!=null?'<span class="pe-mark said'+edge(said)+'" style="--pos:'+pos(said)+'%"><em>'+peEsc(M.said)+'</em></span>':'')+
+        '<span class="pe-mark did'+edge(did)+'" style="--pos:'+pos(did)+'%"><em>'+peEsc(M.did)+'</em></span>'+
+      '</div>'+
+      '<div class="pe-gauge-ends"><span>'+peEsc(M.scale_ends[0])+'</span><span>'+peEsc(M.scale_ends[1])+'</span></div>'+
+    '</div>'+
+    (q1?'<p class="pe-said"><b>'+peEsc(M.said)+':</b> “'+peEsc(q1)+'”</p>':'')+
+    row('gfc2008',a[1])+row('covid2020',a[2])+
+    '<p class="pe-note">'+peEsc(M.note)+'</p></div>';
+}
+
+/* 5-level table (same for everyone) + level picker. */
+function peRangesHTML(d,lv){
+  var S=d.texts.bucket_short,w=d.history.levels[String(lv.value)].weights;
+  return '<div class="pe-ranges">'+lv.ranges.map(function(r){
+    return '<div class="pe-range"><span class="pe-range-l"><i class="pe-dot b-'+r.bucket+'"></i>'+peEsc(S[r.bucket]||r.label)+'</span>'+
+      '<span class="pe-track"><span class="pe-band b-'+r.bucket+'" style="left:'+r.lo+'%;--w:'+Math.max(r.hi-r.lo,1.5)+'%"></span>'+
+      (w&&w[r.bucket]!=null?'<span class="pe-pt" style="left:'+w[r.bucket]+'%"></span>':'')+'</span>'+
+      '<b class="pe-range-v pe-num">'+peEsc(r.range_text)+'</b></div>';
+  }).join('')+'</div><p class="pe-note">'+peEsc(d.texts.sample_line)+'</p>';
+}
+function pePickBodyHTML(d){
+  var T=d.table,lv=T.levels.filter(function(x){return x.value===PE.pick;})[0]||T.levels[0];
+  return '<p class="pe-picked">'+peEsc(peFill(T.pick.template,{level:lv.value,label:lv.label}))+'</p>'+peRangesHTML(d,lv);
+}
+function peTableHTML(d){
+  var T=d.table,S=d.texts.bucket_short;
+  return '<div class="s-pad"><h2 class="s-h">'+peEsc(T.title)+'</h2>'+
+    '<p class="s-sub">'+peEsc(T.intro)+'</p>'+peMore(T.intro_more+' '+T.derived_note)+
+    '<div class="pe-tw"><table class="pe-lvt"><thead><tr><th>'+peEsc(T.level_col)+'</th>'+PE_BKT.map(function(b){return '<th><i class="pe-dot b-'+b+'"></i>'+peEsc(S[b])+'</th>';}).join('')+'</tr></thead><tbody>'+
+      T.levels.map(function(lv){return '<tr data-pe-row="'+lv.value+'"'+(lv.value===PE.pick?' class="on"':'')+'><td><b>'+lv.value+'</b></td>'+lv.ranges.map(function(r){return '<td>'+peEsc(r.range_text)+'</td>';}).join('')+'</tr>';}).join('')+
+    '</tbody></table></div>'+
+    '<div class="apb-lab pe-gap">'+peEsc(T.pick.label)+' · '+peEsc(T.pick.note)+'</div>'+
+    '<div class="apb-chips pe-pick" role="group" aria-label="'+peEsc(T.pick.label)+'">'+T.levels.map(function(lv){
+      return '<button type="button" class="apb-chip'+(lv.value===PE.pick?' on':'')+'" data-pe-pick="'+lv.value+'" aria-pressed="'+(lv.value===PE.pick)+'">'+lv.value+'</button>';}).join('')+'</div>'+
+    '<div id="pePickBody" class="pe-viz">'+pePickBodyHTML(d)+'</div>'+
+    '</div><div class="trait-sec"><div class="trait-hd"><h3 class="s-h" style="margin-bottom:0">'+peEsc(T.how.title)+'</h3></div>'+
+      '<ol class="apb-ol apb-txt pe-sec-body">'+T.how.items.map(function(x){return '<li>'+peEsc(x)+'</li>';}).join('')+'</ol>'+peMore(T.how.more)+
+      '<p class="pe-cta">'+peEsc(T.how.cta)+'</p></div>';
+}
+
+/* 1-year ladder: band = worst..best 12-month hold, dot = median. HTML rows instead of the demo's SVG
+   so the labels use this app's type scale. */
+function peLadderBodyHTML(d){
+  var T=d.texts,X0=-20,X1=45,x=function(v){return ((Math.max(X0,Math.min(X1,v))-X0)/(X1-X0)*100).toFixed(1);};
+  var rows=[1,2,3,4,5].map(function(l){
+    var r=peAt(d,PE.F,l);if(!r)return '';var h=r.hold_12m,on=l===PE.pick;
+    return '<div class="pe-lad'+(on?' on':'')+'"><div class="pe-lad-hd"><span>'+peEsc(peFill(T.row_label,{level:l}))+'</span><span>'+peFillNum(T.avg_label,{cagr:peSigned(r.cagr)})+'</span></div>'+
+      '<div class="pe-lad-tr"><i class="pe-zero" style="left:'+x(0)+'%"></i><span class="pe-lad-band" style="left:'+x(h.worst)+'%;--w:'+(x(h.best)-x(h.worst)).toFixed(1)+'%"></span><span class="pe-lad-med" style="left:'+x(h.median)+'%"></span></div></div>';
+  }).join('');
+  var me=peAt(d,PE.F,PE.pick);
+  return '<p class="pe-note" style="margin-top:0">'+peEsc(T.ladder_legend)+'</p>'+rows+
+    '<div class="pe-lad-ax"><span>−20%</span><span style="left:'+x(0)+'%">0%</span><span>+45%</span></div>'+
+    '<p class="pe-line"><b>'+peEsc(T.ladder_summary)+'</b></p>'+
+    (me?'<p class="s-sub" style="margin:0" id="peLadPick">'+peEsc(peLadPickText(d))+'</p>':'')+
+    '<p class="pe-note">'+peEsc(T.disclaimer)+'</p>';
+}
+function peLadPickText(d){var me=peAt(d,PE.F,PE.pick);return me?peFill(d.texts.ladder_pick,{level:PE.pick,median:peSigned(me.hold_12m.median),worst:peSigned(me.hold_12m.worst),neg:me.hold_12m.pct_negative}):'';}
+function peLadderHTML(d){
+  var T=d.texts;
+  return '<div class="s-pad"><h2 class="s-h">'+peEsc(T.ladder_title)+'</h2>'+
+    '<div class="pe-split"><div class="apb-lab">'+peEsc(T.split_title)+'</div>'+
+      '<input type="range" class="pe-slider" min="0" max="100" step="10" value="'+PE.F+'" id="peFx" aria-label="'+peEsc(T.split_title)+'">'+
+      '<div class="pe-split-ends"><span>'+peEsc(T.split_ends[0])+'</span><span>'+peEsc(T.split_ends[1])+'</span></div>'+
+      '<p class="pe-split-now" id="peFxTxt">'+peEsc(peFill(T.split_template,{th:100-PE.F,fx:PE.F}))+'</p>'+
+      '<p class="pe-note">'+peEsc(T.split_note)+'</p></div>'+
+    '<div id="peLadderBody" class="pe-viz">'+peLadderBodyHTML(d)+'</div></div>';
+}
+
+/* Growth chart: the picked level (bold) against levels 1 and 5, scaled to the amount the player chose. */
+function peGrowthSVG(d){
+  var me=peAt(d,PE.F,PE.pick),n=me.growth_of_100k.length,W=330,Hh=170;
+  var all=[];[1,PE.pick,5].forEach(function(l){all=all.concat(peAt(d,PE.F,l).growth_of_100k);});
+  var lo=Math.min.apply(null,all)*0.97,hi=Math.max.apply(null,all)*1.02;
+  var X=function(i){return 6+i/(n-1)*(W-12);},Y=function(v){return Hh-8-(v-lo)/(hi-lo)*(Hh-16);};
+  var line=function(l,cls){return '<polyline class="'+cls+'" pathLength="1" points="'+peAt(d,PE.F,l).growth_of_100k.map(function(v,i){return X(i).toFixed(1)+','+Y(v).toFixed(1);}).join(' ')+'"/>';};
+  var bi=d.history.months.indexOf(me.max_drop.bottom);
+  return '<svg class="pe-growth" viewBox="0 0 '+W+' '+Hh+'" width="100%" role="img" aria-label="'+peEsc(peFill(d.texts.growth_title_amount,{amount:peBaht(PE.amt),level:PE.pick}))+'">'+
+    '<line class="pe-g-base" x1="6" x2="'+(W-6)+'" y1="'+Y(100000).toFixed(1)+'" y2="'+Y(100000).toFixed(1)+'"/>'+
+    (PE.pick!==1?line(1,'pe-g-l1'):'')+(PE.pick!==5?line(5,'pe-g-l5'):'')+line(PE.pick,'pe-g-me')+
+    (bi>=0?'<circle class="pe-g-bot" cx="'+X(bi).toFixed(1)+'" cy="'+Y(me.growth_of_100k[bi]).toFixed(1)+'" r="5"/>':'')+'</svg>';
+}
+function peGrowthBodyHTML(d){
+  var T=d.texts,me=peAt(d,PE.F,PE.pick);if(!me)return '';
+  var k=PE.amt/100000,md=me.max_drop,top=peAt(d,PE.F,5),bot=peAt(d,PE.F,1),n=me.growth_of_100k.length;
+  var drop=md.months_to_recover==null?'':peFill(T.growth_drop_baht,{pct:peSigned(md.pct),amount:peBaht(PE.amt),baht:peBaht(Math.abs(md.pct)/100*PE.amt),months:md.months_to_recover});
+  return '<div class="pe-g-key"><span><i class="k-me"></i>'+peEsc(peFill(T.row_label,{level:PE.pick}))+'</span>'+(PE.pick!==5?'<span><i class="k-l5"></i>'+peEsc(peFill(T.row_label,{level:5}))+'</span>':'')+(PE.pick!==1?'<span><i class="k-l1"></i>'+peEsc(peFill(T.row_label,{level:1}))+'</span>':'')+'<span><i class="k-bot"></i>'+peEsc(peFill(T.growth_bottom,{month:peMonth(md.bottom),pct:peSigned(md.pct)}))+'</span></div>'+
+    peGrowthSVG(d)+
+    '<div class="pe-g-ax"><span>'+peEsc(peMonth(d.history.months[0]))+' · '+peEsc(peFill(T.growth_base_amount,{amount:peBaht(PE.amt)}))+'</span><span>'+peEsc(peMonth(d.history.months[n-1]))+'</span></div>'+
+    '<p class="pe-big">'+peFillNum(T.growth_today,{value:peBaht(me.growth_of_100k[n-1]*k)})+'</p>'+
+    (drop?'<p class="pe-line">'+peEsc(drop)+'</p>':'')+
+    (PE.pick!==5?'<p class="s-sub" style="margin:0">'+peEsc(peFill(T.growth_compare_hi,{value:peBaht(top.growth_of_100k[n-1]*k),pct:peSigned(top.max_drop.pct)}))+'</p>':'')+
+    (PE.pick!==1?'<p class="s-sub" style="margin:0">'+peEsc(peFill(T.growth_compare_lo,{value:peBaht(bot.growth_of_100k[n-1]*k)}))+'</p>':'')+
+    '<p class="pe-note">'+peEsc(T.disclaimer)+'</p>'+
+    '<p class="pe-note">'+peEsc(peFill(T.source,{from:peMonth(d.history.period.from),to:peMonth(d.history.period.to)}))+'</p>';
+}
+function peGrowthTitle(d){return peFill(d.texts.growth_title_amount,{amount:peBaht(PE.amt),level:PE.pick});}
+function peGrowthHTML(d){
+  var T=d.texts,custom=T.amounts.indexOf(PE.amt)<0;
+  return '<div class="s-pad"><h2 class="s-h" id="peGrowthTitle">'+peEsc(peGrowthTitle(d))+'</h2>'+
+    '<div class="apb-lab pe-sec-body">'+peEsc(T.amount_label)+'</div>'+
+    '<div class="apb-chips pe-amt">'+T.amounts.map(function(a){return '<button type="button" class="apb-chip'+(a===PE.amt?' on':'')+'" data-pe-amt="'+a+'" aria-pressed="'+(a===PE.amt)+'">'+peBaht(a)+'</button>';}).join('')+
+      '<input type="number" class="apb-bl pe-amt-in" id="peAmtIn" inputmode="numeric" min="1000" step="1000" value="'+(custom?PE.amt:'')+'" placeholder="'+peEsc(T.amount_custom)+'" aria-label="'+peEsc(T.amount_custom)+'"></div>'+
+    '<p class="pe-note">'+peEsc(T.calc_note)+'</p>'+
+    '</div><div class="trait-sec pe-viz" id="peGrowthBody">'+peGrowthBodyHTML(d)+'</div>';
+}
+
+/* Own portfolio over 10 years — demo BTMock.portfolioHistory + portfolioEducation, unchanged maths. */
+var PE_HOLD_HIST={cash:'cash',bond:'bond',stock_th:'equity_th',stock_global:'equity_global',gold:'alt',property:null,crypto:null,other:null};
+function peR1(x){return Math.round(x*10)/10;}
+function peSum(a){return a.reduce(function(s,x){return s+x;},0);}
+function pePortHistory(d,vals){
+  var rets=d.history.monthly_returns,meas={};
+  Object.keys(vals).forEach(function(k){if(vals[k]>0&&PE_HOLD_HIST[k]&&rets[PE_HOLD_HIST[k]])meas[k]=vals[k];});
+  var mk=Object.keys(meas),tot=peSum(mk.map(function(k){return meas[k];})),total=peSum(Object.keys(vals).map(function(k){return vals[k];}));
+  if(!tot)return null;
+  var n=Math.min.apply(null,mk.map(function(k){return rets[PE_HOLD_HIST[k]].length;})),v=[100];
+  for(var i=0;i<n;i++)v.push(v[v.length-1]*(1+peSum(mk.map(function(k){return meas[k]/tot*rets[PE_HOLD_HIST[k]][i];}))));
+  var r12=[];for(i=0;i<v.length-12;i++)r12.push(v[i+12]/v[i]-1);
+  var peak=v[0],peakI=0,mdd=0,mddI=0,mddPeak=0;
+  v.forEach(function(x,j){if(x>peak){peak=x;peakI=j;}if(x/peak-1<mdd){mdd=x/peak-1;mddI=j;mddPeak=peakI;}});
+  return {max_drop_pct:peR1(mdd*100),worst_12m_pct:r12.length?peR1(Math.min.apply(null,r12)*100):null,
+    cagr_pct:peR1((Math.pow(v[v.length-1]/v[0],12/(v.length-1))-1)*100),
+    unmeasured_pct:total?Math.round((total-tot)/total*100):0,
+    unmeasured:Object.keys(vals).filter(function(k){return vals[k]>0&&!(k in meas);})};
+}
+function pePortCompute(d,vals){
+  var P=d.port,map=P.input_map,keys=Object.keys(map);
+  var outside=peSum(keys.filter(function(k){return map[k]==='outside';}).map(function(k){return vals[k]||0;})),rest=100-outside,mix={},notes=[];
+  if(outside>0)notes.push(peFill(P.outside_note,{x:pePct(peR1(outside)),rest:pePct(peR1(rest))}));
+  if(rest>0)PE_BKT.forEach(function(b){mix[b]=peR1(peSum(keys.filter(function(k){return map[k]===b;}).map(function(k){return vals[k]||0;}))/rest*100);});
+  var th=vals.stock_th||0,fx=vals.stock_global||0;
+  var foreign=th+fx>0?Math.floor(fx/(th+fx)*10+0.5)*10:d.history.default_foreign;
+  var compare=[1,2,3,4,5].map(function(lv){var r=peAt(d,foreign,lv);return r&&{level:lv,max_drop_pct:r.max_drop.pct,worst_12m_pct:r.hold_12m.worst,cagr_pct:r.cagr};}).filter(Boolean);
+  return {mix:mix,history:pePortHistory(d,vals),compare:compare,foreign:foreign,notes:notes};
+}
+function pePortFormHTML(d){
+  var P=d.port,keys=Object.keys(P.inputs);
+  return '<div class="s-pad"><h2 class="s-h">'+peEsc(P.title)+'</h2><p class="s-sub">'+peEsc(P.input_intro)+'</p>'+
+    keys.map(function(k){return '<div class="pe-in"><label class="pe-in-l" for="peIn-'+k+'">'+peEsc(P.inputs[k])+'</label>'+
+      '<div class="pe-in-r"><input type="range" class="pe-slider" min="0" max="100" step="1" value="'+PE.hold[k]+'" data-pe-k="'+k+'" aria-label="'+peEsc(P.inputs[k])+'">'+
+      '<span class="pe-in-n"><input type="number" class="apb-bl" id="peIn-'+k+'" min="0" max="100" step="1" inputmode="decimal" value="'+PE.hold[k]+'" data-pe-k="'+k+'"><span>%</span></span></div></div>';}).join('')+
+    '<p class="pe-sum" id="peSum"></p>'+
+    '<button type="button" class="ag-more pe-go" id="peCheck">'+peEsc(P.submit)+'</button></div>';
+}
+function pePortResultHTML(d){
+  var P=d.port,r=PE.res,h=r.history,S=d.texts.bucket_short;
+  var cell=function(v){return v==null?'–':'<span class="pe-num">'+peSigned(v)+'</span>';};
+  var rows=(h?'<tr class="you"><td>'+peEsc(P.yours)+'</td><td>'+cell(h.max_drop_pct)+'</td><td>'+cell(h.worst_12m_pct)+'</td><td>'+cell(h.cagr_pct)+'</td></tr>':'')+
+    r.compare.map(function(c){return '<tr><td>'+peEsc(peFill(d.texts.row_label,{level:c.level}))+'</td><td>'+cell(c.max_drop_pct)+'</td><td>'+cell(c.worst_12m_pct)+'</td><td>'+cell(c.cagr_pct)+'</td></tr>';}).join('');
+  return '<div class="s-pad"><h2 class="s-h">'+peEsc(P.title)+'</h2>'+
+    '<div class="apb-lab">'+peEsc(P.mix)+'</div>'+
+    '<div class="pe-stack pe-viz">'+PE_BKT.filter(function(b){return (r.mix[b]||0)>0;}).map(function(b){return '<span class="b-'+b+'" style="--w:'+r.mix[b]+'%">'+(r.mix[b]>=9?Math.round(r.mix[b])+'%':'')+'</span>';}).join('')+'</div>'+
+    '<div class="pe-legend">'+PE_BKT.map(function(b){return '<span><i class="pe-dot b-'+b+'"></i>'+peEsc(S[b])+' <b class="pe-num">'+pePct(r.mix[b]||0)+'%</b></span>';}).join('')+'</div>'+
+    r.notes.map(function(n){return '<div class="apb-warn pe-gap"><div class="apb-txt pe-warn-t">'+peEsc(n)+'</div></div>';}).join('')+
+    '<div class="apb-lab pe-gap">'+peEsc(P.compare_title)+'</div>'+
+    '<div class="pe-tw"><table class="pe-cmp"><thead><tr>'+P.cols.map(function(c){return '<th>'+peEsc(c)+'</th>';}).join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<p class="pe-note">'+peEsc(peFill(P.split_note,{th:100-r.foreign,fx:r.foreign}))+'</p>'+
+    (h&&h.unmeasured_pct?'<p class="pe-note">'+peEsc(peFill(P.unmeasured,{x:h.unmeasured_pct,names:h.unmeasured.map(function(k){return P.inputs[k]||k;}).join(', ')}))+'</p>':'')+
+    '<p class="pe-line">'+peEsc(P.no_verdict)+'</p>'+
+    '<p class="pe-note">'+peEsc(d.texts.disclaimer)+'</p>'+
+    '<p class="pe-note">'+peEsc(P.saved_no)+'</p>'+
+    '<button type="button" class="ag-more" id="peRedo">'+ic('lc-refresh-cw')+peEsc(P.redo)+'</button></div>';
+}
+
+
+function portEduShellHTML(){
+  var d=window.PORT_EDU_DATA;
+  if(!d)return '<section class="card"><div class="s-pad"><p class="s-sub" style="margin:0">'+(PE.err?'โหลดข้อมูลไม่สำเร็จ ลองเปิดแท็บนี้ใหม่อีกครั้ง':'กำลังโหลด…')+'</p></div></section>';
+  if(PE.pick==null)PE.pick=d.table.pick.default;
+  if(PE.F==null)PE.F=d.history.default_foreign;
+  if(!PE.hold){PE.hold={};Object.keys(d.port.inputs).forEach(function(k){PE.hold[k]=0;});}
+  return '<div class="apb-warn pe-banner scroll-reveal"><div class="apb-lab">'+ic('lc-info')+peEsc(d.banner)+'</div></div>'+
+    '<section class="card scroll-reveal">'+peMirrorHTML(d)+'</section>'+
+    '<section class="card scroll-reveal" id="peTable">'+peTableHTML(d)+'</section>'+
+    '<section class="card scroll-reveal">'+peLadderHTML(d)+'</section>'+
+    '<section class="card scroll-reveal" id="peGrowth">'+peGrowthHTML(d)+'</section>'+
+    '<section class="card scroll-reveal" id="pePort">'+(PE.res?pePortResultHTML(d):pePortFormHTML(d))+'</section>'+
+    '';
+}
+/* Called whenever the พอร์ต panel is (or becomes) visible: loads the data once, then paints + binds. */
+function mountPortEdu(){
+  var host=root.querySelector('#portEdu');if(!host)return;
+  if(!window.PORT_EDU_DATA){
+    PE.err=false;
+    portEduLoad(function(ok){PE.err=!ok;var h=root.querySelector('#portEdu');if(!h)return;h.innerHTML=portEduShellHTML();if(ok)bindPortEdu();});
+    return;
+  }
+  if(!host.dataset.bound){host.innerHTML=portEduShellHTML();bindPortEdu();}
+}
+function bindPortEdu(){
+  var d=window.PORT_EDU_DATA,host=root.querySelector('#portEdu');if(!d||!host)return;
+  host.dataset.bound='1';
+  var q=function(s){return host.querySelector(s);},qa=function(s){return host.querySelectorAll(s);};
+  /* Motion (2026-10-08 audit): a tap (level, amount chip) replays the chart's reveal like a first view;
+     dragging the Thai/foreign slider morphs the bars and lines to the new values instead (peLadderMorph,
+     peGrowthMorph), so a continuous drag never restarts the animation. */
+  var paintGrowth=function(replay){q('#peGrowthTitle').textContent=peGrowthTitle(d);q('#peGrowthBody').innerHTML=peGrowthBodyHTML(d);if(replay)peReplay(q('#peGrowthBody'));};
+  var setPick=function(n){
+    PE.pick=n;
+    qa('[data-pe-pick]').forEach(function(b){var on=+b.dataset.pePick===n;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);});
+    qa('[data-pe-row]').forEach(function(r){r.classList.toggle('on',+r.dataset.peRow===n);});
+    q('#pePickBody').innerHTML=pePickBodyHTML(d);peReplay(q('#pePickBody'));
+    qa('#peLadderBody .pe-lad').forEach(function(r,i){r.classList.toggle('on',i+1===n);});
+    var lp=q('#peLadPick');if(lp)lp.textContent=peLadPickText(d);
+    paintGrowth(true);
+  };
+  qa('[data-pe-pick],[data-pe-row]').forEach(function(b){b.onclick=function(){setPick(+(b.dataset.pePick||b.dataset.peRow));};});
+  var fx=q('#peFx');
+  fx.oninput=function(){PE.F=+fx.value;q('#peFxTxt').textContent=peFill(d.texts.split_template,{th:100-PE.F,fx:PE.F});peLadderMorph(d,q('#peLadderBody'));q('#peGrowthTitle').textContent=peGrowthTitle(d);peGrowthMorph(d,q('#peGrowthBody'));};
+  var setAmt=function(a,fromInput){
+    if(!(a>0))return;PE.amt=a;
+    qa('[data-pe-amt]').forEach(function(b){var on=+b.dataset.peAmt===a;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);});
+    if(!fromInput)q('#peAmtIn').value='';
+    paintGrowth(!fromInput); // typed amounts update quietly; a chip tap replays
+  };
+  qa('[data-pe-amt]').forEach(function(b){b.onclick=function(){setAmt(+b.dataset.peAmt);};});
+  var amtIn=q('#peAmtIn');amtIn.oninput=function(){setAmt(Math.min(1e9,Math.round(Number(amtIn.value)||0)),true);};
+  bindPePort(d,host);
+  /* Scroll motion like every other tab (2026-10-08 fix — these three cards used to carry data-no-motion permanently,
+     so half the tab never moved). A card only drops out of the motion once someone actually touches/focuses one of its
+     sliders or fields, so dragging and typing never happen on a tilted card (same reason as the Asset Knowleges map). */
+  var freeze=function(e){var t=e.target;if(!t||!t.closest||!t.closest("input,select,textarea"))return;var c=t.closest("section.card");
+    if(c&&!c.hasAttribute("data-no-motion")){c.setAttribute("data-no-motion","");c.style.transform="";c.style.transformOrigin="";}};
+  host.addEventListener("pointerdown",freeze,true);host.addEventListener("focusin",freeze);
+  initCharts(host);
+  revealTick();
+}
+/* Replays a chart's one-time reveal after its content was swapped (only if it was already revealed;
+   one not yet scrolled into view still waits for initCharts' observer). */
+function peReplay(el){
+  if(!el)return;
+  el.classList.remove('pe-live');
+  if(!el.classList.contains('viz-in'))return;
+  // snap back to the start state with transitions off (.pe-reset), else the reset itself animates and cancels the replay
+  el.classList.add('pe-reset');el.classList.remove('viz-in');void el.offsetWidth;
+  el.classList.remove('pe-reset');void el.offsetWidth;el.classList.add('viz-in');
+}
+/* Slider drag: rebuild the ladder, then start each band/dot from its previous geometry so the short
+   .pe-live transition carries it to the new one. */
+function peLadderMorph(d,box){
+  var geo=function(){return [].map.call(box.querySelectorAll('.pe-lad'),function(r){var b=r.querySelector('.pe-lad-band'),m=r.querySelector('.pe-lad-med');return {l:b.style.left,w:b.style.getPropertyValue('--w'),m:m.style.left};});};
+  var from=geo();box.innerHTML=peLadderBodyHTML(d);
+  if(!box.classList.contains('viz-in'))return;
+  var to=geo(),rows=box.querySelectorAll('.pe-lad');
+  var apply=function(g){[].forEach.call(rows,function(r,i){if(!g[i])return;var b=r.querySelector('.pe-lad-band');b.style.left=g[i].l;b.style.setProperty('--w',g[i].w);r.querySelector('.pe-lad-med').style.left=g[i].m;});};
+  box.classList.add('pe-live');apply(from);void box.offsetWidth;apply(to);
+}
+/* Slider drag on the growth chart: SVG points can't CSS-transition, so tween them (and the low-point
+   marker / baseline) from the previous chart to the new one over 250ms. Reduced motion: no tween. */
+var PE_TW=null;
+function peGrowthMorph(d,box){
+  var pts=function(s){return String(s||'').trim().split(/[\s,]+/).map(Number);};
+  var svg=box.querySelector('svg'),old={};
+  if(svg){[].forEach.call(svg.querySelectorAll('polyline'),function(p){old[p.getAttribute('class')]=pts(p.getAttribute('points'));});
+    var c0=svg.querySelector('.pe-g-bot'),b0=svg.querySelector('.pe-g-base');if(c0)old.bot=[+c0.getAttribute('cx'),+c0.getAttribute('cy')];if(b0)old.base=+b0.getAttribute('y1');}
+  box.innerHTML=peGrowthBodyHTML(d);
+  if(PE_TW){cancelAnimationFrame(PE_TW);PE_TW=null;}
+  if(RM||!svg||!box.classList.contains('viz-in'))return;
+  var s2=box.querySelector('svg'),lines=[].filter.call(s2.querySelectorAll('polyline'),function(p){var o=old[p.getAttribute('class')];return o&&o.length===pts(p.getAttribute('points')).length;});
+  var to=lines.map(function(p){return pts(p.getAttribute('points'));}),fr=lines.map(function(p){return old[p.getAttribute('class')];});
+  var c=s2.querySelector('.pe-g-bot'),cTo=c&&[+c.getAttribute('cx'),+c.getAttribute('cy')],b=s2.querySelector('.pe-g-base'),bTo=b&&+b.getAttribute('y1');
+  var t0=performance.now(),mix=function(a,z,k){return a+(z-a)*k;};
+  var step=function(t){
+    var k=Math.min(1,(t-t0)/250),e=1-Math.pow(1-k,3);
+    lines.forEach(function(p,i){var a=fr[i],z=to[i],o=[];for(var j=0;j<z.length;j+=2)o.push(mix(a[j],z[j],e).toFixed(1)+','+mix(a[j+1],z[j+1],e).toFixed(1));p.setAttribute('points',o.join(' '));});
+    if(c&&old.bot){c.setAttribute('cx',mix(old.bot[0],cTo[0],e).toFixed(1));c.setAttribute('cy',mix(old.bot[1],cTo[1],e).toFixed(1));}
+    if(b&&old.base!=null){var y=mix(old.base,bTo,e).toFixed(1);b.setAttribute('y1',y);b.setAttribute('y2',y);}
+    PE_TW=k<1?requestAnimationFrame(step):null;
+  };
+  PE_TW=requestAnimationFrame(step);
+}
+function bindPePort(d,host){
+  var box=host.querySelector('#pePort');
+  if(PE.res){box.querySelector('#peRedo').onclick=function(){PE.res=null;box.innerHTML=pePortFormHTML(d);bindPePort(d,host);};return;}
+  var keys=Object.keys(d.port.inputs);
+  var sum=function(){return peR1(peSum(keys.map(function(k){return PE.hold[k];})));};
+  var ok=function(){return Math.abs(sum()-100)<=0.5;};
+  var paintSum=function(){
+    var el=box.querySelector('#peSum');
+    el.className='pe-sum'+(ok()?' ok':' bad');
+    el.innerHTML=ok()?peEsc(d.port.sum_label)+' <b>'+pePct(sum())+'%</b> '+ic('lc-check'):peEsc(peFill(d.port.sum_error,{sum:pePct(sum())}));
+    box.querySelector('#peCheck').disabled=!ok();
+  };
+  box.querySelectorAll('input[data-pe-k]').forEach(function(inp){inp.oninput=function(){
+    var k=inp.dataset.peK;PE.hold[k]=Math.max(0,Math.min(100,Number(inp.value)||0));
+    box.querySelectorAll('input[data-pe-k="'+k+'"]').forEach(function(o){if(o!==inp)o.value=PE.hold[k];});
+    paintSum();
+  };});
+  box.querySelector('#peCheck').onclick=function(){
+    if(!ok())return;
+    PE.res=pePortCompute(d,PE.hold);
+    box.innerHTML=pePortResultHTML(d);bindPePort(d,host);initCharts(box);
+    box.scrollIntoView({block:'start',behavior:RM?'auto':'smooth'});
+  };
+  paintSum();
+}
 /* Source text conventions: **bold**, literal \n line breaks, and inline "(1) … (2) … (3) …" sub-items
    (the source's own full edition breaks those onto their own indented lines — same here, as a list). */
 function apbTxt(s,inLi){
@@ -6994,7 +7648,7 @@ function sidesHTML(r){
   return '<section class="card mb-lg scroll-reveal" id="sides-sec"><div class="sides-hd"><div class="s-ey">ข้อมูลจากกิจกรรมบูธจริง</div><h2 class="s-h">6 ด้านที่วัดได้จากคุณ</h2><p class="s-sub" style="margin-bottom:2px">แต่ละด้านมาจากพฤติกรรมในงาน ไม่ใช่คำตอบจากแบบสอบถาม</p></div>'+items+'</section>';
 }
 function togSide(row){var item=row.parentElement,body=item.querySelector('.side-body'),cv=row.querySelector('.s-cv'),isOpen=body.classList.contains('show');root.querySelectorAll('.side-body.show').forEach(function(b){b.classList.remove('show');});root.querySelectorAll('.s-cv.open').forEach(function(c){c.classList.remove('open');});if(!isOpen){body.classList.add('show');cv.classList.add('open');}}
-function resetQuiz(){st={phase:'splash',spidx:0,idx:0,s1:[null,null,null],s2:[null,null,null,null,null,null,null],s3:[]};RESULT=null;BOOK2_TAB='identity';render();}
+function resetQuiz(){st={phase:'splash',spidx:0,idx:0,s1:[null,null,null],s2:[null,null,null,null,null,null,null],s3:[]};RESULT=null;BOOK2_TAB='identity';PE.res=null;PE.hold=null;PE.pick=null;PE.F=null;PE.amt=100000;render();}
 
 /* ══ HOME TAB ══ content ported verbatim from Playbook Final's Home screen (see PLAYBOOK-2026-DATA-
    BASELINE.md §5). Progress values are mock and kept consistent with the Book page's own "2/6 ด้าน"
@@ -8653,7 +9307,7 @@ function gamesDlTap(){
   var filled=gamesPlayedCount();
   if(filled<1)gamesDlModal('blocked');
   else if(filled<6)gamesDlModal('partial');
-  else gamesDlDone();
+  else openPdfPreview({onConfirm:gamesDlDone}); // the A4 preview + confirm step (2026-10-09), same as the Book tab's button
 }
 /* dlpbModal content is filled in per-tap rather than baked into dlpbModalHTML() — same title/sub/
    footer node IDs serve both the 'blocked' (1 button) and 'partial' (2 buttons) states, so there's
@@ -8679,7 +9333,7 @@ function gamesDlModal(kind){
        (2026-09-18, 5th follow-up direction) from "ยืนยันที่จะดาวน์โหลด PLAYBOOK"/"กลับไปเล่นเกม". */
     actions.innerHTML='<button class="btn btn-primary" id="dlpbConfirm">ยืนยันดาวน์โหลด PLAYBOOK</button><button class="ag-more" id="dlpbBack" style="font-size:var(--fs-sub);border-radius:var(--rpill)">กลับไปเล่นเกมต่อ</button>';
     modal.querySelector('#dlpbBack').onclick=gamesDlModalClose;
-    modal.querySelector('#dlpbConfirm').onclick=function(){gamesDlModalClose();gamesDlDone();};
+    modal.querySelector('#dlpbConfirm').onclick=function(){gamesDlModalClose();openPdfPreview({onConfirm:gamesDlDone});};
   }
   modal.classList.add('show');
 }
