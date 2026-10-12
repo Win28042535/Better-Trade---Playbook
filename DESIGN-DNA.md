@@ -422,8 +422,9 @@ book scrolled the group-tab row into place with an animation; it now snaps (`apb
 Motion verified clean: scroll-reveal settles in all 18 books (walk top→bottom at 375px; no card left tilted above the 42% line or
 at the page end; revealTick costs 1–2ms on a 3,300-node page), every toggle re-syncs (step open/close, fold, read-more, sources,
 keyboard) on macro/tax/snote/ai/fund, TOC + section + source jumps land at the 70px margin and never under the top bar, RM
-removes every transform and keeps all content visible. Booth map's own `scrollIntoView({behavior:'smooth'})` (lines ~9225) is
-outside Asset Knowledge and still ignores RM.
+removes every transform and keeps all content visible. The booth map's two `scrollIntoView({behavior:'smooth'})` (step ↔ marker focus,
+เดินบูธ v2) also ignored RM; they now use `RM?'auto':'smooth'` (checked: smooth normally, auto under RM). No smooth-scroll call in
+the app is left unguarded.
 
 **2026-10-12 — Asset Knowledge step 2: visual step summaries, action tables, answer labels (all 18 books).**
 Approved from a MACRO steps 1–3 preview. Each of the 144 steps now opens on the source's visual summary (`apbVisual`):

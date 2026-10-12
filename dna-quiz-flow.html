@@ -9222,8 +9222,8 @@ function renderBooth(){
     var pulseMarker=function(i){var mk=root.querySelector('.map-ph .bmk[data-i="'+i+'"]');if(!mk)return;mk.classList.remove('flash');void mk.offsetWidth;mk.classList.add('flash');};
     var selectStop=function(i,from){
       BOOTH_SEL=i;applySel();
-      if(from==='step'){var mp=root.querySelector('.map-ph');if(mp&&mp.scrollIntoView)mp.scrollIntoView({behavior:'smooth',block:'center'});pulseMarker(i);}
-      else{var rr=root.querySelector('.rt-row.v2[data-i="'+i+'"]');if(rr&&rr.scrollIntoView)rr.scrollIntoView({behavior:'smooth',block:'center'});}
+      if(from==='step'){var mp=root.querySelector('.map-ph');if(mp&&mp.scrollIntoView)mp.scrollIntoView({behavior:RM?'auto':'smooth',block:'center'});pulseMarker(i);}
+      else{var rr=root.querySelector('.rt-row.v2[data-i="'+i+'"]');if(rr&&rr.scrollIntoView)rr.scrollIntoView({behavior:RM?'auto':'smooth',block:'center'});}
     };
     root.querySelectorAll('.rt-row.v2').forEach(function(r){r.onclick=function(){selectStop(+r.dataset.i,'step');};});
     root.querySelectorAll('.map-ph .bmk').forEach(function(m){m.onclick=function(e){e.stopPropagation();selectStop(+m.dataset.i,'map');};});
