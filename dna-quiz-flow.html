@@ -1719,6 +1719,13 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-sb>*+*{margin-top:var(--sp-stack);}
 .apb-ul{margin:0;padding-left:1.2em;font-size:var(--fs-bodysm);line-height:1.6;color:var(--ink);}
 .apb-ul li+li{margin-top:var(--sp-glue);}
+/* Hanging item (2026-10-12 line-break audit): an item that opens on a typed number ("1. สินทรัพย์อ้างอิงคืออะไร…") puts the
+   number in its own column and lets every wrapped line sit under the first WORD, not under the number or a bullet. It
+   replaces the bullet (the list used to show "• 1. …"), so it steps back into the list's own left padding. */
+.apb-ul li.apb-li-n{list-style:none;display:flex;gap:var(--sp-glue);margin-left:-1.2em;}
+.apb-li-m{flex:0 0 1.9em;font-variant-numeric:tabular-nums;color:var(--muted);}
+.apb-li-b{flex:1;min-width:0;}
+.apb-t-n{display:flex;gap:var(--sp-glue);min-width:0;} /* prompt-pack row: "1." then the name + its one-line use, both hanging */
 /* Tool link card (style A, 2026-10-12) — same box as .apb-bl-link ("อ่านเรื่อง…ต่อ"): white, --line-soft, --r1. */
 .apb-tool{position:relative;display:flex;align-items:center;gap:var(--sp-inline);min-height:44px;padding:var(--sp-inline) var(--sp-stack);background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r1);transition:background .15s var(--ease),border-color .15s var(--ease);}
 .apb-tool+.apb-tool{margin-top:var(--sp-list);}
@@ -7383,6 +7390,17 @@ function apbRich(t){
       return ids.indexOf(p[0])>-1&&(!p[1]||sec)?'<a href="#" class="apb-xb" data-book="'+p[0]+'"'+(sec?' data-sec="'+sec+'"':'')+'>'+label+'</a>':label;})
     .replace(APB_INLINE_REF,function(m){return '<span class="apb-refs-in">'+m.match(/S\d+/g).map(function(r){return '<a href="#" class="apb-ref" data-ref="'+r+'">'+r.slice(1)+'</a>';}).join('')+'</span>';});
 }
+/* Line-break audit (2026-10-12): a spaced operator or separator ("เงินได้ − ค่าใช้จ่าย", "→", "=", "+", "×", "÷", "·", "|",
+   " - ") must never START a wrapped line — it read as a bullet (143 of them at 375px across all 18 books, e.g. the TAX
+   formula). A no-break space BEFORE the mark glues it to the word it follows; the plain space after it stays the break.
+   A sign written straight onto a number (−7,685.18) has no space after it and is left alone. */
+function apbNb(h){return String(h).replace(/(\S) (?=(?:[−–=+×÷→·|]|-)(?: |$))/g,'$1 ');}
+/* A typed "1. …" / "10) …" at the start of an item: split the number from its text, so the item can hang (number in its own
+   column, wrapped lines under the first word) instead of wrapping under the number/bullet. Decimals ("2.50") don't match. */
+function apbLead(s){var m=/^\s*(\d{1,2}[.)])\s+([\s\S]+)$/.exec(String(s==null?'':s));return m?{m:m[1],r:m[2]}:null;}
+/* One <li> for a text item: a typed-number item hangs (.apb-li-n), anything else is the plain item. */
+function apbLi(s,render){var L=apbLead(s);render=render||function(x){return apbTxt(x,true);};
+  return L?'<li class="apb-li-n"><span class="apb-li-m">'+apbEsc(L.m)+'</span><span class="apb-li-b">'+render(L.r)+'</span></li>':'<li>'+render(s)+'</li>';}
 function apbTxt(s,inLi){
   // inLi: result goes INSIDE an <li> (step actions) — no <p> wrappers there, so no stray </p> is left
   // behind when the text also carries a "(1) … (2) …" sub-list (bug found 2026-10-06: stripping the
@@ -7390,10 +7408,14 @@ function apbTxt(s,inLi){
   var t=apbRich(apbEsc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>'));
   var parts=t.split(/\s(?=\(\d{1,2}\)\s)/);
   var firstItem=/^\(1\)\s/.test(parts[0])?0:(parts.length>1&&/^\(1\)\s/.test(parts[1])?1:-1);
-  if(parts.length>2&&firstItem>-1){
-    var lead=firstItem?(inLi?parts[0].replace(/\n/g,'<br>'):'<p>'+parts[0].replace(/\n/g,'<br>')+'</p>'):'';
-    return lead+'<ol class="apb-ol">'+parts.slice(firstItem).map(function(p){return '<li>'+p.replace(/^\(\d{1,2}\)\s/,'').replace(/\n/g,'<br>')+'</li>';}).join('')+'</ol>';
+  /* a sub-list needs 2+ "(n)" items (the source's own rule: (1) and (2) both present). It used to need 3 parts, which for a
+     text that opens on "(1)" meant 3 items — a 2-item list stayed running text (REAL ESTATE's 2569–2570 measures). */
+  var nItems=parts.filter(function(p){return /^\(\d{1,2}\)\s/.test(p);}).length;
+  if(nItems>=2&&firstItem>-1){
+    var lead=firstItem?(inLi?apbNb(parts[0]).replace(/\n/g,'<br>'):'<p>'+apbNb(parts[0]).replace(/\n/g,'<br>')+'</p>'):'';
+    return lead+'<ol class="apb-ol">'+parts.slice(firstItem).map(function(p){return '<li>'+apbNb(p.replace(/^\(\d{1,2}\)\s/,'')).replace(/\n/g,'<br>')+'</li>';}).join('')+'</ol>';
   }
+  t=apbNb(t);
   return inLi?t.replace(/\n/g,'<br>'):'<p>'+t.replace(/\n/g,'<br>')+'</p>';
 }
 var APB_TH_MONTH=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -7446,7 +7468,7 @@ function apbFieldHTML(f,fi,state,bid){
     if(opts.length>=2&&opts.length<=6&&opts.every(function(o){return o.length<=30;})){
       return '<div class="apb-g"><div class="apb-gt">'+apbEsc(apbCleanLabel(ttl))+'</div><div class="apb-chips" role="group" aria-label="'+apbEsc(apbCleanLabel(ttl))+'">'+
         opts.map(function(o){var on=state.f[k0]===o;return '<button type="button" class="apb-chip'+(on?' on':'')+'" data-chip="'+k0+'" data-v="'+apbEsc(o)+'" aria-pressed="'+(on?'true':'false')+'">'+apbEsc(o)+'</button>';}).join('')+'</div>'+
-        (hint?'<div class="apb-hint">'+apbEsc(hint)+'</div>':'')+'</div>';
+        (hint?'<div class="apb-hint">'+apbNb(apbEsc(hint))+'</div>':'')+'</div>';
     }
     return '<div class="apb-g"><label class="apb-cell w"><span class="apb-cl">'+apbEsc(apbCleanLabel(raw))+'</span><span class="apb-ci"><input class="apb-bl" type="text" data-fk="'+k0+'" value="'+val(k0)+'" maxlength="200" autocomplete="off" aria-label="'+apbEsc(apbCleanLabel(raw).slice(0,60))+'"></span></label></div>';
   }
@@ -7571,7 +7593,7 @@ function apbRenderField(def,state,fi){
       var al=(c.label||title||'').slice(0,60);
       return '<label class="apb-cell'+(c.wide?' w':'')+'">'+(c.label?'<span class="apb-cl">'+apbEsc(c.label)+'</span>':'')+
         '<span class="apb-ci"><input class="apb-bl" type="text"'+(numUnit(c.unit)?' inputmode="decimal"':'')+' data-fk="'+c.k+'" value="'+val(c.k)+'" maxlength="200" autocomplete="off" aria-label="'+apbEsc(al)+'">'+(c.unit?'<span class="apb-u">'+apbEsc(c.unit)+'</span>':'')+'</span></label>';
-    }).join('')+'</div>'+(hintTail?'<div class="apb-hint">'+apbEsc(hintTail)+'</div>':'')+'</div>';
+    }).join('')+'</div>'+(hintTail?'<div class="apb-hint">'+apbNb(apbEsc(hintTail))+'</div>':'')+'</div>';
 }
 /* ══ Step 2 (2026-10-12): the source round of 9 Oct's reader layers, one function per source renderer ══
    render_visual/v_table/v_panel -> apbVisual (quick table, panels, how-to, ask yourself, takeaways), action_table/
@@ -7618,7 +7640,7 @@ function apbAnswer(a,labels){
 function apbVPanel(p){
   var k=p.kind,it=p.items||[],inner='';
   if(k==='pairs')inner=it.map(function(x){return '<div class="apb-vkv"><span>'+apbTxt(x.label,true)+'</span><span>'+apbTxt(x.value,true)+'</span></div>';}).join('');
-  else if(k==='list')inner='<ul class="apb-ul">'+it.map(function(x){return '<li>'+apbTxt(x,true)+'</li>';}).join('')+'</ul>';
+  else if(k==='list')inner='<ul class="apb-ul">'+it.map(function(x){return apbLi(x);}).join('')+'</ul>';
   else if(k==='flow')inner='<ol class="apb-vsteps">'+it.map(function(x,i){return '<li><span class="apb-vn">'+(i+1)+'</span><div><b>'+apbTxt(x.title,true)+'</b><span>'+apbTxt(x.desc,true)+'</span></div></li>';}).join('')+'</ol>';
   else if(k==='scale')inner='<ol class="apb-vscale">'+it.map(function(x){return '<li>'+apbTxt(x,true)+'</li>';}).join('')+'</ol>';
   else if(k==='quadrant'){var x=p.x||['',''],y=p.y||['',''];
@@ -7760,7 +7782,7 @@ function renderAssetBook(){
   function VIS(s){return !!(s.visual&&apbV2(D.id,s.n));}
   function actsHTML(s){
     var at=V2&&s.action_tables||{};
-    return '<div class="apb-blk"><div class="apb-lab">ทำอะไร</div><ul class="apb-ul">'+s.actions.map(function(a,k){var sp=at[String(k+1)];return '<li>'+(sp?apbActText(a,sp):apbTxt(a,true))+'</li>';}).join('')+'</ul></div>';
+    return '<div class="apb-blk"><div class="apb-lab">ทำอะไร</div><ul class="apb-ul">'+s.actions.map(function(a,k){var sp=at[String(k+1)];return apbLi(a,function(x){return sp?apbActText(x,sp):apbTxt(x,true);});}).join('')+'</ul></div>';
   }
   function sec(id,ey,title,inner){
     return '<section class="card scroll-reveal apb-sec" id="apb-'+id+'"><div class="s-pad"><div class="s-ey"><span>'+ey+'</span></div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">'+title+'</h2>'+inner+'</div></section>';
@@ -7803,7 +7825,7 @@ function renderAssetBook(){
       (PP.shared_rules?'<div class="apb-fq"><div class="apb-lab">กติกาท้ายทุกคำสั่ง</div><div class="apb-txt">'+apbTxt(PP.shared_rules)+'</div></div>':'')+
       (PP.why_it_works?'<div class="apb-analogy"><b>ทำไมถึงช่วย:</b> '+apbTxt(PP.why_it_works,true)+'</div>':'')+
       PP.prompts.map(function(p,k){
-        return '<div class="apb-step apb-mrow"><button class="apb-st" type="button" data-mrow aria-expanded="false" style="grid-template-columns:1fr auto"><span><span class="apb-t">'+apbEsc(p.n||k+1)+'. '+apbEsc(p.name)+'</span><span class="apb-s" style="display:block">'+apbEsc(p.use_for)+'</span></span>'+ic('lc-chevron-down','lib-cat-cv')+'</button>'+
+        return '<div class="apb-step apb-mrow"><button class="apb-st" type="button" data-mrow aria-expanded="false" style="grid-template-columns:1fr auto"><span class="apb-t-n"><span class="apb-li-m">'+apbEsc(p.n||k+1)+'.</span><span class="apb-li-b"><span class="apb-t">'+apbEsc(p.name)+'</span><span class="apb-s" style="display:block">'+apbEsc(p.use_for)+'</span></span></span>'+ic('lc-chevron-down','lib-cat-cv')+'</button>'+
           '<div class="apb-sb" hidden><pre class="apb-pre" id="apbPr'+k+'">'+apbEsc(p.prompt)+'</pre>'+
           '<button class="ag-more apb-more" type="button" data-copy="apbPr'+k+'">'+ic('lc-copy')+'<span>คัดลอกคำสั่ง</span></button>'+apbRefs(p.refs)+'</div></div>';
       }).join(''));
@@ -7831,7 +7853,7 @@ function renderAssetBook(){
       /* decade_map (LONGEVITY — 2026-10-12): the source's "แผนที่การเงินทีละช่วงอายุ" — age band, focus, actions, why + ที่มา. */
       (TH.decade_map&&TH.decade_map.length?'<div class="apb-prog">แผนที่การเงินทีละช่วงอายุ</div>'+TH.decade_map.map(function(dm){
         return '<div class="apb-item"><div class="apb-lab">'+apbEsc(dm.decade)+'</div><div class="apb-q">'+apbTxt(dm.focus,true)+'</div>'+
-          ((dm.actions||[]).length?'<ul class="apb-ul">'+dm.actions.map(function(a){return '<li>'+apbTxt(a,true)+'</li>';}).join('')+'</ul>':'')+
+          ((dm.actions||[]).length?'<ul class="apb-ul">'+dm.actions.map(function(a){return apbLi(a);}).join('')+'</ul>':'')+
           (dm.why?'<div class="apb-analogy"><b>เพราะ:</b> '+apbTxt(dm.why,true)+'</div>':'')+apbRefs(dm.refs)+'</div>';
       }).join(''):'')+
       (TH.final_question?'<div class="apb-fq"><div class="apb-lab">คำถามสุดท้ายก่อนตัดสินใจ</div><div class="apb-q">'+apbTxt(TH.final_question,true)+'</div></div>':'')+
@@ -7867,7 +7889,7 @@ function renderAssetBook(){
         return '<article class="side-item'+(VIS(s)?' apb-vstep':'')+'" data-step="'+i+'"><div class="list-row side-row" role="button" tabindex="0" aria-expanded="false"><div class="side-num lck">'+s.n+'</div>'+
           /* English step code ABOVE the Thai title, violet (2026-10-12, per direction) — the same pairing the book index uses
              (.apb-en over .apb-t). Source order = reading order, so a screen reader also hears the code first. */
-          '<div class="side-cx"><div class="side-s apb-code">'+apbEsc(s.code)+'</div><div class="side-t">'+apbEsc(s.title)+'</div></div>'+
+          '<div class="side-cx"><div class="side-s apb-code">'+apbEsc(s.code)+'</div><div class="side-t">'+apbNb(apbEsc(s.title))+'</div></div>'+
           '<div class="side-r">'+ic('lc-chevron-down','s-cv')+'</div></div>'+
           '<div class="side-body"><div class="side-bi"><div class="side-dl">'+
             (s.goal?'<div class="apb-blk"><div class="apb-lab">ขั้นนี้ได้อะไร</div><div class="apb-txt">'+apbTxt(s.goal)+'</div></div>':'')+
@@ -7884,7 +7906,7 @@ function renderAssetBook(){
             (s.tools&&s.tools.length?'<div class="apb-blk"><div class="apb-lab">เครื่องมือ</div>'+s.tools.map(function(t){
               var u=String(t.url||''),inner=u.charAt(0)==='#',host=u&&!inner?u.replace(/^https?:\/\/(www\.)?/i,'').split(/[\/?#]/)[0]:'';
               var kv=V2&&t.use_for?apbKV(t.use_for):null; // "คืออะไร: … | ทำไมสำคัญ: …" -> label/value rows
-              var nm=inner?'<a href="#" class="apb-tool-a apb-xb" data-book="'+apbEsc(u.slice(1))+'">'+apbEsc(t.name)+'</a>':u?'<a class="apb-tool-a" href="'+apbEsc(u)+'" target="_blank" rel="noopener">'+apbEsc(t.name)+'</a>':'<span class="apb-tool-a">'+apbEsc(t.name)+'</span>';
+              var nm=inner?'<a href="#" class="apb-tool-a apb-xb" data-book="'+apbEsc(u.slice(1))+'">'+apbNb(apbEsc(t.name))+'</a>':u?'<a class="apb-tool-a" href="'+apbEsc(u)+'" target="_blank" rel="noopener">'+apbNb(apbEsc(t.name))+'</a>':'<span class="apb-tool-a">'+apbNb(apbEsc(t.name))+'</span>';
               return '<div class="apb-tool'+(u?'':' is-static')+'">'+ic(inner?'lc-book-open':u?'lc-external-link':'lc-file-text','apb-tool-ic')+
                 '<div class="apb-tool-x">'+nm+(t.use_for?(kv||'<div class="apb-tool-d">'+apbTxt(t.use_for,true)+'</div>'):'')+(host?'<div class="apb-tool-h">'+apbEsc(host)+'</div>':'')+'</div>'+
                 (u?ic('lc-chevron-right','apb-tool-cv'):'')+'</div>';}).join('')+'</div>':'')+
@@ -7909,9 +7931,9 @@ function renderAssetBook(){
       '<div id="apbSrcList" hidden>'+D.sources.map(function(s){
         return '<div class="apb-src" id="apb-src-'+apbEsc(s.id)+'"><b>'+apbEsc(String(s.id).replace(/^S/,''))+'</b>'+
           (s.scope?'<span class="apb-scope">'+(s.scope==='TH'?'ไทย':'ต่างประเทศ')+'</span>':'')+
-          apbEsc(s.publisher)+' · '+(s.url?'<a href="'+apbEsc(s.url)+'" target="_blank" rel="noopener">'+apbEsc(s.title)+'</a>':apbEsc(s.title))+
+          apbNb(apbEsc(s.publisher))+' · '+(s.url?'<a href="'+apbEsc(s.url)+'" target="_blank" rel="noopener">'+apbNb(apbEsc(s.title))+'</a>':apbNb(apbEsc(s.title)))+
           (s.verified===false?' <span class="apb-unv">ยังยืนยันไม่ได้</span>':'')+
-          '<div class="apb-acc">'+[APB_KIND_TH[s.kind]||apbEsc(s.kind||''),s.what_it_supports?'ใช้ยืนยัน: '+apbTxt(s.what_it_supports,true):'',s.accessed?'เข้าถึง '+apbDate(s.accessed):''].filter(Boolean).join(' · ')+'</div></div>';
+          '<div class="apb-acc">'+[APB_KIND_TH[s.kind]||apbEsc(s.kind||''),s.what_it_supports?'ใช้ยืนยัน: '+apbTxt(s.what_it_supports,true):'',s.accessed?'เข้าถึง '+apbDate(s.accessed):''].filter(Boolean).join(' · ')+'</div></div>';
       }).join('')+'</div>'+
     '</div></section>';
   apbShell(apbEsc(D.name_th),'<span class="apb-hd-en">'+apbEn(D.name_en)+'</span>','know',body);

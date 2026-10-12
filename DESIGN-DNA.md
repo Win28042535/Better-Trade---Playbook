@@ -397,6 +397,17 @@ Verified at 320/375/768: 1,193 rows strictly ascending, every pill resolves to a
 icon, a tinted badge, a grey tile and a 3D icon were the others; 3D files exist for only 8 asset types, so no 3D).
 Same 16px size; `.s-ey svg.apb-hd-ic` only — the index tiles (ink icon in a grey tile) are unchanged. Checked on all
 18 books: icon colour = name colour, icon vertically centred on the name, 16px.
+(10) Line-break audit (operators, separators, typed lists). (a) A spaced operator/separator (− = + × ÷ → · | and " - ")
+started a wrapped line 143 times at 375px across all 18 books (the TAX formula "เงินได้ − ค่าใช้จ่าย − …" read as a
+bullet list). `apbNb()` puts a no-break space BEFORE the mark so it stays with the word it follows and the break falls
+after it; applied in `apbTxt` (all running text, tables, notes, how-to, panels) and on source lines, tool names and step
+titles. A sign written onto a number (−7,685.18) has no space after it and is left alone; the prompt-pack `<pre>` is
+verbatim. Result: 0 at 320/375/768. (b) Items that open on a typed number ("1. สินทรัพย์อ้างอิงคืออะไร…", 19: STRUCTURED
+NOTE's 10 term-sheet questions + the AI prompt rows) wrapped under the bullet/number (12–15px off): `apbLead`/`apbLi`
+split the number into its own 1.9em column (`.apb-li-n`, replaces the bullet — it showed "• 1. …"), so every wrapped line
+sits under the first word. (c) `apbTxt` needed 3 "(n)" parts for a list, so a 2-item "(1) … (2) …" stayed running text
+(REAL ESTATE's 2569–2570 measures); it now needs 2 items, the source's own rule. Rule: a mark that joins two things never
+opens a line; an item that opens on a number hangs.
 
 **2026-10-12 — Asset Knowledge step 2: visual step summaries, action tables, answer labels (all 18 books).**
 Approved from a MACRO steps 1–3 preview. Each of the 144 steps now opens on the source's visual summary (`apbVisual`):
