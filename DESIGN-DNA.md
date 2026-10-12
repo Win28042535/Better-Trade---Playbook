@@ -356,6 +356,20 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-10-12 — Asset Knowledge: 18 books, citations as complete as the source document (step 1 of 2).**
+Source = the content team's round of 9 Oct (`BT2026_AssetPlaybooks_2026-09-30 4/.../_source`). Data: + ASSET
+ALLOCATION, GLOBAL STOCK, TFEX, STRUCTURED NOTE, a 4th index group "อนุพันธ์และผลิตภัณฑ์ซับซ้อน" (tab icon
+`lc-zap`, group icons now keyed by name), the 5 small fixes in MACRO/CRYPTO/DR/REAL ESTATE/TAX; DR's book icon
+`lc-globe` → `lc-link` (GLOBAL took the globe); booth "หุ้นต่างประเทศ" → `global`; sw.js `apb-v3`. Reader-side
+completeness, matching the source's own `rich()`/section rules: inline "(S2, S7)" citations are tappable
+(`.apb-refs-in`), "[X PLAYBOOK](#id)" and the 13 tools whose url is "#id" open that book in place (`.apb-xb`,
+previously raw text / a new tab of this page), bare URLs link; new sections `fit_matrix` (หน้าที่ในพอร์ต),
+`prompt_pack` (ชุดคำสั่ง AI, copy button), LONGEVITY's `decade_map`, `method_matrix.refs`/`first_col`, the
+at-event caveat line; each source now shows its ไทย/ต่างประเทศ badge, kind, "ใช้ยืนยัน" and an unverified flag.
+`tools/build-asset-playbooks.js` now aborts on a citation with no matching source or a link to an unknown book.
+Not shown on purpose: `language_guard`/`open_issues` (team notes), sources' `lang`, steps' `chip` (the
+source uses it only as a short menu label). Step 2 (visual step summaries, action tables, answer labels) next.
+
 **2026-10-09 — One Tab Header for every Playbook tab.** Per direction "ให้ทุก tab มีการ์ดสี" +
 "คลังความรู้ควรมี icon + การ์ดเหมือน Asset Knowledge". New `.tab-hd` / `tabHeadHTML()` (see §7.2) now
 opens วิเคราะห์, ความสนใจ, พอร์ต, เส้นทาง and both ความรู้ sub-tabs; คลังความรู้'s heading moved out of
