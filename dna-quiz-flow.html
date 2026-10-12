@@ -1591,6 +1591,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-hd-en{font-family:var(--serif);letter-spacing:.06em;}
 /* English book name that titles each book's header card (e.g. "AI INVESTING"): violet (per direction). */
 .apb-ey-nm{color:var(--violet);}
+.s-ey svg.apb-hd-ic{color:var(--violet);} /* book title: the line icon takes the English name's violet (style A, 2026-10-12); the index tiles are unchanged */
 .apb-art{display:block;width:30px;height:30px;object-fit:contain;}
 .s-ey .apb-art{width:22px;height:22px;}
 /* 8 steps reuse the "6 ด้านที่วัดได้จากคุณ" classes (.side-*); only the open height needs room for real content. */
@@ -7843,7 +7844,7 @@ function renderAssetBook(){
   }
   var body=
     '<section class="card scroll-reveal"><div class="s-pad">'+
-      '<div class="s-ey">'+apbIcon(D.id,D.icon)+'<span class="apb-hd-en apb-ey-nm">'+apbEn(D.name_en)+'</span><span class="apb-bn">เล่ม '+D.n+'/'+IX.books.length+'</span></div>'+
+      '<div class="s-ey">'+ic(D.icon,'apb-hd-ic')+'<span class="apb-hd-en apb-ey-nm">'+apbEn(D.name_en)+'</span><span class="apb-bn">เล่ม '+D.n+'/'+IX.books.length+'</span></div>'+
       '<h2 class="s-h">'+apbEsc(D.headline)+'</h2>'+
       '<p class="s-sub" style="margin-bottom:0">'+apbEsc(D.tagline)+'</p>'+
       '<div class="apb-kv"><div class="apb-lab">เหมาะกับใคร</div><div class="apb-txt">'+apbTxt(D.who_for)+'</div></div>'+

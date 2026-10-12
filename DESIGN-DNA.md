@@ -393,6 +393,10 @@ wide (WCAG 2.2 target size ≥24px). The row now shows each source once in ascen
 `refrow()` does — the data lists them as cited (`S14, S15, S13, S18, S9`: 468 of 1,300 groups were out of order).
 In-sentence markers keep the order the author wrote. The quick table's ที่มา column reuses the same pills.
 Verified at 320/375/768: 1,193 rows strictly ascending, every pill resolves to a listed source, none overflows.
+(9) Book title eyebrow (icon · English name · เล่ม N/18): the line icon is violet like the name (style A of 6 — a bigger
+icon, a tinted badge, a grey tile and a 3D icon were the others; 3D files exist for only 8 asset types, so no 3D).
+Same 16px size; `.s-ey svg.apb-hd-ic` only — the index tiles (ink icon in a grey tile) are unchanged. Checked on all
+18 books: icon colour = name colour, icon vertically centred on the name, 16px.
 
 **2026-10-12 — Asset Knowledge step 2: visual step summaries, action tables, answer labels (all 18 books).**
 Approved from a MACRO steps 1–3 preview. Each of the 144 steps now opens on the source's visual summary (`apbVisual`):
