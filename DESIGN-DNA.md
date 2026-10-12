@@ -356,6 +356,28 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-10-12 — Asset Knowledge responsive + scroll-motion audit; number circles centred.** (1) Number circles: of the
+app's 6 kinds (`.apb-vn`, `.side-num`, `.rs-n`, `.rt-num`, `.bmk-num`, `.opt-key`) only `.apb-vn` was off — Baskervville's
+old-style figures sat 1.5–3.5px low and differed per digit; it now uses `--font`/`--fs-meta`/`--w-head` like `.rs-n`.
+Rule: number circles never use `--serif`. (2) Motion: toggles on the book page (step open/close, folds, keyboard) change
+the height without a scroll event, so cards pulled into view stayed mid-entry (tilted/shrunk) — the page now re-syncs
+`revealTick` on every toggle and after the 0.28s step animation. TOC buttons, "#book-section" links and source jumps
+measured the target while its entry transform was on and landed 62px ABOVE the screen; `apbScrollTo` measures the
+untransformed box (all now land at the 70px scroll-margin; the last section stops at the page end). (3) Responsive:
+from 600px the quick table is a real table (`.apb-vtab` grid, one header row, ที่มา column) instead of row cards;
+the 4-group tab row keeps the picked tab in view at phone width (`apbTabReveal`, also on return from a book).
+Re-verified at 320/375/768/1280: all 144 steps complete (text, refs, rows), nothing overflows.
+(4) Follow-up, same day: the phone-width outdent of the visual summary (a negative margin on `.apb-vis` alone) left
+`.side-dl`'s vertical rule running through the summary boxes in every step of every book (rule at x=87, boxes 41–334 at
+375px). A step with a summary now carries `.apb-vstep`, and below 520px its whole body drops the 66px indent *and* the
+rule, so summary, tools, กับดัก and the fold share the card's 20px inner edge; steps without a summary keep rule + indent.
+Checked on all 144 steps at 320/375/540/768: no rule crosses a box.
+(5) Tool links ("เครื่องมือ", 395 in 18 books) were bold underlined text; now a link card (style A, picked by the user
+from 4 options rendered side by side in the real app): `.apb-tool` = `.apb-bl-link`'s box, icon (`lc-external-link`
+external / `lc-book-open` another book / `lc-file-text` no url) · name · description · host (external only) · chevron.
+The name is the only `<a>`; its `::after` stretches over the card (whole card = tap target, ≥77px tall at 375px) so a
+link inside a description can never nest. Verified at 320/375/768: 395 cards, names verbatim, 381 hosts, 13 in-app links.
+
 **2026-10-12 — Asset Knowledge step 2: visual step summaries, action tables, answer labels (all 18 books).**
 Approved from a MACRO steps 1–3 preview. Each of the 144 steps now opens on the source's visual summary (`apbVisual`):
 quick table as stacked row cards (row name, column: value lines, its own ที่มา), the how-to list (number circles),

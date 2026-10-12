@@ -1712,10 +1712,21 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-sb>*+*{margin-top:var(--sp-stack);}
 .apb-ul{margin:0;padding-left:1.2em;font-size:var(--fs-bodysm);line-height:1.6;color:var(--ink);}
 .apb-ul li+li{margin-top:var(--sp-glue);}
-.apb-tool{font-size:var(--fs-bodysm);line-height:1.5;}
+/* Tool link card (style A, 2026-10-12) — same box as .apb-bl-link ("อ่านเรื่อง…ต่อ"): white, --line-soft, --r1. */
+.apb-tool{position:relative;display:flex;align-items:center;gap:var(--sp-inline);min-height:44px;padding:var(--sp-inline) var(--sp-stack);background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r1);transition:background .15s var(--ease),border-color .15s var(--ease);}
 .apb-tool+.apb-tool{margin-top:var(--sp-list);}
-.apb-tool a{color:var(--ink);font-weight:var(--w-label);text-underline-offset:3px;}
-.apb-tool div{font-size:var(--fs-label);color:var(--muted);}
+.apb-tool:not(.is-static):hover{background:var(--paper);border-color:var(--line-strong);}
+.apb-tool:not(.is-static):active{transform:scale(.99);}
+.apb-tool:has(.apb-tool-a:focus-visible){outline:2px solid var(--focus);outline-offset:2px;}
+.apb-tool-x{flex:1;min-width:0;}
+.apb-tool-a{display:block;font-size:var(--fs-bodysm);font-weight:var(--w-label);line-height:1.4;color:var(--ink);text-decoration:none;overflow-wrap:anywhere;}
+.apb-tool-a:focus-visible{outline:none;}
+a.apb-tool-a::after{content:'';position:absolute;inset:0;border-radius:inherit;} /* whole card = tap target */
+.apb-tool-d{font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin-top:2px;}
+.apb-tool-d a,.apb-tool .apb-kvs a{position:relative;z-index:1;} /* a link inside the description stays its own target */
+.apb-tool-h{font-size:var(--fs-meta);color:var(--muted);margin-top:2px;overflow-wrap:anywhere;}
+.apb-tool svg.apb-tool-ic{width:var(--ic-md);height:var(--ic-md);flex:0 0 auto;color:var(--muted);}
+.apb-tool svg.apb-tool-cv{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;color:var(--muted);}
 .apb-warn{padding:var(--sp-inline) var(--sp-stack);border-radius:var(--r1);background:var(--amber-bg);border:1px solid var(--amber-border);}
 .apb-warn .apb-lab{display:flex;align-items:center;gap:var(--sp-glue);color:var(--amber-text);}
 .apb-warn .apb-lab svg{width:var(--ic-sm);height:var(--ic-sm);}
@@ -1925,17 +1936,35 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    how-to and flow panels reuse the 6-ด้าน number circle; takeaways sit in .apb-take (done wash) with check marks. */
 .apb-vis>*+*{margin-top:var(--sp-stack);}
 /* On a phone the step body's indent (.side-bi 66px past the number circle + .side-dl's rule and padding) left the
-   summary boxes ~190px wide at 320px and their text columns ~110px. The summary steps out to the card's own 20px inner
-   edge there; plain step text keeps the indent. */
-@media(max-width:520px){.apb-sides .apb-vis{margin-left:calc(20px - 66px - var(--sp-inline) - 1px);}}
+   summary boxes ~190px wide at 320px and their text columns ~110px. A step with a summary (.apb-vstep) therefore drops
+   that indent below 520px: the whole body (summary, tools, กับดัก, the fold) sits on the card's own 20px inner edge.
+   Fixed 2026-10-12: the first version pulled only the summary out with a negative margin, so .side-dl's vertical rule
+   ran straight through the summary boxes — the rule is removed with the indent. Plain steps keep rule + indent. */
+@media(max-width:520px){
+  .apb-vstep .side-bi{padding-left:20px;}
+  .apb-vstep .side-dl{border-left:none;padding-left:0;}
+}
 .apb-vbox{padding:var(--sp-inline) var(--sp-stack);border:1px solid var(--line-soft);border-radius:var(--r1);background:var(--white);}
 .apb-vrow{padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);}
-.apb-vrow:first-of-type{border-top:none;padding-top:0;}
+.apb-vhead+.apb-vrow{border-top:none;padding-top:0;} /* first data row (the hidden header row is the first child) */
 .apb-vrt{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.45;margin-bottom:var(--sp-glue);}
 .apb-vkv{display:grid;grid-template-columns:minmax(0,38%) minmax(0,1fr);gap:var(--sp-list);padding:var(--sp-stack-tight) 0;font-size:var(--fs-label);line-height:1.5;}
 .apb-vkv>span:first-child{color:var(--muted);}
 .apb-vkv>span:last-child{color:var(--ink);overflow-wrap:anywhere;}
 .apb-vkv.full{grid-template-columns:minmax(0,1fr);}
+.apb-vhead{display:none;}
+@media(min-width:600px){
+  .apb-vtab .apb-vhead,.apb-vtab .apb-vrow{display:grid;grid-template-columns:var(--vcols);gap:var(--sp-list) var(--sp-inline);align-items:start;}
+  .apb-vtab .apb-vhead{font-size:var(--fs-meta);font-weight:var(--w-label);color:var(--muted);padding-bottom:var(--sp-list);border-bottom:1px solid var(--line-soft);}
+  .apb-vtab .apb-vhead+.apb-vrow{padding-top:var(--sp-list);}
+  .apb-vtab .apb-vrt{margin:0;}
+  .apb-vtab .apb-vkv{display:block;padding:0;border:0!important;}
+  .apb-vtab .apb-vkv>span:first-child{display:none;} /* the header row names the column */
+  .apb-vtab .apb-refs{margin:0;font-size:0;} /* its "ที่มา" word is the column header here; the chips keep their size */
+  .apb-vtab .apb-refs .apb-ref{font-size:var(--fs-meta);}
+  .apb-vtab .apb-refs .apb-ref:first-of-type{margin-left:0;}
+  .apb-vbox .apb-vper{display:none;}
+}
 .apb-vbox>.apb-vkv+.apb-vkv,.apb-kvs>.apb-vkv+.apb-vkv{border-top:1px dashed var(--line-soft);}
 .apb-kvs{margin-top:var(--sp-glue);}
 .apb-vsteps{list-style:none;margin:0;padding:0;}
@@ -1943,7 +1972,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-vsteps li+li{border-top:1px solid var(--line-soft);}
 .apb-vsteps b{display:block;font-size:var(--fs-bodysm);color:var(--ink);line-height:1.45;}
 .apb-vsteps li span:not(.apb-vn){color:var(--muted);}
-.apb-vn{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--white);font-family:var(--serif);font-size:var(--fs-label);display:flex;align-items:center;justify-content:center;}
+/* --font, not --serif (2026-10-12, per direction "ตัวเลขไม่ตรง center ในพื้นที่วงกลม"): Baskervville's default old-style
+   figures sit 1.5–3.5px below the circle's centre and differ per digit (3/4/5/7/9 drop below the baseline). Same type as
+   .rs-n / .side-num, the app's other number circles, which measure centred. */
+.apb-vn{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--white);font-family:var(--font);font-size:var(--fs-meta);font-weight:var(--w-head);display:flex;align-items:center;justify-content:center;}
 .apb-vscale{list-style:none;margin:0;padding:0;counter-reset:vs;}
 .apb-vscale li{position:relative;padding:var(--sp-list) 0 var(--sp-list) calc(var(--sp-stack) + 6px);font-size:var(--fs-label);line-height:1.5;color:var(--ink);}
 .apb-vscale li::before{content:'';position:absolute;left:0;top:calc(var(--sp-list) + 4px);bottom:calc(var(--sp-list) + 4px);width:4px;border-radius:2px;background:var(--violet);opacity:.35;}
@@ -4394,7 +4426,7 @@ html.pdfv-open,html.pdfv-open body{overflow:hidden;}
 <symbol id="lc-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
 <symbol id="lc-maximize-2" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></symbol>
 <symbol id="lc-arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
-<symbol id="lc-plane" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></symbol><symbol id="lc-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+<symbol id="lc-external-link" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol><symbol id="lc-plane" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></symbol><symbol id="lc-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
 <symbol id="lc-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
 <symbol id="lc-share-2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/></symbol>
 <symbol id="lc-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
@@ -7583,15 +7615,34 @@ function apbVPanel(p){
 function apbVisual(s,v){
   var t=v.table,n=(v.howto||[]).length;
   return '<div class="apb-vis">'+
-    (t?'<div class="apb-vbox"><div class="apb-lab">'+apbEsc(t.title||'ตารางสรุปเร็ว')+'</div>'+(t.columns&&t.columns[0]?'<div class="apb-vnote" style="margin:0 0 var(--sp-list)">แต่ละแถว = '+apbEsc(t.columns[0])+'</div>':'')+(t.rows||[]).map(function(r){var c=r.cells||[],cols=t.columns||[];
-      return '<div class="apb-vrow"><div class="apb-vrt">'+apbCell(c[0])+'</div>'+c.slice(1).map(function(x,j){return '<div class="apb-vkv"><span>'+apbEsc(cols[j+1]||'')+'</span><span>'+apbCell(x)+'</span></div>';}).join('')+apbRefs(r.refs)+'</div>';
-    }).join('')+(t.note?'<div class="apb-vnote">'+apbTxt(t.note,true)+'</div>':'')+'</div>':'')+
+    /* Quick table: row cards on a phone; from 600px the same markup lays out as a real table (.apb-vtab grid, one
+       header row .apb-vhead, a ที่มา column) like the source's own table — responsive audit 2026-10-12. */
+    (t?(function(){var cols=t.columns||[],hasRefs=(t.rows||[]).some(function(r){return r.refs&&r.refs.length;});
+      var gcols='minmax(0,1.15fr)'+cols.slice(1).map(function(){return ' minmax(0,1fr)';}).join('')+(hasRefs?' 76px':'');
+      return '<div class="apb-vbox"><div class="apb-lab">'+apbEsc(t.title||'ตารางสรุปเร็ว')+'</div>'+(cols[0]?'<div class="apb-vnote apb-vper" style="margin:0 0 var(--sp-list)">แต่ละแถว = '+apbEsc(cols[0])+'</div>':'')+
+        '<div class="apb-vtab" style="--vcols:'+gcols+'"><div class="apb-vhead" aria-hidden="true">'+cols.map(function(c){return '<span>'+apbEsc(c)+'</span>';}).join('')+(hasRefs?'<span>ที่มา</span>':'')+'</div>'+
+        (t.rows||[]).map(function(r){var c=r.cells||[];
+          return '<div class="apb-vrow"><div class="apb-vrt">'+apbCell(c[0])+'</div>'+c.slice(1).map(function(x,j){return '<div class="apb-vkv"><span>'+apbEsc(cols[j+1]||'')+'</span><span>'+apbCell(x)+'</span></div>';}).join('')+(hasRefs?(apbRefs(r.refs)||'<span></span>'):'')+'</div>';
+        }).join('')+'</div>'+(t.note?'<div class="apb-vnote">'+apbTxt(t.note,true)+'</div>':'')+'</div>';})():'')+
     '<div class="apb-vbox"><div class="apb-lab">'+apbEsc((v.howto_title||'ทำตามใน {n} ขั้น').replace('{n}',n))+'</div><ol class="apb-vsteps">'+(v.howto||[]).map(function(x,i){
       return '<li><span class="apb-vn">'+(i+1)+'</span><div><b>'+apbTxt(x.title,true)+'</b><span>'+apbTxt(x.desc,true)+'</span></div></li>';}).join('')+'</ol></div>'+
     (v.panels||[]).map(apbVPanel).join('')+
     (s.ask_yourself&&s.ask_yourself.length?'<div class="apb-vbox"><div class="apb-lab">ถามตัวเอง</div><ol class="apb-ul apb-vasks">'+s.ask_yourself.map(function(a){return '<li>'+apbTxt(a,true)+'</li>';}).join('')+'</ol></div>':'')+
     (v.takeaways&&v.takeaways.length?'<div class="apb-take"><div class="apb-lab">สรุปที่ควรได้</div><ul class="apb-vcheck">'+v.takeaways.map(function(x){return '<li>'+ic('lc-check')+'<span>'+apbTxt(x,true)+'</span></li>';}).join('')+'</ul></div>':'')+
     '<p class="apb-vfoot">สรุปจากรายละเอียดของขั้นนี้ · ตัวเลขทุกตัวมีวันที่และแหล่งอยู่ใน "อ่านรายละเอียดขั้นนี้"</p></div>';
+}
+/* Scroll to a section / source on the book page (2026-10-12 motion audit). scrollIntoView measured the target card
+   while its scroll-reveal entry transform was still on (shrunk toward its bottom, pushed down), so the TOC buttons and
+   section links landed with the heading 62px ABOVE the screen once the card settled (MACRO → ตัวอย่างคำนวณ; it should
+   sit at its 70px scroll-margin). Measure the untransformed box (and the card around it) and scroll there. */
+function apbScrollTo(el,center){
+  if(!el)return;
+  var cards=[],c=el.closest('.scroll-reveal');if(c){cards.push([c,c.style.transform]);c.style.transform='';}
+  var r=el.getBoundingClientRect(),sc=getComputedStyle(root).overflowY,inRoot=sc==='auto'||sc==='scroll';
+  cards.forEach(function(x){x[0].style.transform=x[1];});
+  var top=center?r.top-(window.innerHeight-r.height)/2:r.top-(parseFloat(getComputedStyle(el).scrollMarginTop)||0);
+  var opt={top:Math.max(0,(inRoot?root.scrollTop:window.scrollY)+top),behavior:RM?'auto':'smooth'};
+  if(inRoot)root.scrollTo(opt);else window.scrollTo(opt);
 }
 function apbRefs(refs){
   if(!refs||!refs.length)return '';
@@ -7649,11 +7700,23 @@ function assetIndexHTML(IX){
     '</div></section>';
   return body;
 }
+/* Responsive audit (2026-10-12): with 4 groups the tab row scrolls sideways at phone width, and a picked tab could stay
+   half off the edge (measured at 320px: "สินทรัพย์ทางเลือก", "ภาพใหญ่ หุ้น และตราสาร"). Bring the selected tab fully
+   into view (12px clear of the edge; the first tab flush left), on pick and when the index re-renders on return. */
+function apbTabReveal(bar){
+  var b=bar&&bar.querySelector('.bt-tab[aria-selected="true"]');if(!b||bar.scrollWidth<=bar.clientWidth)return;
+  var br=bar.getBoundingClientRect(),tr=b.getBoundingClientRect(),pad=12,x=bar.scrollLeft;
+  if(b===bar.firstElementChild)x=0;else if(tr.left<br.left+pad)x-=br.left+pad-tr.left;else if(tr.right>br.right-pad)x+=tr.right-(br.right-pad);
+  bar.scrollTo({left:x,behavior:RM?'auto':'smooth'});
+}
 function bindAssetIndex(scope){
-  initBtTabs(scope.querySelector('#apbTabs'),function(value){
+  var bar=scope.querySelector('#apbTabs');
+  initBtTabs(bar,function(value){
     APB_TAB=+value;
     scope.querySelectorAll('.apb-panel').forEach(function(p){p.style.display=(p.dataset.apbp===value)?'':'none';});
+    apbTabReveal(bar);
   });
+  apbTabReveal(bar);
   scope.querySelectorAll('.apb-li[data-book]').forEach(function(b){b.onclick=function(){APB_CUR=b.dataset.book;st.phase='assetbook';render();};});
 }
 function renderAssetIndex(){BOOK2_TAB='know';KNOW_TAB='asset';st.phase='book';renderBook();}
@@ -7781,7 +7844,7 @@ function renderAssetBook(){
        One step open at a time, like togSide. */
     '<section class="card mb-lg scroll-reveal apb-sec apb-sides" id="apb-steps"><div class="sides-hd"><div class="s-ey">'+D.steps.length+' ขั้นตอน</div><h2 class="s-h">ทำตามลำดับ</h2><p class="s-sub" style="margin-bottom:2px">แตะแต่ละขั้นเพื่อดูสิ่งที่ต้องทำ</p></div>'+
       D.steps.map(function(s,i){
-        return '<article class="side-item" data-step="'+i+'"><div class="list-row side-row" role="button" tabindex="0" aria-expanded="false"><div class="side-num lck">'+s.n+'</div>'+
+        return '<article class="side-item'+(VIS(s)?' apb-vstep':'')+'" data-step="'+i+'"><div class="list-row side-row" role="button" tabindex="0" aria-expanded="false"><div class="side-num lck">'+s.n+'</div>'+
           '<div class="side-cx"><div class="side-t">'+apbEsc(s.title)+'</div><div class="side-s apb-code">'+apbEsc(s.code)+'</div></div>'+
           '<div class="side-r">'+ic('lc-chevron-down','s-cv')+'</div></div>'+
           '<div class="side-body"><div class="side-bi"><div class="side-dl">'+
@@ -7791,10 +7854,18 @@ function renderAssetBook(){
             (s.ask_yourself&&s.ask_yourself.length&&!VIS(s)?'<div class="apb-blk"><div class="apb-lab">ถามตัวเอง</div><ul class="apb-ul">'+s.ask_yourself.map(function(a){return '<li>'+apbTxt(a,true)+'</li>';}).join('')+'</ul></div>':'')+
             /* A tool whose url is "#<book>" is another book in this set (13 of them, e.g. "FUND PLAYBOOK (ในเล่มนี้)") —
                opens that book here (.apb-xb) instead of a new tab of this same page (bug until 2026-10-12). */
+            /* Tool = link card (2026-10-12, style A picked by the user over an outline button, a chip and a plain link):
+               icon · name · description · host, chevron. The name is the one link; its ::after stretches over the card so
+               the whole row is the tap target (44px+) while any link inside the description would stay tappable on its own.
+               External -> lc-external-link + host, new tab; another book ("#id") -> lc-book-open, opens it here; no url -> a
+               plain card, no chevron. */
             (s.tools&&s.tools.length?'<div class="apb-blk"><div class="apb-lab">เครื่องมือ</div>'+s.tools.map(function(t){
-              var u=String(t.url||''),inner=u.charAt(0)==='#';
+              var u=String(t.url||''),inner=u.charAt(0)==='#',host=u&&!inner?u.replace(/^https?:\/\/(www\.)?/i,'').split(/[\/?#]/)[0]:'';
               var kv=V2&&t.use_for?apbKV(t.use_for):null; // "คืออะไร: … | ทำไมสำคัญ: …" -> label/value rows
-              return '<div class="apb-tool">'+(inner?'<a href="#" class="apb-xb" data-book="'+apbEsc(u.slice(1))+'">'+apbEsc(t.name)+'</a>':u?'<a href="'+apbEsc(u)+'" target="_blank" rel="noopener">'+apbEsc(t.name)+'</a>':'<b>'+apbEsc(t.name)+'</b>')+(t.use_for?(kv||'<div>'+apbTxt(t.use_for,true)+'</div>'):'')+'</div>';}).join('')+'</div>':'')+
+              var nm=inner?'<a href="#" class="apb-tool-a apb-xb" data-book="'+apbEsc(u.slice(1))+'">'+apbEsc(t.name)+'</a>':u?'<a class="apb-tool-a" href="'+apbEsc(u)+'" target="_blank" rel="noopener">'+apbEsc(t.name)+'</a>':'<span class="apb-tool-a">'+apbEsc(t.name)+'</span>';
+              return '<div class="apb-tool'+(u?'':' is-static')+'">'+ic(inner?'lc-book-open':u?'lc-external-link':'lc-file-text','apb-tool-ic')+
+                '<div class="apb-tool-x">'+nm+(t.use_for?(kv||'<div class="apb-tool-d">'+apbTxt(t.use_for,true)+'</div>'):'')+(host?'<div class="apb-tool-h">'+apbEsc(host)+'</div>':'')+'</div>'+
+                (u?ic('lc-chevron-right','apb-tool-cv'):'')+'</div>';}).join('')+'</div>':'')+
             (s.pitfall?'<div class="apb-blk apb-warn"><div class="apb-lab">'+ic('lc-alert-triangle')+'กับดักที่พบบ่อย</div><div class="apb-txt">'+apbTxt(s.pitfall)+'</div></div>':'')+
             (VIS(s)?'<button class="ag-more apb-more" type="button" data-rv data-open="อ่านรายละเอียดขั้นนี้ (ข้อความเต็มพร้อมแหล่งอ้างอิง)" data-close="ย่อรายละเอียด">'+ic('lc-chevron-down','ag-more-ic')+'<span>อ่านรายละเอียดขั้นนี้ (ข้อความเต็มพร้อมแหล่งอ้างอิง)</span></button>'+
               '<div hidden>'+actsHTML(s)+apbRefs(s.refs)+'</div>':apbRefs(s.refs))+
@@ -7849,13 +7920,20 @@ function renderAssetBook(){
     main.onchange=function(e){var ci=e.target.dataset&&e.target.dataset.ck;if(ci==null)return;MAPST.c[ci]=e.target.checked;apbMapSave(D.id,MAPST);
       var n=main.querySelectorAll('[data-ck]:checked').length,pg=main.querySelector('#apbProg');if(pg)pg.textContent='เช็กลิสต์ ติ๊กแล้ว '+n+'/'+main.querySelectorAll('[data-ck]').length;};
   }
+  /* Motion audit (2026-10-12): every toggle here changes the page height WITHOUT a scroll event, and the scroll-reveal
+     transforms are only recomputed on scroll — closing an open step pulled the cards below into view still tilted and
+     shrunk (measured: แผนที่ของฉัน at top -105px, mid-entry) until the next scroll. Re-sync now and again once the
+     0.28s step open/close has finished. */
+  function resync(){requestRevealTick();setTimeout(requestRevealTick,340);}
+  main.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ')resync();});
   main.onclick=function(e){
     var t=e.target.closest('button,a.apb-ref,a.apb-xb,.apb-sides .side-row');if(!t||!main.contains(t))return;
+    resync();
     if(t.classList.contains('side-row')){toggleStep(t);return;}
     if(t.classList.contains('apb-xb')){e.preventDefault(); // another book in this set, or a section (data-sec) of this/another book
       var sec=t.dataset.sec;
       if(t.dataset.book!==APB_CUR){APB_CUR=t.dataset.book;render();}
-      if(sec){var tgt=document.querySelector('main #apb-'+sec);if(tgt)tgt.scrollIntoView({behavior:'smooth',block:'start'});}
+      if(sec)apbScrollTo(document.querySelector('main #apb-'+sec));
       return;}
     if(t.hasAttribute('data-copy')){ // prompt_pack: copy the prompt text as written (pre keeps its line breaks)
       var pre=main.querySelector('#'+t.dataset.copy),done=function(){t.querySelector('span').textContent='คัดลอกแล้ว';};
@@ -7875,8 +7953,8 @@ function renderAssetBook(){
         var pg2=main.querySelector('#apbProg');if(pg2)pg2.textContent='เช็กลิสต์ ติ๊กแล้ว 0/'+main.querySelectorAll('[data-ck]').length;
         t.querySelector('span').textContent='ล้างข้อมูลที่กรอกในแผนที่นี้';return;}t.querySelector('span').textContent='แตะอีกครั้งเพื่อยืนยันการล้าง';t.dataset.arm=setTimeout(function(){delete t.dataset.arm;if(t.isConnected)t.querySelector('span').textContent='ล้างข้อมูลที่กรอกในแผนที่นี้';},3500);return;}
     if(t.id==='apbSrcTg'){setSrc(main.querySelector('#apbSrcList').hidden);return;}
-    if(t.hasAttribute('data-jump')){var j=main.querySelector('#apb-'+t.dataset.jump);if(j)j.scrollIntoView({behavior:'smooth',block:'start'});return;}
-    if(t.classList.contains('apb-ref')){e.preventDefault();openSrc();var el=main.querySelector('#apb-src-'+t.dataset.ref);if(el){main.querySelectorAll('.apb-src.hit').forEach(function(x){x.classList.remove('hit');});el.classList.add('hit');el.scrollIntoView({behavior:'smooth',block:'center'});}return;}
+    if(t.hasAttribute('data-jump')){apbScrollTo(main.querySelector('#apb-'+t.dataset.jump));return;}
+    if(t.classList.contains('apb-ref')){e.preventDefault();openSrc();var el=main.querySelector('#apb-src-'+t.dataset.ref);if(el){main.querySelectorAll('.apb-src.hit').forEach(function(x){x.classList.remove('hit');});el.classList.add('hit');apbScrollTo(el,true);}return;}
   };
 }
 function ddTabs(h){
