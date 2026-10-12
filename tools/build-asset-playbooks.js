@@ -28,8 +28,8 @@ const OUT = path.join(__dirname, '..', 'assets', 'playbooks');
 /* Order + grouping = the source's own NAV_GROUPS (build_playbooks.py). Icons are picked from this
    app's own lc-* sprite (no new glyphs). */
 /* 2026-10-12: 18 books / 4 groups (source round of 9 Oct: + allocation, global, tfex, snote and the
-   "อนุพันธ์และผลิตภัณฑ์ซับซ้อน" group). global takes lc-globe, so dr moves to lc-link (a foreign share held
-   through a Thai-listed receipt). */
+   "อนุพันธ์และผลิตภัณฑ์ซับซ้อน" group). global takes lc-globe, so dr moves to lc-plane (= "abroad"; picked by
+   the user from 4 options, 2026-10-12). */
 const GROUPS = [
   { t: 'ภาพใหญ่ หุ้น และตราสาร', ids: ['macro', 'allocation', 'stock', 'global', 'bond', 'fund', 'dr'] },
   { t: 'อนุพันธ์และผลิตภัณฑ์ซับซ้อน', ids: ['tfex', 'snote'] },
@@ -38,7 +38,7 @@ const GROUPS = [
 ];
 const ICON = {
   macro: 'lc-compass', allocation: 'lc-sliders', stock: 'lc-trending-up', global: 'lc-globe',
-  bond: 'lc-landmark', fund: 'lc-pie-chart', dr: 'lc-link', tfex: 'lc-zap', snote: 'lc-target',
+  bond: 'lc-landmark', fund: 'lc-pie-chart', dr: 'lc-plane', tfex: 'lc-zap', snote: 'lc-target',
   gold: 'lc-gold-bars', realestate: 'lc-building-2', crypto: 'lc-bitcoin',
   collectible: 'lc-gem', tax: 'lc-file-text', insurance: 'lc-shield', longevity: 'lc-hourglass',
   ai: 'lc-sparkles', scam: 'lc-alert-triangle',
@@ -59,6 +59,50 @@ function citedIds(o, out = new Set()) {
   return out;
 }
 const ALL_IDS = GROUPS.flatMap(g => g.ids);
+
+/* Step 2 (2026-10-12) — the source round of 9 Oct adds three reader layers, each attached here to the record it
+   belongs to so the app needs no lookups: step.visual (visual/<id>.json: quick table, how-to, panels, takeaways),
+   step.action_tables (action_tables.json: the header row for an action that says "ทำตาราง A | B | C", keyed by
+   action number from 1) and key_question.labels (answer_labels.json: the "xxx:" points the full answer breaks at).
+   The source's own build guards are repeated, so a summary can never say more than its step: no number in a
+   visual summary that is not in that step's full text, one how-to item per action, every answer label found. */
+const readJson = f => (fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {});
+const ACTION_TABLES = readJson(path.join(SRC, 'action_tables.json'));
+const ANSWER_LABELS = readJson(path.join(SRC, 'answer_labels.json'));
+const vNums = s => new Set((String(s || '').match(/\d[\d,]*(?:\.\d+)?/g) || []).map(n => n.replace(/,/g, '').replace(/\.$/, '')));
+const vStrings = (o, out = []) => {
+  if (typeof o === 'string') out.push(o);
+  else if (Array.isArray(o)) o.forEach(x => vStrings(x, out));
+  else if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) if (k !== 'refs' && k !== 'howto_title') vStrings(v, out);
+  return out;
+};
+const stepText = s => [s.title, s.code, s.goal, s.pitfall || '', ...(s.actions || []), ...(s.ask_yourself || []),
+  ...(s.tools || []).map(t => `${t.name || ''} ${t.use_for || ''}`)].join(' ');
+function attachLayers(id, d) {
+  const vis = readJson(path.join(SRC, 'visual', id + '.json')).steps || {};
+  for (const s of d.steps) {
+    const v = vis[String(s.n)];
+    if (v) {
+      const allowed = vNums(stepText(s)), extra = [...vNums(vStrings(v).join(' '))].filter(x => !allowed.has(x));
+      if (extra.length) throw new Error(`${id}: visual summary of step ${s.n} has numbers not in the step: ${extra.join(', ')}`);
+      if ((v.howto || []).length !== (s.actions || []).length) throw new Error(`${id}: step ${s.n} visual has ${(v.howto || []).length} how-to items for ${(s.actions || []).length} actions`);
+      s.visual = v;
+    }
+    const at = (ACTION_TABLES[id] || {})[String(s.n)];
+    if (at) s.action_tables = at;
+  }
+  for (const q of d.key_questions || []) {
+    const labels = (ANSWER_LABELS[id] || {})[q.q];
+    if (!labels) continue;
+    let pos = 0;
+    for (const lb of labels) {
+      const i = q.a.indexOf(lb + ':', pos);
+      if (i < 0 || (i > 0 && !/\s/.test(q.a[i - 1]))) throw new Error(`${id}: answer label "${lb}" not found in "${q.q.slice(0, 40)}"`);
+      pos = i + lb.length + 1;
+    }
+    q.labels = labels;
+  }
+}
 
 const nums = s => (String(s).match(/\d[\d,.]*/g) || []).map(n => n.replace(/[,.]$/, ''));
 function checkShort(id, key, short, full) {
@@ -103,6 +147,7 @@ for (const g of GROUPS) {
       checkShort(id, t, s, b.plain); b.short = s;
     }
 
+    attachLayers(id, d);
     /* fit_matrix + prompt_pack (2026-10-12) and the sources' scope/kind/what_it_supports/verified: the source's
        full edition shows all of them to readers, so they are reader content, not team notes. */
     const book = fixSpelling({
@@ -116,7 +161,10 @@ for (const g of GROUPS) {
     const srcIds = new Set(book.sources.map(s => s.id));
     const dangling = [...citedIds(book)].filter(r => !srcIds.has(r));
     if (dangling.length) throw new Error(`${id}: cites ${dangling.join(', ')} but its sources list has no such id`);
-    const xlinks = (JSON.stringify(book).match(/\]\(#([\w-]+)\)/g) || []).map(m => m.slice(3, -1)).filter(x => !ALL_IDS.includes(x));
+    // "#fund" = a book; "#tax-example" = a section of a book (the source's own anchor names; the app maps them)
+    const SECTIONS = ['steps', 'example', 'takehome', 'event', 'flags', 'sources'];
+    const okLink = x => ALL_IDS.includes(x) || (/^([a-z]+)-([a-z]+)$/.test(x) && ALL_IDS.includes(RegExp.$1) && SECTIONS.includes(RegExp.$2));
+    const xlinks = (JSON.stringify(book).match(/\]\(#([\w-]+)\)/g) || []).map(m => m.slice(3, -1)).filter(x => !okLink(x));
     if (xlinks.length) throw new Error(`${id}: links to unknown book(s) ${[...new Set(xlinks)].join(', ')}`);
     const js = `/* Generated by tools/build-asset-playbooks.js — do not edit by hand. */\n` +
       `(window.ASSET_PB_DATA=window.ASSET_PB_DATA||{})[${JSON.stringify(id)}]=${JSON.stringify(book)};\n`;

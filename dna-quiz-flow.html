@@ -1906,7 +1906,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-flag+.apb-flag{margin-top:var(--sp-inline);}
 .apb-flag .apb-q{margin-bottom:var(--sp-list);}
 .apb-flag .apb-txt+.apb-txt{margin-top:var(--sp-glue);}
-.apb-src{font-size:var(--fs-label);line-height:1.5;padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);scroll-margin-top:70px;}
+.apb-src{font-size:var(--fs-label);line-height:1.5;padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);scroll-margin-top:70px;overflow-wrap:anywhere;} /* anywhere: GOLD S38's long unbroken title overflowed at 320px */
 .apb-src:first-child{border-top:none;}
 .apb-src b{font-family:var(--serif);font-weight:500;margin-right:var(--sp-glue);}
 .apb-src a{color:var(--ink);word-break:break-word;}
@@ -1916,10 +1916,59 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-src div.apb-acc{margin-top:2px;line-height:1.5;}
 .apb-scope{display:inline-block;font-size:var(--fs-meta);color:var(--muted);border:1px solid var(--line-strong);border-radius:var(--rpill);padding:0 var(--sp-list);margin-right:var(--sp-glue);line-height:1.6;}
 .apb-unv{font-size:var(--fs-meta);color:var(--amber-text);background:var(--amber-bg);border-radius:var(--rpill);padding:0 var(--sp-list);}
-.apb-refs-in{font-size:var(--fs-meta);white-space:nowrap;}
+.apb-refs-in{font-size:var(--fs-meta);} /* may wrap between chips: a 5-number group overflowed a 320px step (BOND) */
 .apb-refs-in .apb-ref{display:inline-block;min-width:24px;text-align:center;margin:0 1px;}
 .apb-refs-in .apb-ref:first-child{margin-left:var(--sp-glue);}
 .apb-xb{color:var(--violet);font-weight:var(--w-label);text-underline-offset:3px;}
+/* Step 2 visual step summary (apbVisual, 2026-10-12): boxes on the step body, each titled with .apb-lab. Quick-table rows
+   become stacked row cards (row name, then column: value lines, then ที่มา) since 4–5 columns don't fit a phone; the
+   how-to and flow panels reuse the 6-ด้าน number circle; takeaways sit in .apb-take (done wash) with check marks. */
+.apb-vis>*+*{margin-top:var(--sp-stack);}
+/* On a phone the step body's indent (.side-bi 66px past the number circle + .side-dl's rule and padding) left the
+   summary boxes ~190px wide at 320px and their text columns ~110px. The summary steps out to the card's own 20px inner
+   edge there; plain step text keeps the indent. */
+@media(max-width:520px){.apb-sides .apb-vis{margin-left:calc(20px - 66px - var(--sp-inline) - 1px);}}
+.apb-vbox{padding:var(--sp-inline) var(--sp-stack);border:1px solid var(--line-soft);border-radius:var(--r1);background:var(--white);}
+.apb-vrow{padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);}
+.apb-vrow:first-of-type{border-top:none;padding-top:0;}
+.apb-vrt{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.45;margin-bottom:var(--sp-glue);}
+.apb-vkv{display:grid;grid-template-columns:minmax(0,38%) minmax(0,1fr);gap:var(--sp-list);padding:var(--sp-stack-tight) 0;font-size:var(--fs-label);line-height:1.5;}
+.apb-vkv>span:first-child{color:var(--muted);}
+.apb-vkv>span:last-child{color:var(--ink);overflow-wrap:anywhere;}
+.apb-vkv.full{grid-template-columns:minmax(0,1fr);}
+.apb-vbox>.apb-vkv+.apb-vkv,.apb-kvs>.apb-vkv+.apb-vkv{border-top:1px dashed var(--line-soft);}
+.apb-kvs{margin-top:var(--sp-glue);}
+.apb-vsteps{list-style:none;margin:0;padding:0;}
+.apb-vsteps li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:var(--sp-list);padding:var(--sp-list) 0;font-size:var(--fs-label);line-height:1.5;}
+.apb-vsteps li+li{border-top:1px solid var(--line-soft);}
+.apb-vsteps b{display:block;font-size:var(--fs-bodysm);color:var(--ink);line-height:1.45;}
+.apb-vsteps li span:not(.apb-vn){color:var(--muted);}
+.apb-vn{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--white);font-family:var(--serif);font-size:var(--fs-label);display:flex;align-items:center;justify-content:center;}
+.apb-vscale{list-style:none;margin:0;padding:0;counter-reset:vs;}
+.apb-vscale li{position:relative;padding:var(--sp-list) 0 var(--sp-list) calc(var(--sp-stack) + 6px);font-size:var(--fs-label);line-height:1.5;color:var(--ink);}
+.apb-vscale li::before{content:'';position:absolute;left:0;top:calc(var(--sp-list) + 4px);bottom:calc(var(--sp-list) + 4px);width:4px;border-radius:2px;background:var(--violet);opacity:.35;}
+.apb-vscale li:nth-child(2)::before{opacity:.65;}.apb-vscale li:nth-child(n+3)::before{opacity:1;}
+.apb-vquad{display:grid;gap:var(--sp-glue);}
+.apb-vax{font-size:var(--fs-meta);color:var(--muted);text-align:center;}
+.apb-vax-x{display:flex;justify-content:space-between;}
+.apb-vqg{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-glue);}
+.apb-vq{padding:var(--sp-list);border-radius:var(--r0);background:var(--paper);font-size:var(--fs-meta);line-height:1.45;color:var(--muted);display:flex;flex-direction:column;gap:2px;}
+.apb-vq b{font-size:var(--fs-label);color:var(--ink);}
+.apb-vq small{font-size:var(--fs-meta);color:var(--violet);}
+.apb-vnote{margin-top:var(--sp-list);font-size:var(--fs-meta);color:var(--muted);line-height:1.5;}
+.apb-vcheck{list-style:none;margin:0;padding:0;}
+.apb-vcheck li{display:flex;gap:var(--sp-list);align-items:flex-start;font-size:var(--fs-label);line-height:1.5;color:var(--ink);}
+.apb-vcheck li+li{margin-top:var(--sp-list);}
+.apb-vcheck svg{width:var(--ic-sm);height:var(--ic-sm);flex:0 0 auto;margin-top:3px;}
+.apb-vis .apb-vfoot{margin:0;font-size:var(--fs-meta);color:var(--muted);line-height:1.5;} /* scoped: .side-dl p would otherwise set it at body size */
+.apb-seg+.apb-seg{margin-top:var(--sp-list);}
+.apb-colchip{display:inline-block;margin:2px 4px 2px 0;padding:0 var(--sp-list);border-radius:var(--rpill);background:var(--accent);font-size:var(--fs-meta);line-height:1.7;}
+.apb-tbl{margin-top:var(--sp-list);overflow-x:auto;border:1px solid var(--line-soft);border-radius:var(--r1);}
+.apb-tbl table{border-collapse:collapse;min-width:100%;font-size:var(--fs-meta);line-height:1.45;}
+.apb-tbl caption{caption-side:top;text-align:left;padding:var(--sp-glue) var(--sp-list);color:var(--muted);}
+.apb-tbl th,.apb-tbl td{padding:var(--sp-glue) var(--sp-list);border-top:1px solid var(--line-soft);text-align:left;vertical-align:top;}
+.apb-tbl thead th,.apb-tbl tbody th{background:var(--paper);font-weight:var(--w-label);color:var(--ink);white-space:nowrap;}
+.apb-tbl:not(.filled) td{min-width:64px;height:30px;}
 .apb-pre{margin:0 0 var(--sp-list);padding:var(--sp-inline) var(--sp-stack);background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--r1);font-family:var(--font);font-size:var(--fs-label);line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink);}
 .apb-src.hit{background:var(--active-wash);}
 .apb-load{display:flex;align-items:center;gap:var(--sp-inline);font-size:var(--fs-bodysm);color:var(--muted);}
@@ -4345,7 +4394,7 @@ html.pdfv-open,html.pdfv-open body{overflow:hidden;}
 <symbol id="lc-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
 <symbol id="lc-maximize-2" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></symbol>
 <symbol id="lc-arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
-<symbol id="lc-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+<symbol id="lc-plane" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></symbol><symbol id="lc-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
 <symbol id="lc-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
 <symbol id="lc-share-2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/></symbol>
 <symbol id="lc-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
@@ -7277,11 +7326,14 @@ var APB_URL_RE=/(https?:\/\/[^\s<>"')\]]+)/g;
 var APB_KIND_TH={'regulator':'หน่วยงานกำกับ','exchange':'ตลาดหลักทรัพย์','government':'หน่วยงานรัฐ','central-bank':'ธนาคารกลาง',
   'intl-org':'องค์กรระหว่างประเทศ','academic':'งานวิจัย/วิชาการ','industry':'สมาคม/อุตสาหกรรม',
   'asset-manager':'บริษัทจัดการลงทุน (มุมมองของเขา)','organizer':'ผู้จัดงาน (efin) แหล่งข้อมูลเสริม'}; // = the source's KIND_TH (its em dash dropped, house rule)
+var APB_SEC={steps:'steps',example:'ex',takehome:'map',event:'ev',flags:'flags',sources:'src'}; // source anchor suffix -> this page's #apb-<id>
 var APB_INLINE_REF=/\s?[(\[]\s*S\d+(?:\s*[,;/]\s*S\d+)*\s*[)\]]/g;
 function apbRich(t){
   var IX=window.ASSET_PB_INDEX,ids=IX?IX.books.map(function(b){return b.id;}):[];
   return t.replace(APB_URL_RE,function(u){return '<a href="'+u+'" target="_blank" rel="noopener">'+u+'</a>';})
-    .replace(/\[([^\]]+)\]\(#([\w-]+)\)/g,function(m,label,id){return ids.indexOf(id)>-1?'<a href="#" class="apb-xb" data-book="'+id+'">'+label+'</a>':label;})
+    .replace(/\[([^\]]+)\]\(#([\w-]+)\)/g,function(m,label,id){
+      var p=id.split('-'),sec=p[1]&&APB_SEC[p[1]]; // "#tax-example" = a section of a book (source anchor) -> data-sec
+      return ids.indexOf(p[0])>-1&&(!p[1]||sec)?'<a href="#" class="apb-xb" data-book="'+p[0]+'"'+(sec?' data-sec="'+sec+'"':'')+'>'+label+'</a>':label;})
     .replace(APB_INLINE_REF,function(m){return '<span class="apb-refs-in">'+m.match(/S\d+/g).map(function(r){return '<a href="#" class="apb-ref" data-ref="'+r+'">'+r.slice(1)+'</a>';}).join('')+'</span>';});
 }
 function apbTxt(s,inLi){
@@ -7474,6 +7526,73 @@ function apbRenderField(def,state,fi){
         '<span class="apb-ci"><input class="apb-bl" type="text"'+(numUnit(c.unit)?' inputmode="decimal"':'')+' data-fk="'+c.k+'" value="'+val(c.k)+'" maxlength="200" autocomplete="off" aria-label="'+apbEsc(al)+'">'+(c.unit?'<span class="apb-u">'+apbEsc(c.unit)+'</span>':'')+'</span></label>';
     }).join('')+'</div>'+(hintTail?'<div class="apb-hint">'+apbEsc(hintTail)+'</div>':'')+'</div>';
 }
+/* ══ Step 2 (2026-10-12): the source round of 9 Oct's reader layers, one function per source renderer ══
+   render_visual/v_table/v_panel -> apbVisual (quick table, panels, how-to, ask yourself, takeaways), action_table/
+   action_text -> apbActText, kv_html -> apbKV ("xxx: … | yyy: …" as label/value rows), pipes -> apbPipes (one set per
+   line), answer_html + ENUM_LABEL -> apbAnswer. Laid out as one column (the source puts some side by side on a wide
+   screen); every word, number and ที่มา chip of the source is kept. APB_V2_SAMPLE limits it to a preview (it was
+   {macro:[1,2,3]} until the user approved the look, 2026-10-12); null = every book and step. */
+var APB_V2_SAMPLE=null;
+function apbV2(id,n){if(!APB_V2_SAMPLE)return true;var s=APB_V2_SAMPLE[id];return !!s&&(n==null||s.indexOf(n)>-1);}
+function apbCell(x){return String(x).trim()==='—'?'–':apbTxt(x,true);} // a lone "—" = no figure; apbEsc would blank it
+function apbKV(t){
+  var segs=String(t||'').split(' | ');
+  var lab=segs.map(function(x){return /^[^:]{1,20}: /.test(x);});
+  if(segs.length<2||lab.filter(Boolean).length<2)return null;
+  return '<div class="apb-kvs">'+segs.map(function(x,i){
+    if(!lab[i])return '<div class="apb-vkv full"><span>'+apbTxt(x,true)+'</span></div>';
+    var k=x.indexOf(': ');return '<div class="apb-vkv"><span>'+apbEsc(x.slice(0,k))+'</span><span>'+apbTxt(x.slice(k+2),true)+'</span></div>';
+  }).join('')+'</div>';
+}
+function apbPipes(t){t=String(t==null?'':t);return t.indexOf(' | ')>-1?t.split(' | ').map(function(x){return apbTxt(x,true);}).join('<br>'):apbTxt(t,true);}
+function apbActText(a,spec){
+  var h=apbTxt(a,true);
+  if(spec.inline==='chips'){var joined=apbEsc((spec.columns||[]).join(' | '));h=h.replace(joined,(spec.columns||[]).map(function(c){return '<span class="apb-colchip">'+apbEsc(c)+'</span>';}).join(''));}
+  else if(spec.inline==='arrow')h=h.split(' | ').join(' → ');
+  var cols=spec.columns||[],cap=spec.caption?'<caption>'+apbEsc(spec.caption)+'</caption>':'',body;
+  if(spec.data){
+    body='<thead><tr>'+cols.map(function(c){return '<th>'+apbEsc(c)+'</th>';}).join('')+'</tr></thead><tbody>'+spec.data.map(function(r){return '<tr>'+r.map(function(x){return '<td>'+apbEsc(x)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody>';
+  }else{
+    var rows=spec.rows||Array(spec.blank_rows||2).fill('');
+    body='<thead><tr>'+(spec.rows?'<th></th>':'')+cols.map(function(c){return '<th>'+apbEsc(c)+'</th>';}).join('')+'</tr></thead><tbody>'+
+      rows.map(function(r){return '<tr>'+(spec.rows?'<th>'+apbEsc(r)+'</th>':'')+cols.map(function(){return '<td></td>';}).join('')+'</tr>';}).join('')+'</tbody>';
+  }
+  return h+'<div class="apb-tbl'+(spec.data?' filled':'')+'"><table>'+cap+body+'</table></div>';
+}
+function apbAnswer(a,labels){
+  a=String(a||'');var parts=[],pos=0;
+  (labels||[]).forEach(function(lb){var i=a.indexOf(lb+':',pos);if(i<0||(i>0&&!/\s/.test(a[i-1])))return;parts.push([i,lb]);pos=i+lb.length+1;});
+  var tail=function(t){return apbTxt(t.replace(/\s*[·;]\s*$/,'').trim(),true);}; // the source hides a trailing "·"/";" before the next point
+  var out=parts.length?(parts[0][0]>0?'<div class="apb-seg">'+tail(a.slice(0,parts[0][0]))+'</div>':''):'<div class="apb-seg">'+apbTxt(a,true)+'</div>';
+  parts.forEach(function(p,k){var last=k===parts.length-1,body=a.slice(p[0]+p[1].length+1,last?a.length:parts[k+1][0]).trim();
+    out+='<div class="apb-seg"><b>'+apbEsc(p[1])+':</b> '+(last?apbTxt(body,true):tail(body))+'</div>';});
+  return out.replace(/<li>([^<>():]{1,45}?):(?=\s)/g,'<li><b>$1:</b>'); // ENUM_LABEL: "(1) หัวข้อ: …" -> bold point name
+}
+function apbVPanel(p){
+  var k=p.kind,it=p.items||[],inner='';
+  if(k==='pairs')inner=it.map(function(x){return '<div class="apb-vkv"><span>'+apbTxt(x.label,true)+'</span><span>'+apbTxt(x.value,true)+'</span></div>';}).join('');
+  else if(k==='list')inner='<ul class="apb-ul">'+it.map(function(x){return '<li>'+apbTxt(x,true)+'</li>';}).join('')+'</ul>';
+  else if(k==='flow')inner='<ol class="apb-vsteps">'+it.map(function(x,i){return '<li><span class="apb-vn">'+(i+1)+'</span><div><b>'+apbTxt(x.title,true)+'</b><span>'+apbTxt(x.desc,true)+'</span></div></li>';}).join('')+'</ol>';
+  else if(k==='scale')inner='<ol class="apb-vscale">'+it.map(function(x){return '<li>'+apbTxt(x,true)+'</li>';}).join('')+'</ol>';
+  else if(k==='quadrant'){var x=p.x||['',''],y=p.y||['',''];
+    inner='<div class="apb-vquad"><div class="apb-vax">↑ '+apbEsc(y[0])+'</div><div class="apb-vqg">'+(p.cells||[]).slice(0,4).map(function(c,i){return '<div class="apb-vq q'+i+'"><b>'+apbEsc(c.name)+'</b><small>'+apbEsc(c.sub)+'</small><span>'+apbEsc(c.desc)+'</span></div>';}).join('')+'</div>'+
+      '<div class="apb-vax">↓ '+apbEsc(y[1])+'</div><div class="apb-vax apb-vax-x"><span>← '+apbEsc(x[0])+'</span><span>'+apbEsc(x[1])+' →</span></div></div>';}
+  else return '';
+  return '<div class="apb-vbox"><div class="apb-lab">'+apbEsc(p.title||'')+'</div>'+inner+(p.note?'<div class="apb-vnote">'+apbTxt(p.note,true)+'</div>':'')+apbRefs(p.refs)+'</div>';
+}
+function apbVisual(s,v){
+  var t=v.table,n=(v.howto||[]).length;
+  return '<div class="apb-vis">'+
+    (t?'<div class="apb-vbox"><div class="apb-lab">'+apbEsc(t.title||'ตารางสรุปเร็ว')+'</div>'+(t.columns&&t.columns[0]?'<div class="apb-vnote" style="margin:0 0 var(--sp-list)">แต่ละแถว = '+apbEsc(t.columns[0])+'</div>':'')+(t.rows||[]).map(function(r){var c=r.cells||[],cols=t.columns||[];
+      return '<div class="apb-vrow"><div class="apb-vrt">'+apbCell(c[0])+'</div>'+c.slice(1).map(function(x,j){return '<div class="apb-vkv"><span>'+apbEsc(cols[j+1]||'')+'</span><span>'+apbCell(x)+'</span></div>';}).join('')+apbRefs(r.refs)+'</div>';
+    }).join('')+(t.note?'<div class="apb-vnote">'+apbTxt(t.note,true)+'</div>':'')+'</div>':'')+
+    '<div class="apb-vbox"><div class="apb-lab">'+apbEsc((v.howto_title||'ทำตามใน {n} ขั้น').replace('{n}',n))+'</div><ol class="apb-vsteps">'+(v.howto||[]).map(function(x,i){
+      return '<li><span class="apb-vn">'+(i+1)+'</span><div><b>'+apbTxt(x.title,true)+'</b><span>'+apbTxt(x.desc,true)+'</span></div></li>';}).join('')+'</ol></div>'+
+    (v.panels||[]).map(apbVPanel).join('')+
+    (s.ask_yourself&&s.ask_yourself.length?'<div class="apb-vbox"><div class="apb-lab">ถามตัวเอง</div><ol class="apb-ul apb-vasks">'+s.ask_yourself.map(function(a){return '<li>'+apbTxt(a,true)+'</li>';}).join('')+'</ol></div>':'')+
+    (v.takeaways&&v.takeaways.length?'<div class="apb-take"><div class="apb-lab">สรุปที่ควรได้</div><ul class="apb-vcheck">'+v.takeaways.map(function(x){return '<li>'+ic('lc-check')+'<span>'+apbTxt(x,true)+'</span></li>';}).join('')+'</ul></div>':'')+
+    '<p class="apb-vfoot">สรุปจากรายละเอียดของขั้นนี้ · ตัวเลขทุกตัวมีวันที่และแหล่งอยู่ใน "อ่านรายละเอียดขั้นนี้"</p></div>';
+}
 function apbRefs(refs){
   if(!refs||!refs.length)return '';
   return '<div class="apb-refs">ที่มา'+refs.map(function(r){return '<a href="#" class="apb-ref" data-ref="'+apbEsc(r)+'">'+apbEsc(String(r).replace(/^S/,''))+'</a>';}).join('')+'</div>';
@@ -7545,14 +7664,20 @@ function renderAssetBook(){
   if(!D){var meta=IX.books.filter(function(b){return b.id===APB_CUR;})[0]||{};apbAwait(APB_CUR,'assetbook',apbEsc(meta.name_th||''),'<span class="apb-hd-en">'+apbEn(meta.name_en||'')+'</span>','know');return;}
   /* Expandable answer: verified short first, full answer behind a toggle (source's own pattern).
      Key questions say "อ่านคำตอบทั้งหมด"/"ย่อคำตอบ"; ศัพท์พื้นฐาน says "อ่านต่อ"/"ย่อ" (per direction). */
-  function qa(head,short,full,extra,refs,lab){
+  function qa(head,short,full,extra,refs,lab,labels){
     var hasShort=!!short;
     lab=lab||{open:'อ่านคำตอบทั้งหมด',close:'ย่อคำตอบ'};
     return '<div class="apb-item"><div class="apb-q">'+head+'</div>'+
       (hasShort?'<div class="apb-txt apb-short">'+apbTxt(short)+'</div>':'')+
-      '<div class="apb-full"'+(hasShort?' hidden':'')+'><div class="apb-txt">'+apbTxt(full)+'</div>'+(extra||'')+apbRefs(refs)+'</div>'+
+      '<div class="apb-full"'+(hasShort?' hidden':'')+'><div class="apb-txt">'+(labels?apbAnswer(full,labels):apbTxt(full))+'</div>'+(extra||'')+apbRefs(refs)+'</div>'+
       (hasShort?'<button class="ag-more apb-more" type="button" data-more data-open="'+lab.open+'" data-close="'+lab.close+'">'+ic('lc-chevron-down','ag-more-ic')+'<span>'+lab.open+'</span></button>':'')+
     '</div>';
+  }
+  var V2=apbV2(D.id); // step 2 layers for this book (answers, tools, inputs); VIS(s) = this step shows its visual summary
+  function VIS(s){return !!(s.visual&&apbV2(D.id,s.n));}
+  function actsHTML(s){
+    var at=V2&&s.action_tables||{};
+    return '<div class="apb-blk"><div class="apb-lab">ทำอะไร</div><ul class="apb-ul">'+s.actions.map(function(a,k){var sp=at[String(k+1)];return '<li>'+(sp?apbActText(a,sp):apbTxt(a,true))+'</li>';}).join('')+'</ul></div>';
   }
   function sec(id,ey,title,inner){
     return '<section class="card scroll-reveal apb-sec" id="apb-'+id+'"><div class="s-pad"><div class="s-ey"><span>'+ey+'</span></div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">'+title+'</h2>'+inner+'</div></section>';
@@ -7605,7 +7730,7 @@ function renderAssetBook(){
       (WE.persona?'<div class="apb-pe">'+apbTxt(WE.persona,true)+'</div>':'')+
       '<button class="ag-more apb-more" type="button" data-rv data-open="ดูข้อมูลและขั้นคำนวณ" data-close="ย่อขั้นคำนวณ" style="margin-top:0">'+ic('lc-chevron-down','ag-more-ic')+'<span>ดูข้อมูลและขั้นคำนวณ</span></button>'+
       '<div hidden>'+
-        '<div class="apb-kv"><div class="apb-lab">ข้อมูลที่ใช้</div>'+(WE.inputs||[]).map(function(x){return '<div class="apb-row"><span>'+apbTxt(x.label,true)+'</span><span>'+apbTxt(x.value,true)+(x.refs&&x.refs.length?apbRefs(x.refs):'')+'</span></div>';}).join('')+'</div>'+
+        '<div class="apb-kv"><div class="apb-lab">ข้อมูลที่ใช้</div>'+(WE.inputs||[]).map(function(x){return '<div class="apb-row"><span>'+apbTxt(x.label,true)+'</span><span>'+(V2?apbPipes(x.value):apbTxt(x.value,true))+(x.refs&&x.refs.length?apbRefs(x.refs):'')+'</span></div>';}).join('')+'</div>'+
         '<div class="apb-kv"><div class="apb-lab">คำนวณทีละขั้น</div>'+WE.calc_steps.map(function(s){return '<div class="apb-calc">'+apbTxt(s,true)+'</div>';}).join('')+'</div>'+
       '</div>'+
       (WE.takeaway?'<div class="apb-take"><div class="apb-lab">สรุปจากตัวอย่าง</div><div class="apb-txt">'+apbTxt(WE.takeaway)+'</div></div>':'')+
@@ -7645,7 +7770,7 @@ function renderAssetBook(){
       '<div class="lib-stub" style="margin-top:var(--sp-stack)">'+ic('lc-info')+'<span>เอกสารเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุนหรือภาษีเฉพาะบุคคล · ข้อมูลที่เปลี่ยนตามเวลาระบุวันที่กำกับไว้</span></div>'+
       '<div class="apb-toc" aria-label="ในเล่มนี้">'+toc.map(function(t){return '<button type="button" data-jump="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>'+
     '</div></section>'+
-    sec('kq','คำถามหลัก','ตอบให้ได้ก่อนลงมือ',D.key_questions.map(function(k){return qa(apbEsc(k.q),k.short,k.a,'',k.refs);}).join(''))+
+    sec('kq','คำถามหลัก','ตอบให้ได้ก่อนลงมือ',D.key_questions.map(function(k){return qa(apbEsc(k.q),k.short,k.a,'',k.refs,null,V2?(k.labels||[]):null);}).join(''))+
     sec('basics','ศัพท์พื้นฐาน','คำที่จะเจอบนหน้าจอจริง',D.basics.map(function(b){
       return qa(apbEsc(b.term),b.short,b.plain,b.analogy?'<div class="apb-analogy">เปรียบเทียบ: '+apbTxt(b.analogy,true)+'</div>':'',b.refs,{open:'อ่านต่อ',close:'ย่อ'});
     }).join(''))+
@@ -7661,15 +7786,18 @@ function renderAssetBook(){
           '<div class="side-r">'+ic('lc-chevron-down','s-cv')+'</div></div>'+
           '<div class="side-body"><div class="side-bi"><div class="side-dl">'+
             (s.goal?'<div class="apb-blk"><div class="apb-lab">ขั้นนี้ได้อะไร</div><div class="apb-txt">'+apbTxt(s.goal)+'</div></div>':'')+
-            (s.actions&&s.actions.length?'<div class="apb-blk"><div class="apb-lab">ทำอะไร</div><ul class="apb-ul">'+s.actions.map(function(a){return '<li>'+apbTxt(a,true)+'</li>';}).join('')+'</ul></div>':'')+
-            (s.ask_yourself&&s.ask_yourself.length?'<div class="apb-blk"><div class="apb-lab">ถามตัวเอง</div><ul class="apb-ul">'+s.ask_yourself.map(function(a){return '<li>'+apbTxt(a,true)+'</li>';}).join('')+'</ul></div>':'')+
+            (VIS(s)?apbVisual(s,s.visual):'')+ // step 2: summary first; the full actions + ที่มา move into the fold at the end
+            (s.actions&&s.actions.length&&!VIS(s)?actsHTML(s):'')+
+            (s.ask_yourself&&s.ask_yourself.length&&!VIS(s)?'<div class="apb-blk"><div class="apb-lab">ถามตัวเอง</div><ul class="apb-ul">'+s.ask_yourself.map(function(a){return '<li>'+apbTxt(a,true)+'</li>';}).join('')+'</ul></div>':'')+
             /* A tool whose url is "#<book>" is another book in this set (13 of them, e.g. "FUND PLAYBOOK (ในเล่มนี้)") —
                opens that book here (.apb-xb) instead of a new tab of this same page (bug until 2026-10-12). */
             (s.tools&&s.tools.length?'<div class="apb-blk"><div class="apb-lab">เครื่องมือ</div>'+s.tools.map(function(t){
               var u=String(t.url||''),inner=u.charAt(0)==='#';
-              return '<div class="apb-tool">'+(inner?'<a href="#" class="apb-xb" data-book="'+apbEsc(u.slice(1))+'">'+apbEsc(t.name)+'</a>':u?'<a href="'+apbEsc(u)+'" target="_blank" rel="noopener">'+apbEsc(t.name)+'</a>':'<b>'+apbEsc(t.name)+'</b>')+(t.use_for?'<div>'+apbTxt(t.use_for,true)+'</div>':'')+'</div>';}).join('')+'</div>':'')+
+              var kv=V2&&t.use_for?apbKV(t.use_for):null; // "คืออะไร: … | ทำไมสำคัญ: …" -> label/value rows
+              return '<div class="apb-tool">'+(inner?'<a href="#" class="apb-xb" data-book="'+apbEsc(u.slice(1))+'">'+apbEsc(t.name)+'</a>':u?'<a href="'+apbEsc(u)+'" target="_blank" rel="noopener">'+apbEsc(t.name)+'</a>':'<b>'+apbEsc(t.name)+'</b>')+(t.use_for?(kv||'<div>'+apbTxt(t.use_for,true)+'</div>'):'')+'</div>';}).join('')+'</div>':'')+
             (s.pitfall?'<div class="apb-blk apb-warn"><div class="apb-lab">'+ic('lc-alert-triangle')+'กับดักที่พบบ่อย</div><div class="apb-txt">'+apbTxt(s.pitfall)+'</div></div>':'')+
-            apbRefs(s.refs)+
+            (VIS(s)?'<button class="ag-more apb-more" type="button" data-rv data-open="อ่านรายละเอียดขั้นนี้ (ข้อความเต็มพร้อมแหล่งอ้างอิง)" data-close="ย่อรายละเอียด">'+ic('lc-chevron-down','ag-more-ic')+'<span>อ่านรายละเอียดขั้นนี้ (ข้อความเต็มพร้อมแหล่งอ้างอิง)</span></button>'+
+              '<div hidden>'+actsHTML(s)+apbRefs(s.refs)+'</div>':apbRefs(s.refs))+
           '</div></div></div></article>';
       }).join('')+'</section>'+
     fmHTML+mmHTML+exHTML+ppHTML+mapHTML+evHTML+
@@ -7724,7 +7852,11 @@ function renderAssetBook(){
   main.onclick=function(e){
     var t=e.target.closest('button,a.apb-ref,a.apb-xb,.apb-sides .side-row');if(!t||!main.contains(t))return;
     if(t.classList.contains('side-row')){toggleStep(t);return;}
-    if(t.classList.contains('apb-xb')){e.preventDefault();APB_CUR=t.dataset.book;render();return;} // another book in this set
+    if(t.classList.contains('apb-xb')){e.preventDefault(); // another book in this set, or a section (data-sec) of this/another book
+      var sec=t.dataset.sec;
+      if(t.dataset.book!==APB_CUR){APB_CUR=t.dataset.book;render();}
+      if(sec){var tgt=document.querySelector('main #apb-'+sec);if(tgt)tgt.scrollIntoView({behavior:'smooth',block:'start'});}
+      return;}
     if(t.hasAttribute('data-copy')){ // prompt_pack: copy the prompt text as written (pre keeps its line breaks)
       var pre=main.querySelector('#'+t.dataset.copy),done=function(){t.querySelector('span').textContent='คัดลอกแล้ว';};
       if(pre&&navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(pre.textContent).then(done).catch(function(){});

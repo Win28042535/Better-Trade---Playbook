@@ -356,11 +356,24 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-10-12 — Asset Knowledge step 2: visual step summaries, action tables, answer labels (all 18 books).**
+Approved from a MACRO steps 1–3 preview. Each of the 144 steps now opens on the source's visual summary (`apbVisual`):
+quick table as stacked row cards (row name, column: value lines, its own ที่มา), the how-to list (number circles),
+panels (`pairs`/`list`/`flow`/`scale`/`quadrant` — Investment Clock is the one 2×2), ถามตัวเอง, สรุปที่ควรได้ (done
+wash + checks), a source-worded footnote; tools and กับดัก as before; the full actions + step refs move behind
+"อ่านรายละเอียดขั้นนี้ (ข้อความเต็มพร้อมแหล่งอ้างอิง)". Key-question answers break at the source's 93 labels (47
+questions) with "(1) หัวข้อ:" bolded; the 4 "ทำตาราง A | B | C" actions get their header table (sideways scroll,
+`.apb-tbl`); "xxx: … | yyy: …" tool notes read as label/value rows; example inputs split one set per line. Below
+520px the summary steps out of the step indent to the card's inner edge (`.apb-vis` negative margin) — at 320px it
+had been 190px wide. The exporter repeats the source's guards (no number in a summary that isn't in its step, one
+how-to per action, every answer label found) and also understands section links like "#tax-example". DR's book
+icon is `lc-plane` (user's pick of 4; added to the sprite). Switch: `APB_V2_SAMPLE` (null = all).
+
 **2026-10-12 — Asset Knowledge: 18 books, citations as complete as the source document (step 1 of 2).**
 Source = the content team's round of 9 Oct (`BT2026_AssetPlaybooks_2026-09-30 4/.../_source`). Data: + ASSET
 ALLOCATION, GLOBAL STOCK, TFEX, STRUCTURED NOTE, a 4th index group "อนุพันธ์และผลิตภัณฑ์ซับซ้อน" (tab icon
 `lc-zap`, group icons now keyed by name), the 5 small fixes in MACRO/CRYPTO/DR/REAL ESTATE/TAX; DR's book icon
-`lc-globe` → `lc-link` (GLOBAL took the globe); booth "หุ้นต่างประเทศ" → `global`; sw.js `apb-v3`. Reader-side
+`lc-globe` → `lc-link` (GLOBAL took the globe; then `lc-plane` in step 2); booth "หุ้นต่างประเทศ" → `global`; sw.js `apb-v3`. Reader-side
 completeness, matching the source's own `rich()`/section rules: inline "(S2, S7)" citations are tappable
 (`.apb-refs-in`), "[X PLAYBOOK](#id)" and the 13 tools whose url is "#id" open that book in place (`.apb-xb`,
 previously raw text / a new tab of this page), bare URLs link; new sections `fit_matrix` (หน้าที่ในพอร์ต),
