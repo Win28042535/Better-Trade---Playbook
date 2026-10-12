@@ -1700,9 +1700,15 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 /* the sources row at the end of a block: one marker per source. inline-block gives each its own line-break opportunity
    (adjacent <a>s with no space between them are one unbreakable word — measured 21 markers = 299px in a 234px box, clipped by
    the step body), and a 28px box (WCAG 2.2 AA minimum is 24px) makes each one tappable. In-sentence markers are unchanged. */
-.apb-refs{overflow-wrap:anywhere;}
-.apb-refs .apb-ref{display:inline-block;min-width:28px;line-height:28px;text-align:center;margin:0 2px;text-decoration:none;}
-.apb-refs .apb-ref:first-of-type{margin-left:var(--sp-glue);}
+/* Sources row, small grey pills (style 3 of 3, picked by the user, 2026-10-12): label + one pill per source in a wrapping flex
+   row with a fixed 6px gap, so the spacing no longer depends on how many digits a number has (it was a 28px transparent
+   box per number, centred — "9" looked far from "14"). A pill is 26px tall (WCAG 2.2 target minimum 24px) and at least
+   28px wide; the row wraps between pills (a 21-source group overflowed a 234px box when the markers were one word). */
+.apb-refs{overflow-wrap:anywhere;display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+.apb-refs-lab{margin-right:2px;}
+.apb-refs .apb-ref{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:26px;padding:0 var(--sp-list);margin:0;border-radius:var(--rpill);background:var(--accent);color:var(--muted);font-size:var(--fs-meta);font-weight:var(--w-head);line-height:1;text-decoration:none;font-variant-numeric:tabular-nums;transition:background .15s var(--ease),color .15s var(--ease);}
+.apb-refs .apb-ref:hover{background:var(--fill-control);color:var(--ink);}
+.apb-refs .apb-ref:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
 .apb-step{border-top:1px solid var(--line-soft);}
 .apb-st{display:grid;grid-template-columns:34px 1fr auto;gap:var(--sp-inline);align-items:flex-start;width:100%;min-height:44px;padding:var(--sp-stack) 0;background:none;border:none;font-family:var(--font);text-align:left;cursor:pointer;color:var(--ink);}
 .apb-code{font-family:var(--serif);font-size:var(--fs-eyebrow);letter-spacing:.06em;color:var(--muted);}
@@ -1928,8 +1934,11 @@ a.apb-tool-a::after{content:'';position:absolute;inset:0;border-radius:inherit;}
 .apb-scope{display:inline-block;font-size:var(--fs-meta);color:var(--muted);border:1px solid var(--line-strong);border-radius:var(--rpill);padding:0 var(--sp-list);margin-right:var(--sp-glue);line-height:1.6;}
 .apb-unv{font-size:var(--fs-meta);color:var(--amber-text);background:var(--amber-bg);border-radius:var(--rpill);padding:0 var(--sp-list);}
 .apb-refs-in{font-size:var(--fs-meta);} /* may wrap between chips: a 5-number group overflowed a 320px step (BOND) */
-.apb-refs-in .apb-ref{display:inline-block;min-width:24px;text-align:center;margin:0 1px;}
+/* In-sentence "(S2, S7)" markers: the same grey pill, smaller, so a citation reads as one with the ที่มา row. */
+.apb-refs-in .apb-ref{display:inline-block;min-width:22px;padding:0 7px;margin:0 2px;border-radius:var(--rpill);background:var(--accent);color:var(--muted);font-weight:var(--w-head);line-height:1.5;text-align:center;text-decoration:none;font-variant-numeric:tabular-nums;}
 .apb-refs-in .apb-ref:first-child{margin-left:var(--sp-glue);}
+.apb-refs-in .apb-ref:hover{background:var(--fill-control);color:var(--ink);}
+.apb-refs-in .apb-ref:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
 /* In-text link to another book (style B, 2026-10-12, picked by the user from 6: it had been violet + label weight + a full
    underline, too loud — 132 of them, up to 4 in one sentence). Now violet at the surrounding weight with a thin 40%
    underline; hover/focus firm the underline up. The tool cards' own name link (.apb-tool-a) is excluded: it stays ink. */
@@ -7649,9 +7658,14 @@ function apbScrollTo(el,center){
   var opt={top:Math.max(0,(inRoot?root.scrollTop:window.scrollY)+top),behavior:RM?'auto':'smooth'};
   if(inRoot)root.scrollTo(opt);else window.scrollTo(opt);
 }
+/* ที่มา row (2026-10-12): sources in ascending order, each once — the source document's own refrow() sorts them and the
+   data lists them as the author cited them (14, 15, 13, 18, 9 …: 468 of 1,300 groups were out of order). Each number is a
+   small grey pill; see .apb-refs. */
 function apbRefs(refs){
   if(!refs||!refs.length)return '';
-  return '<div class="apb-refs">ที่มา'+refs.map(function(r){return '<a href="#" class="apb-ref" data-ref="'+apbEsc(r)+'">'+apbEsc(String(r).replace(/^S/,''))+'</a>';}).join('')+'</div>';
+  var n=function(r){var v=parseInt(String(r).replace(/^\D+/,''),10);return isNaN(v)?0:v;},seen={};
+  var list=refs.filter(function(r){var k=String(r).trim();if(seen[k])return false;seen[k]=1;return true;}).sort(function(a,b){return n(a)-n(b);});
+  return '<div class="apb-refs"><span class="apb-refs-lab">ที่มา</span>'+list.map(function(r){return '<a href="#" class="apb-ref" data-ref="'+apbEsc(r)+'">'+apbEsc(String(r).replace(/^S/,''))+'</a>';}).join('')+'</div>';
 }
 function apbShell(title,sub,backPhase,body){
   root.innerHTML=

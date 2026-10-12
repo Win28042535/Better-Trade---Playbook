@@ -386,6 +386,13 @@ a 1px underline at 40% violet, 4px offset; hover/focus firm the underline up (+ 
 eyebrow size, .06em tracking), the same pairing as the book index (`.apb-en` over `.apb-t`); it was grey, under the
 title. Source order = reading order. Number circle stays top-aligned like every other list of this kind. Verified at
 320/375/768: all 144 rows (code text, title text unchanged, code above title, no clipping, 12px clear of the chevron).
+(8) Source markers (ที่มา rows and in-sentence "(S2, S7)"): now small grey pills (`--accent` fill, `--rpill`, meta size,
+tabular figures). The ที่มา row is a wrapping flex row with a fixed 6px gap — before, each number sat centred in an
+invisible 28px box, so the visual gap depended on the digit count ("9" looked far from "14"). Pills are 26px tall, ≥28px
+wide (WCAG 2.2 target size ≥24px). The row now shows each source once in ascending order, as the source document's own
+`refrow()` does — the data lists them as cited (`S14, S15, S13, S18, S9`: 468 of 1,300 groups were out of order).
+In-sentence markers keep the order the author wrote. The quick table's ที่มา column reuses the same pills.
+Verified at 320/375/768: 1,193 rows strictly ascending, every pill resolves to a listed source, none overflows.
 
 **2026-10-12 — Asset Knowledge step 2: visual step summaries, action tables, answer labels (all 18 books).**
 Approved from a MACRO steps 1–3 preview. Each of the 144 steps now opens on the source's visual summary (`apbVisual`):
