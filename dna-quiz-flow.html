@@ -1678,9 +1678,11 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-cell{display:flex;flex-direction:column;justify-content:flex-end;gap:var(--sp-stack-tight);flex:1 1 130px;min-width:0;}
 .apb-cell.w{flex-basis:100%;}
 .apb-cl{font-size:var(--fs-label);color:var(--muted);line-height:1.4;}
-.apb-ci{display:flex;align-items:center;gap:var(--sp-list);}
-.apb-u{flex:0 0 auto;font-size:var(--fs-label);color:var(--muted);}
-.apb-bl{flex:1;min-width:0;width:100%;font-family:var(--font);font-size:var(--fs-bodysm);color:var(--ink);background:var(--paper);border:1px solid var(--line-strong);border-radius:var(--r0);padding:2px var(--sp-list);min-height:44px;}
+/* Responsive audit (2026-10-12): a long unit ("% ของเงินลงทุนทั้งหมด", BOND's MY MAP) beside the box squeezed the input to
+   21px at 375px — unusable. The row now wraps: the box keeps at least 72px and the unit drops under it when it doesn't fit. */
+.apb-ci{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-glue) var(--sp-list);}
+.apb-u{flex:0 1 auto;font-size:var(--fs-label);color:var(--muted);min-width:0;overflow-wrap:anywhere;}
+.apb-bl{flex:1 1 72px;min-width:72px;width:auto;font-family:var(--font);font-size:var(--fs-bodysm);color:var(--ink);background:var(--paper);border:1px solid var(--line-strong);border-radius:var(--r0);padding:2px var(--sp-list);min-height:44px;}
 .apb-bl:focus{outline:2px solid var(--focus);outline-offset:1px;background:var(--white);}
 .apb-hint{font-size:var(--fs-label);color:var(--muted);line-height:1.5;margin-top:var(--sp-list);}
 .apb-chips{display:flex;flex-wrap:wrap;gap:var(--sp-list);}
@@ -1959,13 +1961,12 @@ a.apb-xb:not(.apb-tool-a):focus-visible{outline:2px solid var(--focus);outline-o
 .apb-vis>*+*{margin-top:var(--sp-stack);}
 /* On a phone the step body's indent (.side-bi 66px past the number circle + .side-dl's rule and padding) left the
    summary boxes ~190px wide at 320px and their text columns ~110px. A step with a summary (.apb-vstep) therefore drops
-   that indent below 520px: the whole body (summary, tools, กับดัก, the fold) sits on the card's own 20px inner edge.
+   that indent in the mobile view (the app's <768px frame, ~400px wide): the whole body (summary, tools, กับดัก, the fold) sits on the card's own 20px inner edge.
    Fixed 2026-10-12: the first version pulled only the summary out with a negative margin, so .side-dl's vertical rule
    ran straight through the summary boxes — the rule is removed with the indent. Plain steps keep rule + indent. */
-@media(max-width:520px){
-  .apb-vstep .side-bi{padding-left:20px;}
-  .apb-vstep .side-dl{border-left:none;padding-left:0;}
-}
+:root[data-view="mobile"] .apb-vstep .side-bi{padding-left:20px;}
+:root[data-view="mobile"] .apb-vstep .side-dl{border-left:none;padding-left:0;}
+
 .apb-vbox{padding:var(--sp-inline) var(--sp-stack);border:1px solid var(--line-soft);border-radius:var(--r1);background:var(--white);}
 .apb-vrow{padding:var(--sp-list) 0;border-top:1px solid var(--line-soft);}
 .apb-vhead+.apb-vrow{border-top:none;padding-top:0;} /* first data row (the hidden header row is the first child) */
@@ -1975,18 +1976,18 @@ a.apb-xb:not(.apb-tool-a):focus-visible{outline:2px solid var(--focus);outline-o
 .apb-vkv>span:last-child{color:var(--ink);overflow-wrap:anywhere;}
 .apb-vkv.full{grid-template-columns:minmax(0,1fr);}
 .apb-vhead{display:none;}
-@media(min-width:600px){
-  .apb-vtab .apb-vhead,.apb-vtab .apb-vrow{display:grid;grid-template-columns:var(--vcols);gap:var(--sp-list) var(--sp-inline);align-items:start;}
-  .apb-vtab .apb-vhead{font-size:var(--fs-meta);font-weight:var(--w-label);color:var(--muted);padding-bottom:var(--sp-list);border-bottom:1px solid var(--line-soft);}
-  .apb-vtab .apb-vhead+.apb-vrow{padding-top:var(--sp-list);}
-  .apb-vtab .apb-vrt{margin:0;}
-  .apb-vtab .apb-vkv{display:block;padding:0;border:0!important;}
-  .apb-vtab .apb-vkv>span:first-child{display:none;} /* the header row names the column */
-  .apb-vtab .apb-refs{margin:0;font-size:0;} /* its "ที่มา" word is the column header here; the chips keep their size */
-  .apb-vtab .apb-refs .apb-ref{font-size:var(--fs-meta);}
-  .apb-vtab .apb-refs .apb-ref:first-of-type{margin-left:0;}
-  .apb-vbox .apb-vper{display:none;}
-}
+/* keyed to the app's own view (mobile < 768px is a ~400px frame even in a 700px window), not the window width: a window of 600-767px
+   used to get the 5-column table in a 400px frame and clip every cell (responsive audit, 2026-10-12) */
+  :root:not([data-view="mobile"]) .apb-vtab .apb-vhead,:root:not([data-view="mobile"]) .apb-vtab .apb-vrow{display:grid;grid-template-columns:var(--vcols);gap:var(--sp-list) var(--sp-inline);align-items:start;}
+  :root:not([data-view="mobile"]) .apb-vtab .apb-vhead{font-size:var(--fs-meta);font-weight:var(--w-label);color:var(--muted);padding-bottom:var(--sp-list);border-bottom:1px solid var(--line-soft);}
+  :root:not([data-view="mobile"]) .apb-vtab .apb-vhead+.apb-vrow{padding-top:var(--sp-list);}
+  :root:not([data-view="mobile"]) .apb-vtab .apb-vrt{margin:0;}
+  :root:not([data-view="mobile"]) .apb-vtab .apb-vkv{display:block;padding:0;border:0!important;}
+  :root:not([data-view="mobile"]) .apb-vtab .apb-vkv>span:first-child{display:none;} /* the header row names the column */
+  :root:not([data-view="mobile"]) .apb-vtab .apb-refs{margin:0;font-size:0;} /* its "ที่มา" word is the column header here; the chips keep their size */
+  :root:not([data-view="mobile"]) .apb-vtab .apb-refs .apb-ref{font-size:var(--fs-meta);}
+  :root:not([data-view="mobile"]) .apb-vtab .apb-refs .apb-ref:first-of-type{margin-left:0;}
+  :root:not([data-view="mobile"]) .apb-vbox .apb-vper{display:none;}
 .apb-vbox>.apb-vkv+.apb-vkv,.apb-kvs>.apb-vkv+.apb-vkv{border-top:1px dashed var(--line-soft);}
 .apb-kvs{margin-top:var(--sp-glue);}
 .apb-vsteps{list-style:none;margin:0;padding:0;}
@@ -7745,11 +7746,11 @@ function assetIndexHTML(IX){
 /* Responsive audit (2026-10-12): with 4 groups the tab row scrolls sideways at phone width, and a picked tab could stay
    half off the edge (measured at 320px: "สินทรัพย์ทางเลือก", "ภาพใหญ่ หุ้น และตราสาร"). Bring the selected tab fully
    into view (12px clear of the edge; the first tab flush left), on pick and when the index re-renders on return. */
-function apbTabReveal(bar){
+function apbTabReveal(bar,instant){
   var b=bar&&bar.querySelector('.bt-tab[aria-selected="true"]');if(!b||bar.scrollWidth<=bar.clientWidth)return;
   var br=bar.getBoundingClientRect(),tr=b.getBoundingClientRect(),pad=12,x=bar.scrollLeft;
   if(b===bar.firstElementChild)x=0;else if(tr.left<br.left+pad)x-=br.left+pad-tr.left;else if(tr.right>br.right-pad)x+=tr.right-(br.right-pad);
-  bar.scrollTo({left:x,behavior:RM?'auto':'smooth'});
+  bar.scrollTo({left:x,behavior:(RM||instant)?'auto':'smooth'}); // instant on first paint / coming back from a book: the row should simply be there, not scroll into place
 }
 function bindAssetIndex(scope){
   var bar=scope.querySelector('#apbTabs');
@@ -7758,7 +7759,7 @@ function bindAssetIndex(scope){
     scope.querySelectorAll('.apb-panel').forEach(function(p){p.style.display=(p.dataset.apbp===value)?'':'none';});
     apbTabReveal(bar);
   });
-  apbTabReveal(bar);
+  apbTabReveal(bar,true);
   scope.querySelectorAll('.apb-li[data-book]').forEach(function(b){b.onclick=function(){APB_CUR=b.dataset.book;st.phase='assetbook';render();};});
 }
 function renderAssetIndex(){BOOK2_TAB='know';KNOW_TAB='asset';st.phase='book';renderBook();}
@@ -10692,7 +10693,9 @@ function buildGoTop(){
   root.addEventListener('scroll',onScroll,{passive:true});
   window.addEventListener('resize',reposition,{passive:true});
   reposition();
-  btn.onclick=function(){window.scrollTo({top:0,behavior:'smooth'});root.scrollTo({top:0,behavior:'smooth'});};
+  /* Motion audit (2026-10-12): the ↑ button always scrolled smoothly, even for a reader who asked their device for reduced
+     motion (every other jump on the book pages already honours RM). */
+  btn.onclick=function(){var b=RM?'auto':'smooth';window.scrollTo({top:0,behavior:b});root.scrollTo({top:0,behavior:b});};
 }
 
 /* Default demo state (2026-09-10, per direction): "ทำแบบทดสอบตัวตนแล้ว" out of the box — seed a

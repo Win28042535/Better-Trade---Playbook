@@ -408,6 +408,22 @@ split the number into its own 1.9em column (`.apb-li-n`, replaces the bullet —
 sits under the first word. (c) `apbTxt` needed 3 "(n)" parts for a list, so a 2-item "(1) … (2) …" stayed running text
 (REAL ESTATE's 2569–2570 measures); it now needs 2 items, the source's own rule. Rule: a mark that joins two things never
 opens a line; an item that opens on a number hangs.
+(11) Full responsive + motion re-audit (20 pages: both ความรู้ sub-tabs + 18 books, every section/step/fold opened).
+Widths: 320 360 375 414 520 540 620 767 768 1024 1440 (mobile frame ≤767, tablet 768–1439, pc ≥1440). Checks: overflow, text
+wider than its box, truncated labels, tap targets (<40 / <24), input width, text <13px, broken images, content hidden behind the
+tab bar, index rows, quick-table layout, summary width, stray rules. Found and fixed: (a) **layout keyed to the window, not the
+app view** — the quick table switched to its 5-column grid at a 600px window and the stepped-out summary at 520px, but the app
+keeps a ~400px phone frame up to 767px, so a 600–767px window got the wide table inside the 400px frame (75 clipped cells, 93
+spills) and an un-stepped summary; both now key off `:root[data-view]` (table real only outside "mobile"; summary outdent only in
+"mobile"). Rule: breakpoints inside the app follow `data-view`, never `@media(min/max-width)`. (b) **MY MAP blanks with a long
+unit** ("% ของเงินลงทุนทั้งหมด", BOND): the unit squeezed the input to 21px at 375px; `.apb-ci` now wraps and the box keeps ≥72px.
+(c) the ↑ button scrolled smoothly even under prefers-reduced-motion — now honours RM like every other jump. (d) returning from a
+book scrolled the group-tab row into place with an animation; it now snaps (`apbTabReveal(bar,true)`), smooth only on a tap.
+Motion verified clean: scroll-reveal settles in all 18 books (walk top→bottom at 375px; no card left tilted above the 42% line or
+at the page end; revealTick costs 1–2ms on a 3,300-node page), every toggle re-syncs (step open/close, fold, read-more, sources,
+keyboard) on macro/tax/snote/ai/fund, TOC + section + source jumps land at the 70px margin and never under the top bar, RM
+removes every transform and keeps all content visible. Booth map's own `scrollIntoView({behavior:'smooth'})` (lines ~9225) is
+outside Asset Knowledge and still ignores RM.
 
 **2026-10-12 — Asset Knowledge step 2: visual step summaries, action tables, answer labels (all 18 books).**
 Approved from a MACRO steps 1–3 preview. Each of the 144 steps now opens on the source's visual summary (`apbVisual`):
