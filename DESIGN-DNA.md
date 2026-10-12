@@ -377,6 +377,11 @@ from 4 options rendered side by side in the real app): `.apb-tool` = `.apb-bl-li
 external / `lc-book-open` another book / `lc-file-text` no url) · name · description · host (external only) · chevron.
 The name is the only `<a>`; its `::after` stretches over the card (whole card = tap target, ≥77px tall at 375px) so a
 link inside a description can never nest. Verified at 320/375/768: 395 cards, names verbatim, 381 hosts, 13 in-app links.
+(6) In-text links to another book ("[GOLD PLAYBOOK](#gold)", 132 in 18 books) were violet + label weight + full underline —
+too loud, up to 4 in one sentence. Now style B (picked from 6 rendered side by side): violet at the *surrounding* weight,
+a 1px underline at 40% violet, 4px offset; hover/focus firm the underline up (+ focus ring). Scoped with
+`a.apb-xb:not(.apb-tool-a)` — the tool cards reuse `.apb-xb` for their name link, which must stay ink (the old global
+`.apb-xb` rule would have turned it violet). Rule: an in-text link is never bolder than its sentence.
 
 **2026-10-12 — Asset Knowledge step 2: visual step summaries, action tables, answer labels (all 18 books).**
 Approved from a MACRO steps 1–3 preview. Each of the 144 steps now opens on the source's visual summary (`apbVisual`):

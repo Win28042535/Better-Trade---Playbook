@@ -1930,7 +1930,12 @@ a.apb-tool-a::after{content:'';position:absolute;inset:0;border-radius:inherit;}
 .apb-refs-in{font-size:var(--fs-meta);} /* may wrap between chips: a 5-number group overflowed a 320px step (BOND) */
 .apb-refs-in .apb-ref{display:inline-block;min-width:24px;text-align:center;margin:0 1px;}
 .apb-refs-in .apb-ref:first-child{margin-left:var(--sp-glue);}
-.apb-xb{color:var(--violet);font-weight:var(--w-label);text-underline-offset:3px;}
+/* In-text link to another book (style B, 2026-10-12, picked by the user from 6: it had been violet + label weight + a full
+   underline, too loud — 132 of them, up to 4 in one sentence). Now violet at the surrounding weight with a thin 40%
+   underline; hover/focus firm the underline up. The tool cards' own name link (.apb-tool-a) is excluded: it stays ink. */
+a.apb-xb:not(.apb-tool-a){color:var(--violet);font-weight:inherit;text-decoration:underline;text-decoration-thickness:1px;text-decoration-color:color-mix(in srgb,var(--violet) 40%,transparent);text-underline-offset:4px;transition:text-decoration-color .15s var(--ease);}
+a.apb-xb:not(.apb-tool-a):hover,a.apb-xb:not(.apb-tool-a):focus-visible{text-decoration-color:var(--violet);}
+a.apb-xb:not(.apb-tool-a):focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:2px;}
 /* Step 2 visual step summary (apbVisual, 2026-10-12): boxes on the step body, each titled with .apb-lab. Quick-table rows
    become stacked row cards (row name, then column: value lines, then ที่มา) since 4–5 columns don't fit a phone; the
    how-to and flow panels reuse the 6-ด้าน number circle; takeaways sit in .apb-take (done wash) with check marks. */
