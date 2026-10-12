@@ -1600,7 +1600,7 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .apb-bl,.apb-chip,.apb-ck{scroll-margin-top:96px;scroll-margin-bottom:160px;}
 .apb-chip{max-width:100%;}
 .apb-sides .side-row:focus-visible{outline:2px solid var(--focus);outline-offset:-2px;border-radius:var(--r1);}
-.apb-sides .side-s.apb-code{font-family:var(--serif);letter-spacing:.06em;}
+.apb-sides .side-s.apb-code{font-family:var(--serif);font-size:var(--fs-eyebrow);letter-spacing:.06em;line-height:1.3;color:var(--violet);margin:0 0 2px;} /* above .side-t: violet, as .apb-en on the index */
 .apb-sides .side-dl>*+*{margin-top:var(--sp-stack);}
 .apb-sides .apb-warn{margin-top:var(--sp-stack);}
 /* Top-bar English name 2px under the shared .tb-sub size (14 -> 12px), per direction 2026-10-06. */
@@ -7850,7 +7850,9 @@ function renderAssetBook(){
     '<section class="card mb-lg scroll-reveal apb-sec apb-sides" id="apb-steps"><div class="sides-hd"><div class="s-ey">'+D.steps.length+' ขั้นตอน</div><h2 class="s-h">ทำตามลำดับ</h2><p class="s-sub" style="margin-bottom:2px">แตะแต่ละขั้นเพื่อดูสิ่งที่ต้องทำ</p></div>'+
       D.steps.map(function(s,i){
         return '<article class="side-item'+(VIS(s)?' apb-vstep':'')+'" data-step="'+i+'"><div class="list-row side-row" role="button" tabindex="0" aria-expanded="false"><div class="side-num lck">'+s.n+'</div>'+
-          '<div class="side-cx"><div class="side-t">'+apbEsc(s.title)+'</div><div class="side-s apb-code">'+apbEsc(s.code)+'</div></div>'+
+          /* English step code ABOVE the Thai title, violet (2026-10-12, per direction) — the same pairing the book index uses
+             (.apb-en over .apb-t). Source order = reading order, so a screen reader also hears the code first. */
+          '<div class="side-cx"><div class="side-s apb-code">'+apbEsc(s.code)+'</div><div class="side-t">'+apbEsc(s.title)+'</div></div>'+
           '<div class="side-r">'+ic('lc-chevron-down','s-cv')+'</div></div>'+
           '<div class="side-body"><div class="side-bi"><div class="side-dl">'+
             (s.goal?'<div class="apb-blk"><div class="apb-lab">ขั้นนี้ได้อะไร</div><div class="apb-txt">'+apbTxt(s.goal)+'</div></div>':'')+

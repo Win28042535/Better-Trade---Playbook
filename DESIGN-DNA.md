@@ -382,6 +382,10 @@ too loud, up to 4 in one sentence. Now style B (picked from 6 rendered side by s
 a 1px underline at 40% violet, 4px offset; hover/focus firm the underline up (+ focus ring). Scoped with
 `a.apb-xb:not(.apb-tool-a)` — the tool cards reuse `.apb-xb` for their name link, which must stay ink (the old global
 `.apb-xb` rule would have turned it violet). Rule: an in-text link is never bolder than its sentence.
+(7) Step list ("ทำตามลำดับ", 144 steps): the English step code now sits ABOVE the Thai title and is violet (Baskervville
+eyebrow size, .06em tracking), the same pairing as the book index (`.apb-en` over `.apb-t`); it was grey, under the
+title. Source order = reading order. Number circle stays top-aligned like every other list of this kind. Verified at
+320/375/768: all 144 rows (code text, title text unchanged, code above title, no clipping, 12px clear of the chevron).
 
 **2026-10-12 — Asset Knowledge step 2: visual step summaries, action tables, answer labels (all 18 books).**
 Approved from a MACRO steps 1–3 preview. Each of the 144 steps now opens on the source's visual summary (`apbVisual`):
