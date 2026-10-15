@@ -356,6 +356,13 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-10-15 — PDF preview fixed on Vercel + demo-panel case picker.** On the deployed site the preview always showed
+"โหลดไม่สำเร็จ": (a) `vercel.json` cleanUrls 308s `…/index.html` to the bare folder URL, so the mockup's relative assets
+404'd — the local copy is now `mockup/playbook-pdf/preview.html` (lands on `…/playbook-pdf/preview`); (b) the pre-fetched
+copy held that redirected response and a redirected response can't answer a navigation — `sw.js` re-wraps it
+(`unredirect`). Verified live: page ready, 0 broken images, served from `pdf-<hash>`. Demo panel row "พรีวิว PDF" — ปกติ
+(default, the real load) / กำลังโหลด / ไม่มีสัญญาณ / โหลดไม่สำเร็จ (`DEMO.pdfCase` holds the state) + "เปิดพรีวิว PDF".
+
 **2026-10-15 — PDF preview: readable on phones, loading/error states, offline copy.** Follow-up to the audit below, all
 user-approved. (1) *อ่านง่าย*: the page never scales below `PDF_READ_S` 0.70 (≈11px text); where fit-to-width would go lower
 (<556px frames) the iframe is made narrower than the page in its own px and the mockup pans sideways inside it (one native
