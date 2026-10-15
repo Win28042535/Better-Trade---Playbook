@@ -356,6 +356,12 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-10-15 — PDF preview responsive + motion audit.** Audited at 320/375/414/620/1024: overlay is full-screen, the iframe
+fills the frame, no sideways clip, no header overlap. Fixes: the close button was 28px (`.howto-x` out-ranked it) → `.pdfv .pdfv-x`
+44×44; added Esc to close, a Tab focus trap (`pdfKeys`), `inert` on the app root while open, and focus returned to the opener.
+Open question (not changed): the fixed 794px A4 page is scaled to fit, so body text is ~8px at 414 and ~6.4px at 320 —
+readable only with zoom; options are pinch-zoom or a partial-fit with pan.
+
 **2026-10-15 — Playbook PDF preview synced to the design team's 14 Oct round.** `node tools/sync-pdf-mockup.js` re-pulled
 https://playbook-pdf-git-ver2-win999.vercel.app/dna-quiz-flow into `mockup/playbook-pdf/` (68 files, 4.3MB): the leather
 front/back cover (1240×1754 webp), centred card sheet, engraved drawings at the end of each side heading, the engraved set

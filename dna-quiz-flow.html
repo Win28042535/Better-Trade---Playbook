@@ -3332,7 +3332,7 @@ html.pdfv-open,html.pdfv-open body{overflow:hidden;}
 .pdfv-ttl{flex:1;min-width:0;}
 .pdfv-t{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);line-height:1.3;}
 .pdfv-s{display:flex;align-items:center;gap:var(--sp-list);margin-top:4px;font-size:var(--fs-meta);color:var(--muted);}
-.pdfv-x{position:static;flex:0 0 auto;width:44px;height:44px;}
+.pdfv .pdfv-x{position:static;flex:0 0 auto;width:44px;height:44px;} /* .pdfv prefix: the later .howto-x (28px) used to win and left a 28px close target (audit 2026-10-15) */
 .pdfv-frame{flex:1;min-height:0;position:relative;overflow:hidden;}
 .pdfv-iframe{position:absolute;top:0;left:0;width:794px;border:0;transform-origin:0 0;background:var(--white);opacity:0;transition:opacity .3s var(--ease);}
 .pdfv.ready .pdfv-iframe{opacity:1;}
@@ -6279,15 +6279,35 @@ function pdfFit(){
   f.style.height=Math.ceil(box.clientHeight/s)+'px';
   f.style.left=Math.max(0,(box.clientWidth-PDF_W*s)/2)+'px';
 }
+/* Keyboard + focus contract of the preview (audit 2026-10-15; it is role=dialog aria-modal but behaved like a page): Esc closes,
+   Tab/Shift+Tab stay inside it, the page behind is inert (so nothing behind can take focus or be read as content), and closing
+   hands focus back to the control that opened it. */
+var PDF_OPENER=null;
+function pdfKeys(e){
+  var v=document.getElementById('pdfv');if(!v)return;
+  if(e.key==='Escape'){e.preventDefault();closePdfPreview();return;}
+  if(e.key!=='Tab')return;
+  var f=[].slice.call(v.querySelectorAll('button:not([disabled]),iframe,a[href],[tabindex]:not([tabindex="-1"])'));
+  if(!f.length){e.preventDefault();return;}
+  var first=f[0],last=f[f.length-1],a=document.activeElement;
+  if(e.shiftKey&&(a===first||!v.contains(a))){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&(a===last||!v.contains(a))){e.preventDefault();first.focus();}
+}
 function closePdfPreview(){
   var v=document.getElementById('pdfv');if(v)v.parentNode.removeChild(v);
   document.documentElement.classList.remove('pdfv-open');
   window.removeEventListener('resize',pdfFit);
+  document.removeEventListener('keydown',pdfKeys,true);
+  if(root)root.removeAttribute('inert');
+  var o=PDF_OPENER;PDF_OPENER=null;
+  if(v&&o&&o.isConnected&&o.focus)try{o.focus({preventScroll:true});}catch(err){}
 }
 /* opts.onConfirm — what the launching screen does once confirmed (e.g. gamesDlDone() flips its own button). */
 function openPdfPreview(opts){
   opts=opts||{};
+  var opener=document.activeElement; // remembered before closePdfPreview() clears any earlier one
   closePdfPreview();
+  PDF_OPENER=opener&&opener!==document.body?opener:null;
   var v=document.createElement('div');v.className='pdfv';v.id='pdfv';
   v.setAttribute('role','dialog');v.setAttribute('aria-modal','true');v.setAttribute('aria-labelledby','pdfvT');
   v.innerHTML='<div class="pdfv-top"><div class="pdfv-ttl"><div class="pdfv-t" id="pdfvT">ตัวอย่าง Playbook PDF</div>'+
@@ -6298,6 +6318,8 @@ function openPdfPreview(opts){
     '<div class="pdfv-bar"><p class="pdfv-hint"></p><button class="btn btn-primary pdfv-go" type="button"></button></div>';
   document.body.appendChild(v);
   document.documentElement.classList.add('pdfv-open');
+  if(root)root.setAttribute('inert',''); // the dialog lives on <body>, outside #root
+  document.addEventListener('keydown',pdfKeys,true);
   var go=v.querySelector('.pdfv-go'),hint=v.querySelector('.pdfv-hint');
   var paint=function(){
     go.disabled=PDF_DONE;
