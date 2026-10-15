@@ -356,6 +356,20 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-10-15 — PDF preview: readable on phones, loading/error states, offline copy.** Follow-up to the audit below, all
+user-approved. (1) *อ่านง่าย*: the page never scales below `PDF_READ_S` 0.70 (≈11px text); where fit-to-width would go lower
+(<556px frames) the iframe is made narrower than the page in its own px and the mockup pans sideways inside it (one native
+scroller), and a floating `.pdfv-zoom` pill "พอดีจอ | อ่านง่าย" switches back; the reading spot is kept across switches and
+resizes (the mockup is quirks-mode: fit makes `<body>` the scroller, panning the viewport — both are read/written). file://
+can't reach the copy, so it stays fit (`noacc`). (2) *Loading*: `.pdfv-skel` blank A4 sheet with a slow light sweep (still
+under reduced motion), label "กำลังโหลดตัวอย่าง…", confirm waits (`.pdfv-go.wait`). (3) *Error, option C*: `.pdfv-err` card —
+offline: amber wifi-off "ไม่มีสัญญาณอินเทอร์เน็ต" and it reloads by itself on `online`; otherwise file-x "โหลดตัวอย่างไม่สำเร็จ";
+both with "ลองอีกครั้ง"; confirm stays live. A load is real only if the copy's `#root` is readable (offline error pages read
+null, a 404 has no `#root`); no ready page within `PDF_TIMEOUT` 12s = error. (4) *Offline*: `pdfPrefetch()` (registered player
+reaches the Playbook, idle, not offline/data-saver, once per load) asks `sw.js` to `addAll` the files in
+`mockup/playbook-pdf/manifest.json` into `pdf-<hash>` — all or nothing, older pdf-* dropped after; the fetch handler serves
+from it first (not on localhost). `tools/sync-pdf-mockup.js` writes the manifest (or `--manifest` alone).
+
 **2026-10-15 — PDF preview responsive + motion audit.** Audited at 320/375/414/620/1024: overlay is full-screen, the iframe
 fills the frame, no sideways clip, no header overlap. Fixes: the close button was 28px (`.howto-x` out-ranked it) → `.pdfv .pdfv-x`
 44×44; added Esc to close, a Tab focus trap (`pdfKeys`), `inert` on the app root while open, and focus returned to the opener.

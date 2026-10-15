@@ -5,15 +5,18 @@
    branch-preview URL changes. Re-run whenever the mockup is updated:
 
      node tools/sync-pdf-mockup.js [url]
+     node tools/sync-pdf-mockup.js --manifest   (only rebuild manifest.json from the local copy, no fetch)
 
    Copies the page (as index.html) + every js/, data/ and assets/ file it references. Some file names are built in its JS
    at runtime ('assets/'+img+'.svg', 'assets/playbook-cover-'+which+'.webp'), so those are listed in DYNAMIC below —
    they were read from the page's own network log; add to it if the preview shows a missing image after a sync. */
 'use strict';
 const fs = require('fs');
+const crypto = require('crypto');
 const path = require('path');
 
-const URL0 = process.argv[2] || 'https://playbook-pdf-git-ver2-win999.vercel.app/dna-quiz-flow';
+const ONLY_MANIFEST = process.argv[2] === '--manifest';
+const URL0 = (!ONLY_MANIFEST && process.argv[2]) || 'https://playbook-pdf-git-ver2-win999.vercel.app/dna-quiz-flow';
 const OUT = path.join(__dirname, '..', 'mockup', 'playbook-pdf');
 const base = new URL('./', URL0);
 
@@ -36,6 +39,24 @@ async function get(rel) {
   if (!res.ok) throw new Error(`${res.status} ${rel}`);
   return Buffer.from(await res.arrayBuffer());
 }
+/* manifest.json (2026-10-15) — the list sw.js pre-fetches so the preview opens offline (app: pdfPrefetch()). Built from
+   what is actually in the folder, so it never names a file that 404s (sw.js stores all-or-nothing); v = content hash, so
+   any change to the copy makes the app's next visit build a fresh cache. */
+function writeManifest() {
+  const files = [];
+  const walk = (dir) => { for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, e.name);
+    if (e.isDirectory()) walk(full); else files.push(path.relative(OUT, full).split(path.sep).join('/'));
+  } };
+  walk(OUT);
+  const list = files.filter((f) => f !== 'manifest.json').sort();
+  const h = crypto.createHash('sha1');
+  for (const f of list) { h.update(f); h.update(fs.readFileSync(path.join(OUT, f))); }
+  const v = h.digest('hex').slice(0, 10);
+  fs.writeFileSync(path.join(OUT, 'manifest.json'), JSON.stringify({ v, files: list }, null, 1) + '\n');
+  console.log(`manifest.json: ${list.length} files, v ${v}`);
+}
+if (ONLY_MANIFEST) { writeManifest(); process.exit(0); }
 (async () => {
   const html = (await fetch(URL0).then((r) => { if (!r.ok) throw new Error(`${r.status} ${URL0}`); return r.text(); }));
   const files = new Set(DYNAMIC);
@@ -71,4 +92,5 @@ async function get(rel) {
   }
   console.log(`synced ${files.size + 1} files (${(total / 1024 / 1024).toFixed(2)} MB) from ${URL0} -> ${path.relative(process.cwd(), OUT)}`);
   if (missing.length) console.log('not found (skipped):\n  ' + missing.join('\n  '));
+  writeManifest();
 })().catch((e) => { console.error(e.message); process.exit(1); });

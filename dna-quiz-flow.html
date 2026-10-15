@@ -3336,8 +3336,37 @@ html.pdfv-open,html.pdfv-open body{overflow:hidden;}
 .pdfv-frame{flex:1;min-height:0;position:relative;overflow:hidden;}
 .pdfv-iframe{position:absolute;top:0;left:0;width:794px;border:0;transform-origin:0 0;background:var(--white);opacity:0;transition:opacity .3s var(--ease);}
 .pdfv.ready .pdfv-iframe{opacity:1;}
-.pdfv-load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:var(--fs-bodysm);color:var(--muted);}
-.pdfv.ready .pdfv-load{display:none;}
+/* loading state (2026-10-15): a blank A4 sheet the width the page will land at (pdfFit sets width/left), light sweeping
+   across it — the global reduced-motion reset leaves it still. Hidden once ready or on error. */
+.pdfv-skel{position:absolute;top:var(--sp-stack);bottom:0;left:0;width:794px;background:var(--white);overflow:hidden;padding:44px 6%;pointer-events:none;}
+.pdfv-skel i{display:block;height:12px;border-radius:var(--rpill);background:var(--cloud);margin-bottom:14px;}
+.pdfv-skel i.h{height:26px;width:60%;margin-bottom:26px;}
+.pdfv-skel i.s{width:72%;}
+.pdfv-skel i.b{height:120px;border-radius:var(--r1);margin:22px 0;}
+.pdfv-skel::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.75) 50%,transparent 70%);transform:translateX(-100%);animation:pdfvSweep 1.6s var(--ease) infinite;}
+@keyframes pdfvSweep{to{transform:translateX(100%);}}
+.pdfv.ready .pdfv-skel,.pdfv.err .pdfv-skel{display:none;}
+/* error state (2026-10-15, user picked "C"): one card, two causes — no signal (amber wifi-off, reloads by itself on
+   'online') or a failed load (file-x). The confirm button stays live: confirming only records the request. */
+.pdfv-err{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:var(--sp-edge);}
+.pdfv.err .pdfv-err{display:flex;}
+.pdfv.err .pdfv-iframe{visibility:hidden;}
+.pdfv-ec{display:flex;flex-direction:column;align-items:center;gap:var(--sp-inline);max-width:300px;padding:28px 22px;text-align:center;background:var(--white);border-radius:var(--r2);}
+.pdfv-ei{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--cloud);color:var(--muted);}
+.pdfv-ei svg{width:26px;height:26px;}
+.pdfv.off .pdfv-ei{background:var(--amber-bg);color:var(--amber-text);}
+.pdfv-et{font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);line-height:1.35;}
+.pdfv-ed{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.55;margin:0;}
+.pdfv-ec .btn{margin-top:6px;}
+.pdfv-ec .btn svg{width:var(--ic-sm);height:var(--ic-sm);}
+/* confirm waits while loading (not while erroring); .pdfv-go:disabled below is the "confirmed" look, so waiting gets its own */
+.pdfv-go.wait{background:var(--cloud);color:var(--muted);box-shadow:none;cursor:default;}
+/* พอดีจอ | อ่านง่าย (2026-10-15): only shown where fitting the 794px page would drop below PDF_READ_S (phones);
+   อ่านง่าย keeps 0.70 and the page pans sideways inside the iframe */
+.pdfv-zoom{position:absolute;right:var(--sp-inline);bottom:var(--sp-inline);display:inline-flex;padding:3px;background:var(--white);border-radius:var(--rpill);box-shadow:0 2px 8px rgba(17,19,24,.12);z-index:1;}
+.pdfv-zoom[hidden],.pdfv.err .pdfv-zoom{display:none;}
+.pdfv-zoom button{min-height:36px;padding:0 var(--sp-inline);border:0;border-radius:var(--rpill);background:transparent;font:inherit;font-size:var(--fs-meta);color:var(--muted);cursor:pointer;white-space:nowrap;}
+.pdfv-zoom button[aria-pressed="true"]{background:var(--ink);color:var(--white);}
 .pdfv-bar{display:flex;flex-direction:column;gap:var(--sp-list);padding:var(--sp-inline) var(--sp-edge) calc(var(--sp-inline) + env(safe-area-inset-bottom));background:var(--white);border-top:1px solid var(--line-soft);}
 .pdfv-hint{font-size:var(--fs-meta);color:var(--muted);line-height:1.5;margin:0;}
 .pdfv-go{width:100%;justify-content:center;}
@@ -4409,6 +4438,8 @@ html.pdfv-open,html.pdfv-open body{overflow:hidden;}
 <symbol id="lc-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
 <symbol id="lc-refresh-cw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M8 16H3v5"/></symbol>
 <symbol id="lc-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="lc-wifi-off" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M8.5 16.43a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 4.18-2.65"/><path d="M19 12.86a10 10 0 0 0-2.29-1.59"/><path d="M22 8.82a15 15 0 0 0-11.29-3.76"/><path d="M5 12.86a10 10 0 0 1 5.17-2.69"/><path d="m2 2 20 20"/></symbol>
+<symbol id="lc-file-x" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m14.5 12.5-5 5"/><path d="m9.5 12.5 5 5"/></symbol>
 <symbol id="lc-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
 <symbol id="lc-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
 <symbol id="lc-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
@@ -6271,13 +6302,38 @@ function mountPdfDlBtn(){
 /* PDF_PAGES is only the fallback shown until the mockup has built its sheets: openPdfPreview then counts the numbered pages
    (.pb-pn-n) in the loaded copy, so the "N หน้า" label follows every `node tools/sync-pdf-mockup.js` (56 until 2026-10-14, 59 after). */
 var PDF_SRC='mockup/playbook-pdf/index.html',PDF_W=794,PDF_PAGES=59,PDF_DONE=false;
+/* อ่านง่าย (2026-10-15, audit: fitting 794px into a phone left ~6–8px text): the page never drops below PDF_READ_S
+   (≈11px text) — the iframe is then narrower than the page (in its own px) and the mockup pans sideways inside it,
+   one native scroller for both axes. พอดีจอ = the old fit-to-width. The switch only shows where they differ. On file://
+   the copy can't be reached to let it pan ('noacc'), so it stays fit-to-width. PDF_TIMEOUT: no ready page by then = error state. */
+var PDF_READ_S=0.7,PDF_MODE='read',PDF_TIMEOUT=12000,PDF_OFF=null;
 function pdfFit(){
   var v=document.getElementById('pdfv');if(!v)return;
-  var box=v.querySelector('.pdfv-frame'),f=v.querySelector('.pdfv-iframe');
-  var s=Math.min(1,box.clientWidth/PDF_W);
+  var box=v.querySelector('.pdfv-frame'),f=v.querySelector('.pdfv-iframe'),sk=v.querySelector('.pdfv-skel'),zm=v.querySelector('.pdfv-zoom');
+  var bw=box.clientWidth,bh=box.clientHeight,fit=Math.min(1,bw/PDF_W);
+  var canPan=fit<PDF_READ_S&&!v.classList.contains('noacc'),pan=canPan&&PDF_MODE==='read',s=pan?PDF_READ_S:fit;
+  zm.hidden=!canPan;
+  [].forEach.call(zm.querySelectorAll('button'),function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-m')===(pan?'read':'fit')));});
+  // keep the reading spot: read it before the iframe is resized (resizing first loses it). Which element holds it moves
+  // with the mode — the mockup has no doctype (quirks mode): fit-to-width's overflow-x:hidden makes <body> its own
+  // scroller, panning leaves the viewport scrolling (read/written through body.scrollTop in quirks) — so read the larger
+  // of both and write both (a doctype'd mockup would use <html>; covered too)
+  var d=null,y=0;
+  if(v.classList.contains('ready'))try{d=f.contentDocument;y=Math.max(d.documentElement.scrollTop,d.body.scrollTop);}catch(e){d=null;}
+  var left=pan?0:Math.max(0,(bw-PDF_W*s)/2);
   f.style.transform='scale('+s.toFixed(4)+')';
-  f.style.height=Math.ceil(box.clientHeight/s)+'px';
-  f.style.left=Math.max(0,(box.clientWidth-PDF_W*s)/2)+'px';
+  f.style.width=(pan?Math.floor(bw/s):PDF_W)+'px';
+  f.style.height=Math.ceil(bh/s)+'px';
+  f.style.left=left+'px';
+  if(sk){sk.style.width=Math.round(PDF_W*s)+'px';sk.style.left=left+'px';}
+  if(!d)return;
+  // the page scrolls sideways only while panning (fit-to-width clips stray overflow, as before); body overflow is left
+  // visible while panning so the root stays the one scroller for both axes (a body scroller would split them)
+  var he=d.documentElement,o=pan?'auto':'hidden';
+  if(he.style.overflowX!==o){he.style.overflowX=o;d.body.style.overflowX=pan?'':'hidden';he.scrollLeft=d.body.scrollLeft=0;}
+  // again after the frame: the iframe takes its new size (and switches scroller) on the next frame, which drops the spot
+  var keep=function(){if(Math.max(he.scrollTop,d.body.scrollTop)!==y){he.scrollTop=y;d.body.scrollTop=y;}};
+  keep();requestAnimationFrame(function(){keep();requestAnimationFrame(keep);});
 }
 /* Keyboard + focus contract of the preview (audit 2026-10-15; it is role=dialog aria-modal but behaved like a page): Esc closes,
    Tab/Shift+Tab stay inside it, the page behind is inert (so nothing behind can take focus or be read as content), and closing
@@ -6298,6 +6354,7 @@ function closePdfPreview(){
   document.documentElement.classList.remove('pdfv-open');
   window.removeEventListener('resize',pdfFit);
   document.removeEventListener('keydown',pdfKeys,true);
+  if(PDF_OFF){PDF_OFF();PDF_OFF=null;} // load timer + 'online' listener of the closed preview
   if(root)root.removeAttribute('inert');
   var o=PDF_OPENER;PDF_OPENER=null;
   if(v&&o&&o.isConnected&&o.focus)try{o.focus({preventScroll:true});}catch(err){}
@@ -6311,38 +6368,91 @@ function openPdfPreview(opts){
   var v=document.createElement('div');v.className='pdfv';v.id='pdfv';
   v.setAttribute('role','dialog');v.setAttribute('aria-modal','true');v.setAttribute('aria-labelledby','pdfvT');
   v.innerHTML='<div class="pdfv-top"><div class="pdfv-ttl"><div class="pdfv-t" id="pdfvT">ตัวอย่าง Playbook PDF</div>'+
-      '<div class="pdfv-s"><span class="ex-tag">ตัวอย่าง</span><span>'+PDF_PAGES+' หน้า · A4</span></div></div>'+
+      '<div class="pdfv-s"><span class="ex-tag">ตัวอย่าง</span><span class="pdfv-n"></span></div></div>'+
       '<button class="howto-x pdfv-x" type="button" aria-label="ปิด">'+ic('lc-x')+'</button></div>'+
-    '<div class="pdfv-frame"><div class="pdfv-load">กำลังเตรียมตัวอย่าง…</div>'+
-      '<iframe class="pdfv-iframe" src="'+PDF_SRC+'" title="ตัวอย่าง Playbook PDF" loading="eager"></iframe></div>'+
+    '<div class="pdfv-frame">'+
+      '<div class="pdfv-skel" aria-hidden="true"><i class="h"></i><i></i><i class="s"></i><i></i><i class="b"></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i></div>'+
+      '<iframe class="pdfv-iframe" title="ตัวอย่าง Playbook PDF" loading="eager"></iframe>'+
+      '<div class="pdfv-err" aria-live="polite"></div>'+
+      '<div class="pdfv-zoom" role="group" aria-label="ขนาดตัวอย่าง" hidden><button type="button" data-m="fit">พอดีจอ</button><button type="button" data-m="read">อ่านง่าย</button></div></div>'+
     '<div class="pdfv-bar"><p class="pdfv-hint"></p><button class="btn btn-primary pdfv-go" type="button"></button></div>';
   document.body.appendChild(v);
   document.documentElement.classList.add('pdfv-open');
   if(root)root.setAttribute('inert',''); // the dialog lives on <body>, outside #root
   document.addEventListener('keydown',pdfKeys,true);
-  var go=v.querySelector('.pdfv-go'),hint=v.querySelector('.pdfv-hint');
+  var go=v.querySelector('.pdfv-go'),hint=v.querySelector('.pdfv-hint'),lab=v.querySelector('.pdfv-n'),er=v.querySelector('.pdfv-err');
+  var f=v.querySelector('.pdfv-iframe'),state='load',pages=PDF_PAGES,tmo=0,poll=0;
+  /* states (2026-10-15): load = skeleton, confirm waits · ready = the page · err = card "C" (no signal / failed load);
+     confirm stays live on err — it only records the request and doesn't depend on the sample */
   var paint=function(){
-    go.disabled=PDF_DONE;
+    var wait=state==='load'&&!PDF_DONE;
+    go.disabled=PDF_DONE||wait;go.classList.toggle('wait',wait);
     go.innerHTML=PDF_DONE?ic('lc-check-circle')+'ยืนยันแล้ว · จะพร้อมหลังงาน':ic('lc-download')+'ยืนยันดาวน์โหลด PDF';
-    hint.textContent=PDF_DONE?'เราจะส่ง Playbook ฉบับเต็มของคุณให้หลังจบงาน':'ด้านบนเป็นตัวอย่างหน้าตาเล่ม · ฉบับของคุณจะใช้ข้อมูลจากแบบทดสอบ เกม และบูธที่คุณเล่น';
+    hint.textContent=PDF_DONE?'เราจะส่ง Playbook ฉบับเต็มของคุณให้หลังจบงาน':
+      (state==='err'?'ดูตัวอย่างไม่ได้ก็ยืนยันได้':'ด้านบนเป็นตัวอย่างหน้าตาเล่ม')+' · ฉบับของคุณจะใช้ข้อมูลจากแบบทดสอบ เกม และบูธที่คุณเล่น';
+    lab.textContent=state==='load'?'กำลังโหลดตัวอย่าง…':pages+' หน้า · A4';
   };
-  paint();
+  var fail=function(){
+    clearTimeout(tmo);if(state==='ready'||!document.getElementById('pdfv'))return;
+    var off=navigator.onLine===false;
+    state='err';v.classList.add('err');v.classList.toggle('off',off);
+    er.innerHTML='<div class="pdfv-ec"><div class="pdfv-ei">'+ic(off?'lc-wifi-off':'lc-file-x')+'</div>'+
+      '<div class="pdfv-et">'+(off?'ไม่มีสัญญาณอินเทอร์เน็ต':'โหลดตัวอย่างไม่สำเร็จ')+'</div>'+
+      '<p class="pdfv-ed">'+(off?'เชื่อมต่อแล้วตัวอย่างจะโหลดให้เอง หรือยืนยันดาวน์โหลดได้เลย':'ตัวอย่างเล่มยังแสดงไม่ได้ในตอนนี้ ลองใหม่อีกครั้ง หรือยืนยันดาวน์โหลดได้เลย')+'</p>'+
+      '<button class="btn btn-secondary pdfv-retry" type="button">'+ic('lc-refresh-cw')+'ลองอีกครั้ง</button></div>';
+    er.querySelector('.pdfv-retry').onclick=load;
+    paint();
+  };
+  var load=function(){
+    clearTimeout(tmo);clearInterval(poll);
+    var hadFocus=er.contains(document.activeElement);
+    state='load';v.classList.remove('err','off','ready');er.innerHTML='';paint();
+    if(hadFocus)v.querySelector('.pdfv-x').focus({preventScroll:true}); // the retry button just went away
+    tmo=setTimeout(fail,PDF_TIMEOUT);
+    f.src=PDF_SRC;
+  };
+  var onl=function(){if(state==='err')load();}; // signal is back: reload by itself
+  window.addEventListener('online',onl);
+  PDF_OFF=function(){clearTimeout(tmo);clearInterval(poll);window.removeEventListener('online',onl);};
   go.onclick=function(){if(PDF_DONE)return;PDF_DONE=true;paint();if(opts.onConfirm)opts.onConfirm();};
   v.querySelector('.pdfv-x').onclick=closePdfPreview;
-  var f=v.querySelector('.pdfv-iframe');
+  v.querySelector('.pdfv-zoom').onclick=function(e){var b=e.target.closest('button[data-m]');if(!b)return;PDF_MODE=b.getAttribute('data-m');pdfFit();};
   f.onload=function(){
-    try{var d=f.contentDocument;d.documentElement.style.overflowX='hidden';d.body.style.overflowX='hidden';}catch(e){} // same-origin local copy
-    v.classList.add('ready');pdfFit();
+    if(!f.getAttribute('src'))return;
+    // a real load has the mockup's #root; an offline error page reads as null (cross-origin), a 404 has no #root.
+    // file:// is the exception: every local copy reads as null there, so the load is trusted (and can't pan: 'noacc')
+    var d=null;try{d=f.contentDocument;}catch(e){}
+    var ok=d&&d.getElementById('root'),fileTrust=!d&&location.protocol==='file:';
+    if(!ok&&!fileTrust){fail();return;}
+    clearTimeout(tmo);state='ready';er.innerHTML='';v.classList.remove('err','off');v.classList.toggle('noacc',!d);
+    if(d)try{
+      var st=d.createElement('style');st.textContent='.shell{flex-shrink:0}'; // its flex body would squeeze the 794px page when the viewport is narrower (panning)
+      d.head.appendChild(st);d.documentElement.style.overflowX='hidden';d.body.style.overflowX='hidden';
+    }catch(e){}
+    v.classList.add('ready');pdfFit();paint();
     // the mockup builds its sheets after its fonts load: wait for the numbered pages, then show the real count
-    var tries=0,lab=v.querySelector('.pdfv-s span:last-child'),tm=setInterval(function(){
+    var tries=0;clearInterval(poll);poll=setInterval(function(){
       tries++;
-      try{var n=f.contentDocument.querySelectorAll('.pb-pn-n').length;if(n>0){if(lab)lab.textContent=n+' หน้า · A4';clearInterval(tm);return;}}catch(e){clearInterval(tm);return;}
-      if(tries>=20||!document.getElementById('pdfv'))clearInterval(tm);
+      try{var n=f.contentDocument.querySelectorAll('.pb-pn-n').length;if(n>0){pages=n;paint();clearInterval(poll);return;}}catch(e){clearInterval(poll);return;}
+      if(tries>=20||!document.getElementById('pdfv'))clearInterval(poll);
     },300);
   };
   window.addEventListener('resize',pdfFit);
+  load();
   pdfFit();
-  go.focus({preventScroll:true});
+  (go.disabled?v.querySelector('.pdfv-x'):go).focus({preventScroll:true});
+}
+/* Offline copy of the preview (2026-10-15): once per page load, when a registered player reaches the Playbook and the
+   browser is idle, ask sw.js to keep the whole mockup (mockup/playbook-pdf/manifest.json, written by
+   tools/sync-pdf-mockup.js) — so the preview still opens if the event Wi-Fi drops before it was ever opened.
+   Skipped offline and on data-saver. sw.js stores it all-or-nothing, so a half download never counts as offline-ready. */
+var PDF_PF=false;
+function pdfPrefetch(){
+  if(PDF_PF)return;PDF_PF=true;
+  if(!('serviceWorker' in navigator)||navigator.onLine===false)return;
+  var c=navigator.connection;if(c&&c.saveData)return;
+  var send=function(){navigator.serviceWorker.ready.then(function(r){if(r.active)r.active.postMessage({type:'pdf-prefetch'});}).catch(function(){});};
+  if(window.requestIdleCallback)requestIdleCallback(send,{timeout:5000});else setTimeout(send,3000);
 }
 /* "ไปเล่นกิจกรรม" CTA on the "ทัศนคติต่อความกลัวและ FOMO" side-item (2026-08-29, per direction
    "ใช้ style เดียวกับ สแกน QR") — same 'compact' preset as the header QR pill and mountPdfDlBtn
@@ -6560,6 +6670,7 @@ function renderBook(){
      and no bottom app-tabbar — their only way forward is the register CTA (unregisteredCtaHTML). */
   var unreg=!DEMO.registered;
   if(unreg)BOOK2_TAB='identity';
+  else pdfPrefetch(); // keep the PDF preview for offline (once per load)
   // A tab left selected on พอร์ต/เส้นทาง from before the demo panel switched to Pre-Event would
   // otherwise render with no matching subnav button (book2Subnav no longer emits one) and no
   // .b2-panel showing 'show' (see the pre guard below) — fall back to the one tab that's always
