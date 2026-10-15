@@ -6301,7 +6301,10 @@ function mountPdfDlBtn(){
    its height compensated so it still fills the frame. */
 /* PDF_PAGES is only the fallback shown until the mockup has built its sheets: openPdfPreview then counts the numbered pages
    (.pb-pn-n) in the loaded copy, so the "N หน้า" label follows every `node tools/sync-pdf-mockup.js` (56 until 2026-10-14, 59 after). */
-var PDF_SRC='mockup/playbook-pdf/index.html',PDF_W=794,PDF_PAGES=59,PDF_DONE=false;
+/* preview.html, not index.html (2026-10-15): vercel.json's cleanUrls 308s …/index.html to the bare folder URL
+   (/mockup/playbook-pdf, no slash), so every relative asset of the mockup resolved one level up and 404'd. preview.html
+   lands on …/playbook-pdf/preview, inside the folder. tools/sync-pdf-mockup.js writes it. */
+var PDF_SRC='mockup/playbook-pdf/preview.html',PDF_W=794,PDF_PAGES=59,PDF_DONE=false;
 /* อ่านง่าย (2026-10-15, audit: fitting 794px into a phone left ~6–8px text): the page never drops below PDF_READ_S
    (≈11px text) — the iframe is then narrower than the page (in its own px) and the mockup pans sideways inside it,
    one native scroller for both axes. พอดีจอ = the old fit-to-width. The switch only shows where they differ. On file://
@@ -6394,7 +6397,7 @@ function openPdfPreview(opts){
   };
   var fail=function(){
     clearTimeout(tmo);if(state==='ready'||!document.getElementById('pdfv'))return;
-    var off=navigator.onLine===false;
+    var off=forced?forced==='off':navigator.onLine===false;
     state='err';v.classList.add('err');v.classList.toggle('off',off);
     er.innerHTML='<div class="pdfv-ec"><div class="pdfv-ei">'+ic(off?'lc-wifi-off':'lc-file-x')+'</div>'+
       '<div class="pdfv-et">'+(off?'ไม่มีสัญญาณอินเทอร์เน็ต':'โหลดตัวอย่างไม่สำเร็จ')+'</div>'+
@@ -6403,15 +6406,19 @@ function openPdfPreview(opts){
     er.querySelector('.pdfv-retry').onclick=load;
     paint();
   };
+  /* demo panel "พรีวิว PDF" (DEMO.pdfCase, 2026-10-15): 'auto' = the real load; 'load'/'off'/'fail' hold that state so each
+     can be shown on demand — the iframe is never pointed at the file, and ลองอีกครั้ง shows loading briefly, then the same card */
+  var forced=DEMO.pdfCase&&DEMO.pdfCase!=='auto'?DEMO.pdfCase:null;
   var load=function(){
     clearTimeout(tmo);clearInterval(poll);
     var hadFocus=er.contains(document.activeElement);
     state='load';v.classList.remove('err','off','ready');er.innerHTML='';paint();
     if(hadFocus)v.querySelector('.pdfv-x').focus({preventScroll:true}); // the retry button just went away
+    if(forced){if(forced!=='load')tmo=setTimeout(fail,900);return;}
     tmo=setTimeout(fail,PDF_TIMEOUT);
     f.src=PDF_SRC;
   };
-  var onl=function(){if(state==='err')load();}; // signal is back: reload by itself
+  var onl=function(){if(state==='err'&&!forced)load();}; // signal is back: reload by itself
   window.addEventListener('online',onl);
   PDF_OFF=function(){clearTimeout(tmo);clearInterval(poll);window.removeEventListener('online',onl);};
   go.onclick=function(){if(PDF_DONE)return;PDF_DONE=true;paint();if(opts.onConfirm)opts.onConfirm();};
@@ -10619,7 +10626,7 @@ function renderProfile(){
    ACTIVITY_NEED, so it reads "ยังขาด" out of the box — see the 'auto' branch in renderBooth this
    direction restored). Switching the ช่วงงาน segment to Pre-Event is the one way back to the
    splash/quiz flow (RESULT/quizDone/boothVer aren't touched by that switch, same as before). */
-var DEMO={view:'auto',quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,heroProps:true,boothVer:'v2',registered:true,forceLock:false,forceInstall:false}; // forceLock/forceInstall (2026-09-25) — demo-panel-only previews for the PIN lock screen and the install card, see buildDemo()'s own "ล็อก PIN / ติดตั้งแอป" section. draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. (splashVer removed 2026-09-18, per direction "preview card เอา v1 ออก" — the splash fan carousel's "การ์ดมีชีวิต" build (added 2026-09-09, promoted to shipped default 2026-09-11) is now the only splash preview; v1 the plain static carousel, v3/v5 the "3D Character Card Flow" field and its living-card variant, were all removed the same day/session — see renderSplash's own comment for that full history.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO. (sumTitleVer — a brief demo-panel toggle comparing 2 title treatments for renderPlaySummary's game-name — removed 2026-09-11, per direction "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย": v2, the DNA quiz's .q-icon-bare + .q-title header, is now just how renderPlaySummary always renders — see its own comment there.)
+var DEMO={view:'auto',quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,heroProps:true,boothVer:'v2',registered:true,forceLock:false,forceInstall:false,pdfCase:'auto'}; // forceLock/forceInstall (2026-09-25) — demo-panel-only previews for the PIN lock screen and the install card, see buildDemo()'s own "ล็อก PIN / ติดตั้งแอป" section. draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. (splashVer removed 2026-09-18, per direction "preview card เอา v1 ออก" — the splash fan carousel's "การ์ดมีชีวิต" build (added 2026-09-09, promoted to shipped default 2026-09-11) is now the only splash preview; v1 the plain static carousel, v3/v5 the "3D Character Card Flow" field and its living-card variant, were all removed the same day/session — see renderSplash's own comment for that full history.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO. (sumTitleVer — a brief demo-panel toggle comparing 2 title treatments for renderPlaySummary's game-name — removed 2026-09-11, per direction "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย": v2, the DNA quiz's .q-icon-bare + .q-title header, is now just how renderPlaySummary always renders — see its own comment there.)
 /* 'auto' resolves from real window.innerWidth again (2026-09-10 responsive audit — the 2026-08-26
    "always resolve to mobile" change meant a real event-tablet visitor (768–1024px wide) never got
    data-view="tablet": the .shell/topbar/book-tabbar all clamped to the 400px phone-frame width,
@@ -10726,6 +10733,10 @@ function buildDemo(){
        so this is a pure UI preview, never a real lock. "การ์ดติดตั้งแอป" force-shows the install card
        on browsers that never fire the real event (most desktop preview setups); its button just
        acknowledges the tap since there's no real prompt to trigger (see triggerInstall()). */
+    /* พรีวิว PDF (2026-10-15, per direction) — the preview's loading / error states only show on a slow or broken
+       connection; this holds one so it can be demoed. Default อัตโนมัติ = the real load (the sample shows). */
+    '<div class="demo-lbl">พรีวิว PDF (ดาวน์โหลด Playbook)</div>'+seg('segPdfCase',[{v:'auto',t:'ปกติ'},{v:'load',t:'กำลังโหลด'},{v:'off',t:'ไม่มีสัญญาณ'},{v:'fail',t:'โหลดไม่สำเร็จ'}],DEMO.pdfCase)+
+    '<button class="btn btn-secondary demo-reset" id="demoPdfOpen">'+ic('lc-file-text')+'เปิดพรีวิว PDF</button>'+
     '<div class="demo-lbl">ล็อก PIN (พรีวิว)</div>'+
     '<button class="btn btn-secondary demo-reset" id="demoLockPreview">'+ic('lc-lock')+'ดูหน้าจอล็อก PIN</button>'+
     '<div class="demo-lbl">การ์ดติดตั้งแอปบนหน้าหลัก</div>'+seg('segInstall',[{v:'auto',t:'อัตโนมัติ'},{v:'force',t:'บังคับแสดง'}],DEMO.forceInstall?'force':'auto')+
@@ -10765,6 +10776,8 @@ function buildDemo(){
   document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.multiTicket=(b.dataset.v==='2');document.querySelectorAll('#segTicketCount button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segRegistered').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.registered=(b.dataset.v==='yes');document.querySelectorAll('#segRegistered button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='book')render();};});
   document.getElementById('segEfin').querySelectorAll('button').forEach(function(b){b.onclick=function(){EFIN_CHECKED_IN=(b.dataset.v==='yes');document.querySelectorAll('#segEfin button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='games')render();};});
+  document.getElementById('segPdfCase').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.pdfCase=b.dataset.v;document.querySelectorAll('#segPdfCase button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(document.getElementById('pdfv'))openPdfPreview();};});
+  document.getElementById('demoPdfOpen').onclick=function(){panel.classList.remove('open');openPdfPreview();};
   document.getElementById('demoLockPreview').onclick=function(){PIN_UNLOCKED=false;DEMO.forceLock=true;panel.classList.remove('open');render();};
   document.getElementById('segInstall').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.forceInstall=(b.dataset.v==='force');document.querySelectorAll('#segInstall button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='home')renderHome();};});
   document.getElementById('demoClearPinDemo').onclick=function(){clearPin();lsDel('pb_install_dismissed');DEMO.forceLock=false;DEMO.forceInstall=false;PIN_UNLOCKED=true;panel.classList.remove('open');render();};

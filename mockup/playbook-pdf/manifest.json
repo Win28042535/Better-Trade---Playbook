@@ -1,5 +1,5 @@
 {
- "v": "abba57712e",
+ "v": "0e65102206",
  "files": [
   "assets/ICON_CRYPTO_PNG.webp",
   "assets/ICON_FUND_PNG.webp",
@@ -69,7 +69,7 @@
   "assets/topo.svg",
   "assets/waverider.jpg",
   "data/app/port/edu.js",
-  "index.html",
-  "js/library-data.js"
+  "js/library-data.js",
+  "preview.html"
  ]
 }

@@ -63,6 +63,13 @@ function pdfPrefetch() {
 self.addEventListener('message', function (e) {
   if (e.data && e.data.type === 'pdf-prefetch') e.waitUntil(pdfPrefetch());
 });
+// A response that came through a redirect can't answer a page navigation (the browser rejects it and the iframe shows an
+// error page — what broke the preview on Vercel, 2026-10-15: cleanUrls redirects the mockup's .html). Re-wrap it as a
+// plain response before serving.
+function unredirect(res) {
+  if (!res || !res.redirected) return res;
+  return res.blob().then(function (b) { return new Response(b, { status: res.status, statusText: res.statusText, headers: res.headers }); });
+}
 function pdfHit(req) {
   return caches.keys().then(function (keys) {
     var k = keys.filter(function (n) { return n.indexOf('pdf-') === 0; })[0];
@@ -84,11 +91,11 @@ self.addEventListener('fetch', function (e) {
   var req = e.request;
   if (!DEV_HOST && req.method === 'GET' && req.url.indexOf('/mockup/playbook-pdf/') > -1) {
     // the complete pre-fetched copy first; anything it lacks (or before it exists) as before
-    e.respondWith(pdfHit(req).then(function (hit) { return hit || swr(req); }));
+    e.respondWith(pdfHit(req).then(function (hit) { return hit || swr(req); }).then(unredirect));
     return;
   }
   if (!DEV_HOST && req.method === 'GET' && (req.url.indexOf('/assets/playbooks/') > -1 || req.url.indexOf('/assets/port/') > -1)) {
-    e.respondWith(swr(req));
+    e.respondWith(swr(req).then(unredirect));
     return;
   }
   e.respondWith(fetch(req));
