@@ -356,6 +356,16 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-10-15 — Playbook PDF preview synced to the design team's 14 Oct round.** `node tools/sync-pdf-mockup.js` re-pulled
+https://playbook-pdf-git-ver2-win999.vercel.app/dna-quiz-flow into `mockup/playbook-pdf/` (68 files, 4.3MB): the leather
+front/back cover (1240×1754 webp), centred card sheet, engraved drawings at the end of each side heading, the engraved set
+for every asset, a Baskervville subset, the พอร์ต sheet reading `data/app/port/edu.js` (byte-identical to the app's
+`assets/port/edu.js`), 59 numbered pages (was 56). Tool fixes: it now also follows `data/` references, reads names the page
+assembles from arrays (`SIDE_FIG`, `src:'eng-*.svg'` — `eng-stetho.svg` had slipped through), writes only changed files
+and retries (Windows "UNKNOWN: unknown error, open" on a just-written file). The preview's "N หน้า · A4" label now counts the
+loaded copy's numbered pages (`.pb-pn-n`) instead of a constant. Checked in-app: all 61 referenced files exist, 0 broken
+images, 59 sequential pages, confirm → "ยืนยันแล้ว", close/reopen keeps state.
+
 **2026-10-12 — Asset Knowledge responsive + scroll-motion audit; number circles centred.** (1) Number circles: of the
 app's 6 kinds (`.apb-vn`, `.side-num`, `.rs-n`, `.rt-num`, `.bmk-num`, `.opt-key`) only `.apb-vn` was off — Baskervville's
 old-style figures sat 1.5–3.5px low and differed per digit; it now uses `--font`/`--fs-meta`/`--w-head` like `.rs-n`.

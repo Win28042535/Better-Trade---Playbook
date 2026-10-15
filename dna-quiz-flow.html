@@ -6268,7 +6268,9 @@ function mountPdfDlBtn(){
    PDF to serve yet, and printing the sample would read as the player's own Playbook.
    The mockup is a fixed 794px-wide page (A4 @96dpi): the iframe stays 794px wide and is scaled down to the screen,
    its height compensated so it still fills the frame. */
-var PDF_SRC='mockup/playbook-pdf/index.html',PDF_W=794,PDF_PAGES=56,PDF_DONE=false;
+/* PDF_PAGES is only the fallback shown until the mockup has built its sheets: openPdfPreview then counts the numbered pages
+   (.pb-pn-n) in the loaded copy, so the "N หน้า" label follows every `node tools/sync-pdf-mockup.js` (56 until 2026-10-14, 59 after). */
+var PDF_SRC='mockup/playbook-pdf/index.html',PDF_W=794,PDF_PAGES=59,PDF_DONE=false;
 function pdfFit(){
   var v=document.getElementById('pdfv');if(!v)return;
   var box=v.querySelector('.pdfv-frame'),f=v.querySelector('.pdfv-iframe');
@@ -6309,6 +6311,12 @@ function openPdfPreview(opts){
   f.onload=function(){
     try{var d=f.contentDocument;d.documentElement.style.overflowX='hidden';d.body.style.overflowX='hidden';}catch(e){} // same-origin local copy
     v.classList.add('ready');pdfFit();
+    // the mockup builds its sheets after its fonts load: wait for the numbered pages, then show the real count
+    var tries=0,lab=v.querySelector('.pdfv-s span:last-child'),tm=setInterval(function(){
+      tries++;
+      try{var n=f.contentDocument.querySelectorAll('.pb-pn-n').length;if(n>0){if(lab)lab.textContent=n+' หน้า · A4';clearInterval(tm);return;}}catch(e){clearInterval(tm);return;}
+      if(tries>=20||!document.getElementById('pdfv'))clearInterval(tm);
+    },300);
   };
   window.addEventListener('resize',pdfFit);
   pdfFit();

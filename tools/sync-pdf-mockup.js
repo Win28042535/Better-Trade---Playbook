@@ -6,7 +6,7 @@
 
      node tools/sync-pdf-mockup.js [url]
 
-   Copies the page (as index.html) + every js/ and assets/ file it references. Some file names are built in its JS
+   Copies the page (as index.html) + every js/, data/ and assets/ file it references. Some file names are built in its JS
    at runtime ('assets/'+img+'.svg', 'assets/playbook-cover-'+which+'.webp'), so those are listed in DYNAMIC below —
    they were read from the page's own network log; add to it if the preview shows a missing image after a sync. */
 'use strict';
@@ -28,7 +28,8 @@ const DYNAMIC = [
   'assets/eng-cat-basics.svg', 'assets/eng-cat-assets.svg', 'assets/eng-cat-costs.svg', 'assets/eng-cat-risk.svg', 'assets/eng-cat-planning.svg', 'assets/eng-cat-scams.svg',
   'assets/float-stock.png', 'assets/float-heart.png', 'assets/float-bitcoin.png', 'assets/float-gold.png',
 ];
-const REF = /["'(]((?:assets|js)\/[A-Za-z0-9_.\-\/]+\.(?:png|jpe?g|webp|svg|ttf|woff2?|js))/g;
+/* assets/ + js/ + data/ (2026-10-15: the mockup's พอร์ต sheet loads data/app/port/edu.js, byte-identical to the app's assets/port/edu.js) */
+const REF = /["'(]((?:assets|js|data)\/[A-Za-z0-9_.\-\/]+\.(?:png|jpe?g|webp|svg|ttf|woff2?|js))/g;
 
 async function get(rel) {
   const res = await fetch(new URL(rel, base));
@@ -39,8 +40,20 @@ async function get(rel) {
   const html = (await fetch(URL0).then((r) => { if (!r.ok) throw new Error(`${r.status} ${URL0}`); return r.text(); }));
   const files = new Set(DYNAMIC);
   for (const m of html.matchAll(REF)) files.add(m[1]);
+  /* names the page assembles at runtime from arrays (2026-10-15: a new "eng-stetho.svg" slipped through the DYNAMIC list):
+     SIDE_FIG=['gauge',…] -> assets/eng-<name>.svg, and bare file names in src:'eng-fund.svg' style objects -> assets/<name> */
+  for (const arr of html.matchAll(/SIDE_FIG\s*=\s*\[([^\]]*)\]/g)) for (const n of arr[1].matchAll(/['"]([a-z0-9-]+)['"]/g)) files.add(`assets/eng-${n[1]}.svg`);
+  for (const m of html.matchAll(/\bsrc\s*:\s*['"]([A-Za-z0-9_.\-]+\.(?:png|jpe?g|webp|svg))['"]/g)) files.add(`assets/${m[1]}`);
   fs.mkdirSync(OUT, { recursive: true });
-  fs.writeFileSync(path.join(OUT, 'index.html'), html);
+  /* write only what changed, and retry: on Windows a file that was just rewritten (or is open in the dev server / a scanner)
+     can fail a second write straight away with "UNKNOWN: unknown error, open" (seen 2026-10-15) */
+  const writeSafe = async (dest, buf) => {
+    try { if (fs.existsSync(dest) && Buffer.compare(fs.readFileSync(dest), Buffer.from(buf)) === 0) return; } catch (e) { /* fall through to write */ }
+    for (let i = 0; ; i++) {
+      try { fs.writeFileSync(dest, buf); return; } catch (e) { if (i >= 4) throw e; await new Promise((r) => setTimeout(r, 400 * (i + 1))); }
+    }
+  };
+  await writeSafe(path.join(OUT, 'index.html'), html);
   let total = html.length, missing = [];
   // js files can reference more assets, so read them first
   for (const f of [...files].filter((x) => x.endsWith('.js'))) {
@@ -53,7 +66,7 @@ async function get(rel) {
     if (!buf) continue;
     const dest = path.join(OUT, f);
     fs.mkdirSync(path.dirname(dest), { recursive: true });
-    fs.writeFileSync(dest, buf);
+    await writeSafe(dest, buf);
     total += buf.length;
   }
   console.log(`synced ${files.size + 1} files (${(total / 1024 / 1024).toFixed(2)} MB) from ${URL0} -> ${path.relative(process.cwd(), OUT)}`);
