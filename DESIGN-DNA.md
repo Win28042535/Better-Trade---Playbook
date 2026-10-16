@@ -356,6 +356,18 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-10-16 — Chart motion phase 1 (from the Builder OS Bento reference, 21st.dev).** Its motion DNA shares our easing
+exactly (`--ease` = cubic-bezier(.22,1,.36,1)); phase 1 adds its counting numbers + 3-tier rhythm to the charts we have.
+(1) *Counting numbers*: `vcHTML(v,spring)` wraps a chart value (markup keeps the real value); `initCharts` zeroes them just
+before the card is watched and `vizCountIn` counts them up on reveal — a value beside a bar reads that bar's own computed
+transition delay/duration so number and bar land together; the big Confidence score springs (stiffness 140 / damping 27 /
+mass .8, from .15s) to settle with the last bar (~1.3s, user asked for "จบพร้อมกัน"). `.vc` = tabular-nums. Safety: final
+value written at 2.2s regardless (rAF pauses in hidden pages), a run token stops stale loops. Reduced motion: never
+zeroed, never counted. (2) *Rhythm in the AI Insight card*: card enters (.scroll-reveal) → "บอก" bar .2s → "จริง" bar .45s
+(the gap opens before it is named) → "ต่างกัน ±N" fades in last (1.15s, user kept it); Confidence/SKILL rows from .35s, 70ms
+apart, .75s each. Applies to: analysis tab (risk + Confidence), identity tab (SKILL ประจำการ์ด), interest tab (trait bars).
+Not applied: game/booth points — no points are displayed anywhere since 2026-09-11.
+
 **2026-10-15 — PDF preview fixed on Vercel + demo-panel case picker.** On the deployed site the preview always showed
 "โหลดไม่สำเร็จ": (a) `vercel.json` cleanUrls 308s `…/index.html` to the bare folder URL, so the mockup's relative assets
 404'd — the local copy is now `mockup/playbook-pdf/preview.html` (lands on `…/playbook-pdf/preview`); (b) the pre-fetched

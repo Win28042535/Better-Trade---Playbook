@@ -1456,10 +1456,21 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    collapses all of this to an instant snap-to-final-value — no separate RM branch needed here. */
 .viz-bar{width:0;transition:width .7s var(--ease);}
 .viz-in .viz-bar{width:var(--tw,0);}
-.risk-row:nth-child(2) .viz-bar{transition-delay:.08s;}
-.conf-row:nth-child(2) .viz-bar{transition-delay:.06s;}
-.conf-row:nth-child(3) .viz-bar{transition-delay:.12s;}
-.conf-row:nth-child(4) .viz-bar{transition-delay:.18s;}
+/* 3-tier rhythm (2026-10-16, motion phase 1 from the Builder OS Bento reference, user-approved): the card enters
+   (.scroll-reveal, 0–0.55s) → the "บอก" bar (.2s) then the "จริง" bar (.45s), so the gap opens before it is named →
+   the "ต่างกัน ±N" label fades in last (1.15s); Confidence/SKILL rows follow 70ms apart from .35s. Every number beside
+   a bar counts up in step with its own bar (vizCountIn reads these same delays/durations), and the big score
+   springs to its value finishing with the last bar (~1.3s). */
+.risk-box .viz-bar,.conf-box .viz-bar{transition-duration:.75s;}
+.risk-row:nth-child(1) .viz-bar{transition-delay:.2s;}
+.risk-row:nth-child(2) .viz-bar{transition-delay:.45s;}
+.conf-row:nth-child(1) .viz-bar{transition-delay:.35s;}
+.conf-row:nth-child(2) .viz-bar{transition-delay:.42s;}
+.conf-row:nth-child(3) .viz-bar{transition-delay:.49s;}
+.conf-row:nth-child(4) .viz-bar{transition-delay:.56s;}
+.risk-box .risk-match{opacity:0;transform:translateY(4px);transition:opacity .4s var(--ease) 1.15s,transform .4s var(--ease) 1.15s;}
+.risk-box.viz-in .risk-match{opacity:1;transform:none;}
+.vc{font-variant-numeric:tabular-nums;} /* counting digits keep one width, so the number doesn't jitter sideways */
 .trait-row:nth-child(2) .viz-bar{transition-delay:.06s;}
 .trait-row:nth-child(3) .viz-bar{transition-delay:.12s;}
 .trait-row:nth-child(4) .viz-bar{transition-delay:.18s;}
@@ -4819,7 +4830,7 @@ function skillCardHTML(h){
   var rows=SKC_ROWS.map(function(l,i){var v=h.skills[i];
     return '<div class="conf-row"><span class="conf-rl skc-rl">'+l+'</span>'+
       '<div class="conf-tr skc-tr"><div class="conf-fi skc-fi viz-bar" style="--tw:'+(v*10)+'%;background:'+SKC_COLORS[i]+'"></div></div>'+
-      '<span class="conf-vl skc-vl">'+v+'/10</span></div>';}).join('');
+      '<span class="conf-vl skc-vl">'+vcHTML(v)+'/10</span></div>';}).join('');
   /* chip — reuses .sc/.sc.act verbatim, the exact pill component sidesHTML() uses for
      "เสร็จ"/"รอทำ"/"ล็อก" on the 6-ด้าน page (2026-08-31, earlier direction, unchanged this pass). */
   var chip=h.motto?'<div class="skc-chiprow"><span class="sc act">คำประจำตัว: '+h.motto+'</span></div>':'';
@@ -6054,12 +6065,51 @@ function radarSVG(vals,hue){
    the observer keeps watching regardless of the .b2-panel/.show toggle. One-time per
    element (unobserve after firing) — re-scrolling past an already-revealed chart never re-plays it,
    matching the reference's "not a decorative loop" rule. */
+/* Counting numbers (2026-10-16, motion phase 1 — Builder OS Bento's AnimatedNumber, user-approved). vcHTML(v,spring)
+   wraps a chart value; the markup keeps the real value (no-JS / reduced motion / print read correctly). initCharts sets
+   each to 0 just before its card is watched and vizCountIn() counts it up when the card reveals: a value beside a bar
+   rides that bar's own transition (same delay + duration, ≈ the --ease curve), so number and bar land together; the
+   big score (spring) uses a spring tuned to settle with the last bar. Reduced motion: never zeroed, never counted. */
+function vcHTML(v,spring){return '<span class="vc" data-vc="'+v+'"'+(spring?' data-vc-s="1"':'')+'>'+v+'</span>';}
+function vcFmt(x,to){var d=(String(to).split('.')[1]||'').length;return d?x.toFixed(d):String(Math.round(x));}
+function vcSecs(s){return parseFloat(String(s).split(',')[0])||0;}
+function vizCountIn(box){
+  if(RM)return;
+  box.querySelectorAll('.vc[data-vc]').forEach(function(el){
+    var to=+el.getAttribute('data-vc');if(!isFinite(to))return;
+    // safety net: rAF pauses while the page is hidden (backgrounded tab / app), so the real value lands by 2.2s anyway;
+    // the run token stops a paused loop from resuming over it (and a newer run from being overwritten by an older one)
+    var tok=el.__vcTok=(el.__vcTok||0)+1;
+    setTimeout(function(){if(el.__vcTok===tok){el.__vcTok++;el.textContent=vcFmt(to,to);}},2200);
+    if(el.hasAttribute('data-vc-s')){ // spring: stiffness 140 / damping 27 / mass .8, from .15s → settles ≈1.3s
+      var x=0,v=0,last=null;
+      setTimeout(function(){requestAnimationFrame(function step(t){
+        if(el.__vcTok!==tok)return;
+        var dt=Math.min(.032,last==null?.016:(t-last)/1000);last=t;
+        v+=((-140*(x-to)-27*v)/.8)*dt;x+=v*dt;
+        if(Math.abs(to-x)<.5&&Math.abs(v)<.5){el.textContent=vcFmt(to,to);return;}
+        el.textContent=vcFmt(Math.max(0,x),to);requestAnimationFrame(step);
+      });},150);
+      return;
+    }
+    var row=el.closest('.risk-row,.conf-row,.trait-row'),bar=row&&row.querySelector('.viz-bar');
+    var cs=bar?getComputedStyle(bar):null,delay=cs?vcSecs(cs.transitionDelay):0,dur=(cs&&vcSecs(cs.transitionDuration))||.75;
+    var t0=performance.now()+delay*1000;
+    requestAnimationFrame(function step(t){
+      if(el.__vcTok!==tok)return;
+      var p=Math.max(0,Math.min(1,(t-t0)/(dur*1000)));
+      el.textContent=vcFmt(to*(1-Math.pow(1-p,5)),to); // easeOutQuint ≈ --ease
+      if(p<1)requestAnimationFrame(step);
+    });
+  });
+}
 function initCharts(scope){
   var boxes=(scope||root).querySelectorAll('.conf-box,.risk-box,.trait-sec,.alloc-sec,.radar-sec,.pe-viz');
   if(!boxes.length)return;
   if(!window.IntersectionObserver){boxes.forEach(function(b){b.classList.add('viz-in');});return;}
+  if(!RM)boxes.forEach(function(b){if(!b.classList.contains('viz-in'))b.querySelectorAll('.vc[data-vc]').forEach(function(el){el.textContent=vcFmt(0,+el.getAttribute('data-vc'));});});
   var io=new IntersectionObserver(function(entries){
-    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('viz-in');io.unobserve(e.target);}});
+    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('viz-in');vizCountIn(e.target);io.unobserve(e.target);}});
   },{threshold:.3});
   boxes.forEach(function(b){io.observe(b);});
 }
@@ -6571,9 +6621,9 @@ function insightHTML(r,h,matchOk){
     '<div class="risk-box"><div class="risk-hd"><span class="risk-tag">ความเสี่ยง "บอก" vs "จริง"</span><span class="risk-match">'+(matchOk?('<span class="ld" style="background:var(--cyan)"></span>ตรงกัน'):('ต่างกัน '+(r.gap>0?'+':'')+r.gap))+'</span></div>'+
       '<p class="risk-desc">'+(matchOk?'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน':'ความเสี่ยงที่คุณ "บอก" กับพฤติกรรมจริงต่างกันอยู่บ้าง รู้ gap นี้ช่วยให้วางแผนได้แม่นขึ้น')+'</p>'+
       '<div class="risk-slbl">ระดับความเสี่ยง 1–10</div>'+
-      '<div class="risk-bars"><div class="risk-row"><span class="risk-rl">ความเสี่ยงที่บอก</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.declared*10)+'%;background:var(--muted)"></div></div><span class="risk-vl">'+r.declared+'</span></div>'+
-      '<div class="risk-row"><span class="risk-rl" style="color:var(--ink)">ความเสี่ยงจริง</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.revealed*10)+'%"></div></div><span class="risk-vl">'+r.revealed+'</span></div></div></div>'+
-    '<div class="conf-box"><div class="conf-glow"></div><div class="conf-hd"><div><div class="conf-ml">Confidence Score</div><div class="conf-mv">'+r.confLevel+'</div></div><div class="conf-sc">'+r.conf+'<span class="conf-su">/100</span></div></div>'+
+      '<div class="risk-bars"><div class="risk-row"><span class="risk-rl">ความเสี่ยงที่บอก</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.declared*10)+'%;background:var(--muted)"></div></div><span class="risk-vl">'+vcHTML(r.declared)+'</span></div>'+
+      '<div class="risk-row"><span class="risk-rl" style="color:var(--ink)">ความเสี่ยงจริง</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.revealed*10)+'%"></div></div><span class="risk-vl">'+vcHTML(r.revealed)+'</span></div></div></div>'+
+    '<div class="conf-box"><div class="conf-glow"></div><div class="conf-hd"><div><div class="conf-ml">Confidence Score</div><div class="conf-mv">'+r.confLevel+'</div></div><div class="conf-sc">'+vcHTML(r.conf,true)+'<span class="conf-su">/100</span></div></div>'+
       '<div class="conf-bars">'+confRow('ตัวตน',r.subs.identity)+confRow('พฤติกรรม',r.subs.behavior)+confRow('ความเสี่ยง',r.subs.riskAlign)+confRow('วินัย',r.subs.discipline)+'</div>'+
       '<div class="conf-foot"><p class="conf-note">คะแนนจะสมบูรณ์เมื่อทำครบ 6 ด้านในงาน</p><button class="btn btn-primary" id="confPlayBtn" type="button">'+ic('lc-gamepad-2')+'เล่นเกม 6 ด้าน</button></div></div>'+
     '</div></section>';
@@ -6933,7 +6983,7 @@ function bindTabbar(){root.querySelectorAll('.book-tabbar .tab-item[data-tab]').
    don't exist yet); each carries an .ex-tag in the UI so nothing here reads as a real measurement. ── */
 function traitBars(){
   var rows=[{l:'เก็บข้อมูลก่อนตัดสินใจ',v:31,m:35},{l:'ความมีวินัยการลงทุน',v:25,m:25},{l:'การกระจายความเสี่ยง',v:10,m:25},{l:'รับความผันผวนได้',v:11,m:15}];
-  var bars='<div class="trait-list">'+rows.map(function(t){return '<div class="trait-row"><span class="trait-l">'+t.l+'</span><span class="trait-v"><b>'+t.v+'</b>/'+t.m+'</span><div class="trait-tr"><div class="trait-fi viz-bar" style="--tw:'+Math.round(t.v/t.m*100)+'%"></div></div></div>';}).join('')+'</div>';
+  var bars='<div class="trait-list">'+rows.map(function(t){return '<div class="trait-row"><span class="trait-l">'+t.l+'</span><span class="trait-v"><b>'+vcHTML(t.v)+'</b>/'+t.m+'</span><div class="trait-tr"><div class="trait-fi viz-bar" style="--tw:'+Math.round(t.v/t.m*100)+'%"></div></div></div>';}).join('')+'</div>';
   /* Which data sources feed the 4 bars above — 3 chips, all "ตัวอย่าง" (example) collected state
      like the bars themselves (2026-08-26, per direction — this row was missing entirely before). */
   var chips=[{t:'แบบทดสอบตัวตน 7 ข้อ',done:true},{t:'เกมย้อนเวลาพอร์ต',done:true},{t:'เกมบูธ 5/10',done:true}];
@@ -8170,7 +8220,7 @@ function ddTabs(h){
    sync has already bitten this file once (see the risk-fi indentation mismatch in update #19). Same
    4-hue set allocBars() already uses, so both charts read as one consistent palette. */
 var CONF_ROW_COLOR={'ตัวตน':'var(--violet)','พฤติกรรม':'var(--cyan)','ความเสี่ยง':'var(--pink)','วินัย':'var(--yellow)'};
-function confRow(l,v){var c=CONF_ROW_COLOR[l]||'var(--ink)';return '<div class="conf-row"><span class="conf-rl">'+l+'</span><div class="conf-tr"><div class="conf-fi viz-bar" style="--tw:'+(v/20*100)+'%;background:'+c+'"></div></div><span class="conf-vl">'+v+'</span></div>';}
+function confRow(l,v){var c=CONF_ROW_COLOR[l]||'var(--ink)';return '<div class="conf-row"><span class="conf-rl">'+l+'</span><div class="conf-tr"><div class="conf-fi viz-bar" style="--tw:'+(v/20*100)+'%;background:'+c+'"></div></div><span class="conf-vl">'+vcHTML(v)+'</span></div>';}
 /* ══ SHARE MODAL (logic) ══ "แชร์ภาพการ์ด"/"แชร์พรุ่งนี้ของคุณ" both open this bottom-sheet share
    modal — a copy-link field plus social targets (LINE first, it's the dominant channel in TH),
    modeled on the reference share sheet but skinned to this app's design DNA. Each social chip opens
