@@ -775,6 +775,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    character card ลง เพื่อให้เห็นข้อมูล...อย่างน้อยในปริมาณที่เท่ากับของ mobile"). Extended the same
    230px cap to tablet/pc so all three views free up the identical ~100px of headroom. */
 :root[data-view="mobile"] .cr2,:root[data-view="tablet"] .cr2,:root[data-view="pc"] .cr2{max-width:230px;}
+/* Identity card tilt sheen (2026-10-16, motion phase 3 "B" — see cardTilt()): a soft light that follows the mouse while
+   the frame tilts; above the card art, below the ก่อนงาน/หลังงาน chips (6) and the divider (10). Mouse only. */
+.cr2-sheen{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .25s var(--ease);background:radial-gradient(circle at var(--sx,50%) var(--sy,30%),rgba(255,255,255,.35),rgba(255,255,255,0) 55%);mix-blend-mode:soft-light;}
+.cr2.tilting .cr2-sheen{opacity:1;}
 .cr2-side{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
 .cr2-side .pc3d,.cr2-side .pc-tilt{width:100%;height:100%;aspect-ratio:auto;}
 .cr2-side .pc-face{box-shadow:none;border-radius:0;}
@@ -6653,6 +6657,39 @@ function insightHTML(r,h,matchOk){
 /* opts.onMove(pos), if given, fires only on USER-driven position changes (drag/keyboard/double-
    click) — deliberately NOT from the intro sweep, so the linked detail-swap below (see renderBook)
    doesn't flicker through both personas during the automatic reveal animation. */
+/* Identity card tilt (2026-10-16, motion phase 3 from the Builder OS Bento reference — user picked "B": 4° + sheen over
+   the reference's 0.8°, since this is a collectible card). The WHOLE .cr2 frame tilts, never one card inside it, so the
+   ก่อนงาน/หลังงาน split stays one straight seam; pressing (dragging the divider) lays it flat until release. Smoothed
+   toward the cursor each frame (lerp .14), back to flat on leave. Only with a real mouse (hover:hover + pointer:fine
+   + pointerType mouse) — touch never tilts — and never under reduced motion. Rows elsewhere keep their old hover
+   (user's call, same pass). */
+function cardTilt(el){
+  if(RM||el.__tilt||!window.matchMedia||!window.matchMedia('(hover:hover) and (pointer:fine)').matches)return;
+  el.__tilt=1;
+  var sh=document.createElement('div');sh.className='cr2-sheen';sh.setAttribute('aria-hidden','true');el.appendChild(sh);
+  var MAX=4,rx=0,ry=0,tx=0,ty=0,raf=0,held=false,last=0;
+  var loop=function(t){
+    // time-based easing (.14 per 60fps frame), so a slow device follows the cursor at the same speed, just choppier
+    var k=1-Math.pow(.86,Math.min(6,last?(t-last)/16.7:1));last=t;
+    rx+=(tx-rx)*k;ry+=(ty-ry)*k;
+    var still=Math.abs(tx-rx)<.01&&Math.abs(ty-ry)<.01;
+    el.style.transform=(still&&!tx&&!ty)?'':'perspective(900px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg)';
+    raf=still?0:requestAnimationFrame(loop);if(!raf)last=0;
+  };
+  var go=function(){if(!raf){last=0;raf=requestAnimationFrame(loop);}};
+  var flat=function(){tx=ty=0;el.classList.remove('tilting');go();};
+  el.addEventListener('pointermove',function(e){
+    if(e.pointerType!=='mouse'||held)return;
+    var r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    ty=x*2*MAX;tx=-y*2*MAX;
+    el.style.setProperty('--sx',((x+.5)*100).toFixed(1)+'%');el.style.setProperty('--sy',((y+.5)*100).toFixed(1)+'%');
+    el.classList.add('tilting');go();
+  });
+  el.addEventListener('pointerleave',flat);
+  el.addEventListener('pointerdown',function(){held=true;flat();});
+  el.addEventListener('pointerup',function(){held=false;});
+  el.addEventListener('pointercancel',function(){held=false;});
+}
 function initCompareReveal(opts){
   opts=opts||{};
   root.querySelectorAll('[data-cr2]').forEach(function(cr){
@@ -6921,6 +6958,7 @@ function renderBook(){
     '<div class="ev-empty-t">ยังไม่มีข้อมูลจากในงาน</div>'+
     '<div class="ev-empty-s">เล่นเกมและเดินบูธในงานก่อน แล้วค่อยกลับมาดูว่าตัวตนที่ "ทำจริง" ตรงกับที่ DNA Quiz บอกไหม</div>'+
     '<button class="btn btn-primary" id="evGoGames2">'+ic('lc-play-circle')+'ไปเล่นเกมส์</button></div>';
+  root.querySelectorAll('.cr2').forEach(cardTilt); // identity card tilt (mouse only), slider and unreg static card alike
   var activeIsPre=true;
   initCompareReveal({onMove:function(pos){
     var wantPre=pos>=50;

@@ -356,6 +356,15 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-10-16 — Motion phase 3: identity card tilt (Builder OS Bento's tilting cells, user picked "B").** `cardTilt()` tilts
+the whole `.cr2` frame (ก่อนงาน/หลังงาน slider, and the unregistered single card) up to 4° toward the mouse, with a soft
+`.cr2-sheen` light following the cursor (z 5: above the art, below the chips and divider). The frame tilts as one — never a
+card inside it — so the split seam stays straight; pressing to drag the divider lays it flat until release. Smoothed with
+a time-based lerp (.14 per 60fps frame) so slow devices follow at the same speed; flat again on leave (inline transform
+cleared). Mouse only (hover:hover + pointer:fine + pointerType mouse), never under reduced motion. Compared against the
+reference's 0.8° ("A") — too subtle for a collectible card. The proposed row hover (wash + 2px nudge) for Asset
+Knowledge rows / คลังความรู้ categories was declined: rows keep their current behaviour.
+
 **2026-10-16 — Chart motion phase 2 (Builder OS Bento, user-approved after an old/new side-by-side).** (1) *พอร์ต growth
 chart*: reference lines (levels 1/5) draw first (.9s), the player's violet line draws slower and lands last (1.3s from .35s);
 the low-point ring pops as the line reaches it (`peGrowthSVG` inverts the ease at the ring's x for its delay); then the
