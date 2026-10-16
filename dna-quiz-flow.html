@@ -1790,9 +1790,29 @@ a.apb-tool-a::after{content:'';position:absolute;inset:0;border-radius:inherit;}
 .pe-viz .pe-mark{left:0;transition:left .7s var(--ease);}
 .pe-viz.viz-in .pe-mark{left:var(--pos);}
 .pe-viz .pe-mark.did{transition-delay:.08s;}
-.pe-viz .pe-growth polyline{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .45s var(--ease);}
+/* motion phase 2 (2026-10-16, Builder OS Bento's self-drawing sparkline, user-approved): the reference lines (levels 1/5)
+   draw first (.9s), the player's own violet line draws slower and finishes last (1.3s from .35s), the low-point ring pops
+   as the line reaches it (peGrowthSVG sets its delay from its x position), then the line's end dot lands (1.6s) with ONE
+   ripple (.pe-g-pulse) — "your money is here now". No loop. Mid-drag (.pe-live) the ripple stays off. */
+.pe-viz .pe-growth polyline{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .9s var(--ease);}
 .pe-viz.viz-in .pe-growth polyline{stroke-dashoffset:0;}
-.pe-viz .pe-growth .pe-g-l1{transition-delay:.08s;}.pe-viz .pe-growth .pe-g-l5{transition-delay:.13s;}.pe-viz .pe-growth .pe-g-me{transition-delay:.18s;}
+.pe-viz .pe-growth .pe-g-l1{transition-delay:.1s;}.pe-viz .pe-growth .pe-g-l5{transition-delay:.2s;}.pe-viz .pe-growth .pe-g-me{transition-duration:1.3s;transition-delay:.35s;}
+.pe-g-end{fill:var(--violet);}
+.pe-viz .pe-g-end{opacity:0;transform:scale(0);transform-box:fill-box;transform-origin:center;transition:opacity .25s var(--ease) 1.6s,transform .45s var(--ease) 1.6s;}
+.pe-viz.viz-in .pe-g-end{opacity:1;transform:scale(1);}
+.pe-g-pulse{fill:none;stroke:var(--violet);stroke-width:2;opacity:0;transform-box:fill-box;transform-origin:center;}
+.pe-viz.viz-in .pe-g-pulse{animation:peRipple 1.1s var(--ease) 1.75s 1 both;}
+@keyframes peRipple{0%{opacity:.6;transform:scale(1);}100%{opacity:0;transform:scale(2.6);}}
+/* ladder (same pass): every level's band grows in neutral first; the player's own level turns violet + bold at .95s and
+   its median dot bumps once — "you are here" lands last */
+.pe-viz .pe-lad.on .pe-lad-band{background:var(--line-strong);transition:width .7s var(--ease),left .7s var(--ease),background-color .45s var(--ease) .95s;}
+.pe-viz.viz-in .pe-lad.on .pe-lad-band{background:var(--violet);}
+.pe-viz .pe-lad.on .pe-lad-hd{color:var(--muted);font-weight:var(--w-body);transition:color .45s var(--ease) .95s,font-weight .45s var(--ease) .95s;}
+.pe-viz.viz-in .pe-lad.on .pe-lad-hd{color:var(--ink);font-weight:var(--w-label);}
+.pe-viz.viz-in .pe-lad.on .pe-lad-med{animation:peBump .5s var(--ease) 1.05s 1;}
+@keyframes peBump{0%,100%{transform:scale(1);}45%{transform:scale(1.45);}}
+.pe-viz.pe-live .pe-g-pulse,.pe-viz.pe-live .pe-lad.on .pe-lad-med{animation:none;}
+.pe-viz.pe-live .pe-g-end,.pe-viz.pe-live .pe-lad.on .pe-lad-band,.pe-viz.pe-live .pe-lad.on .pe-lad-hd{transition-delay:0s;}
 .pe-viz .pe-g-base{opacity:0;transition:opacity .3s var(--ease);}
 .pe-viz.viz-in .pe-g-base{opacity:1;}
 .pe-viz .pe-g-bot{opacity:0;transform:scale(0);transform-box:fill-box;transform-origin:center;transition:opacity .3s var(--ease) .6s,transform .45s var(--ease) .6s;}
@@ -6092,7 +6112,7 @@ function vizCountIn(box){
       });},150);
       return;
     }
-    var row=el.closest('.risk-row,.conf-row,.trait-row'),bar=row&&row.querySelector('.viz-bar');
+    var row=el.closest('.risk-row,.conf-row,.trait-row,.int-bar-row'),bar=row&&row.querySelector('.viz-bar');
     var cs=bar?getComputedStyle(bar):null,delay=cs?vcSecs(cs.transitionDelay):0,dur=(cs&&vcSecs(cs.transitionDuration))||.75;
     var t0=performance.now()+delay*1000;
     requestAnimationFrame(function step(t){
@@ -7334,10 +7354,14 @@ function peGrowthSVG(d){
   var X=function(i){return 6+i/(n-1)*(W-12);},Y=function(v){return Hh-8-(v-lo)/(hi-lo)*(Hh-16);};
   var line=function(l,cls){return '<polyline class="'+cls+'" pathLength="1" points="'+peAt(d,PE.F,l).growth_of_100k.map(function(v,i){return X(i).toFixed(1)+','+Y(v).toFixed(1);}).join(' ')+'"/>';};
   var bi=d.history.months.indexOf(me.max_drop.bottom);
+  var ex=X(n-1).toFixed(1),ey=Y(me.growth_of_100k[n-1]).toFixed(1);
+  // the low-point ring pops as the violet line reaches it: invert the line's ease (≈easeOutQuint) at its x fraction
+  var botD=bi>=0?(.35+1.3*(1-Math.pow(1-bi/(n-1),1/5))).toFixed(2):0;
   return '<svg class="pe-growth" viewBox="0 0 '+W+' '+Hh+'" width="100%" role="img" aria-label="'+peEsc(peFill(d.texts.growth_title_amount,{amount:peBaht(PE.amt),level:PE.pick}))+'">'+
     '<line class="pe-g-base" x1="6" x2="'+(W-6)+'" y1="'+Y(100000).toFixed(1)+'" y2="'+Y(100000).toFixed(1)+'"/>'+
     (PE.pick!==1?line(1,'pe-g-l1'):'')+(PE.pick!==5?line(5,'pe-g-l5'):'')+line(PE.pick,'pe-g-me')+
-    (bi>=0?'<circle class="pe-g-bot" cx="'+X(bi).toFixed(1)+'" cy="'+Y(me.growth_of_100k[bi]).toFixed(1)+'" r="5"/>':'')+'</svg>';
+    (bi>=0?'<circle class="pe-g-bot" cx="'+X(bi).toFixed(1)+'" cy="'+Y(me.growth_of_100k[bi]).toFixed(1)+'" r="5" style="transition-delay:'+botD+'s,'+botD+'s"/>':'')+
+    '<circle class="pe-g-pulse" cx="'+ex+'" cy="'+ey+'" r="4.5"/><circle class="pe-g-end" cx="'+ex+'" cy="'+ey+'" r="4.5"/></svg>';
 }
 function peGrowthBodyHTML(d){
   var T=d.texts,me=peAt(d,PE.F,PE.pick);if(!me)return '';
@@ -7528,7 +7552,7 @@ function peGrowthMorph(d,box){
   var svg=box.querySelector('svg'),old={};
   if(svg){[].forEach.call(svg.querySelectorAll('polyline'),function(p){old[p.getAttribute('class')]=pts(p.getAttribute('points'));});
     var c0=svg.querySelector('.pe-g-bot'),b0=svg.querySelector('.pe-g-base');if(c0)old.bot=[+c0.getAttribute('cx'),+c0.getAttribute('cy')];if(b0)old.base=+b0.getAttribute('y1');}
-  box.innerHTML=peGrowthBodyHTML(d);
+  box.innerHTML=peGrowthBodyHTML(d);if(box.classList.contains('viz-in'))box.classList.add('pe-live'); // no ripple replay per drag step (peReplay clears it); a not-yet-revealed chart keeps its full first reveal
   if(PE_TW){cancelAnimationFrame(PE_TW);PE_TW=null;}
   if(RM||!svg||!box.classList.contains('viz-in'))return;
   var s2=box.querySelector('svg'),lines=[].filter.call(s2.querySelectorAll('polyline'),function(p){var o=old[p.getAttribute('class')];return o&&o.length===pts(p.getAttribute('points')).length;});
@@ -7540,6 +7564,7 @@ function peGrowthMorph(d,box){
     lines.forEach(function(p,i){var a=fr[i],z=to[i],o=[];for(var j=0;j<z.length;j+=2)o.push(mix(a[j],z[j],e).toFixed(1)+','+mix(a[j+1],z[j+1],e).toFixed(1));p.setAttribute('points',o.join(' '));});
     if(c&&old.bot){c.setAttribute('cx',mix(old.bot[0],cTo[0],e).toFixed(1));c.setAttribute('cy',mix(old.bot[1],cTo[1],e).toFixed(1));}
     if(b&&old.base!=null){var y=mix(old.base,bTo,e).toFixed(1);b.setAttribute('y1',y);b.setAttribute('y2',y);}
+    var meL=s2.querySelector('.pe-g-me');if(meL){var mp=meL.getAttribute('points').trim().split(/\s+/).pop().split(',');[].forEach.call(s2.querySelectorAll('.pe-g-end,.pe-g-pulse'),function(dt){dt.setAttribute('cx',mp[0]);dt.setAttribute('cy',mp[1]);});}
     PE_TW=k<1?requestAnimationFrame(step):null;
   };
   PE_TW=requestAnimationFrame(step);
@@ -8311,7 +8336,7 @@ function interestsHTML(r){
   var rows=order.map(function(i,pos){
     var touched=((BOOTH_CHK[i]&&BOOTH_CHK[i].size)>0)||!!BOOTH_ACT[i];
     var delay=Math.min(pos*0.03,0.3).toFixed(2);
-    return '<div class="int-bar-row'+(touched?'':' muted')+'"><span class="int-bar-l">'+INT_SHORT_L[i]+'</span><span class="int-bar-v">'+realPct[i]+'%</span>'+
+    return '<div class="int-bar-row'+(touched?'':' muted')+'"><span class="int-bar-l">'+INT_SHORT_L[i]+'</span><span class="int-bar-v">'+vcHTML(realPct[i])+'%</span>'+
       '<div class="int-bar-tr"><div class="int-bar-fi viz-bar" style="--tw:'+realPct[i]+'%;transition-delay:'+delay+'s"></div></div></div>';
   }).join('');
   return '<div class="int-bar-list">'+rows+'</div>'+

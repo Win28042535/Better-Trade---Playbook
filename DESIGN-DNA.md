@@ -356,6 +356,16 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-10-16 — Chart motion phase 2 (Builder OS Bento, user-approved after an old/new side-by-side).** (1) *พอร์ต growth
+chart*: reference lines (levels 1/5) draw first (.9s), the player's violet line draws slower and lands last (1.3s from .35s);
+the low-point ring pops as the line reaches it (`peGrowthSVG` inverts the ease at the ring's x for its delay); then the
+line's end dot `.pe-g-end` lands (1.6s) with ONE ripple `.pe-g-pulse` — no loop. (2) *พอร์ต risk ladder*: all bands grow
+neutral; the player's own level turns violet + bold at .95s and its median dot bumps once. (3) *ความสนใจ bars*: the % counts
+up with its bar (phase-1 `vcHTML`, `vizCountIn` now also reads `.int-bar-row`). Mid-drag on the Thai/foreign slider
+(`.pe-live`) keeps the quick .25s morph: no ripple/bump replay, no delays, and `peGrowthMorph` moves the end dot with the
+line. The journey-tab progress donut from the plan was skipped: that ring was removed earlier by direction (now the text
+card "เปิดแล้ว X จาก 6 ด้าน").
+
 **2026-10-16 — Chart motion phase 1 (from the Builder OS Bento reference, 21st.dev).** Its motion DNA shares our easing
 exactly (`--ease` = cubic-bezier(.22,1,.36,1)); phase 1 adds its counting numbers + 3-tier rhythm to the charts we have.
 (1) *Counting numbers*: `vcHTML(v,spring)` wraps a chart value (markup keeps the real value); `initCharts` zeroes them just
