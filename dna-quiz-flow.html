@@ -1202,6 +1202,10 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
 .risk-tag{font-size:var(--fs-label);font-weight:var(--w-label);color:var(--ink);flex:1;}
 .risk-match{display:inline-flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);padding:var(--sp-stack-tight) 0;}
 .risk-match .ld{width:6px;height:6px;}
+/* risk-gap label chip (2026-10-20, the preview's "ยังไม่นิ่ง" pill under the risk card's title) */
+.risk-chip{display:inline-flex;align-items:center;margin:2px 0 var(--sp-list);padding:3px var(--sp-inline);border-radius:var(--rpill);font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:color-mix(in srgb,var(--violet) 62%,var(--ink));background:var(--active-fill);}
+.risk-chip.k-aligned{color:var(--green-text);background:color-mix(in srgb,var(--green-text) 12%,var(--white));}
+.risk-chip.k-unknown{color:var(--muted);background:var(--cloud);}
 .risk-desc{font-size:var(--fs-bodysm);font-weight:var(--w-body);color:var(--muted);line-height:1.65;margin-bottom:var(--sp-stack);}
 .risk-slbl{font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:var(--w-head);color:var(--muted);letter-spacing:0.06em;margin-bottom:var(--sp-list);text-transform:uppercase;}
 .risk-bars{display:flex;flex-direction:column;gap:var(--sp-list);}
@@ -6634,7 +6638,54 @@ function book2NavFade(nav){
   nav.classList.toggle('fade-r',max>1&&nav.scrollLeft<max-1);
 }
 /* AI Insight card (risk gap + confidence) — shared markup so v1 and v2 can't drift apart. */
+/* Confidence Score + risk gap, the real product's way (2026-10-20, read off its preview's Debug panels; user: "ยังไม่มี ให้
+   mockup ไปก่อน" for what the content team hasn't supplied). Score = ความรู้ 35 + รู้จักตัวเอง 25 + ลงมือ 25 + เปิดโลก 15:
+   - ความรู้: distinct knowledge items of the MAIN games played, 1 point each, max 35. CONF_KNOW = the 31 items the preview
+     listed per game (mock until the content team's term list exists).
+   - รู้จักตัวเอง: เกมย้อนเวลาพอร์ต played +15; then |บอก − จริง| ≤ 1 → +10.
+   - ลงมือ: เกมก้าวแรก played +15; at least one booth asset game played +10 (threshold = mock; the preview passed with 3).
+   - เปิดโลก: 4 asset groups × 3.75, a group counts once any of its booths' games is played. Group membership is inferred
+     from the preview's counts (core 3 · growth 1 · alternative 5 · cash 1 — matches the 10 booths); confirm with the team.
+   Level wording: only the top one is the preview's; the rest are mock. */
+var CONF_KNOW={
+  0:['ความเสี่ยงที่คุณบอก (Declared Risk)','ความเสี่ยงที่ประเมินเอง กับความเสี่ยงที่แท้จริง (Declared vs Revealed Risk)','การขายตอนตื่นตระหนก (Panic Selling)','Risk Gap (ช่องว่างความเสี่ยง)','Risk Gap อ่านอย่างไร','การมีแผนล่วงหน้าเพื่อกันอารมณ์ (Rule-based)','การฟื้นตัวเร็วของตลาด (V-shaped recovery)'],
+  1:['DCA และกองทุนรวมคืออะไร และเกี่ยวข้องกับการกระจายความเสี่ยงอย่างไร','งบการเงิน (Financial Statements)','พื้นฐาน vs กระแสข่าว (Fundamental vs Hype)'],
+  2:['กฎหยุดก่อนตัดสินใจ (Cooling-off)','สัญญาณหลอกลงทุน 3 ธง','FOMO และการแห่ตามฝูง (Herding)','แห่ตามฝูง (Herding)'],
+  3:['ช่วงถอนใช้หลังเกษียณ (Decumulation)','Asset Allocation คืออะไร','การลดความเสี่ยงตามอายุ (Glide path)','การจัดเงินตามเป้าหมาย (Goals-based / Bucketing)','ระยะเวลาการลงทุน (Time Horizon)'],
+  4:['ดอกเบี้ยทบต้น (Compounding)','ต้นทุนของการไม่เริ่มลงทุน','เงินสำรองฉุกเฉิน (Emergency Fund)','การตั้งลงทุนอัตโนมัติ (Automation / auto-DCA)','ขั้นตอนพื้นฐานของการเริ่มลงทุน','ผลตอบแทนและความเสี่ยง (Risk-Return Tradeoff)','เริ่มด้วยเงินน้อยได้ และเวลามีน้ำหนักกว่าจำนวนเงิน'],
+  5:['ทองคำไม่ให้ดอกผล (No Yield)','ทองคำกับบทบาทกระจายความเสี่ยง (Low Correlation)','เงินเฟ้อ (Inflation)','ทองคำในฐานะเครื่องเก็บมูลค่า (Store of Value)','Position Sizing (การกำหนดขนาดการถือ)']
+};
+var CONF_GROUPS=[{t:'สินทรัพย์แกนหลัก (กองทุน/หุ้นใหญ่)',b:[0,1,2]},{t:'สินทรัพย์เติบโต',b:[7]},{t:'สินทรัพย์ทางเลือก / กระจาย',b:[4,5,6,8,9]},{t:'เงินสด / สภาพคล่อง',b:[3]}];
+/* risk gap, preview direction: บอก − จริง. Label from the 2 crisis scenes of เกมย้อนเวลาพอร์ต (GAME_ANSWERS[0][1], [2]):
+   not played → unknown · the 2 reactions differ → exploratory · else |gap| ≤ 1 → aligned · บอก > จริง → closet_con · else closet_agg.
+   Only exploratory's wording is the preview's; the other four are mock. */
+var GAP_TX={
+  aligned:{chip:'ตรงกัน',d:'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน'},
+  exploratory:{chip:'ยังไม่นิ่ง',d:'ปฏิกิริยาต่อวิกฤตต่างกันในสองฉาก – ยังอยู่ระหว่างสำรวจตัวเอง'},
+  closet_con:{chip:'ระวังกว่าที่บอก',d:'ตอนตลาดลงจริง คุณเลือกทางที่ระวังกว่าที่ประเมินตัวเองไว้'},
+  closet_agg:{chip:'กล้ากว่าที่บอก',d:'ตอนตลาดลงจริง คุณกล้าเสี่ยงกว่าที่ประเมินตัวเองไว้'},
+  unknown:{chip:'ยังไม่มีข้อมูล',d:'ยังไม่มีคำตอบจากเกมย้อนเวลาพอร์ต เล่นแล้วจะเห็นว่าความเสี่ยงที่บอกตรงกับที่ทำไหม'}
+};
+function riskGap(r){
+  var diff=Math.round((r.declared-r.revealed)*10)/10,a=GAME_ANSWERS[0],k;
+  if(!GAME_PLAYED[0]||!a||a[1]==null||a[2]==null)k='unknown';
+  else if(a[1]!==a[2])k='exploratory';
+  else if(Math.abs(diff)<=1)k='aligned';
+  else k=diff>0?'closet_con':'closet_agg';
+  return {diff:diff,key:k};
+}
+function confCompute(r){
+  var seen={};for(var g=0;g<6;g++)if(GAME_PLAYED[g])(CONF_KNOW[g]||[]).forEach(function(x){seen[x]=1;});
+  var know=Math.min(35,Object.keys(seen).length);
+  var self=(GAME_PLAYED[0]?15:0)+(GAME_PLAYED[0]&&Math.abs(riskGap(r).diff)<=1?10:0);
+  var act=(GAME_PLAYED[4]?15:0)+(boothActivityCount()>=1?10:0);
+  var open=CONF_GROUPS.filter(function(G){return G.b.some(function(i){return BOOTH_ACT[i];});}).length*3.75;
+  var total=Math.round((know+self+act+open)*100)/100;
+  var lvl=total>=85?'สูงมาก – หลักฐานมากพอจะอ่านคุณ':(total>=70?'สูง – หลักฐานเริ่มชัด':(total>=50?'ปานกลาง – ยังต้องการหลักฐานเพิ่ม':'เริ่มต้น – เล่นเกมและเดินบูธเพื่อเก็บหลักฐาน'));
+  return {total:total,level:lvl,know:know,self:self,act:act,open:open};
+}
 function insightHTML(r,h,matchOk){
+  var G=riskGap(r),GT=GAP_TX[G.key],C=confCompute(r);
   /* padding-bottom:0 dropped (2026-08-19, per direction) — this .s-pad is the section's ONLY
      content when insightHTML() is used standalone (Book v2's "วิเคราะห์" tab), so removing the
      bottom padding left .conf-box sitting flush against the card's own bottom edge. The near-
@@ -6642,13 +6693,14 @@ function insightHTML(r,h,matchOk){
      has more sections following inside the same card — this copy has nothing after it. */
   return '<section class="card scroll-reveal"><div class="s-pad">'+
     '<div class="s-ey" style="font-weight:var(--w-label)">AI Insight</div><h2 class="s-h" style="margin-bottom:18px">คุณเป็นนักลงทุนแบบไหน</h2>'+
-    '<div class="risk-box"><div class="risk-hd"><span class="risk-tag">ความเสี่ยง "บอก" vs "จริง"</span><span class="risk-match">'+(matchOk?('<span class="ld" style="background:var(--cyan)"></span>ตรงกัน'):('ต่างกัน '+(r.gap>0?'+':'')+r.gap))+'</span></div>'+
-      '<p class="risk-desc">'+(matchOk?'ความเสี่ยงที่ประเมินตัวเองกับพฤติกรรมจริงไปในทิศทางเดียวกัน':'ความเสี่ยงที่คุณ "บอก" กับพฤติกรรมจริงต่างกันอยู่บ้าง รู้ gap นี้ช่วยให้วางแผนได้แม่นขึ้น')+'</p>'+
+    '<div class="risk-box"><div class="risk-hd"><span class="risk-tag">ความเสี่ยง "บอก" vs "จริง"</span><span class="risk-match">'+(G.diff===0?('<span class="ld" style="background:var(--cyan)"></span>ตรงกัน'):('ต่างกัน '+(G.diff>0?'+':'')+G.diff))+'</span></div>'+
+      '<span class="risk-chip k-'+G.key+'">'+GT.chip+'</span>'+
+      '<p class="risk-desc">'+GT.d+'</p>'+
       '<div class="risk-slbl">ระดับความเสี่ยง 1–10</div>'+
       '<div class="risk-bars"><div class="risk-row"><span class="risk-rl">ความเสี่ยงที่บอก</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.declared*10)+'%;background:var(--muted)"></div></div><span class="risk-vl">'+vcHTML(r.declared)+'</span></div>'+
       '<div class="risk-row"><span class="risk-rl" style="color:var(--ink)">ความเสี่ยงจริง</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.revealed*10)+'%"></div></div><span class="risk-vl">'+vcHTML(r.revealed)+'</span></div></div></div>'+
-    '<div class="conf-box"><div class="conf-glow"></div><div class="conf-hd"><div><div class="conf-ml">Confidence Score</div><div class="conf-mv">'+r.confLevel+'</div></div><div class="conf-sc">'+vcHTML(r.conf,true)+'<span class="conf-su">/100</span></div></div>'+
-      '<div class="conf-bars">'+confRow('ตัวตน',r.subs.identity)+confRow('พฤติกรรม',r.subs.behavior)+confRow('ความเสี่ยง',r.subs.riskAlign)+confRow('วินัย',r.subs.discipline)+'</div>'+
+    '<div class="conf-box"><div class="conf-glow"></div><div class="conf-hd"><div><div class="conf-ml">Confidence Score</div><div class="conf-mv">'+C.level+'</div></div><div class="conf-sc">'+vcHTML(C.total,true)+'<span class="conf-su">/100</span></div></div>'+
+      '<div class="conf-bars">'+confRow('ความรู้',C.know,35)+confRow('รู้จักตัวเอง',C.self,25)+confRow('ลงมือ',C.act,25)+confRow('เปิดโลก',C.open,15)+'</div>'+
       '<div class="conf-foot"><p class="conf-note">คะแนนจะสมบูรณ์เมื่อทำครบ 6 ด้านในงาน</p><button class="btn btn-primary" id="confPlayBtn" type="button">'+ic('lc-gamepad-2')+'เล่นเกม 6 ด้าน</button></div></div>'+
     '</div></section>';
 }
@@ -7234,7 +7286,9 @@ function apbEsc(s){return String(s==null?'':s).replace(/\s*—\s*/g,' ').replace
    Deferred: financial profile + 3 lights (phase 2: needs a storage decision; its consent copy
    promises server storage), and the per-player market lessons / patterns A–E (the demo ships only
    server output for 3 fictional players, not the rules that produce them). */
-var PE={pick:null,F:null,amt:100000,hold:null,res:null,err:false};
+/* Defaults follow the real product's preview (2026-10-20): 10,000 บาท and หุ้นไทย 70 · ต่างประเทศ 30 (PE_F0; the data file's own
+   default_foreign is 20). */
+var PE={pick:null,F:null,amt:10000,hold:null,res:null,err:false},PE_F0=30;
 var PE_LOADING=null;
 function portEduLoad(done){
   if(window.PORT_EDU_DATA){done(true);return;}
@@ -7305,25 +7359,29 @@ var PE_BKT=['cash','bond','equity','alt'];
    3-step ระวัง → กล้า line instead: "ที่บอก" sits on the Q1 step, "ที่ทำ" on the average of the two
    crisis choices. It describes what was done, it is not a risk-level result. */
 var PE_CHOICE=['sell','hold','buy_more'];
+/* 2026-10-20 — worded and laid out like the real product's preview: "พฤติกรรมของคุณ", short ที่บอก/ที่ทำ marks on a ระวัง →
+   กล้าเสี่ยง line and one "วิกฤต 2008: ถือ" line per crisis. Not played yet → the same sample the preview shows (said ระวัง, 2008
+   ถือ, 2020 ซื้อเพิ่ม), labelled ตัวอย่าง. */
+var PE_MIRROR={title:'พฤติกรรมของคุณ',sub:'เปรียบ “ที่บอก” vs “ที่ทำ” จากเกมย้อนเวลาพอร์ต',said:'ที่บอก',did:'ที่ทำ',ends:['ระวัง','กล้าเสี่ยง'],
+  crises:{gfc2008:'วิกฤต 2008',covid2020:'โควิด 2020'},choices:{sell:'ขาย',hold:'ถือ',buy_more:'ซื้อเพิ่ม'},
+  sample:'ตัวอย่าง · เล่นเกมย้อนเวลาพอร์ตเพื่อดูข้อมูลจริงของคุณ',sampleAns:[0,1,2]};
 function peMirrorHTML(d){
-  var M=d.mirror,a=GAME_ANSWERS[0];
-  var head='<div class="s-pad"><h2 class="s-h">'+peEsc(M.title)+'</h2>';
-  if(!a||a[1]==null||a[2]==null)return head+'<p class="s-sub" style="margin:0">'+peEsc(M.not_played)+'</p></div>';
+  var M=PE_MIRROR,a=GAME_ANSWERS[0],sample=!a||a[1]==null||a[2]==null;
+  if(sample)a=M.sampleAns;
+  var head='<div class="s-pad"><h2 class="s-h">'+peEsc(M.title)+'</h2><p class="s-sub" style="margin:0 0 var(--sp-stack)">'+peEsc(M.sub)+'</p>';
   var said=a[0],did=(a[1]+a[2])/2,pos=function(v){return (v/2*100).toFixed(1);};
   var edge=function(v){return v<=0?' l':v>=2?' r':'';}; // end markers: label hugs the inside of the line
-  var q1=MINIGAME_Q[0].questions[0].opts[said];
-  var row=function(id,c){return '<p class="pe-crisis '+PE_CHOICE[c]+'">'+peEsc(peFill(M.crisis_row,{crisis:M.crises[id],choice:M.choices[PE_CHOICE[c]]}))+'</p>';};
+  var row=function(id,c){return '<p class="pe-crisis '+PE_CHOICE[c]+'">'+peEsc(M.crises[id])+': <b>'+peEsc(M.choices[PE_CHOICE[c]])+'</b></p>';};
   return head+
     '<div class="pe-gauge pe-viz" role="img" aria-label="'+peEsc(M.said+' · '+M.did)+'">'+
       '<div class="pe-gauge-track"><i style="left:0"></i><i style="left:50%"></i><i style="left:100%"></i>'+
         (said!=null?'<span class="pe-mark said'+edge(said)+'" style="--pos:'+pos(said)+'%"><em>'+peEsc(M.said)+'</em></span>':'')+
         '<span class="pe-mark did'+edge(did)+'" style="--pos:'+pos(did)+'%"><em>'+peEsc(M.did)+'</em></span>'+
       '</div>'+
-      '<div class="pe-gauge-ends"><span>'+peEsc(M.scale_ends[0])+'</span><span>'+peEsc(M.scale_ends[1])+'</span></div>'+
+      '<div class="pe-gauge-ends"><span>'+peEsc(M.ends[0])+'</span><span>'+peEsc(M.ends[1])+'</span></div>'+
     '</div>'+
-    (q1?'<p class="pe-said"><b>'+peEsc(M.said)+':</b> “'+peEsc(q1)+'”</p>':'')+
     row('gfc2008',a[1])+row('covid2020',a[2])+
-    '<p class="pe-note">'+peEsc(M.note)+'</p></div>';
+    (sample?'<p class="pe-note">'+peEsc(M.sample)+'</p>':'')+'</div>';
 }
 
 /* 5-level table (same for everyone) + level picker. */
@@ -7404,8 +7462,8 @@ function peGrowthSVG(d){
 function peGrowthBodyHTML(d){
   var T=d.texts,me=peAt(d,PE.F,PE.pick);if(!me)return '';
   var k=PE.amt/100000,md=me.max_drop,top=peAt(d,PE.F,5),bot=peAt(d,PE.F,1),n=me.growth_of_100k.length;
-  var drop=md.months_to_recover==null?'':peFill(T.growth_drop_baht,{pct:peSigned(md.pct),amount:peBaht(PE.amt),baht:peBaht(Math.abs(md.pct)/100*PE.amt),months:md.months_to_recover});
-  return '<div class="pe-g-key"><span><i class="k-me"></i>'+peEsc(peFill(T.row_label,{level:PE.pick}))+'</span>'+(PE.pick!==5?'<span><i class="k-l5"></i>'+peEsc(peFill(T.row_label,{level:5}))+'</span>':'')+(PE.pick!==1?'<span><i class="k-l1"></i>'+peEsc(peFill(T.row_label,{level:1}))+'</span>':'')+'<span><i class="k-bot"></i>'+peEsc(peFill(T.growth_bottom,{month:peMonth(md.bottom),pct:peSigned(md.pct)}))+'</span></div>'+
+  var drop=md.months_to_recover==null?'':'ช่วงแย่สุดเคยลดลง '+peSigned(md.pct)+' ถ้าตอนนั้นมีเงินลงทุน '+peBaht(PE.amt)+' จะหายไปชั่วคราว '+peBaht(Math.abs(md.pct)/100*PE.amt)+' แล้วใช้ '+md.months_to_recover+' เดือนกลับมาเท่าเดิม';
+  return '<div class="pe-g-key"><span><i class="k-me"></i>'+peEsc(peFill(T.row_label,{level:PE.pick})+' (เลือก)')+'</span>'+(PE.pick!==5?'<span><i class="k-l5"></i>'+peEsc(peFill(T.row_label,{level:5}))+'</span>':'')+(PE.pick!==1?'<span><i class="k-l1"></i>'+peEsc(peFill(T.row_label,{level:1}))+'</span>':'')+'<span><i class="k-bot"></i>'+peEsc(peMonth(md.bottom)+' ลดลงสุด '+peSigned(md.pct))+'</span></div>'+
     peGrowthSVG(d)+
     '<div class="pe-g-ax"><span>'+peEsc(peMonth(d.history.months[0]))+' · '+peEsc(peFill(T.growth_base_amount,{amount:peBaht(PE.amt)}))+'</span><span>'+peEsc(peMonth(d.history.months[n-1]))+'</span></div>'+
     '<p class="pe-big">'+peFillNum(T.growth_today,{value:peBaht(me.growth_of_100k[n-1]*k)})+'</p>'+
@@ -7418,11 +7476,12 @@ function peGrowthBodyHTML(d){
 function peGrowthTitle(d){return peFill(d.texts.growth_title_amount,{amount:peBaht(PE.amt),level:PE.pick}).replace(/ (\d+)$/,' $1');} // no-break space: the level number never wraps alone onto a 2nd line
 function peGrowthHTML(d){
   var T=d.texts,custom=T.amounts.indexOf(PE.amt)<0;
+  var mo=d.history.months;
   return '<div class="s-pad"><h2 class="s-h" id="peGrowthTitle">'+peEsc(peGrowthTitle(d))+'</h2>'+
+    '<p class="s-sub" style="margin:0">'+peEsc('จำลองผลตอบแทน '+peMonth(mo[0])+'–'+peMonth(mo[mo.length-1])+' จากข้อมูลตลาดไทย')+'</p>'+
     '<div class="apb-lab pe-sec-body">'+peEsc(T.amount_label)+'</div>'+
     '<div class="apb-chips pe-amt">'+T.amounts.map(function(a){return '<button type="button" class="apb-chip'+(a===PE.amt?' on':'')+'" data-pe-amt="'+a+'" aria-pressed="'+(a===PE.amt)+'">'+peBaht(a)+'</button>';}).join('')+
       '<input type="number" class="apb-bl pe-amt-in" id="peAmtIn" inputmode="numeric" min="1000" step="1000" value="'+(custom?PE.amt:'')+'" placeholder="'+peEsc(T.amount_custom)+'" aria-label="'+peEsc(T.amount_custom)+'"></div>'+
-    '<p class="pe-note">'+peEsc(T.calc_note)+'</p>'+
     '</div><div class="trait-sec pe-viz" id="peGrowthBody">'+peGrowthBodyHTML(d)+'</div>';
 }
 
@@ -7489,7 +7548,7 @@ function portEduShellHTML(){
   var d=window.PORT_EDU_DATA;
   if(!d)return '<section class="card"><div class="s-pad"><p class="s-sub" style="margin:0">'+(PE.err?'โหลดข้อมูลไม่สำเร็จ ลองเปิดแท็บนี้ใหม่อีกครั้ง':'กำลังโหลด…')+'</p></div></section>';
   if(PE.pick==null)PE.pick=d.table.pick.default;
-  if(PE.F==null)PE.F=d.history.default_foreign;
+  if(PE.F==null)PE.F=PE_F0;
   if(!PE.hold){PE.hold={};Object.keys(d.port.inputs).forEach(function(k){PE.hold[k]=0;});}
   /* Tab Header (2026-10-09) replaces the amber .pe-banner; its compliance text (d.banner) is no longer shown in this tab
      (removed per direction, same day). */
@@ -8282,8 +8341,9 @@ function ddTabs(h){
    identically from 2 places in this file (renderBook + insightHTML) and editing both call sites in
    sync has already bitten this file once (see the risk-fi indentation mismatch in update #19). Same
    4-hue set allocBars() already uses, so both charts read as one consistent palette. */
-var CONF_ROW_COLOR={'ตัวตน':'var(--violet)','พฤติกรรม':'var(--cyan)','ความเสี่ยง':'var(--pink)','วินัย':'var(--yellow)'};
-function confRow(l,v){var c=CONF_ROW_COLOR[l]||'var(--ink)';return '<div class="conf-row"><span class="conf-rl">'+l+'</span><div class="conf-tr"><div class="conf-fi viz-bar" style="--tw:'+(v/20*100)+'%;background:'+c+'"></div></div><span class="conf-vl">'+vcHTML(v)+'</span></div>';}
+var CONF_ROW_COLOR={'ตัวตน':'var(--violet)','พฤติกรรม':'var(--cyan)','ความเสี่ยง':'var(--pink)','วินัย':'var(--yellow)',
+  'ความรู้':'var(--violet)','รู้จักตัวเอง':'var(--cyan)','ลงมือ':'var(--pink)','เปิดโลก':'var(--yellow)'}; // 2nd line: the 2026-10-20 Confidence parts (same hue order as the preview)
+function confRow(l,v,max){var c=CONF_ROW_COLOR[l]||'var(--ink)';return '<div class="conf-row"><span class="conf-rl">'+l+'</span><div class="conf-tr"><div class="conf-fi viz-bar" style="--tw:'+(v/(max||20)*100)+'%;background:'+c+'"></div></div><span class="conf-vl">'+vcHTML(v)+'</span></div>';}
 /* ══ SHARE MODAL (logic) ══ "แชร์ภาพการ์ด"/"แชร์พรุ่งนี้ของคุณ" both open this bottom-sheet share
    modal — a copy-link field plus social targets (LINE first, it's the dominant channel in TH),
    modeled on the reference share sheet but skinned to this app's design DNA. Each social chip opens

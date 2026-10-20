@@ -356,6 +356,22 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-10-20 — Playbook aligned with the real product's preview (วิเคราะห์ · พอร์ต · Asset Knowledge).** Read off
+preview-inevents.efin.finance (its Debug panels gave the scoring rules). (1) *วิเคราะห์*: Confidence = ความรู้ 35 + รู้จักตัวเอง 25
++ ลงมือ 25 + เปิดโลก 15 (`confCompute`; rules in its comment) — knowledge items `CONF_KNOW` (the preview's 31 per game), the
+4 asset groups `CONF_GROUPS` (inferred), the ≥1 booth-game threshold and 3 of 4 level wordings are MOCK until the content team
+supplies them. Risk gap now บอก − จริง (preview direction) with a label chip `.risk-chip` (`riskGap`: unknown / exploratory /
+aligned / closet_con / closet_agg from the 2 crisis answers of เกมย้อนเวลาพอร์ต; only "ยังไม่นิ่ง" wording is the preview's).
+Score shows decimals (e.g. 78.5) and keeps the phase-1 count-up. (2) *พอร์ต*: defaults 10,000 บาท and หุ้นไทย 70 · ต่างประเทศ 30
+(`PE_F0`); the mirror is now "พฤติกรรมของคุณ" with short ที่บอก/ที่ทำ marks and "วิกฤต 2008: ถือ" lines, showing the preview's
+sample (ตัวอย่าง) before the game is played; growth block gains "จำลองผลตอบแทน … จากข้อมูลตลาดไทย", "(เลือก)" on the picked line
+and the preview's drop wording. The input form / result table already matched. NOT done: the preview's back-test numbers
+differ from ours (e.g. level 3 at 70/30, 10,000 → 13,528 vs our 15,003; worst year −9.4% vs −3.2%) — user chose the preview's,
+but its dataset couldn't be read (the preview went blank after a redeploy) → needs the data file. (3) *Asset Knowledge*: group
+membership/order/titles follow the preview (AI INVESTING joins derivatives; 4th group "…สุขภาพการเงิน"), book numbers keep
+the source order (`BOOK_NO`, STOCK stays 3/18). The preview's "ETF"/"DW"/"OPTIONS" cards open exactly our GLOBAL STOCK /
+TFEX / STRUCTURED NOTE books (same text) — no new content exists, so those slots keep their real names here.
+
 **2026-10-16 — Motion phase 3: identity card tilt (Builder OS Bento's tilting cells, user picked "B").** `cardTilt()` tilts
 the whole `.cr2` frame (ก่อนงาน/หลังงาน slider, and the unregistered single card) up to 4° toward the mouse, with a soft
 `.cr2-sheen` light following the cursor (z 5: above the art, below the chips and divider). The frame tilts as one — never a

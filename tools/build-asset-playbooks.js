@@ -30,11 +30,15 @@ const OUT = path.join(__dirname, '..', 'assets', 'playbooks');
 /* 2026-10-12: 18 books / 4 groups (source round of 9 Oct: + allocation, global, tfex, snote and the
    "อนุพันธ์และผลิตภัณฑ์ซับซ้อน" group). global takes lc-globe, so dr moves to lc-plane (= "abroad"; picked by
    the user from 4 options, 2026-10-12). */
+/* Group membership, order and titles follow the real product's preview (2026-10-20, per direction "ให้ของในระบบสัมพันธ์
+   กับ preview"): AI INVESTING sits with the derivatives, the 4th group is "…สุขภาพการเงิน", ASSET ALLOCATION closes group 1.
+   The preview's "ETF" / "DW" / "OPTIONS" cards open exactly the GLOBAL STOCK / TFEX / STRUCTURED NOTE books (checked
+   2026-10-20: same key questions and text) — those slots keep the real book names here, not the preview's card labels. */
 const GROUPS = [
-  { t: 'ภาพใหญ่ หุ้น และตราสาร', ids: ['macro', 'allocation', 'stock', 'global', 'bond', 'fund', 'dr'] },
-  { t: 'อนุพันธ์และผลิตภัณฑ์ซับซ้อน', ids: ['tfex', 'snote'] },
+  { t: 'ภาพใหญ่ หุ้น และตราสาร', ids: ['macro', 'stock', 'bond', 'fund', 'dr', 'global', 'allocation'] },
+  { t: 'อนุพันธ์และผลิตภัณฑ์ซับซ้อน', ids: ['ai', 'tfex', 'snote'] },
   { t: 'สินทรัพย์ทางเลือก', ids: ['gold', 'realestate', 'crypto', 'collectible'] },
-  { t: 'วางแผน ป้องกัน และเครื่องมือ', ids: ['tax', 'insurance', 'longevity', 'ai', 'scam'] },
+  { t: 'วางแผน ป้องกัน และสุขภาพการเงิน', ids: ['tax', 'insurance', 'longevity', 'scam'] },
 ];
 const ICON = {
   macro: 'lc-compass', allocation: 'lc-sliders', stock: 'lc-trending-up', global: 'lc-globe',
@@ -128,10 +132,14 @@ const pick = (o, keys) => keys.reduce((r, k) => (o[k] !== undefined && (r[k] = o
 
 fs.mkdirSync(OUT, { recursive: true });
 const index = [];
-let n = 0;
+/* "เล่ม N/18" keeps the source's own book order (the preview numbers STOCK 3/18 the same way), independent of how GROUPS
+   arranges the books on screen. */
+const BOOK_NO = ['macro', 'allocation', 'stock', 'global', 'bond', 'fund', 'dr', 'tfex', 'snote', 'gold', 'realestate', 'crypto',
+  'collectible', 'tax', 'insurance', 'longevity', 'ai', 'scam'];
 for (const g of GROUPS) {
   for (const id of g.ids) {
-    n++;
+    const n = BOOK_NO.indexOf(id) + 1;
+    if (!n) throw new Error(id + ': not in BOOK_NO');
     const d = JSON.parse(fs.readFileSync(path.join(SRC, 'data', id + '.json'), 'utf8'));
     const shortsFile = path.join(SRC, 'shorts', id + '.json');
     const sh = fs.existsSync(shortsFile) ? JSON.parse(fs.readFileSync(shortsFile, 'utf8')) : {};
