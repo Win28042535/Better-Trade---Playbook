@@ -356,6 +356,17 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-10-20 — PDF preview now shows the product's real book.** The ดาวน์โหลด Playbook preview used the design team's demo
+(`mockup/playbook-pdf/`, sample data). It now shows the real product's live-playbook render (persona Guardian, chosen as
+the sample). That page can't be framed (`X-Frame-Options: DENY`, per-user token, no-store) and isn't server-rendered: the
+Next page passes css + mainScript (the same A4 template as the demo) + initScript (the user's data written over the
+template's demo data) and the browser builds the sheets. `tools/sync-pdf-live.js "<live-playbook url>"` rebuilds exactly that
+as one standalone `preview.html` (standards mode, asset paths made relative, missing assets downloaded — cardback.jpg) and
+refreshes manifest.json; verified page-for-page identical to the live render (62 sheets, 59 numbered). The product's wrapper
+(header with a stale "56 หน้า", DEBUG panel, confirm bar) is not copied — the app's overlay stays (loading/error states,
+อ่านง่าย pan mode, offline copy). The demo page is kept as `demo.html` (`tools/sync-pdf-mockup.js` now writes that name).
+The link is per user: pass it on the command line, never commit it.
+
 **2026-10-20 — Playbook aligned with the real product's preview (วิเคราะห์ · พอร์ต · Asset Knowledge).** Read off
 preview-inevents.efin.finance (its Debug panels gave the scoring rules). (1) *วิเคราะห์*: Confidence = ความรู้ 35 + รู้จักตัวเอง 25
 + ลงมือ 25 + เปิดโลก 15 (`confCompute`; rules in its comment) — knowledge items `CONF_KNOW` (the preview's 31 per game), the

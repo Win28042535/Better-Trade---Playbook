@@ -1,5 +1,5 @@
 {
- "v": "0e65102206",
+ "v": "beb46e97a9",
  "files": [
   "assets/ICON_CRYPTO_PNG.webp",
   "assets/ICON_FUND_PNG.webp",
@@ -10,6 +10,7 @@
   "assets/analyst.jpg",
   "assets/baskervville-regular-sub.woff2",
   "assets/bt.png",
+  "assets/cardback.jpg",
   "assets/cinzel-caps-sub.woff2",
   "assets/collector.jpg",
   "assets/contrarian.jpg",
@@ -69,6 +70,7 @@
   "assets/topo.svg",
   "assets/waverider.jpg",
   "data/app/port/edu.js",
+  "demo.html",
   "js/library-data.js",
   "preview.html"
  ]

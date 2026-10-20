@@ -7,7 +7,7 @@
      node tools/sync-pdf-mockup.js [url]
      node tools/sync-pdf-mockup.js --manifest   (only rebuild manifest.json from the local copy, no fetch)
 
-   Copies the page (as preview.html — see PDF_SRC in dna-quiz-flow.html for why not index.html) + every js/, data/ and assets/ file it references. Some file names are built in its JS
+   Copies the page (as demo.html — the app shows preview.html, which tools/sync-pdf-live.js builds from the product) and the assets/js/data it uses + every js/, data/ and assets/ file it references. Some file names are built in its JS
    at runtime ('assets/'+img+'.svg', 'assets/playbook-cover-'+which+'.webp'), so those are listed in DYNAMIC below —
    they were read from the page's own network log; add to it if the preview shows a missing image after a sync. */
 'use strict';
@@ -74,7 +74,9 @@ if (ONLY_MANIFEST) { writeManifest(); process.exit(0); }
       try { fs.writeFileSync(dest, buf); return; } catch (e) { if (i >= 4) throw e; await new Promise((r) => setTimeout(r, 400 * (i + 1))); }
     }
   };
-  await writeSafe(path.join(OUT, 'preview.html'), html); // not index.html: Vercel cleanUrls would redirect it to the folder URL (see PDF_SRC)
+  // the design team's demo page is kept as demo.html; preview.html (what the app shows) is the product's real book since
+  // 2026-10-20 — written by tools/sync-pdf-live.js. Not index.html either: Vercel cleanUrls redirects it to the folder URL.
+  await writeSafe(path.join(OUT, 'demo.html'), html);
   try { fs.unlinkSync(path.join(OUT, 'index.html')); } catch (e) { /* already gone */ }
   let total = html.length, missing = [];
   // js files can reference more assets, so read them first
