@@ -356,6 +356,8 @@ for the next time a version A/B is needed, not as a pointer to live code.
 For quick orientation on what's newest and least battle-tested — worth a closer look in review.
 Newest first; each session's own commit(s) are named so you can `git show` for the full diff.
 
+**2026-10-20 — PDF preview audit with the real book (responsive · motion · scroll).** Checked 320 / 414 / 540 / 768 / 1440 and landscape 812×375: overlay full-screen, frame fills, no sideways page overflow, อ่านง่าย switch only below the 0.70 threshold (no sideways overflow in พอดีจอ), 44px close, 59 pages counted. The real book has no animations or transitions of its own (nothing for reduced motion to stop). Fixed: its 82 in-book links (สารบัญ, #pb-pN) used the frame's hash navigation, adding one browser-history entry per tap, so a phone's Back walked back through pages instead of leaving the preview — they now scroll to the page (no history), landing at its top edge, and return to the left edge when panning.
+
 **2026-10-20 — PDF preview now shows the product's real book.** The ดาวน์โหลด Playbook preview used the design team's demo
 (`mockup/playbook-pdf/`, sample data). It now shows the real product's live-playbook render (persona Guardian, chosen as
 the sample). That page can't be framed (`X-Frame-Options: DENY`, per-user token, no-store) and isn't server-rendered: the

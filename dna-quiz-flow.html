@@ -6513,6 +6513,16 @@ function openPdfPreview(opts){
     if(d)try{
       var st=d.createElement('style');st.textContent='.shell{flex-shrink:0}'; // its flex body would squeeze the 794px page when the viewport is narrower (panning)
       d.head.appendChild(st);d.documentElement.style.overflowX='hidden';d.body.style.overflowX='hidden';
+      /* in-book links (สารบัญ and the other 80 "#pb-pN" jumps, audit 2026-10-20): the frame's own hash navigation added a
+         browser-history entry per tap, so the phone's Back walked back through pages instead of leaving the preview. Jump
+         by scrolling instead (no history), and back to the left edge of the page when panning. Instant, like a book. */
+      d.addEventListener('click',function(e){
+        var a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;
+        var t=d.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));if(!t)return;
+        e.preventDefault();
+        var he=d.documentElement,y=t.getBoundingClientRect().top+Math.max(he.scrollTop,d.body.scrollTop);
+        he.scrollTop=y;d.body.scrollTop=y;he.scrollLeft=0;d.body.scrollLeft=0;
+      });
     }catch(e){}
     v.classList.add('ready');pdfFit();paint();
     // the mockup builds its sheets after its fonts load: wait for the numbered pages, then show the real count
