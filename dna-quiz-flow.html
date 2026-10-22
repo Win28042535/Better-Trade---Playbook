@@ -6301,12 +6301,12 @@ function tabHeadHTML(o){
   '</header>';
 }
 function efinBannerHTML(h){
-  var unlocked=curTier().name==='Master Class'||curTier().name==='Ultimate';
+  var unlocked=isUltimate();
   return '<div class="efin-banner scroll-reveal"><div class="efin-hd"><img class="efin-logo" src="'+LOGO_IMG.aiSymbol+'" alt="efin AI"><div class="efin-t">ให้ AI ช่วยแนะนำแบบคุณ</div></div>'+
     '<div class="efin-d">คัดลอกคำถามที่ปรับตามตัวตน '+h.th+' ของคุณไปคุยกับ efin AI ต่อได้ทันที</div>'+
     (unlocked
       ? '<div class="efin-acts"><button class="btn btn-primary" id="efinCopyBtn">'+ic('lc-copy')+'<span>คัดลอกคำถามไปถาม efin AI</span></button><button class="btn btn-secondary" id="efinOpenBtn"><span class="efin-ai-orb" aria-hidden="true"></span><span>เปิดหน้า efin AI</span></button></div>'
-      : '<div class="pe-locked">'+ic('lc-lock')+'<span>ปลดล็อกด้วยสิทธิ์บัตร Master Class ขึ้นไป</span></div>')+
+      : '<div class="pe-locked">'+ic('lc-lock')+'<span>ปลดล็อกด้วยบัตร Ultimate</span></div>')+
   '</div>';
 }
 /* Radar Chart DNA — "Insight-oriented": the DNA's own Visual Structure (Title → Supporting Context →
@@ -8543,6 +8543,11 @@ var TIER_META={
 /* PNG icon-set counterparts for the 3 tier keys above — used only by tierIcHTML (the pass-card),
    never by .prof-tier's plain ic() badge. */
 var TIER_ICON_PNG={'lc-crown':ICON_CROWN_PNG,'lc-gem':ICON_DIAMOND_PNG,'lc-compass':ICON_COMPASS_PNG};
+/* Ticket rule (2026-10-22, per direction): Ultimate differs from Explorer in exactly 3 things — the real card, downloading
+   the Playbook, and the efin AI prompt — plus the Conference summary after the event (kept Ultimate-only). Everything else
+   is the same for every ticket. The demo panel's "Master Class" option stays but behaves like Explorer (on the site Master
+   Class is a per-class add-on, not a tier). */
+function isUltimate(){return curTier().name==='Ultimate';}
 function curTier(){var s=document.getElementById('demoTier');var n=(s&&s.value)||'Master Class';return {name:n,meta:TIER_META[n]||TIER_META['Master Class']};}
 /* Multi-ticket demo preview (2026-09-02, per direction "จำลองเคส...ลูกค้าบัตร 2 แบบ [เช่น] ซื้อบัตร
    Ultimate แล้ว ซื้อ Master class เพิ่ม", revised same day per follow-up direction — Profile's
@@ -8576,7 +8581,7 @@ var LIFECYCLE_CTA={
   3:{body:'ผลของคุณครบแล้ว — อัปเกรดเป็น Ultimate เพื่อดูสรุปและวิดีโอย้อนหลังครบทุกแทร็ก',primary:'อัปเกรดเป็น Ultimate'},
   4:{body:'สิทธิ์ครบทุกอย่างแล้ว — ดูผลและ e-book ย้อนหลังได้บน efin.finance',primary:'เปิดใช้ efin.finance'}
 };
-function tierLevel(name){return name==='Ultimate'?4:(name==='Master Class'?3:2);}
+function tierLevel(name){return name==='Ultimate'?4:2;} // Master Class behaves like Explorer (2026-10-22)
 function postEventState(){
   var ti=tierLevel(curTier().name);
   var confOK=ti>=4;
@@ -8593,7 +8598,7 @@ function postEventState(){
   var vdos=[];
   if(confOK)vdos.push({title:'Conference (ย้อนหลัง)',note:'ครบทั้ง 2 วัน · ดูซ้ำได้หลังงาน',icon:'lc-landmark'});
   var ebookNote=confOK?'สิทธิ Ultimate · เปิดครบทุกแทร็ก':'ล็อกตามสิทธิบัตร — อัปเกรดเพื่อดาวน์โหลดสรุปและดูย้อนหลัง';
-  var progressUnlocked=ti>=3;
+  var progressUnlocked=true; // not one of Ultimate's extras (2026-10-22) — open to every ticket
   var progressNote=progressUnlocked?'ปลดแล้ว — เราสรุปพัฒนาการให้หลังงาน ดูย้อนหลังได้บน efin.finance':'ปลดด้วยบัตร Master Class ขึ้นไป เพื่อให้เราสรุปพัฒนาการให้หลังงาน';
   return {ti:ti,tracks:tracks,vdos:vdos,ebookNote:ebookNote,progressUnlocked:progressUnlocked,progressNote:progressNote,cta:LIFECYCLE_CTA[ti]};
 }
@@ -9345,8 +9350,7 @@ function buildRoute(){
   // — matches the entitlement table's "แผนที่เดินบูธ" row: ยังไม่สมัคร/สมาชิกฟรี/Explorer stay on the
   // generic "ภาพรวม" order regardless of quiz status). RESULT alone used to be enough; the tier half
   // was missing (2026-08-28, per direction "เปิดแต่จะโชว์ตามสิทธ์").
-  var tierOk=curTier().name==='Master Class'||curTier().name==='Ultimate';
-  var personalized=!!h&&tierOk;
+  var personalized=!!h; // every ticket gets the persona-ordered route since 2026-10-22 (the map isn't one of Ultimate's 3 extras)
   var out=personalized?zs.slice().sort(function(a,b){return b.score-a.score;}):zs;
   out.forEach(function(z,i){z.topPick=personalized&&i===0;z.newAngle=personalized&&i===out.length-1;});
   /* leading card-redemption stop, then the 5 (ordered) asset zones — matches source `zones`. */
@@ -9378,13 +9382,13 @@ function renderBooth(){
   var pre=DEMO.eventPhase==='pre';
   // Same personalized-map condition as buildRoute() (RESULT + qualifying tier) — recomputed here
   // rather than exposed off buildRoute's return so its per-stop array shape stays untouched.
-  var mapPersonalized=!!RESULT&&(curTier().name==='Master Class'||curTier().name==='Ultimate');
+  var mapPersonalized=!!RESULT; // same for every ticket (2026-10-22)
   /* Map tier split (2026-09-10, per direction) — Explorer sees ONLY the bare map image (no header/
      badge, no v2 tracking markers, no zone route-list below); Master Class/Ultimate keep the full
      experience unchanged. Deliberately keyed on the tier alone, not mapPersonalized (which also
      requires RESULT) — an Explorer ticket-holder without a RESULT yet still gets the minimal map,
      never the full one. */
-  var mapOnly=curTier().name==='Explorer';
+  var mapOnly=false; // 2026-10-22: Explorer gets the full map too (was the bare image only); the branch below is kept for history
   var chk=boothCheckinCount(),act=boothActivityCount();
   var chkOK=chk>=CHECKIN_NEED,actOK=act>=ACTIVITY_NEED;
   /* DEMO.draw force (2026-08-26, per direction "อยากให้จำลองเคส...ไว้ด้วย กรณีครบเงื่อนไขแล้ว และ
