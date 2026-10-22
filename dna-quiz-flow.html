@@ -2604,6 +2604,26 @@ a.apb-xb:not(.apb-tool-a):focus-visible{outline:2px solid var(--focus);outline-o
 .ag-time{flex:0 0 auto;white-space:nowrap;font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--violet);line-height:1.45;font-family:var(--font);}
 .ag-t{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.4;}
 .ag-by{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;}
+/* agenda rooms (2026-10-22): room tabs under the day tabs, the room's own line (Thai name + who gets in, plain text), a
+   start/end time column (end muted underneath; rows with no time, e.g. a Workshop BREAK, keep the column), the session's
+   Thai one-liner, Workshop room 1/2 sub-heads, Master Class price + ซื้อบัตร link, and the site's "may change" note */
+.ag-rooms{margin-top:var(--sp-list);}
+/* mobile view: 4 rooms in a 2×2 grid — as a scrolling row "Master Class" was cut off at 375px */
+:root[data-view="mobile"] .ag-rooms{display:grid;grid-template-columns:1fr 1fr;overflow:visible;}
+:root[data-view="mobile"] .ag-rooms .bt-tab{flex:none;width:auto;min-width:0;}
+.ag-acc{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-glue) var(--sp-list);margin-top:var(--sp-stack);font-size:var(--fs-eyebrow);color:var(--muted);}
+.ag-acc-th{font-weight:var(--w-label);color:var(--ink);}
+.ag-acc-chip{display:inline-flex;align-items:center;padding:3px var(--sp-inline);border-radius:var(--rpill);background:var(--cloud);color:var(--ink);font-weight:var(--w-label);}
+.ag-time{flex:0 0 3.3em;} /* one fixed column: start times differ in width and a BREAK row has none */
+.ag-end{display:block;font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);}
+.ag-c{min-width:0;}
+.ag-sum{font-size:var(--fs-eyebrow);color:var(--ink);line-height:1.45;margin-top:2px;}
+.ag-sub{margin-top:var(--sp-stack);font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--violet);text-transform:uppercase;letter-spacing:.04em;}
+.ag-buy{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-list);margin-top:var(--sp-list);}
+.ag-price{font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--ink);}
+.ag-buy-a{display:inline-flex;align-items:center;gap:4px;min-height:32px;padding:0 var(--sp-inline);border-radius:var(--rpill);border:1px solid var(--line-strong);font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--ink);text-decoration:none;}
+.ag-buy-a svg{width:14px;height:14px;}
+.ag-note{margin-top:var(--sp-stack);font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;}
 .ag-more{width:100%;margin-top:var(--sp-inline);display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-glue);border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-weight:var(--w-head);font-size:var(--fs-bodysm);min-height:44px;border-radius:var(--r1);cursor:pointer;transition:transform .15s var(--ease),background .15s var(--ease);}
 .ag-more svg{width:var(--ic-sm);height:var(--ic-sm);}
 /* Chevron now actually flips (2026-08-28, per direction "กรณีย่อรายการ...ไอคอนต้องเป็น top...ตอนนี้ยัง
@@ -4569,6 +4589,8 @@ html.pdfv-open,html.pdfv-open body{overflow:hidden;}
   window.mountLiquidMetalButtonInto = mountLiquidMetalButtonInto;
   window.dispatchEvent(new Event('lmb:ready'));
 </script>
+<!-- Home กำหนดการ data from the registration website (tools/sync-agenda.js) — a plain script so file:// works too -->
+<script src="assets/agenda.js"></script>
 
 <script>
 /* Icon asset audit (2026-09-11, per direction "ไอคอน spectrum ทั้งหมดในระบบ audit เรื่อง size, item
@@ -8500,7 +8522,7 @@ function resetQuiz(){st={phase:'splash',spidx:0,idx:0,s1:[null,null,null],s2:[nu
 /* ══ HOME TAB ══ content ported verbatim from Playbook Final's Home screen (see PLAYBOOK-2026-DATA-
    BASELINE.md §5). Progress values are mock and kept consistent with the Book page's own "2/6 ด้าน"
    example data so the whole app reads as one coherent (example-tagged) state, not real tracking. */
-var HOME_MST={agendaDay:1,agendaAll:false};
+var HOME_MST={agendaDay:1,agendaRoom:'conf',agendaAll:false};
 /* tier meta — the 3 tiers the demo panel exposes (from source tierMeta: Explorer/Master Class/
    Ultimate rungs; Visitor/Free omitted since the demo can't select them). Each tier now has its
    own distinct icon key (2026-08-26, per direction — "ประเภทของบัตร...3 ประเภท" — Ultimate=มงกุฎ/
@@ -8511,9 +8533,11 @@ var HOME_MST={agendaDay:1,agendaAll:false};
    below); the ICON_*_PNG lookup in tierIcHTML below is what swaps these same 3 keys to the
    full-color icon-set art specifically for the "บัตรของคุณ" pass-card. */
 var TIER_META={
-  'Explorer':{sub:'สมาชิกระดับสำรวจ · 150/200 บาท',icon:'lc-compass'},
-  'Master Class':{sub:'Playbook เต็ม + เวิร์กช็อป · 990/1,890 บาท',icon:'lc-gem'},
-  'Ultimate':{sub:'ทุกสิทธิ์ + การ์ดตัวจริง · 1,500/2,500 บาท',icon:'lc-crown'}
+  /* benefit lines + prices as on the registration site's ticket section (2026-10-22): Explorer 1/2 days 150/200; Master Class
+     is bought per class (490 / 990 / 1,190); Ultimate 1/2 days 1,500/2,500 */
+  'Explorer':{sub:'เดินชมงาน สัมผัสทุกประสบการณ์ · 150/200 บาท',icon:'lc-compass'},
+  'Master Class':{sub:'เจาะลึกเฉพาะทางกับตัวจริง กลุ่มเล็ก · 490–1,190 บาท/คลาส',icon:'lc-gem'},
+  'Ultimate':{sub:'ครบทุกเวที พร้อม Playbook ฉบับเต็ม · 1,500/2,500 บาท',icon:'lc-crown'}
 };
 /* PNG icon-set counterparts for the 3 tier keys above — used only by tierIcHTML (the pass-card),
    never by .prof-tier's plain ic() badge. */
@@ -8547,7 +8571,7 @@ var CONF_SUMMARY=[{d:1,pg:38},{d:2,pg:34}];
 /* CTA copy verbatim from the source's `CTA` lifecycle object, keyed by the source's own tier index
    (2 Explorer / 3 Master Class / 4 Ultimate — this demo has no free/visitor tiers below Explorer). */
 var LIFECYCLE_CTA={
-  2:{body:'Explorer เล่นเกมได้ครบ — อัปเกรด Master Class (990 บาท) เพื่ออ่านผลตัวตนและเรดาร์',primary:'อัปเกรด Master Class'},
+  2:{body:'Explorer เดินชมงานและเล่นเกมได้ครบ — อัปเกรดเป็น Ultimate (1 วัน 1,500 บาท) เพื่อเข้า Conference และ Workshop พร้อม Playbook ฉบับเต็ม',primary:'อัปเกรดเป็น Ultimate'}, // price/benefit per the registration site (2026-10-22): Master Class is a per-class ticket, not an upgrade step
   3:{body:'ผลของคุณครบแล้ว — อัปเกรดเป็น Ultimate เพื่อดูสรุปและวิดีโอย้อนหลังครบทุกแทร็ก',primary:'อัปเกรดเป็น Ultimate'},
   4:{body:'สิทธิ์ครบทุกอย่างแล้ว — ดูผลและ e-book ย้อนหลังได้บน efin.finance',primary:'เปิดใช้ efin.finance'}
 };
@@ -8641,32 +8665,44 @@ var HOME_ANN=[
   {icon:'lc-hourglass',color:'var(--violet)',t:'ปิดรับสิทธิ์ลุ้นรางวัลใหญ่ 16:00 น. วันที่ 2',s:'ประกาศผล 17:30 น. ที่เวทีห้องใหญ่'},
   {icon:'lc-gift',color:'var(--pink)',t:'การ์ดตัวจริง แลกที่จุดแลกรับการ์ดตัวจริง',s:'สิทธิบัตร Ultimate · 1 คน 1 ใบ · มีจำนวนจำกัด'}
 ];
-/* agenda — verbatim from AGENDA_D1/AGENDA_D2 in Playbook Final (main stage, both days). */
-var AGENDA_D1=[
-  {time:'09:00',t:'ลงทะเบียน',by:'Samyan Mitrtown ชั้น 5'},
-  {time:'10:05',t:'Opening Session · Intelligent Investor',by:'ศ.พิเศษ กิติพงศ์ อุรพีพัฒนพงศ์'},
-  {time:'10:20',t:'มองเหนือกระแสเศรษฐกิจ ปรับทิศการลงทุน',by:'Reframe your global vision'},
-  {time:'11:20',t:'ทองคำ หลุมหลบภัย หรือพลังขับเคลื่อนพอร์ต',by:'นพ.กฤชรัตน์ หิรัณยศิริ'},
-  {time:'11:50',t:'พักเบรค · จับรางวัลครั้งที่ 1',by:'เวทีห้องใหญ่'},
-  {time:'12:45',t:'ตั้งรับความเสี่ยงอย่างชาญฉลาด เห็นโอกาสปี 2026',by:'คุณทรงพล ชีวะปัญญาโรจน์ · คุณเอนก อยู่ยืน · คุณชวินดา หาญรัตนกูล'},
-  {time:'14:00',t:'อ่านเกมเศรษฐกิจโลก 2026 · โอกาสในความผันผวน',by:'ดร.กอบศักดิ์ ภูตระกูล'},
-  {time:'15:10',t:'พอร์ตทนทุกพายุ · Asset Allocation ฉบับนักลงทุนไทย',by:'คุณกวี ชูกิจเกษม'},
-  {time:'16:20',t:'คริปโต & สินทรัพย์ดิจิทัล · จับจังหวะอย่างมีวินัย',by:'คุณพิริยะ สัมพันธารักษ์'},
-  {time:'17:30',t:'จับรางวัลใหญ่ · ปิดวันแรก',by:'เวทีห้องใหญ่'},
-  {time:'18:30',t:'ปิดงานวันที่ 1',by:''}
-];
-var AGENDA_D2=[
-  {time:'09:00',t:'ลงทะเบียน',by:'Samyan Mitrtown ชั้น 5'},
-  {time:'10:00',t:'ภาษีกับการลงทุน · จ่ายให้น้อย ถูกกฎหมาย',by:'TAXBugnom'},
-  {time:'11:00',t:'หุ้นปันผล · สร้างกระแสเงินสดระยะยาว',by:'ดร.นิเวศน์ เหมวชิรวรากร'},
-  {time:'12:00',t:'พักเบรค · จับรางวัลครั้งที่ 2',by:'เวทีห้องใหญ่'},
-  {time:'13:00',t:'อ่านงบการเงินใน 15 นาที · จับสัญญาณก่อนคนอื่น',by:'ผศ.ดร.อุดมศักดิ์ รักวงษ์วาน'},
-  {time:'14:10',t:'ลงทุนต่างประเทศ · เปิดพอร์ตข้ามพรมแดน',by:'คุณวชิรเมษฐ์ ธเนศสถิตพงษ์'},
-  {time:'15:20',t:'เซียนหุ้นถอดบทเรียน · 20 ปีในตลาด',by:'เซียนมี่ คุณทิวา ชินธาดาพงศ์'},
-  {time:'16:00',t:'ปิดรับสิทธิ์ลุ้นรางวัลใหญ่',by:'ระบบปิดอัตโนมัติ'},
-  {time:'17:30',t:'ประกาศผลรางวัลใหญ่',by:'เวทีห้องใหญ่'},
-  {time:'18:30',t:'ปิดงาน',by:''}
-];
+/* Agenda (2026-10-22, per direction "ใช้ข้อมูลอ้างอิงจริงตามเว็บลงทะเบียนทั้งหมด") — every room of both days from the
+   registration website: window.BT_AGENDA (assets/agenda.js, written by tools/sync-agenda.js — re-run when the site
+   changes). Replaces the old AGENDA_D1/D2 (main stage only, from Playbook Final, no longer matching the real programme).
+   Day tabs → room tabs (Conference · Experience · Workshop · Master Class) → that room's list; each room shows who gets in
+   as plain text (no locking, user's call), Master Class rows carry the site's per-class price + its ซื้อบัตร link. */
+function agData(){return window.BT_AGENDA&&window.BT_AGENDA.days?window.BT_AGENDA:null;}
+function agTimes(s){var m=String(s||'').split(/\s*[–-]\s*/);return {a:m[0]||'',b:m[1]||''};}
+function agRowHTML(r){
+  var tm=agTimes(r.time);
+  return '<div class="ag-row"><div class="ag-time">'+(tm.a?apbEsc(tm.a)+(tm.b?'<span class="ag-end">'+apbEsc(tm.b)+'</span>':''):'')+'</div><div class="ag-c">'+
+    '<div class="ag-t">'+apbEsc(r.t)+'</div>'+(r.sum?'<div class="ag-sum">'+apbEsc(r.sum)+'</div>':'')+(r.by?'<div class="ag-by">'+apbEsc(r.by)+'</div>':'')+
+    (r.buy?'<div class="ag-buy">'+(r.price?'<span class="ag-price">'+apbEsc(r.price)+'</span>':'')+'<a class="ag-buy-a" href="'+apbEsc(r.buy)+'" target="_blank" rel="noopener noreferrer">ซื้อบัตร'+ic('lc-external-link')+'</a></div>':'')+
+  '</div></div>';
+}
+function agendaHTML(){
+  var A=agData();
+  if(!A)return '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">กำหนดการ</div><div class="hcard-s">ยังโหลดกำหนดการไม่ได้</div></div></section>';
+  var day=A.days.filter(function(d){return d.d===HOME_MST.agendaDay;})[0]||A.days[0];
+  var room=day.rooms.filter(function(r){return r.key===HOME_MST.agendaRoom;})[0]||day.rooms[0];
+  var rows=[].concat.apply([],room.tables.map(function(t){return t.rows;})),timed=rows.filter(function(r){return r.time;});
+  var span=timed.length?agTimes(timed[0].time).a+'–'+(agTimes(timed[timed.length-1].time).b||agTimes(timed[timed.length-1].time).a)+' น. · ':'';
+  // one long list folds to its first 3 rows; rooms split into sub-rooms (Workshop) are short — always shown whole
+  var fold=room.tables.length===1&&rows.length>4,open=HOME_MST.agendaAll||!fold;
+  var list=room.tables.map(function(t){
+    var rs=open?t.rows:t.rows.slice(0,3);
+    return (room.tables.length>1?'<div class="ag-sub">'+apbEsc(t.room)+'</div>':'')+'<div class="ag-list">'+rs.map(agRowHTML).join('')+'</div>';
+  }).join('');
+  return '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">กำหนดการ</div><div class="hcard-s">'+span+'Samyan Mitrtown Hall ชั้น 5</div></div>'+
+    '<div class="bt-tabs bt-tabs--primary" id="agTabs" role="tablist" aria-label="เลือกวันที่กำหนดการ">'+A.days.map(function(d){
+      return '<button class="bt-tab" type="button" role="tab" aria-selected="'+(d.d===day.d)+'" data-value="'+d.d+'"><span class="bt-tab-label">วันที่ '+d.d+' ✦ '+apbEsc(d.date.replace(/ 25\d\d$/,''))+'</span></button>';}).join('')+'</div>'+
+    '<div class="bt-tabs bt-tabs--secondary ag-rooms" id="agRooms" role="tablist" aria-label="เลือกห้อง">'+day.rooms.map(function(r){
+      return '<button class="bt-tab" type="button" role="tab" aria-selected="'+(r.key===room.key)+'" data-value="'+r.key+'"><span class="bt-tab-label">'+apbEsc(r.label)+'</span></button>';}).join('')+'</div>'+
+    '<div class="ag-acc"><span class="ag-acc-th">'+apbEsc(room.th)+'</span>'+(room.access?'<span class="ag-acc-chip">'+apbEsc(room.access)+'</span>':'')+'</div>'+
+    list+
+    (fold?'<button class="ag-more" id="agMore">'+ic('lc-chevron-down',HOME_MST.agendaAll?'ag-more-ic open':'ag-more-ic')+(HOME_MST.agendaAll?'ย่อกำหนดการ':('ดูกำหนดการทั้งวัน '+rows.length+' รายการ'))+'</button>':'')+
+    (A.note?'<p class="ag-note">'+apbEsc(A.note)+'</p>':'')+
+  '</section>';
+}
 /* Logo dropped efin (2026-08-20, per direction "หน้าหลัก เดินบูธ เกมส์หลัก โปรไฟล์ ให้โลโก้เหลือแค่
    better trade...อ้างอิงตาม header ของหน้าคู่มือ") — swaps the combined efin×BetterTrade lockup
    (LOGO_IMG.efinBT) for the standalone BetterTrade mark (LOGO_IMG.bt), matching renderBook's own
@@ -8758,8 +8794,6 @@ function renderHome(){
   // agnostic poster + tier card + the two informational sections (agenda/announcements).
   var pre=DEMO.eventPhase==='pre';
   var ns=homeNext(),t=curTier();
-  var days=(HOME_MST.agendaDay===2?AGENDA_D2:AGENDA_D1);
-  var shown=HOME_MST.agendaAll?days:days.slice(0,3);
   /* On-Event + no RESULT branch added (2026-09-01, same direction as homeNext()'s on-event branch
      above) — this row's onclick always sends to st.phase='book' regardless of RESULT, which already
      resolves safely (renderBook's own !RESULT guard redirects to splash, and render()'s on-event gate
@@ -8806,11 +8840,7 @@ function renderHome(){
     '<section class="next-step scroll-reveal"><div class="ns-ic">'+(ns.iconPng?'<img src="'+ns.iconPng+'" alt="">':ic(ns.icon))+'</div><div class="ns-tx"><div class="ns-ey">'+ns.ey+'</div><div class="ns-t">'+ns.t+'</div></div><div class="ns-cta-slot" id="ns-cta-slot"></div><div class="ns-body"><div class="ns-b">'+ns.b+'</div></div></section>'+
     '<div class="home-counters scroll-reveal">'+HOME_COUNTERS.map(function(c){return '<button class="hc-card" data-go="'+c.go+'"><svg viewBox="0 0 24 24" class="lucide" style="color:'+c.color+'"><use href="#'+c.icon+'"/></svg><div class="hc-val">'+c.val()+'</div><div class="hc-label">'+c.label+'</div></button>';}).join('')+'</div>'+
     '<div class="list-row book-teaser" id="homeBook"><div class="klib-tx"><div class="bt-t"><img class="bt-t-ic" src="'+ICON_BOOK_PNG+'" alt="">Playbook ลงทุนของคุณ</div><div class="bt-s">'+bookTeaser+'</div></div>'+ic('lc-chevron-right','bt-cv')+'</div>'))+
-    '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">เวทีห้องใหญ่</div><div class="hcard-s">09.00–18.30 น. · Samyan Mitrtown ชั้น 5 · เวทีเดียว 2 วัน กำหนดการคนละชุด</div></div>'+
-      '<div class="bt-tabs bt-tabs--primary" id="agTabs" role="tablist" aria-label="เลือกวันที่กำหนดการ"><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===1?'true':'false')+'" data-value="1"><span class="bt-tab-label">วันที่ 1 ✦ 31 ต.ค.</span></button><button class="bt-tab" type="button" role="tab" aria-selected="'+(HOME_MST.agendaDay===2?'true':'false')+'" data-value="2"><span class="bt-tab-label">วันที่ 2 ✦ 1 พ.ย.</span></button></div>'+
-      '<div class="ag-list">'+shown.map(function(a){return '<div class="ag-row"><div class="ag-time">'+a.time+'</div><div><div class="ag-t">'+a.t+'</div>'+(a.by?'<div class="ag-by">'+a.by+'</div>':'')+'</div></div>';}).join('')+'</div>'+
-      (days.length>3?('<button class="ag-more" id="agMore">'+ic('lc-chevron-down',HOME_MST.agendaAll?'ag-more-ic open':'ag-more-ic')+(HOME_MST.agendaAll?'ย่อกำหนดการ':('ดูกำหนดการทั้งวัน '+days.length+' รายการ'))+'</button>'):'')+
-    '</section>'+
+    agendaHTML()+
     '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">ประกาศจากงาน</div></div>'+
       HOME_ANN.map(function(a){return '<div class="ann-row"><div><div class="ann-t">'+a.t+'</div><div class="ann-s">'+a.s+'</div></div></div>';}).join('')+
     '</section>'+
@@ -8821,6 +8851,10 @@ function renderHome(){
   var homeBook=root.querySelector('#homeBook');if(homeBook)homeBook.onclick=function(){st.phase='book';render();};
   root.querySelector('#homeTier').onclick=function(){st.phase='profile';render();};
   root.querySelectorAll('.hc-card').forEach(function(c){c.onclick=function(){st.phase=c.dataset.go;render();};});
+  initBtTabs(root.querySelector('#agRooms'),function(value){
+    HOME_MST.agendaRoom=value;HOME_MST.agendaAll=false;renderHome();
+    var fr=root.querySelector('#agRooms [aria-selected="true"]');if(fr)fr.focus({preventScroll:true}); // same refocus as the day tabs below
+  });
   initBtTabs(root.querySelector('#agTabs'),function(value){
     HOME_MST.agendaDay=parseInt(value,10);HOME_MST.agendaAll=false;renderHome();
     // renderHome() replaces #agTabs wholesale (unlike ddTabs' local-repaint case below), which

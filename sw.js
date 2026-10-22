@@ -14,10 +14,10 @@
 //
 // Bump APB_CACHE when the book file list changes (tools/build-asset-playbooks.js) so a stale cache is
 // dropped on activate.
-var APB_CACHE = 'apb-v3'; // v3 2026-10-12: 18 books (+ allocation, global, tfex, snote)
+var APB_CACHE = 'apb-v4'; // v4 2026-10-22: + assets/agenda.js // v3 2026-10-12: 18 books (+ allocation, global, tfex, snote)
 var APB_FILES = ['index', 'macro', 'allocation', 'stock', 'global', 'bond', 'fund', 'dr', 'tfex', 'snote',
   'gold', 'realestate', 'crypto', 'collectible', 'tax', 'insurance', 'longevity', 'ai', 'scam'].map(function (f) { return 'assets/playbooks/' + f + '.js'; })
-  .concat(['assets/port/edu.js']); // Playbook พอร์ต tab data (2026-10-08, tools/build-port-education.js)
+  .concat(['assets/port/edu.js', 'assets/agenda.js']); // Playbook พอร์ต tab data (2026-10-08, tools/build-port-education.js)
 
 self.addEventListener('install', function (e) {
   if (/^(localhost|127\.0\.0\.1)$/.test(self.location.hostname)) { e.waitUntil(self.skipWaiting()); return; } // dev: no pre-cache
@@ -94,7 +94,7 @@ self.addEventListener('fetch', function (e) {
     e.respondWith(pdfHit(req).then(function (hit) { return hit || swr(req); }).then(unredirect));
     return;
   }
-  if (!DEV_HOST && req.method === 'GET' && (req.url.indexOf('/assets/playbooks/') > -1 || req.url.indexOf('/assets/port/') > -1)) {
+  if (!DEV_HOST && req.method === 'GET' && (req.url.indexOf('/assets/playbooks/') > -1 || req.url.indexOf('/assets/port/') > -1 || req.url.indexOf('/assets/agenda.js') > -1)) {
     e.respondWith(swr(req).then(unredirect));
     return;
   }
