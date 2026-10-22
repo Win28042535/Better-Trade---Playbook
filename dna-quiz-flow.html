@@ -2606,8 +2606,11 @@ a.apb-xb:not(.apb-tool-a):focus-visible{outline:2px solid var(--focus);outline-o
 .ag-by{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;}
 /* agenda rooms (2026-10-22): room tabs under the day tabs, the room's own line (Thai name + who gets in, plain text), a
    start/end time column (end muted underneath; rows with no time, e.g. a Workshop BREAK, keep the column), the session's
-   Thai one-liner, Workshop room 1/2 sub-heads, Master Class price + ซื้อบัตร link, and the site's "may change" note */
+   Thai one-liner, Workshop room 1/2 sub-heads, Master Class price, and the site's "may change" note */
 .ag-rooms{margin-top:var(--sp-list);}
+/* left-aligned (2026-10-22, per direction), not centred like the other secondary tab rows — the view-prefixed selectors
+   match the specificity of the shared tablet/pc centring rule */
+:root[data-view="tablet"] .bt-tabs--secondary.ag-rooms,:root[data-view="pc"] .bt-tabs--secondary.ag-rooms,.bt-tabs--secondary.ag-rooms{justify-content:flex-start;}
 /* mobile view: 4 rooms in a 2×2 grid — as a scrolling row "Master Class" was cut off at 375px */
 :root[data-view="mobile"] .ag-rooms{display:grid;grid-template-columns:1fr 1fr;overflow:visible;}
 :root[data-view="mobile"] .ag-rooms .bt-tab{flex:none;width:auto;min-width:0;}
@@ -2621,8 +2624,6 @@ a.apb-xb:not(.apb-tool-a):focus-visible{outline:2px solid var(--focus);outline-o
 .ag-sub{margin-top:var(--sp-stack);font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--violet);text-transform:uppercase;letter-spacing:.04em;}
 .ag-buy{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-list);margin-top:var(--sp-list);}
 .ag-price{font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--ink);}
-.ag-buy-a{display:inline-flex;align-items:center;gap:4px;min-height:32px;padding:0 var(--sp-inline);border-radius:var(--rpill);border:1px solid var(--line-strong);font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--ink);text-decoration:none;}
-.ag-buy-a svg{width:14px;height:14px;}
 .ag-note{margin-top:var(--sp-stack);font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;}
 .ag-more{width:100%;margin-top:var(--sp-inline);display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-glue);border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-weight:var(--w-head);font-size:var(--fs-bodysm);min-height:44px;border-radius:var(--r1);cursor:pointer;transition:transform .15s var(--ease),background .15s var(--ease);}
 .ag-more svg{width:var(--ic-sm);height:var(--ic-sm);}
@@ -8669,14 +8670,14 @@ var HOME_ANN=[
    registration website: window.BT_AGENDA (assets/agenda.js, written by tools/sync-agenda.js — re-run when the site
    changes). Replaces the old AGENDA_D1/D2 (main stage only, from Playbook Final, no longer matching the real programme).
    Day tabs → room tabs (Conference · Experience · Workshop · Master Class) → that room's list; each room shows who gets in
-   as plain text (no locking, user's call), Master Class rows carry the site's per-class price + its ซื้อบัตร link. */
+   as plain text (no locking, user's call), Master Class rows carry the site's per-class price (no buy link: the agenda is view-only). */
 function agData(){return window.BT_AGENDA&&window.BT_AGENDA.days?window.BT_AGENDA:null;}
 function agTimes(s){var m=String(s||'').split(/\s*[–-]\s*/);return {a:m[0]||'',b:m[1]||''};}
 function agRowHTML(r){
   var tm=agTimes(r.time);
   return '<div class="ag-row"><div class="ag-time">'+(tm.a?apbEsc(tm.a)+(tm.b?'<span class="ag-end">'+apbEsc(tm.b)+'</span>':''):'')+'</div><div class="ag-c">'+
     '<div class="ag-t">'+apbEsc(r.t)+'</div>'+(r.sum?'<div class="ag-sum">'+apbEsc(r.sum)+'</div>':'')+(r.by?'<div class="ag-by">'+apbEsc(r.by)+'</div>':'')+
-    (r.buy?'<div class="ag-buy">'+(r.price?'<span class="ag-price">'+apbEsc(r.price)+'</span>':'')+'<a class="ag-buy-a" href="'+apbEsc(r.buy)+'" target="_blank" rel="noopener noreferrer">ซื้อบัตร'+ic('lc-external-link')+'</a></div>':'')+
+    (r.price?'<div class="ag-buy"><span class="ag-price">'+apbEsc(r.price)+'</span></div>':'')+ // price only: the agenda is view-only, no ซื้อบัตร link (2026-10-22, per direction)
   '</div></div>';
 }
 function agendaHTML(){
