@@ -2604,26 +2604,13 @@ a.apb-xb:not(.apb-tool-a):focus-visible{outline:2px solid var(--focus);outline-o
 .ag-time{flex:0 0 auto;white-space:nowrap;font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--violet);line-height:1.45;font-family:var(--font);}
 .ag-t{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.4;}
 .ag-by{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;}
-/* agenda rooms (2026-10-22): room tabs under the day tabs, the room's own line (Thai name + who gets in, plain text), a
-   start/end time column (end muted underneath; rows with no time, e.g. a Workshop BREAK, keep the column), the session's
-   Thai one-liner, Workshop room 1/2 sub-heads, Master Class price, and the site's "may change" note */
-.ag-rooms{margin-top:var(--sp-list);}
-/* left-aligned (2026-10-22, per direction), not centred like the other secondary tab rows — the view-prefixed selectors
-   match the specificity of the shared tablet/pc centring rule */
-:root[data-view="tablet"] .bt-tabs--secondary.ag-rooms,:root[data-view="pc"] .bt-tabs--secondary.ag-rooms,.bt-tabs--secondary.ag-rooms{justify-content:flex-start;}
-/* mobile view: 4 rooms in a 2×2 grid — as a scrolling row "Master Class" was cut off at 375px */
-:root[data-view="mobile"] .ag-rooms{display:grid;grid-template-columns:1fr 1fr;overflow:visible;}
-:root[data-view="mobile"] .ag-rooms .bt-tab{flex:none;width:auto;min-width:0;}
-.ag-acc{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-glue) var(--sp-list);margin-top:var(--sp-stack);font-size:var(--fs-eyebrow);color:var(--muted);}
-.ag-acc-th{font-weight:var(--w-label);color:var(--ink);}
-.ag-acc-chip{display:inline-flex;align-items:center;padding:3px var(--sp-inline);border-radius:var(--rpill);background:var(--cloud);color:var(--ink);font-weight:var(--w-label);}
+/* agenda rows (2026-10-22): a start/end time column (end muted underneath; rows with no time keep the column), the
+   session's Thai one-liner and the site's "may change" note. Conference only since 2026-10-26 (room tabs, room access
+   line, Workshop sub-heads and Master Class price removed, per direction). */
 .ag-time{flex:0 0 3.3em;} /* one fixed column: start times differ in width and a BREAK row has none */
 .ag-end{display:block;font-size:var(--fs-eyebrow);font-weight:var(--w-body);color:var(--muted);}
 .ag-c{min-width:0;}
 .ag-sum{font-size:var(--fs-eyebrow);color:var(--ink);line-height:1.45;margin-top:2px;}
-.ag-sub{margin-top:var(--sp-stack);font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--violet);text-transform:uppercase;letter-spacing:.04em;}
-.ag-buy{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-list);margin-top:var(--sp-list);}
-.ag-price{font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--ink);}
 .ag-note{margin-top:var(--sp-stack);font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;}
 .ag-more{width:100%;margin-top:var(--sp-inline);display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-glue);border:1px solid var(--line-soft);background:var(--white);color:var(--ink);font-family:var(--font);font-weight:var(--w-head);font-size:var(--fs-bodysm);min-height:44px;border-radius:var(--r1);cursor:pointer;transition:transform .15s var(--ease),background .15s var(--ease);}
 .ag-more svg{width:var(--ic-sm);height:var(--ic-sm);}
@@ -4305,6 +4292,9 @@ html.pdfv-open,html.pdfv-open body{overflow:hidden;}
 .go-top svg{width:var(--ic-lg);height:var(--ic-lg);}
 .demo-panel{position:fixed;right:18px;bottom:calc(80px + env(safe-area-inset-bottom,0px));z-index:9999;width:308px;max-height:80vh;overflow-y:auto;background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);box-shadow:var(--shadow-lg);padding:var(--sp-stack);display:none;font-family:var(--font);}
 .demo-panel.open{display:block;animation:fade .28s var(--ease);}
+/* hidden by default (2026-10-26, per direction) — body.demo-off hides the fab + panel; the demo state itself stays in
+   effect. Bring it back with ?demo=1, 5 quick taps on the header logo, or Ctrl+Shift+D (see setDemoVisible) */
+body.demo-off .demo-fab,body.demo-off .demo-panel{display:none!important;}
 .demo-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-glue);}
 .demo-ti{display:flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);}
 .demo-ti svg{width:var(--ic-md);height:var(--ic-md);color:var(--focus);}
@@ -4549,6 +4539,7 @@ html.pdfv-open,html.pdfv-open body{overflow:hidden;}
 <symbol id="lc-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
 <symbol id="lc-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
 <symbol id="lc-sliders" viewBox="0 0 24 24"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></symbol>
+<symbol id="lc-eye-off" viewBox="0 0 24 24"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></symbol>
 <symbol id="lc-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
 <symbol id="lc-maximize-2" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></symbol>
 <symbol id="lc-arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
@@ -8523,7 +8514,7 @@ function resetQuiz(){st={phase:'splash',spidx:0,idx:0,s1:[null,null,null],s2:[nu
 /* ══ HOME TAB ══ content ported verbatim from Playbook Final's Home screen (see PLAYBOOK-2026-DATA-
    BASELINE.md §5). Progress values are mock and kept consistent with the Book page's own "2/6 ด้าน"
    example data so the whole app reads as one coherent (example-tagged) state, not real tracking. */
-var HOME_MST={agendaDay:1,agendaRoom:'conf',agendaAll:false};
+var HOME_MST={agendaDay:1,agendaAll:false};
 /* tier meta — the 3 tiers the demo panel exposes (from source tierMeta: Explorer/Master Class/
    Ultimate rungs; Visitor/Free omitted since the demo can't select them). Each tier now has its
    own distinct icon key (2026-08-26, per direction — "ประเภทของบัตร...3 ประเภท" — Ultimate=มงกุฎ/
@@ -8674,36 +8665,29 @@ var HOME_ANN=[
 /* Agenda (2026-10-22, per direction "ใช้ข้อมูลอ้างอิงจริงตามเว็บลงทะเบียนทั้งหมด") — every room of both days from the
    registration website: window.BT_AGENDA (assets/agenda.js, written by tools/sync-agenda.js — re-run when the site
    changes). Replaces the old AGENDA_D1/D2 (main stage only, from Playbook Final, no longer matching the real programme).
-   Day tabs → room tabs (Conference · Experience · Workshop · Master Class) → that room's list; each room shows who gets in
-   as plain text (no locking, user's call), Master Class rows carry the site's per-class price (no buy link: the agenda is view-only). */
+   Conference only (2026-10-26, per direction "กำหนดการจะแสดงแค่ของ Conference") — day tabs → the main stage's list, no
+   room tabs / room access line; assets/agenda.js still carries every room, the card just reads the 'conf' room. */
 function agData(){return window.BT_AGENDA&&window.BT_AGENDA.days?window.BT_AGENDA:null;}
 function agTimes(s){var m=String(s||'').split(/\s*[–-]\s*/);return {a:m[0]||'',b:m[1]||''};}
 function agRowHTML(r){
-  var tm=agTimes(r.time);
+  var tm=agTimes(r.time),by=/^รอประกาศ/.test(r.by||'')?'':r.by; // speaker not announced yet: hide the placeholder
   return '<div class="ag-row"><div class="ag-time">'+(tm.a?apbEsc(tm.a)+(tm.b?'<span class="ag-end">'+apbEsc(tm.b)+'</span>':''):'')+'</div><div class="ag-c">'+
-    '<div class="ag-t">'+apbEsc(r.t)+'</div>'+(r.sum?'<div class="ag-sum">'+apbEsc(r.sum)+'</div>':'')+(r.by?'<div class="ag-by">'+apbEsc(r.by)+'</div>':'')+
-    (r.price?'<div class="ag-buy"><span class="ag-price">'+apbEsc(r.price)+'</span></div>':'')+ // price only: the agenda is view-only, no ซื้อบัตร link (2026-10-22, per direction)
+    '<div class="ag-t">'+apbEsc(r.t)+'</div>'+(r.sum?'<div class="ag-sum">'+apbEsc(r.sum)+'</div>':'')+(by?'<div class="ag-by">'+apbEsc(by)+'</div>':'')+
   '</div></div>';
 }
 function agendaHTML(){
   var A=agData();
-  if(!A)return '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">กำหนดการ</div><div class="hcard-s">ยังโหลดกำหนดการไม่ได้</div></div></section>';
+  if(!A)return '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">เวทีห้องใหญ่</div><div class="hcard-s">ยังโหลดกำหนดการไม่ได้</div></div></section>';
   var day=A.days.filter(function(d){return d.d===HOME_MST.agendaDay;})[0]||A.days[0];
-  var room=day.rooms.filter(function(r){return r.key===HOME_MST.agendaRoom;})[0]||day.rooms[0];
+  var room=day.rooms.filter(function(r){return r.key==='conf';})[0]||day.rooms[0];
   var rows=[].concat.apply([],room.tables.map(function(t){return t.rows;})),timed=rows.filter(function(r){return r.time;});
   var span=timed.length?agTimes(timed[0].time).a+'–'+(agTimes(timed[timed.length-1].time).b||agTimes(timed[timed.length-1].time).a)+' น. · ':'';
-  // one long list folds to its first 3 rows; rooms split into sub-rooms (Workshop) are short — always shown whole
-  var fold=room.tables.length===1&&rows.length>4,open=HOME_MST.agendaAll||!fold;
-  var list=room.tables.map(function(t){
-    var rs=open?t.rows:t.rows.slice(0,3);
-    return (room.tables.length>1?'<div class="ag-sub">'+apbEsc(t.room)+'</div>':'')+'<div class="ag-list">'+rs.map(agRowHTML).join('')+'</div>';
-  }).join('');
-  return '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">กำหนดการ</div><div class="hcard-s">'+span+'Samyan Mitrtown Hall ชั้น 5</div></div>'+
+  // the day's list folds to its first 3 rows
+  var fold=rows.length>4,shown=HOME_MST.agendaAll||!fold?rows:rows.slice(0,3);
+  var list='<div class="ag-list">'+shown.map(agRowHTML).join('')+'</div>';
+  return '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">เวทีห้องใหญ่</div><div class="hcard-s">'+span+'Samyan Mitrtown Hall ชั้น 5</div></div>'+
     '<div class="bt-tabs bt-tabs--primary" id="agTabs" role="tablist" aria-label="เลือกวันที่กำหนดการ">'+A.days.map(function(d){
       return '<button class="bt-tab" type="button" role="tab" aria-selected="'+(d.d===day.d)+'" data-value="'+d.d+'"><span class="bt-tab-label">วันที่ '+d.d+' ✦ '+apbEsc(d.date.replace(/ 25\d\d$/,''))+'</span></button>';}).join('')+'</div>'+
-    '<div class="bt-tabs bt-tabs--secondary ag-rooms" id="agRooms" role="tablist" aria-label="เลือกห้อง">'+day.rooms.map(function(r){
-      return '<button class="bt-tab" type="button" role="tab" aria-selected="'+(r.key===room.key)+'" data-value="'+r.key+'"><span class="bt-tab-label">'+apbEsc(r.label)+'</span></button>';}).join('')+'</div>'+
-    '<div class="ag-acc"><span class="ag-acc-th">'+apbEsc(room.th)+'</span>'+(room.access?'<span class="ag-acc-chip">'+apbEsc(room.access)+'</span>':'')+'</div>'+
     list+
     (fold?'<button class="ag-more" id="agMore">'+ic('lc-chevron-down',HOME_MST.agendaAll?'ag-more-ic open':'ag-more-ic')+(HOME_MST.agendaAll?'ย่อกำหนดการ':('ดูกำหนดการทั้งวัน '+rows.length+' รายการ'))+'</button>':'')+
     (A.note?'<p class="ag-note">'+apbEsc(A.note)+'</p>':'')+
@@ -8728,7 +8712,7 @@ function appHeader(){return '<header class="topbar"><img class="tb-logo hd-logo"
 /* Header logo (left) is clickable system-wide → always routes to Home, same "brand mark = home"
    convention as most apps/sites. Bound once per render call right after appHeader()/renderBook's
    own header is injected — see mountHeaderQR's sibling calls and renderBook's own binding. */
-function bindHeaderLogo(){var el=root.querySelector('#hdLogo');if(el)el.onclick=function(){if(st.phase==='home')return;st.phase='home';render();};}
+function bindHeaderLogo(){var el=root.querySelector('#hdLogo');if(el)el.onclick=function(){demoLogoTap();if(st.phase==='home')return;st.phase='home';render();};}
 /* Every screen that renders appHeader() calls this right after — same re-callable-mount pattern as
    mountSplashCTA(), just aimed at the 'compact' preset/slot instead of the hero one. Now opens the
    QR scan modal (generic — no specific booth) instead of being a no-op tap. */
@@ -8857,10 +8841,6 @@ function renderHome(){
   var homeBook=root.querySelector('#homeBook');if(homeBook)homeBook.onclick=function(){st.phase='book';render();};
   root.querySelector('#homeTier').onclick=function(){st.phase='profile';render();};
   root.querySelectorAll('.hc-card').forEach(function(c){c.onclick=function(){st.phase=c.dataset.go;render();};});
-  initBtTabs(root.querySelector('#agRooms'),function(value){
-    HOME_MST.agendaRoom=value;HOME_MST.agendaAll=false;renderHome();
-    var fr=root.querySelector('#agRooms [aria-selected="true"]');if(fr)fr.focus({preventScroll:true}); // same refocus as the day tabs below
-  });
   initBtTabs(root.querySelector('#agTabs'),function(value){
     HOME_MST.agendaDay=parseInt(value,10);HOME_MST.agendaAll=false;renderHome();
     // renderHome() replaces #agTabs wholesale (unlike ddTabs' local-repaint case below), which
@@ -10902,6 +10882,19 @@ function seedPersonaResult(key){
 }
 function forcePersona(key){seedPersonaResult(key);st.phase='book';stopSplashTimer();render();}
 
+/* Demo panel visibility (2026-10-26, per direction "ซ่อนก่อน...ถ้าจะใช้ จะเรียกลับมาอีกครั้ง") — hidden unless turned on;
+   remembered per device in localStorage ('bt-demo'). On: ?demo=1 in the URL (?demo=0 turns it off), 5 taps on the header
+   logo within 2s (bindHeaderLogo), Ctrl+Shift+D. Off: the same, or "ซ่อนแผงจำลอง" in the panel. Hiding never resets DEMO. */
+function demoVisible(){return lsGet('bt-demo')==='1';}
+function setDemoVisible(on){
+  if(on)lsSet('bt-demo','1');else lsDel('bt-demo');
+  document.body.classList.toggle('demo-off',!on);
+  if(!on){var p=document.getElementById('demoPanel');if(p)p.classList.remove('open');}
+}
+(function(){var m=/[?&]demo=([01])\b/.exec(location.search);if(m)setDemoVisible(m[1]==='1');else setDemoVisible(demoVisible());})();
+document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.shiftKey&&(e.key==='D'||e.key==='d')){e.preventDefault();setDemoVisible(!demoVisible());}});
+var DEMO_TAPS=[];
+function demoLogoTap(){var t=Date.now();DEMO_TAPS=DEMO_TAPS.filter(function(x){return t-x<2000;});DEMO_TAPS.push(t);if(DEMO_TAPS.length>=5){DEMO_TAPS=[];setDemoVisible(!demoVisible());}}
 /* ── DEMO SIMULATION PANEL (dev/booth demo) ── persists across renders (lives on <body>, not #root) ── */
 function buildDemo(){
   var wrap=document.createElement('div');
@@ -10989,9 +10982,11 @@ function buildDemo(){
        real gate itself — this is a demo-panel-only shortcut around the check-in step, not a change to
        renderBooth's own checkedIn logic. */
     '<button class="btn btn-secondary demo-reset" id="demoChkAll">'+ic('lc-qr-code')+'เช็คอินครบทุกบูธ (ทดสอบเล่นเกม)</button>'+
+    '<button class="btn btn-secondary demo-reset" id="demoHide">'+ic('lc-eye-off')+'ซ่อนแผงจำลอง</button>'+
   '</div>';
   document.body.appendChild(wrap);
   var panel=document.getElementById('demoPanel');
+  document.getElementById('demoHide').onclick=function(){setDemoVisible(false);};
   document.getElementById('demoFab').onclick=function(){panel.classList.toggle('open');};
   document.getElementById('demoClose').onclick=function(){panel.classList.remove('open');};
   document.getElementById('segPhase').querySelectorAll('button').forEach(function(b){b.onclick=function(){
