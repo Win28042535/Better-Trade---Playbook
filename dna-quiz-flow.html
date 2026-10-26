@@ -3727,6 +3727,10 @@ html.pdfv-open,html.pdfv-open body{overflow:hidden;}
    poking a square corner outside the round mask. */
 .prof-av{width:66px;height:66px;margin:0 auto var(--sp-list);border-radius:50%;overflow:hidden;background:var(--accent);animation:profPop .36s var(--ease) both;}
 .prof-av img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.16,1,.3,1);}
+/* efin icon instead of the photo (2026-10-26, per direction "รูปใช้เป็นพื้นขาว และใช้โลโก้นี้เป็นรูปโปรไฟล์แทน") — white
+   circle with a hairline (a bare white circle vanishes on the white card), logo ~60% of the circle, contained not cropped */
+.prof-av--logo{background:var(--white);border:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;}
+.prof-av--logo img{width:60%;height:60%;object-fit:contain;}
 .prof-name{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);}
 .prof-org{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.45;margin-top:2px;}
 .prof-chips{display:flex;flex-wrap:wrap;gap:var(--sp-glue);justify-content:center;margin-top:var(--sp-inline);}
@@ -4639,7 +4643,8 @@ var ICON_HEALTH_PNG='assets/ICON_HEALTH_PNG.webp';
 var ICON_JOYSTICK_PNG='assets/ICON_JOYSTICK_PNG.png';
 var ICON_INSURANCE_PNG='assets/ICON_INSURANCE_PNG.webp';
 var SERIFFONT="'Baskervville',Georgia,'Times New Roman',serif";
-var PROFILE_PHOTO='assets/PROFILE_PHOTO.jpg';
+var PROFILE_PHOTO='assets/PROFILE_PHOTO.jpg'; // unused since 2026-10-26 (kept in case the photo comes back)
+var PROFILE_LOGO='assets/efin-icon.svg'; // Profile avatar = efin icon on white (2026-10-26, per direction; from LOGO/LOGO-icon-efin 24x24px.svg)
 var LOGO_IMG={aiSymbol:'assets/aiSymbol.png',efinAiIcon:'assets/efinAiIcon.png',efin:'assets/efin.png',efinBT:'assets/efinBT.png',bt:'assets/bt.png',nwnp:'assets/nwnp.png'};
 /* Real event floor plan (Floorplan BTT (1).png, 2026-08-26 per direction — replaces the earlier
    generic Map.png mockup placeholder), base64-embedded like the other images so the app stays
@@ -10801,7 +10806,7 @@ function renderProfile(){
   root.innerHTML=appHeader()+
   '<main class="scroll fade">'+
     '<section class="prof-card scroll-reveal">'+
-      '<div class="prof-av"><img src="'+PROFILE_PHOTO+'" alt="รูปโปรไฟล์ของออนไลน์ แอสเซ็ท"></div>'+
+      '<div class="prof-av prof-av--logo"><img src="'+PROFILE_LOGO+'" alt="โลโก้ efin"></div>'+
       '<div class="prof-name">ออนไลน์ แอสเซ็ท</div>'+
       '<div class="prof-org">บริษัทตัวอย่าง จำกัด (ข้อมูลจำลอง)</div>'+
       '<div class="prof-chips"><span class="prof-vf">'+ic('lc-check-circle')+'ยืนยันแล้ว</span>'+tierChips+'</div>'+
