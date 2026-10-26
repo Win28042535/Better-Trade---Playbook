@@ -4292,8 +4292,8 @@ html.pdfv-open,html.pdfv-open body{overflow:hidden;}
 .go-top svg{width:var(--ic-lg);height:var(--ic-lg);}
 .demo-panel{position:fixed;right:18px;bottom:calc(80px + env(safe-area-inset-bottom,0px));z-index:9999;width:308px;max-height:80vh;overflow-y:auto;background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);box-shadow:var(--shadow-lg);padding:var(--sp-stack);display:none;font-family:var(--font);}
 .demo-panel.open{display:block;animation:fade .28s var(--ease);}
-/* hidden by default (2026-10-26, per direction) — body.demo-off hides the fab + panel; the demo state itself stays in
-   effect. Bring it back with ?demo=1, 5 quick taps on the header logo, or Ctrl+Shift+D (see setDemoVisible) */
+/* body.demo-off hides the fab + panel (2026-10-26) — shown by default, hidden per device via ?demo=0, 5 quick taps on
+   the header logo, Ctrl+Shift+D or the panel's ซ่อน button (see setDemoVisible); the demo state itself stays in effect */
 body.demo-off .demo-fab,body.demo-off .demo-panel{display:none!important;}
 .demo-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-glue);}
 .demo-ti{display:flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-sub);font-weight:var(--w-label);color:var(--ink);}
@@ -10884,12 +10884,13 @@ function seedPersonaResult(key){
 }
 function forcePersona(key){seedPersonaResult(key);st.phase='book';stopSplashTimer();render();}
 
-/* Demo panel visibility (2026-10-26, per direction "ซ่อนก่อน...ถ้าจะใช้ จะเรียกลับมาอีกครั้ง") — hidden unless turned on;
-   remembered per device in localStorage ('bt-demo'). On: ?demo=1 in the URL (?demo=0 turns it off), 5 taps on the header
-   logo within 2s (bindHeaderLogo), Ctrl+Shift+D. Off: the same, or "ซ่อนแผงจำลอง" in the panel. Hiding never resets DEMO. */
-function demoVisible(){return lsGet('bt-demo')==='1';}
+/* Demo panel visibility (2026-10-26, per direction "ซ่อนก่อน...ถ้าจะใช้ จะเรียกลับมาอีกครั้ง") — remembered per device in
+   localStorage ('bt-demo'). Shown by default again since the same day (per direction "เอาจำลองเคส (สำหรับเดโม) กลับมา");
+   only a device that hid it ('bt-demo'='0') keeps it hidden. Off: ?demo=0, 5 taps on the header logo within 2s
+   (bindHeaderLogo), Ctrl+Shift+D, or "ซ่อนแผงจำลอง" in the panel; on: ?demo=1 or the same toggles. Hiding never resets DEMO. */
+function demoVisible(){return lsGet('bt-demo')!=='0';}
 function setDemoVisible(on){
-  if(on)lsSet('bt-demo','1');else lsDel('bt-demo');
+  if(on)lsDel('bt-demo');else lsSet('bt-demo','0');
   document.body.classList.toggle('demo-off',!on);
   if(!on){var p=document.getElementById('demoPanel');if(p)p.classList.remove('open');}
 }
