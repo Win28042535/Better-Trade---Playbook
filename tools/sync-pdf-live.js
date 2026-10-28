@@ -12,6 +12,8 @@
    page: <style>css</style> + #root.shell + the template's two data scripts + mainScript + initScript. Asset paths are made
    relative (the product serves them from /mockup/playbook-pdf/, same folder as here); any the folder lacks are downloaded.
    The product's own wrapper (header, "56 หน้า", DEBUG panel, confirm bar) is not copied — the app's overlay is used. */
+/* Not in use since 2026-10-26: the preview is now the design team's Ver.2 parchment book, written by tools/sync-pdf-mockup.js
+   (per direction "pdf เวอร์ล่าสุดที่อยู่ในระบบดูจะไม่ได้อัปเดต"). Running this would put the product's (older) book back. */
 'use strict';
 const fs = require('fs');
 const path = require('path');

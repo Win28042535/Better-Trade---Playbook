@@ -7,7 +7,11 @@
      node tools/sync-pdf-mockup.js [url]
      node tools/sync-pdf-mockup.js --manifest   (only rebuild manifest.json from the local copy, no fetch)
 
-   Copies the page (as demo.html — the app shows preview.html, which tools/sync-pdf-live.js builds from the product) and the assets/js/data it uses + every js/, data/ and assets/ file it references. Some file names are built in its JS
+   Copies the page as preview.html — what the app shows (2026-10-26, per direction "pdf เวอร์ล่าสุดที่อยู่ในระบบดูจะไม่ได้
+   อัปเดต ให้วิเคราะห์จากลิงค์นี้": the design team's Ver.2 parchment book replaces the product live-playbook copy that
+   tools/sync-pdf-live.js wrote; running that tool again would put the product book back) — plus the assets/js/data it uses +
+   every js/, data/ and assets/ file it references. Files under assets/ js/ data/ that the new copy no longer uses are
+   removed, so the offline pre-fetch (manifest.json) stays the size of the book. Some file names are built in its JS
    at runtime ('assets/'+img+'.svg', 'assets/playbook-cover-'+which+'.webp'), so those are listed in DYNAMIC below —
    they were read from the page's own network log; add to it if the preview shows a missing image after a sync. */
 'use strict';
@@ -20,16 +24,17 @@ const URL0 = (!ONLY_MANIFEST && process.argv[2]) || 'https://playbook-pdf-git-ve
 const OUT = path.join(__dirname, '..', 'mockup', 'playbook-pdf');
 const base = new URL('./', URL0);
 
+/* read from the Ver.2 page's network log after scrolling every sheet (2026-10-26) — names built at runtime included */
 const DYNAMIC = [
-  'assets/playbook-cover-front.webp', 'assets/playbook-cover-back.webp',
-  'assets/orn-corner.svg', 'assets/orn-asterism.svg', 'assets/topo.svg', 'assets/topo-b.svg',
-  'assets/ill-compass.svg', 'assets/ill-scale.svg', 'assets/ill-chart.svg', 'assets/ill-path.svg', 'assets/ill-book.svg', 'assets/ill-quill.svg',
-  'assets/sage.jpg', 'assets/waverider.jpg',
-  'assets/ICON_HEALTH_PNG.webp', 'assets/ICON_FUND_PNG.webp', 'assets/ICON_STOCK_TH_PNG.webp', 'assets/ICON_STOCK_INTL_PNG.webp', 'assets/ICON_GOLD_PNG.webp', 'assets/ICON_CRYPTO_PNG.webp',
-  'assets/eng-fund.svg', 'assets/eng-stockth.svg', 'assets/eng-gold.svg', 'assets/eng-gauge.svg', 'assets/eng-hook.svg', 'assets/eng-lens.svg',
-  'assets/eng-hourglass.svg', 'assets/eng-heart.svg', 'assets/eng-steps.svg',
+  'assets/playbook-cover-front.jpg', 'assets/playbook-cover-back.jpg', 'assets/paper-parchment.jpg', 'assets/toc-compass.png',
+  'assets/orn-asterism.svg', 'assets/orn-footer.png', 'assets/topo.svg',
+  'assets/baskervville-regular-sub.woff2', 'assets/noto-sans-thai.ttf', 'assets/psl-praewsuda-serif-bold.otf',
+  'assets/sarabun-500.ttf', 'assets/sarabun-700.ttf', 'assets/th-sarabun-new.ttf',
+  'assets/ill-book.svg', 'assets/ill-chart.svg', 'assets/ill-path.svg', 'assets/ill-quill.svg', 'assets/ill-scale.png', 'assets/ill-telescope.svg',
+  'assets/eng-gauge.svg', 'assets/eng-hook.svg', 'assets/eng-hourglass.svg', 'assets/eng-lens.svg', 'assets/eng-side-gauge.svg', 'assets/eng-side-lens.svg',
+  'assets/eng-steps.svg', 'assets/eng-stetho.svg', 'assets/eng-stockth.svg',
   'assets/eng-cat-basics.svg', 'assets/eng-cat-assets.svg', 'assets/eng-cat-costs.svg', 'assets/eng-cat-risk.svg', 'assets/eng-cat-planning.svg', 'assets/eng-cat-scams.svg',
-  'assets/float-stock.png', 'assets/float-heart.png', 'assets/float-bitcoin.png', 'assets/float-gold.png',
+  ...['analyst', 'collector', 'contrarian', 'diamondhand', 'explorer', 'guardian', 'harvester', 'maverick', 'planner', 'sage', 'steadyhand', 'waverider'].map((k) => `assets/art-${k}.webp`),
 ];
 /* assets/ + js/ + data/ (2026-10-15: the mockup's พอร์ต sheet loads data/app/port/edu.js, byte-identical to the app's assets/port/edu.js) */
 const REF = /["'(]((?:assets|js|data)\/[A-Za-z0-9_.\-\/]+\.(?:png|jpe?g|webp|svg|ttf|woff2?|js))/g;
@@ -74,10 +79,10 @@ if (ONLY_MANIFEST) { writeManifest(); process.exit(0); }
       try { fs.writeFileSync(dest, buf); return; } catch (e) { if (i >= 4) throw e; await new Promise((r) => setTimeout(r, 400 * (i + 1))); }
     }
   };
-  // the design team's demo page is kept as demo.html; preview.html (what the app shows) is the product's real book since
-  // 2026-10-20 — written by tools/sync-pdf-live.js. Not index.html either: Vercel cleanUrls redirects it to the folder URL.
-  await writeSafe(path.join(OUT, 'demo.html'), html);
-  try { fs.unlinkSync(path.join(OUT, 'index.html')); } catch (e) { /* already gone */ }
+  // preview.html, not index.html: Vercel cleanUrls redirects index.html to the folder URL. demo.html (the older demo kept
+  // beside the product book, 2026-10-20) is superseded by this copy.
+  await writeSafe(path.join(OUT, 'preview.html'), html);
+  for (const old of ['index.html', 'demo.html']) try { fs.unlinkSync(path.join(OUT, old)); } catch (e) { /* already gone */ }
   let total = html.length, missing = [];
   // js files can reference more assets, so read them first
   for (const f of [...files].filter((x) => x.endsWith('.js'))) {
@@ -95,5 +100,14 @@ if (ONLY_MANIFEST) { writeManifest(); process.exit(0); }
   }
   console.log(`synced ${files.size + 1} files (${(total / 1024 / 1024).toFixed(2)} MB) from ${URL0} -> ${path.relative(process.cwd(), OUT)}`);
   if (missing.length) console.log('not found (skipped):\n  ' + missing.join('\n  '));
+  // prune what this copy doesn't use (only after a full sync, and only under assets/ js/ data/)
+  const keep = new Set([...files].filter((f) => fs.existsSync(path.join(OUT, f))));
+  const pruned = [];
+  const walk = (dir) => { if (!fs.existsSync(dir)) return; for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, e.name), rel = path.relative(OUT, full).split(path.sep).join('/');
+    if (e.isDirectory()) walk(full); else if (!keep.has(rel)) { fs.unlinkSync(full); pruned.push(rel); }
+  } };
+  for (const d of ['assets', 'js', 'data']) walk(path.join(OUT, d));
+  if (pruned.length) console.log(`removed ${pruned.length} unused: ${pruned.join(', ')}`);
   writeManifest();
 })().catch((e) => { console.error(e.message); process.exit(1); });

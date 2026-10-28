@@ -2796,7 +2796,7 @@ a.apb-xb:not(.apb-tool-a):focus-visible{outline:2px solid var(--focus);outline-o
 /* aspect-ratio matches Floorplan BTT (1).png's real 3657×2772 (2026-08-26, per direction — swapped
    in for the old square Map.png mockup) — was 1/1, which forced object-fit:cover to crop the sides
    off this wider top-down floor plan. */
-.map-ph{position:relative;border:1px solid var(--line-soft);border-radius:var(--r1);overflow:hidden;background:linear-gradient(135deg,var(--paper),var(--cloud));aspect-ratio:3373/1960;display:flex;align-items:center;justify-content:center;margin-bottom:var(--sp-stack);}
+.map-ph{position:relative;border:1px solid var(--line-soft);border-radius:var(--r1);overflow:hidden;background:linear-gradient(135deg,var(--paper),var(--cloud));aspect-ratio:2200/1283;display:flex;align-items:center;justify-content:center;margin-bottom:var(--sp-stack);}
 .map-ph .mp-in{display:flex;flex-direction:column;align-items:center;gap:var(--sp-glue);color:var(--muted);}
 .map-ph .mp-in svg{width:var(--ic-lg);height:var(--ic-lg);}
 .map-ph .mp-img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -4496,6 +4496,108 @@ body.demo-off .demo-fab,body.demo-off .demo-panel{display:none!important;}
 /* cross-fade the whole scene out as we hand off to the Playbook (bridge, not hard cut) */
 .cr-scene.s-bridge{animation:crBridge .55s var(--ease) forwards;}
 @keyframes crBridge{to{opacity:0;transform:scale(1.02);}}
+
+/* ══ PLAYBOOK "BOOK" STYLE (demo, 2026-10-26) ══ per direction "ปรับ design dna ให้เป็นแบบเดียวกับ pdf … เฉพาะ Playbook
+   (ทำไว้ใน demo แบบจำลอง)": the design team's Ver.2 parchment book (playbook-pdf ver2, now also the PDF preview) applied to
+   the Playbook screens only, switched by the demo panel's "สไตล์ Playbook" (DEMO.pbStyle). render() puts html.pbk on while
+   the phase is book/library/assetpb/assetbook, so nothing here reaches Home, Booth, Games or Profile.
+   Book DNA carried over: warm parchment paper + warm ink, Noto Sans Thai for Thai text, PSL Praewsuda Serif for the
+   chapter running head, Baskervville English display with the silver gradient, engraved line art per chapter, charcoal
+   pills, thin ink bars on a sand track, "ornaments, not frames" (rules between sections instead of card boxes), a flourish
+   + "BetterTrade 2026 · Personalized Playbook" at the end of each chapter. The spectrum hues are re-tinted to muted earth
+   tones (not removed) so done/active/locked states still read apart on screen — the one thing a printed book never needs.
+   Fonts/art copied from the book into assets/pbk/. */
+@font-face{font-family:'PSL Praewsuda Serif';src:url(assets/pbk/psl-praewsuda-serif-bold.otf) format('opentype');font-weight:700;font-style:normal;font-display:swap;}
+@font-face{font-family:'Noto Sans Thai';src:url(assets/pbk/noto-sans-thai.ttf) format('truetype');font-weight:100 900;font-style:normal;font-display:swap;}
+/* tokens on the Playbook content + its chapter tabs only — the header, bottom tabbar and body-level overlays (scan, PDF
+   preview, demo panel) keep the app's own tokens/font (Noto Sans Thai runs wider: the tabbar labels wrapped) */
+html.pbk main.scroll,html.pbk .toc{
+  --ink:#14110f; --muted:#6b5e57; --paper:#f6f1e6; --cloud:#efe8da; --accent:rgba(20,17,15,.07); --white:#fbf9f2;
+  --line:rgba(20,17,15,.14); --line-soft:rgba(20,17,15,.12); --line-strong:rgba(20,17,15,.26); --line-header:rgba(20,17,15,.1);
+  --violet:#5d5249; --cyan:#7d8b6a; --pink:#9b6b5e; --yellow:#c9a54a;
+  --spectrum:linear-gradient(90deg,#2b2621,#a9a59e,#d9d6cf,#5d5852,#2b2621);
+  --font:'Noto Sans Thai','Taviraj',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --pbk-display:'PSL Praewsuda Serif','Taviraj',serif;
+  --pbk-track:#cfc7b8; --pbk-pill:#3a3a3a; --pbk-cream:#fbf9f2;
+  --pbk-silver:linear-gradient(100deg,#2b2621 0%,#45403a 28%,#a9a59e 47%,#d9d6cf 52%,#5d5852 66%,#2b2621 100%);
+}
+/* one sheet of paper fixed behind the scroll (repeating the portrait scan showed its vignette seams every screen) */
+html.pbk body,html.pbk #root.shell{background:transparent;}
+html.pbk body::before{content:'';position:fixed;inset:0;z-index:-1;background:#f3ede0 url(assets/pbk/paper-parchment.jpg) center/cover no-repeat;}
+html.pbk .topbar,html.pbk .book-tabbar{background:rgba(246,241,230,.94);}
+/* chapter tabs: text + hairline underline, like the book's running heads (no pills) */
+html.pbk .toc.bt-tabs--secondary .bt-tab{background:transparent;border:0;border-bottom:1px solid transparent;border-radius:0;color:var(--muted);}
+html.pbk .toc.bt-tabs--secondary .bt-tab[aria-selected="true"]{background:transparent;color:var(--ink);border-bottom-color:var(--ink);}
+/* chapter opener (tabHeadHTML's book branch) */
+html.pbk .tab-hd.pbk-op{display:block;background:none;border:0;border-radius:0;padding:0;}
+.pbk-run{display:flex;align-items:center;gap:var(--sp-inline);font-family:var(--pbk-display);font-size:22px;font-weight:700;line-height:1.2;color:var(--ink);margin-bottom:var(--sp-stack);}
+.pbk-run::before,.pbk-run::after{content:'';flex:1;height:1px;background:var(--line-strong);}
+.pbk-op-in{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;column-gap:var(--sp-inline);}
+.pbk-op-en{font-family:var(--serif);font-weight:400;font-size:40px;line-height:1.05;white-space:nowrap;}
+.pbk-op-en i{font-style:normal;font-size:.62em;margin-right:8px;vertical-align:.18em;}
+.pbk-op-en span{background:var(--pbk-silver);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;padding-bottom:.12em;}
+html.pbk .pbk-op .tab-hd-t{font-family:var(--font);font-weight:500;font-size:26px;line-height:1.3;margin-top:4px;}
+html.pbk .pbk-op .s-ey{margin:var(--sp-stack) 0 0;}
+html.pbk .pbk-op .tab-hd-d,html.pbk .pbk-op .tab-hd-note{margin-top:var(--sp-list);}
+.pbk-op-ill{width:104px;height:104px;object-fit:contain;mix-blend-mode:multiply;align-self:start;}
+/* phones: title + engraving scale with the width so "Your Portfolio" never runs under the drawing (it did at 320) */
+:root[data-view="mobile"] .pbk-op-en{font-size:min(34px,8.2vw);}
+:root[data-view="mobile"] .pbk-op-ill{width:min(84px,20vw);height:min(84px,20vw);}
+/* identity chapter has no tab header — the running head sits above the card */
+html.pbk .b2-panel[data-panel="identity"]::before{content:'✦ ตัวตน ✦';display:block;text-align:center;background:linear-gradient(var(--line-strong),var(--line-strong)) left center/calc(50% - 64px) 1px no-repeat,linear-gradient(var(--line-strong),var(--line-strong)) right center/calc(50% - 64px) 1px no-repeat;font-family:var(--pbk-display);font-size:22px;font-weight:700;color:var(--ink);margin-bottom:var(--sp-stack);}
+/* end of every chapter: flourish + book footer line */
+html.pbk .b2-panel::after{content:'BetterTrade 2026  ·  Personalized Playbook';display:block;margin-top:var(--sp-block);padding-top:34px;background:url(assets/pbk/orn-footer.png) center top/132px auto no-repeat;text-align:center;font-family:var(--serif);font-size:13px;color:var(--muted);}
+/* ornaments, not frames: cards lose their box and sit between hairline rules */
+html.pbk .hero-glow{display:none;}
+html.pbk .hero-gw{padding:0;}
+html.pbk .hero-in,html.pbk .b2-panel .card,html.pbk .efin-banner,html.pbk .redeem-card{background:transparent;border:0;border-top:1px solid var(--line-strong);border-radius:0;box-shadow:none;}
+html.pbk .hero-in{border-top:0;padding-left:0;padding-right:0;}
+/* !important: these boxes are restyled by later, more specific rules in their own sections (e.g. the hero's .ast-block) */
+html.pbk .str-box,html.pbk .risk-box,html.pbk .conf-box,html.pbk .ast-block{background:transparent!important;border:0!important;border-top:1px solid var(--line-soft)!important;border-radius:0!important;box-shadow:none!important;padding-left:0!important;padding-right:0!important;}
+html.pbk .hero-note,html.pbk .skill-note{background:transparent;border-left:2px solid var(--line-strong);border-radius:0;}
+html.pbk .str-hd,html.pbk .str-box.wn .str-hd{color:var(--ink);}
+html.pbk .conf-glow{display:none;}
+/* type */
+html.pbk .s-h{font-weight:500;}
+html.pbk .s-ey{font-style:italic;text-transform:none;letter-spacing:0;font-weight:var(--w-body);}
+/* pills: charcoal with cream text */
+html.pbk .ex-tag,html.pbk .cr2-chip{background:var(--pbk-pill);color:var(--pbk-cream);border-color:transparent;}
+html.pbk .chip{background:transparent!important;border:1px solid var(--line-strong)!important;color:var(--ink)!important;}
+/* bars: ink on sand */
+html.pbk .risk-tr,html.pbk .conf-tr,html.pbk .int-bar-tr,html.pbk .trait-tr,html.pbk .skc-tr{background:var(--pbk-track);}
+html.pbk .risk-fi,html.pbk .conf-fi,html.pbk .int-bar-fi,html.pbk .trait-fi,html.pbk .skc-fi{background:var(--ink)!important;}
+/* ── the rest of the Playbook menu (2026-10-26, per direction "ลองปรับใช้กับ tab ที่เหลือ … แสดงตัวอย่างรวมอยู่ใน สไตล์
+   Playbook ด้วย") ── */
+/* ตัวตน: the book's identity page — silver English name, Thai name, centred lede, assets as a ✦ line, two columns */
+.pbk-id{text-align:center;margin:var(--sp-stack) 0 var(--sp-list);}
+.pbk-id-en{font-family:var(--serif);font-weight:400;font-size:44px;line-height:1.05;}
+.pbk-id-en span{background:var(--pbk-silver);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;padding-bottom:.12em;}
+.pbk-id-th{font-family:var(--font);font-weight:500;font-size:24px;line-height:1.3;color:var(--ink);margin-top:2px;}
+.pbk-id-fam{display:inline-block;margin-top:var(--sp-list);padding:4px 14px 5px;border-radius:var(--rpill);background:var(--pbk-pill);color:var(--pbk-cream);font-size:13px;line-height:17px;}
+:root[data-view="mobile"] .pbk-id-en{font-size:min(44px,11vw);}
+html.pbk .hero-sig-c{font-weight:500;color:var(--ink);text-wrap:balance;}
+html.pbk .ast-chips{gap:4px 0;}
+html.pbk .ast-chips .chip{border:0!important;padding:0;min-height:0;font-weight:var(--w-label);}
+html.pbk .ast-chips .chip svg{display:none;}
+html.pbk .ast-chips .chip+.chip::before{content:'✦';margin:0 10px;font-weight:400;font-size:.8em;}
+html.pbk:not([data-view="mobile"]) .str-grid .str-box+.str-box{border-left:1px solid var(--line-soft)!important;padding-left:var(--sp-inline)!important;}
+html.pbk .cr2-cap{color:var(--muted);}
+/* boxed bits across the tabs: no fill, no shadow, square, hairline (the book's notes and callouts are ruled, not boxed) */
+html.pbk main.scroll :is(.redeem-tier,.redeem-note,.pe-locked,.radar-insight,.trait-chip,.lib-cat,.lib-cat-hd,.lib-stub,.apb-bl,.apb-chip,.pe-crisis,.pe-cta,.pe-split,.howto-btn,.side-item,.rs){background:transparent!important;box-shadow:none!important;border-radius:0!important;border-color:var(--line-soft)!important;}
+html.pbk main.scroll :is(.lib-cat,.apb-bl){border-width:0 0 1px!important;}
+html.pbk main.scroll :is(.radar-insight,.pe-crisis){border-width:0 0 0 2px!important;border-color:var(--line-strong)!important;}
+html.pbk main.scroll .pe-locked{border-style:dashed!important;border-width:1px!important;}
+html.pbk main.scroll .trait-chip,html.pbk main.scroll .apb-chip{border-radius:var(--rpill)!important;border-width:1px!important;}
+/* พอร์ต 5 ระดับ table keeps the app's narrower face: in Noto Sans Thai its nowrap headers ran 352px in a 291px box at 375
+   (still 324px at 13px) */
+html.pbk .pe-lvt{font-family:'FC Minimal','Taviraj',system-ui,sans-serif;}
+/* outline buttons (แชร์ภาพการ์ด, ดูทั้งหมด…) */
+html.pbk main.scroll .ag-more{background:transparent;border-color:var(--ink);color:var(--ink);}
+/* sub-tabs inside a chapter (คลังความรู้ | Asset Knowledge, the ladder's level picker): text + underline like the chapter tabs */
+html.pbk main.scroll .bt-tabs{background:transparent;box-shadow:none;}
+html.pbk main.scroll .bt-tabs.bt-tabs--segment{border:0;border-bottom:1px solid var(--line-soft);border-radius:0;padding:0;}
+html.pbk main.scroll .bt-tabs .bt-tab{background:transparent!important;box-shadow:none!important;border:0;border-bottom:1px solid transparent;border-radius:0;color:var(--muted);}
+html.pbk main.scroll .bt-tabs .bt-tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);}
 </style>
 
 <!-- Lucide icons — inline symbol defs (MIT, lucide.dev), per Design DNA §07. -->
@@ -4649,7 +4751,7 @@ var LOGO_IMG={aiSymbol:'assets/aiSymbol.png',efinAiIcon:'assets/efinAiIcon.png',
 /* Real event floor plan (Floorplan BTT (1).png, 2026-08-26 per direction — replaces the earlier
    generic Map.png mockup placeholder), base64-embedded like the other images so the app stays
    self-contained. Used in the booth map card + its fullscreen lightbox. */
-var MAP_IMG="assets/MAP_IMG.webp?v=2";
+var MAP_IMG="assets/MAP_IMG.webp?v=3"; // 2026-10-28: "Floor Plan - Top View-03.webp" (white margin cropped, 2200px webp, 90 KB)
 var RADAR_AXES=['หุ้นไทย','ต่างปท.','กองทุน','คริปโต','ทอง','สุขภาพ'];
 /* Custom illustrated question/analyzing icons — replaces specific Lucide icons per direction; each compressed via in-browser canvas (no local image tool available) from a 1920x1920 source PNG down to 160x160, kept as PNG (not JPEG) to preserve alpha transparency. */
 var ICON_HOURGLASS_PNG='assets/ICON_HOURGLASS_PNG.png';
@@ -5615,6 +5717,8 @@ function initBtTabs(tablist,onSelect){
    showing during On-Event, same class of bug this gate exists to prevent — this gate itself still
    matters even with the manual trigger gone, since the ช่วงงาน-toggle path is still live. */
 function render(){
+  // Playbook book style (demo, 2026-10-26): on for the Playbook screens only — see the PLAYBOOK "BOOK" STYLE CSS block
+  document.documentElement.classList.toggle('pbk',DEMO.pbStyle==='book'&&['book','library','assetpb','assetbook'].indexOf(st.phase)>-1);
   /* PIN lock gate (2026-09-25) — checked FIRST, ahead of the On-Event gate below, so it blocks every
      phase including 'splash' itself. Same single-choke-point shape as that gate: one check here
      instead of patching each of the ~11 phases render() can otherwise reach. DEMO.forceLock previews
@@ -6289,7 +6393,22 @@ function heroDetailBody(hero,previewOnly){
    the same dashed "locked" row .pe-locked already uses elsewhere, so this doesn't invent a new look. */
 /* Tab Header (see the .tab-hd CSS note): o = {tone, icon (3D PNG), ey?, num?, title, desc?, note?}. Every Playbook tab /
    sub-tab opens with one; the persona tabs use "สำหรับ <persona>" as the eyebrow so the set reads as one series. */
+/* book style (DEMO.pbStyle 'book', 2026-10-26): the same header becomes the book's chapter opener — running head, English
+   serif title + the chapter's engraving (assets/pbk/) instead of the 3D icon on a tinted card. Keyed by tone; the asset
+   shelf (title 'Asset Knowledge') gets the quill. */
+var PBK_CH={analysis:{th:'วิเคราะห์',en:'AI Insight',ill:'ill-scale.png'},interest:{th:'ความสนใจ',en:'Your Interests',ill:'ill-telescope.svg'},
+  port:{th:'พอร์ต',en:'Your Portfolio',ill:'ill-chart.svg'},journey:{th:'เส้นทาง',en:'The Journey',ill:'ill-path.svg'},know:{th:'ความรู้',en:'The Library',ill:'ill-book.svg'}};
 function tabHeadHTML(o){
+  if(DEMO.pbStyle==='book'){
+    var c=PBK_CH[o.tone||'analysis'],ill=o.title==='Asset Knowledge'?'ill-quill.svg':c.ill;
+    return '<header class="tab-hd pbk-op scroll-reveal"><div class="pbk-run">✦ '+c.th+' ✦</div><div class="pbk-op-in"><div>'+
+      '<div class="pbk-op-en"><i>✦</i><span>'+c.en+'</span></div>'+
+      '<h2 class="tab-hd-t">'+(o.num!=null?'<span class="lib-num">'+o.num+'</span> ':'')+o.title+'</h2></div>'+
+      '<img class="pbk-op-ill" src="assets/pbk/'+ill+'" alt=""></div>'+
+      (o.ey?'<div class="s-ey">'+o.ey+'</div>':'')+(o.desc?'<p class="tab-hd-d">'+o.desc+'</p>':'')+
+      (o.note?'<p class="tab-hd-note">'+ic('lc-info')+'<span>'+o.note+'</span></p>':'')+
+    '</header>';
+  }
   return '<header class="tab-hd'+(o.tone?' tab-hd--'+o.tone:'')+' scroll-reveal"><img class="tab-hd-ic" src="'+o.icon+'" alt="">'+
     (o.ey?'<div class="s-ey">'+o.ey+'</div>':'')+'<h2 class="tab-hd-t">'+(o.num!=null?'<span class="lib-num">'+o.num+'</span> ':'')+o.title+'</h2>'+
     (o.desc?'<p class="tab-hd-d">'+o.desc+'</p>':'')+
@@ -6413,7 +6532,7 @@ function mountPdfDlBtn(){
 /* preview.html, not index.html (2026-10-15): vercel.json's cleanUrls 308s …/index.html to the bare folder URL
    (/mockup/playbook-pdf, no slash), so every relative asset of the mockup resolved one level up and 404'd. preview.html
    lands on …/playbook-pdf/preview, inside the folder. tools/sync-pdf-mockup.js writes it. */
-var PDF_SRC='mockup/playbook-pdf/preview.html',PDF_W=794,PDF_PAGES=59,PDF_DONE=false;
+var PDF_SRC='mockup/playbook-pdf/preview.html',PDF_W=794,PDF_PAGES=60,PDF_DONE=false;
 /* อ่านง่าย (2026-10-15, audit: fitting 794px into a phone left ~6–8px text): the page never drops below PDF_READ_S
    (≈11px text) — the iframe is then narrower than the page (in its own px) and the mockup pans sideways inside it,
    one native scroller for both axes. พอดีจอ = the old fit-to-width. The switch only shows where they differ. On file://
@@ -6819,6 +6938,10 @@ function initCompareReveal(opts){
 function book2IdentityDetail(hero,previewOnly){
   // .hero-leg ("แรงบันดาลใจจาก") removed 2026-08-19, per direction — applies to both sides of the
   // compare-reveal (this same function renders both the pre-event and post-event detail block).
+  /* book style (2026-10-26): the book's identity page title — English persona name in the silver serif, Thai name under
+     it, family as a small line — in place of the gradient family badge */
+  if(DEMO.pbStyle==='book')return '<div class="pbk-id"><div class="pbk-id-en"><span>'+hero.en+'</span></div><div class="pbk-id-th">'+hero.th+'</div>'+
+    '<div class="pbk-id-fam">'+hero.famTh+'</div></div>'+heroDetailBody(hero,previewOnly);
   return '<div class="fam-badge" style="'+famBadgeStyle(hero)+'"><span>'+hero.famTh+'</span></div>'+
     heroDetailBody(hero,previewOnly);
 }
@@ -8897,14 +9020,17 @@ var BOOTH_SEL=null;
    point of the sync is that a stop's NUMBER changes with route order while its physical marker stays
    put. `s` is the short marker label (per the spec's "Short Name / Label เมื่อจำเป็น"); the full
    name still lives on the route row. Positions read off the floor plan's own printed zone labels. */
+/* Re-read 2026-10-28 off the new plan ("Floor Plan - Top View-03.webp", per direction "แผนที่สำหรับหน้า เดินบูธ ปรับมาใช้
+   อันนี้แทน"): one Health zone now (the second purple block became Life Style, not a route stop), the card counter sits at
+   the far-left walkway (the old grey counter box is gone). */
 var BOOTH_MAP_POS={
-  'จุดแลกรับการ์ดตัวจริง':{x:7.5,y:57.7,s:'แลกการ์ด'},
-  'โซนการ์ดเกม · ของสะสม':{x:30,y:82.3,s:'การ์ดเกม'},
-  'Capital Zone':{x:50.8,y:51.6,s:'Capital',more:[{x:44,y:51.6},{x:58.2,y:51.6}]},
-  'Crypto Zone':{x:58.2,y:36.1,s:'Crypto'},
-  'Commodity + Property Zone':{x:41,y:21.5,s:'Commodity+Property'},
-  'Alternative Investment Zone':{x:54,y:5.5,s:'Alternative'},
-  'Health Zone':{x:58.2,y:21.5,s:'Health',more:[{x:49.8,y:21.5}]}
+  'จุดแลกรับการ์ดตัวจริง':{x:4.5,y:57.2,s:'แลกการ์ด'},
+  'โซนการ์ดเกม · ของสะสม':{x:28.7,y:83,s:'การ์ดเกม'},
+  'Capital Zone':{x:50.8,y:51.7,s:'Capital',more:[{x:43.4,y:51.7},{x:58.1,y:51.7}]},
+  'Crypto Zone':{x:58.1,y:36.7,s:'Crypto'},
+  'Commodity + Property Zone':{x:41.2,y:22.6,s:'Commodity+Property'},
+  'Alternative Investment Zone':{x:54.1,y:5.9,s:'Alternative'},
+  'Health Zone':{x:50,y:21.7,s:'Health'}
 };
 /* 10 booths — asset / gamified game name / icon (Material→Lucide) — verbatim from BOOTHS. */
 var BOOTHS=[
@@ -10849,7 +10975,7 @@ function renderProfile(){
    direction restored). Switching the ช่วงงาน segment to Pre-Event is the one way back to the
    splash/quiz flow (RESULT/quizDone/boothVer aren't touched by that switch, same as before). */
 // registered:false by default since 2026-10-26 (per direction "หน้าตัวตน อยากให้ default ที่ยังไม่ลงทะเบียน (การ์ดแสดงหน้าเดียว)")
-var DEMO={view:'auto',quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,heroProps:true,boothVer:'v2',registered:false,forceLock:false,forceInstall:false,pdfCase:'auto'}; // forceLock/forceInstall (2026-09-25) — demo-panel-only previews for the PIN lock screen and the install card, see buildDemo()'s own "ล็อก PIN / ติดตั้งแอป" section. draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. (splashVer removed 2026-09-18, per direction "preview card เอา v1 ออก" — the splash fan carousel's "การ์ดมีชีวิต" build (added 2026-09-09, promoted to shipped default 2026-09-11) is now the only splash preview; v1 the plain static carousel, v3/v5 the "3D Character Card Flow" field and its living-card variant, were all removed the same day/session — see renderSplash's own comment for that full history.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO. (sumTitleVer — a brief demo-panel toggle comparing 2 title treatments for renderPlaySummary's game-name — removed 2026-09-11, per direction "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย": v2, the DNA quiz's .q-icon-bare + .q-title header, is now just how renderPlaySummary always renders — see its own comment there.)
+var DEMO={view:'auto',quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,heroProps:true,boothVer:'v2',pbStyle:'app',registered:false,forceLock:false,forceInstall:false,pdfCase:'auto'}; // forceLock/forceInstall (2026-09-25) — demo-panel-only previews for the PIN lock screen and the install card, see buildDemo()'s own "ล็อก PIN / ติดตั้งแอป" section. draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. (splashVer removed 2026-09-18, per direction "preview card เอา v1 ออก" — the splash fan carousel's "การ์ดมีชีวิต" build (added 2026-09-09, promoted to shipped default 2026-09-11) is now the only splash preview; v1 the plain static carousel, v3/v5 the "3D Character Card Flow" field and its living-card variant, were all removed the same day/session — see renderSplash's own comment for that full history.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO. (sumTitleVer — a brief demo-panel toggle comparing 2 title treatments for renderPlaySummary's game-name — removed 2026-09-11, per direction "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย": v2, the DNA quiz's .q-icon-bare + .q-title header, is now just how renderPlaySummary always renders — see its own comment there.)
 /* 'auto' resolves from real window.innerWidth again (2026-09-10 responsive audit — the 2026-08-26
    "always resolve to mobile" change meant a real event-tablet visitor (768–1024px wide) never got
    data-view="tablet": the .shell/topbar/book-tabbar all clamped to the 400px phone-frame width,
@@ -10942,6 +11068,8 @@ function buildDemo(){
        only changes what คู่มือ/ตัวตน renders — it doesn't touch RESULT/quizDone above, so pick a
        persona first (or leave the seeded default) to actually see the locked tab. */
     '<div class="demo-lbl">การลงทะเบียน</div>'+seg('segRegistered',[{v:'yes',t:'ลงทะเบียนแล้ว'},{v:'no',t:'ยังไม่ได้ลงทะเบียน'}],DEMO.registered?'yes':'no')+
+    /* สไตล์ Playbook (2026-10-26) — the PDF book's DNA on the Playbook screens, as a side-by-side sample (html.pbk) */
+    '<div class="demo-lbl">สไตล์ Playbook</div>'+seg('segPbStyle',[{v:'app',t:'แอป (เดิม)'},{v:'book',t:'หนังสือ (PDF)'}],DEMO.pbStyle)+
     '<div class="demo-stub">* ยังไม่ได้ลงทะเบียน = Playbook เห็นแค่ tab ตัวตน ตัดจบที่จุดแข็ง/จุดที่ต้องระวัง + CTA ชวนลงทะเบียน (bottom nav ยังกดออกไปหน้าอื่นได้ตามปกติ)</div>'+
     /* Force the "เดินบูธ ✦ ลุ้นรางวัล" draw-status card's eligible/not-eligible state for preview
        (2026-08-26, per direction "อยากให้จำลองเคส...ไว้ด้วย กรณีครบเงื่อนไขแล้ว และกรณียังขาด") —
@@ -11014,6 +11142,7 @@ function buildDemo(){
   document.getElementById('segView').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.view=b.dataset.v;document.querySelectorAll('#segView button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');applyView();};});
   document.getElementById('segDraw').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.draw=b.dataset.v;document.querySelectorAll('#segDraw button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.multiTicket=(b.dataset.v==='2');document.querySelectorAll('#segTicketCount button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
+  document.getElementById('segPbStyle').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.pbStyle=b.dataset.v;document.querySelectorAll('#segPbStyle button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(['home','passport','games','profile'].indexOf(st.phase)>-1)st.phase='book';render();};});
   document.getElementById('segRegistered').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.registered=(b.dataset.v==='yes');document.querySelectorAll('#segRegistered button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='book')render();};});
   document.getElementById('segEfin').querySelectorAll('button').forEach(function(b){b.onclick=function(){EFIN_CHECKED_IN=(b.dataset.v==='yes');document.querySelectorAll('#segEfin button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='games')render();};});
   document.getElementById('segPdfCase').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.pdfCase=b.dataset.v;document.querySelectorAll('#segPdfCase button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(document.getElementById('pdfv'))openPdfPreview();};});
