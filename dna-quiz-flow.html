@@ -6532,7 +6532,7 @@ function mountPdfDlBtn(){
 /* preview.html, not index.html (2026-10-15): vercel.json's cleanUrls 308s …/index.html to the bare folder URL
    (/mockup/playbook-pdf, no slash), so every relative asset of the mockup resolved one level up and 404'd. preview.html
    lands on …/playbook-pdf/preview, inside the folder. tools/sync-pdf-mockup.js writes it. */
-var PDF_SRC='mockup/playbook-pdf/preview.html',PDF_W=794,PDF_PAGES=60,PDF_DONE=false;
+var PDF_SRC='mockup/playbook-pdf/preview.html',PDF_W=794,PDF_PAGES=59,PDF_DONE=false;
 /* อ่านง่าย (2026-10-15, audit: fitting 794px into a phone left ~6–8px text): the page never drops below PDF_READ_S
    (≈11px text) — the iframe is then narrower than the page (in its own px) and the mockup pans sideways inside it,
    one native scroller for both axes. พอดีจอ = the old fit-to-width. The switch only shows where they differ. On file://

@@ -24,17 +24,19 @@ const URL0 = (!ONLY_MANIFEST && process.argv[2]) || 'https://playbook-pdf-git-ve
 const OUT = path.join(__dirname, '..', 'mockup', 'playbook-pdf');
 const base = new URL('./', URL0);
 
-/* read from the Ver.2 page's network log after scrolling every sheet (2026-10-26) — names built at runtime included */
+/* read from the Ver.2 page's network log after scrolling every sheet (2026-10-28, Ver.2 c68f7b9 "Map DNA is the book") —
+   names built at runtime included: the small drawings are now tinted PNGs (eng-*.tint.png), the chapter openers iridescent
+   JPEGs (ill-*-iri.jpg); the 12-persona sheet moved to ?proof, so only the sample's two arts remain */
 const DYNAMIC = [
-  'assets/playbook-cover-front.jpg', 'assets/playbook-cover-back.jpg', 'assets/paper-parchment.jpg', 'assets/toc-compass.png',
-  'assets/orn-asterism.svg', 'assets/orn-footer.png', 'assets/topo.svg',
+  'assets/playbook-cover-front.jpg', 'assets/playbook-cover-back.jpg', 'assets/paper-parchment.jpg', 'assets/toc-compass.tint.png',
+  'assets/orn-asterism.svg', 'assets/orn-footer.tint.png',
   'assets/baskervville-regular-sub.woff2', 'assets/noto-sans-thai.ttf', 'assets/psl-praewsuda-serif-bold.otf',
-  'assets/sarabun-500.ttf', 'assets/sarabun-700.ttf', 'assets/th-sarabun-new.ttf',
+  'assets/sarabun-400.ttf', 'assets/sarabun-500.ttf', 'assets/sarabun-700.ttf', 'assets/th-sarabun-new.ttf',
+  ...['book', 'chart', 'path', 'quill', 'scale', 'telescope'].map((k) => `assets/ill-${k}-iri.jpg`),
   'assets/ill-book.svg', 'assets/ill-chart.svg', 'assets/ill-path.svg', 'assets/ill-quill.svg', 'assets/ill-scale.png', 'assets/ill-telescope.svg',
-  'assets/eng-gauge.svg', 'assets/eng-hook.svg', 'assets/eng-hourglass.svg', 'assets/eng-lens.svg', 'assets/eng-side-gauge.svg', 'assets/eng-side-lens.svg',
-  'assets/eng-steps.svg', 'assets/eng-stetho.svg', 'assets/eng-stockth.svg',
-  'assets/eng-cat-basics.svg', 'assets/eng-cat-assets.svg', 'assets/eng-cat-costs.svg', 'assets/eng-cat-risk.svg', 'assets/eng-cat-planning.svg', 'assets/eng-cat-scams.svg',
-  ...['analyst', 'collector', 'contrarian', 'diamondhand', 'explorer', 'guardian', 'harvester', 'maverick', 'planner', 'sage', 'steadyhand', 'waverider'].map((k) => `assets/art-${k}.webp`),
+  ...['gauge', 'hook', 'hourglass', 'lens', 'side-gauge', 'side-lens', 'steps', 'stetho', 'stockth',
+    'cat-basics', 'cat-assets', 'cat-costs', 'cat-risk', 'cat-planning', 'cat-scams'].map((k) => `assets/eng-${k}.tint.png`),
+  'assets/art-sage.webp', 'assets/art-waverider.webp',
 ];
 /* assets/ + js/ + data/ (2026-10-15: the mockup's พอร์ต sheet loads data/app/port/edu.js, byte-identical to the app's assets/port/edu.js) */
 const REF = /["'(]((?:assets|js|data)\/[A-Za-z0-9_.\-\/]+\.(?:png|jpe?g|webp|svg|ttf|woff2?|js))/g;
