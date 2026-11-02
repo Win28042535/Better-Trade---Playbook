@@ -2666,14 +2666,32 @@ a.apb-xb:not(.apb-tool-a):focus-visible{outline:2px solid var(--focus);outline-o
    its sibling sub-titles despite doing the same job. Color matched to --ink too: at this size/
    weight, muted gray would look like a mismatch against its now-equal-sized siblings. */
 .pe-vlbl{font-size:var(--fs-h2);font-weight:var(--w-label);color:var(--ink);margin:var(--sp-inline) 0 6px;}
-.pe-vlist{display:flex;flex-direction:column;gap:var(--sp-list);}
-.pe-vitem{display:flex;align-items:center;gap:var(--sp-inline);padding:var(--sp-card-pad-sm);border-radius:var(--r1);border:1px solid var(--line-soft);background:var(--white);}
-.pe-vic{width:36px;height:36px;flex:0 0 auto;border-radius:var(--r1);background:var(--active-fill);color:var(--violet);display:flex;align-items:center;justify-content:center;}
-.pe-vic svg{width:var(--ic-md);height:var(--ic-md);}
-.pe-vtx{flex:1;min-width:0;}
-.pe-vt{font-size:var(--fs-bodysm);font-weight:var(--w-head);color:var(--ink);}
-.pe-vs{font-size:var(--fs-eyebrow);color:var(--muted);margin-top:1px;}
-.pe-vplay{width:22px;height:22px;flex:0 0 auto;color:var(--violet);}
+/* video clips (2026-11-02): thumbnail card on Home, the player page (renderVideo). Same image zoom inside the frame as the Home poster */
+.vid-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-stack);}
+:root[data-view="mobile"] .vid-grid{grid-template-columns:minmax(0,1fr);}
+.vid-card{display:block;width:100%;padding:0;border:0;background:none;color:inherit;font-family:var(--font);text-align:left;cursor:pointer;}
+.vid-thumb{position:relative;display:block;aspect-ratio:16/9;border-radius:var(--r1);overflow:hidden;background:var(--ink);}
+.vid-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.16,1,.3,1);}
+.vid-card:active .vid-thumb img{transform:scale(1.04);}
+@media(hover:hover) and (pointer:fine){.vid-card:hover .vid-thumb img{transform:scale(1.06);}}
+.vid-play{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--white);color:var(--ink);box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:center;}
+.vid-play svg{width:var(--ic-md);height:var(--ic-md);fill:currentColor;}
+.vid-tx{display:block;margin-top:var(--sp-list);}
+.vid-t{display:block;font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.4;}
+.vid-s{display:block;font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.45;margin-top:2px;}
+.vid-card.row{display:grid;grid-template-columns:128px minmax(0,1fr);gap:var(--sp-inline);align-items:center;}
+.vid-card.row .vid-tx{margin-top:0;}
+.vid-card.row .vid-play{width:32px;height:32px;margin:-16px 0 0 -16px;}
+.vid-card.row .vid-play svg{width:var(--ic-sm);height:var(--ic-sm);}
+.vid-rows{display:flex;flex-direction:column;gap:var(--sp-stack);}
+.vid-frame{aspect-ratio:16/9;margin-bottom:var(--sp-stack);border-radius:var(--r1);overflow:hidden;background:var(--ink);}
+.vid-frame iframe{display:block;width:100%;height:100%;border:0;}
+.vid-off{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-list);padding:var(--sp-stack);color:var(--white);font-size:var(--fs-bodysm);text-align:center;}
+.vid-off svg{width:var(--ic-lg);height:var(--ic-lg);}
+.vid-off .ag-more{width:auto;margin:0;padding:0 var(--sp-stack);}
+.vid-hd{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-list);}
+a.vid-yt{margin-top:var(--sp-stack);text-decoration:none;}
+.vid-sub{margin:var(--sp-stack) 0 var(--sp-list);font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--muted);}
 /* .pe-trk (renamed from .pe-track 2026-10-09): the post-event track box shared its class with the พอร์ต tab's slider rail
    (.pe-track, height:12px), so it collapsed to 12px and its header/locked row spilled over the upgrade button below. */
 .pe-trk{margin-top:var(--sp-stack);}
@@ -5739,6 +5757,7 @@ function render(){
   else if(st.phase==='assetpb')renderAssetIndex();
   else if(st.phase==='assetbook')renderAssetBook();
   else if(st.phase==='home')renderHome();
+  else if(st.phase==='video')renderVideo();
   else if(st.phase==='passport')renderBooth();
   else if(st.phase==='games')renderGames();
   else if(st.phase==='profile')renderProfile();
@@ -8667,7 +8686,7 @@ var TIER_ICON_PNG={'lc-crown':ICON_CROWN_PNG,'lc-gem':ICON_DIAMOND_PNG,'lc-compa
    is the same for every ticket. The demo panel's "Master Class" option stays but behaves like Explorer (on the site Master
    Class is a per-class add-on, not a tier). */
 function isUltimate(){return curTier().name==='Ultimate';}
-function curTier(){var s=document.getElementById('demoTier');var n=(s&&s.value)||'Master Class';return {name:n,meta:TIER_META[n]||TIER_META['Master Class']};}
+function curTier(){var s=document.getElementById('demoTier');var n=(s&&s.value)||'Ultimate';return {name:n,meta:TIER_META[n]||TIER_META['Master Class']};}
 /* Multi-ticket demo preview (2026-09-02, per direction "จำลองเคส...ลูกค้าบัตร 2 แบบ [เช่น] ซื้อบัตร
    Ultimate แล้ว ซื้อ Master class เพิ่ม", revised same day per follow-up direction — Profile's
    photo/name/org should stay the SAME as the single-ticket demo, not a different persona, and Home's
@@ -8714,12 +8733,99 @@ function postEventState(){
   var tracks=[
     mkTrack('conf','Conference',confItems,confOK,'ทั้งหมด '+confItems.length+' รายการ · เปิดให้ผู้ถือบัตร Ultimate')
   ];
-  var vdos=[];
-  if(confOK)vdos.push({title:'Conference (ย้อนหลัง)',note:'ครบทั้ง 2 วัน · ดูซ้ำได้หลังงาน',icon:'lc-landmark'});
   var ebookNote=confOK?'สิทธิ Ultimate · เปิดครบทุกแทร็ก':'ล็อกตามสิทธิบัตร — อัปเกรดเพื่อดาวน์โหลดสรุปและดูย้อนหลัง';
   var progressUnlocked=true; // not one of Ultimate's extras (2026-10-22) — open to every ticket
   var progressNote=progressUnlocked?'ปลดแล้ว — เราสรุปพัฒนาการให้หลังงาน ดูย้อนหลังได้บน efin.finance':'ปลดด้วยบัตร Master Class ขึ้นไป เพื่อให้เราสรุปพัฒนาการให้หลังงาน';
-  return {ti:ti,tracks:tracks,vdos:vdos,ebookNote:ebookNote,progressUnlocked:progressUnlocked,progressNote:progressNote,cta:LIFECYCLE_CTA[ti]};
+  return {ti:ti,tracks:tracks,ebookNote:ebookNote,progressUnlocked:progressUnlocked,progressNote:progressNote,cta:LIFECYCLE_CTA[ti]};
+}
+/* Video clips + player page (2026-11-02, per direction — the real product's Home has the how-to clips, opening YouTube in a new
+   tab, and no replay clips yet). Both Home sections share one card and one in-app player page ('video' phase), so a tap never
+   leaves the app. The replay ids are the how-to clips standing in (tagged ตัวอย่าง) until the real Conference links exist. */
+var VIDEOS={
+  howto:[{id:'lCxDvl37jl4',t:'เตรียมตัวก่อนงาน',s:'เตรียมบัตรและตั้งค่าแอปให้พร้อม'},{id:'JnR_6d10750',t:'ใช้งานในวันงาน',s:'สแกน QR และใช้งานฟีเจอร์ในงาน'}],
+  /* by day + the 3 Master Classes (2026-11-02, per direction); class names/speakers/dates from assets/agenda.js */
+  replay:[
+    {grp:'Conference',id:'lCxDvl37jl4',t:'Conference วันที่ 1',s:'31 ต.ค. 2569 · ดูย้อนหลัง',sample:true},
+    {grp:'Conference',id:'JnR_6d10750',t:'Conference วันที่ 2',s:'1 พ.ย. 2569 · ดูย้อนหลัง',sample:true},
+    {grp:'Master Class',id:'lCxDvl37jl4',t:'RADIANCE RIFT RUMBLE (R.R.R)',s:'31 ต.ค. 2569 · คุณวัชรวิชญ์ จิรวงศาพันธุ์ และคุณปรินทร์ ตั้งกิจเวทย์',sample:true},
+    {grp:'Master Class',id:'JnR_6d10750',t:'VALUE MEETS MOMENTUM',s:'1 พ.ย. 2569 · คุณเผดิมภพ สงเคราะห์ และคุณกวี ชูกิจเกษม',sample:true},
+    {grp:'Master Class',id:'lCxDvl37jl4',t:'MONEY MAKEOVER 40+',s:'1 พ.ย. 2569 · คุณนฤมล บุญสนอง',sample:true}
+  ]
+};
+var VIDEO_CUR=null,VIDEO_BACK={phase:'home',y:0};
+/* maxres has no letterbox bars; a clip without one falls back to hq (its 4:3 bars crop away at 16:9), then to the dark box */
+function vidThumbHTML(id){
+  var base='https://img.youtube.com/vi/'+id+'/';
+  return '<img src="'+base+'maxresdefault.jpg" alt="" loading="lazy" onerror="if(this.dataset.f){this.remove()}else{this.dataset.f=1;this.src=\''+base+'hqdefault.jpg\'}">';
+}
+var VID_PLAY='<span class="vid-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="9 6.5 18 12 9 17.5"/></svg></span>';
+function vidCardHTML(g,i,row){
+  var v=VIDEOS[g][i];
+  return '<button class="vid-card'+(row?' row':'')+'" type="button" data-vid="'+g+':'+i+'"><span class="vid-thumb">'+vidThumbHTML(v.id)+VID_PLAY+'</span>'+
+    '<span class="vid-tx"><span class="vid-t">'+v.t+'</span><span class="vid-s">'+v.s+'</span></span></button>';
+}
+function vidGridHTML(g,grp){return '<div class="vid-grid">'+VIDEOS[g].map(function(v,i){return grp&&v.grp!==grp?'':vidCardHTML(g,i);}).join('')+'</div>';}
+function howtoHTML(){
+  return '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">ดูวิธีใช้งานให้พร้อมก่อนเริ่มงาน</div><div class="hcard-s">แนะนำขั้นตอนง่าย ๆ ทั้งก่อนงานและในวันงาน</div></div>'+vidGridHTML('howto')+'</section>';
+}
+function bindVideoCards(){
+  root.querySelectorAll('[data-vid]').forEach(function(b){b.onclick=function(){
+    var p=b.dataset.vid.split(':');
+    if(st.phase!=='video')VIDEO_BACK={phase:st.phase,y:window.scrollY};
+    VIDEO_CUR={g:p[0],i:+p[1]};st.phase='video';render();
+  };});
+}
+/* Replay clips = Ultimate only, no link out to YouTube (2026-11-02, per direction "เฉพาะคนที่มีสิทธิ์ ... จะไม่ลิ้งไปที่หน้า youtube
+   โดยตรง"; the how-to clips stay open to everyone, with their link). So they mount through YouTube's player API: a plain iframe
+   can't tell the page a clip failed, and with no fallback link the player has to say so itself. This is a demo-side gate only:
+   the logo inside YouTube's player still links out, and the ids sit in this file. Real protection needs a private video host
+   + a server check per play (handed to the dev team). */
+var YT_API=null;
+function loadYtApi(){
+  if(!YT_API)YT_API=new Promise(function(ok,no){
+    if(window.YT&&window.YT.Player){ok();return;}
+    var prev=window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady=function(){if(prev)prev();ok();};
+    var s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';
+    s.onerror=function(){YT_API=null;no();};
+    document.head.appendChild(s);
+  });
+  return YT_API;
+}
+function vidMsgHTML(icon,msg){return '<div class="vid-off">'+ic(icon)+'<span>'+msg+'</span><button class="ag-more" id="vidRetry" type="button">ลองอีกครั้ง</button></div>';}
+function mountReplayPlayer(v){
+  var frame=root.querySelector('.vid-frame'),ready=false,tmo=0;
+  var fail=function(){
+    clearTimeout(tmo);if(!frame.isConnected)return;
+    frame.innerHTML=vidMsgHTML('lc-alert-triangle','เล่นวิดีโอไม่ได้ในตอนนี้');
+    frame.querySelector('#vidRetry').onclick=function(){render();};
+  };
+  tmo=setTimeout(function(){if(!ready)fail();},PDF_TIMEOUT);
+  loadYtApi().then(function(){
+    if(!frame.isConnected){clearTimeout(tmo);return;}
+    new window.YT.Player(frame.querySelector('#vidPlayer'),{host:'https://www.youtube-nocookie.com',videoId:v.id,width:'100%',height:'100%',
+      playerVars:{rel:0,iv_load_policy:3,playsinline:1,origin:location.origin},
+      events:{onReady:function(){ready=true;clearTimeout(tmo);},onError:fail}});
+  },fail);
+}
+function renderVideo(){
+  var back=function(){st.phase=VIDEO_BACK.phase;render();window.scrollTo(0,VIDEO_BACK.y);requestRevealTick();};
+  var locked=VIDEO_CUR&&VIDEO_CUR.g==='replay'&&!isUltimate(); // the demo panel can change the ticket while this page is open
+  if(!VIDEO_CUR||locked){back();return;}
+  var g=VIDEO_CUR.g,v=VIDEOS[g][VIDEO_CUR.i],url='https://youtu.be/'+v.id,off=navigator.onLine===false;
+  root.innerHTML='<header class="topbar"><button class="tb-ic" id="vidBack" type="button" aria-label="ย้อนกลับ">'+ic('lc-arrow-left')+'</button><div style="flex:1;min-width:0"><div class="tb-title apb-tbt">'+v.t+'</div><div class="tb-sub">'+(g==='howto'?'วิธีใช้งาน':'ดูย้อนหลัง')+'</div></div></header>'+
+    '<main class="scroll fade"><section class="home-card vid-page"><div class="vid-frame">'+
+      (off?vidMsgHTML('lc-wifi-off','ไม่มีสัญญาณอินเทอร์เน็ต'):g==='replay'?'<div id="vidPlayer"></div>'
+        :'<iframe src="https://www.youtube-nocookie.com/embed/'+v.id+'?rel=0&amp;playsinline=1" title="'+v.t+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>')+
+      '</div><div class="vid-hd"><div class="s-h">'+v.t+'</div>'+(v.sample?'<span class="ex-tag">คลิปตัวอย่าง</span>':'')+'</div><div class="hcard-s">'+v.s+'</div>'+
+      (g==='replay'?'':'<a class="ag-more vid-yt" href="'+url+'" target="_blank" rel="noopener">'+ic('lc-external-link')+'เปิดใน YouTube</a>')+'</section>'+
+      '<section class="home-card"><div class="hcard-hd"><div class="s-h">คลิปอื่น</div></div><div class="vid-rows">'+VIDEOS[g].map(function(_,i){return i===VIDEO_CUR.i?'':vidCardHTML(g,i,true);}).join('')+'</div></section>'+
+    '</main>'+appTabbar('home');
+  bindTabbar();
+  root.querySelector('#vidBack').onclick=back;
+  var rt=root.querySelector('#vidRetry');if(rt)rt.onclick=function(){render();};
+  bindVideoCards();
+  if(g==='replay'&&!off)mountReplayPlayer(v);
 }
 function postEventHTML(){
   var s=postEventState();
@@ -8735,7 +8841,7 @@ function postEventHTML(){
   };
   return '<section class="home-card pe-sec scroll-reveal"><div class="hcard-hd"><div class="s-h">หลังจบงาน <span class="hd-star">✦</span> ดูย้อนหลัง</div></div><div class="hcard-s" style="margin-top:-6px">'+s.ebookNote+'</div>'+
     '<div class="pe-report'+(s.progressUnlocked?' on':'')+'">'+ic(s.progressUnlocked?'lc-file-text':'lc-lock')+'<div><div class="pe-report-t">รายงานพัฒนาการหลังงาน</div><div class="pe-report-s">'+s.progressNote+'</div></div></div>'+
-    (s.vdos.length?('<div class="pe-vlbl">วิดีโอย้อนหลัง</div><div class="pe-vlist">'+s.vdos.map(function(v){return '<div class="pe-vitem"><div class="pe-vic">'+ic(v.icon)+'</div><div class="pe-vtx"><div class="pe-vt">'+v.title+'</div><div class="pe-vs">'+v.note+'</div></div>'+ic('lc-play-circle','pe-vplay')+'</div>';}).join('')+'</div>'):'')+
+    '<div class="pe-vlbl">วิดีโอย้อนหลัง</div>'+(s.ti>=4?['Conference','Master Class'].map(function(grp){return '<div class="vid-sub">'+grp+'</div>'+vidGridHTML('replay',grp);}).join(''):'<div class="pe-locked">'+ic('lc-lock')+'<span>ทั้งหมด '+VIDEOS.replay.length+' คลิป · เปิดให้ผู้ถือบัตร Ultimate</span></div>')+
     s.tracks.map(trackHTML).join('')+
     '<div class="pe-cta-row"><button class="btn btn-primary pe-upgrade" id="peUpgrade">'+ic('lc-sparkles')+s.cta.primary+'</button></div>'+
   '</section>';
@@ -8954,6 +9060,7 @@ function renderHome(){
        the ticket card, ahead of เวทีห้องใหญ่, regardless of pre/on-event phase) — both are account-
        level app settings, not event-progress content, so they sit outside the `pre?'':(...)` block
        that gates the in-event-only next-step/counters/book-teaser group just below. */
+    howtoHTML()+ // both phases (2026-11-02): its clips cover before the event and the day itself; same slot as the real product
     pinCardHTML()+installCardHTML()+pinModalHTML()+
     (pre?'':(
     '<section class="next-step scroll-reveal"><div class="ns-ic">'+(ns.iconPng?'<img src="'+ns.iconPng+'" alt="">':ic(ns.icon))+'</div><div class="ns-tx"><div class="ns-ey">'+ns.ey+'</div><div class="ns-t">'+ns.t+'</div></div><div class="ns-cta-slot" id="ns-cta-slot"></div><div class="ns-body"><div class="ns-b">'+ns.b+'</div></div></section>'+
@@ -8967,6 +9074,7 @@ function renderHome(){
   '</main>'+
   appTabbar('home');
   bindTabbar();
+  bindVideoCards();
   var homeBook=root.querySelector('#homeBook');if(homeBook)homeBook.onclick=function(){st.phase='book';render();};
   root.querySelector('#homeTier').onclick=function(){st.phase='profile';render();};
   root.querySelectorAll('.hc-card').forEach(function(c){c.onclick=function(){st.phase=c.dataset.go;render();};});
@@ -11051,7 +11159,7 @@ function buildDemo(){
     /* "Poster หน้าหลัก" preview row removed (2026-08-29, per direction "ไม่ต้องมี preview...V1, V2
        ลบออก เหลือแค่ V3") — renderHome's home-hero now only ever ships as V3, so a 1-choice
        switcher had nothing left to switch. */
-    '<div class="demo-lbl">สิทธิ์ของคุณ</div><select class="demo-sel" id="demoTier"><option>Master Class</option><option>Explorer</option><option>Ultimate</option></select>'+
+    '<div class="demo-lbl">สิทธิ์ของคุณ</div><select class="demo-sel" id="demoTier"><option>Master Class</option><option>Explorer</option><option selected>Ultimate</option></select>'+
     '<div class="demo-stub">* ยังไม่เชื่อมสิทธิ์บัตรกับเนื้อหา (เดโม)</div>'+
     /* จำนวนบัตร (2026-09-02) — separate preview toggle, not a 3rd demoTier option: "2 ใบ" previews a
        FIXED illustrative combo (MULTI_TICKET_DEMO) on just the Home pass-card + Profile page, it
