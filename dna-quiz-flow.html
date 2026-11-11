@@ -1432,6 +1432,9 @@ body{font-family:var(--font);background:var(--paper);color:var(--ink);font-weigh
    the 4 bars above). Green = that data source is already collected; a future not-yet-done source
    would render without .done (quiet grey), matching the reference's "แตะชิปสีเทาเพื่อไปเก็บต่อ" idiom. */
 .trait-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--sp-stack);}
+/* adviser questions (2026-11-04, product's สรุปไว้คุยกับผู้แนะนำ list) */
+.adv-q{margin:var(--sp-list) 0 0;padding-left:1.4em;display:flex;flex-direction:column;gap:var(--sp-list);font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.5;}
+.adv-note{margin-top:var(--sp-stack);font-size:var(--fs-eyebrow);color:var(--muted);}
 .trait-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--rpill);font-size:var(--fs-eyebrow);font-weight:var(--w-label);background:var(--accent);color:var(--muted);}
 .trait-chip svg{width:var(--ic-xs,14px);height:var(--ic-xs,14px);flex:0 0 auto;}
 .trait-chip.done{background:color-mix(in srgb,var(--green-text) 12%,var(--white));color:var(--green-text);}
@@ -2684,7 +2687,64 @@ a.apb-xb:not(.apb-tool-a):focus-visible{outline:2px solid var(--focus);outline-o
 .vid-card.row .vid-play{width:32px;height:32px;margin:-16px 0 0 -16px;}
 .vid-card.row .vid-play svg{width:var(--ic-sm);height:var(--ic-sm);}
 .vid-rows{display:flex;flex-direction:column;gap:var(--sp-stack);}
-.vid-frame{aspect-ratio:16/9;margin-bottom:var(--sp-stack);border-radius:var(--r1);overflow:hidden;background:var(--ink);}
+/* ══ RERUN (post-event, 2026-11-11) ══ rights card, session rows, package sheet, profile "สิทธิ์ของฉัน". Spectrum only on the
+   progress meter + the selected package border (interactive/selected states), per DESIGN-DNA. */
+.rr-card{background:var(--white);border:1px solid var(--line-soft);border-radius:var(--r2);padding:var(--sp-card-pad-sm) var(--sp-card-pad);display:flex;flex-direction:column;gap:var(--sp-list);}
+.rr-ey{display:flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--muted);}
+.rr-ey .lucide{width:16px;height:16px;}
+.rr-name{font-size:var(--fs-heading);font-weight:var(--w-head);color:var(--ink);line-height:1.3;}
+.rr-sub{font-size:var(--fs-bodysm);color:var(--muted);line-height:1.5;}
+.rr-meter{height:6px;border-radius:var(--rpill);background:var(--accent);overflow:hidden;margin-top:var(--sp-glue);}
+.rr-meter span{display:block;height:100%;border-radius:inherit;background:var(--spectrum);}
+.rr-win{display:flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-eyebrow);color:var(--muted);}
+.rr-win .lucide{width:14px;height:14px;}
+.rr-buy{width:100%;margin-top:var(--sp-list);}
+.rr-buy[disabled],.rr-sheet .rr-go[aria-disabled=true]{opacity:.5;cursor:not-allowed;}
+.rr-full{display:flex;align-items:center;gap:var(--sp-glue);font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--green-text);margin-top:var(--sp-glue);}
+.rr-full .lucide{width:18px;height:18px;}
+.rr-pending{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-list);align-items:start;padding:var(--sp-inline);border-radius:var(--r1);background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber-text);font-size:var(--fs-eyebrow);line-height:1.5;}
+.rr-pending>.lucide{width:18px;height:18px;margin-top:2px;}
+.rr-pending b{display:block;font-size:var(--fs-bodysm);}
+.rr-pending .ag-more{grid-column:1/-1;margin-top:0;}
+.rr-day{font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--muted);margin:var(--sp-stack) 0 var(--sp-list);}
+#rrTabs{margin-bottom:var(--sp-glue);}
+.rr-row.is-locked .vid-thumb img{filter:grayscale(.6) brightness(.75);}
+.rr-row[disabled]{cursor:default;}
+.rr-lockic{position:absolute;left:50%;top:50%;width:32px;height:32px;margin:-16px 0 0 -16px;border-radius:50%;background:rgba(17,19,24,.55);display:flex;align-items:center;justify-content:center;color:#fff;}
+.rr-lockic .lucide{width:16px;height:16px;}
+.rr-st{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:var(--fs-eyebrow);font-weight:var(--w-label);color:var(--muted);}
+.rr-st .lucide{width:12px;height:12px;}
+.rr-st.open{color:var(--ink);}
+.rr-picks .vid-rows{margin-top:var(--sp-glue);}
+.rr-in-book{margin-top:var(--sp-section);text-align:left;}
+.rr-sheet{max-width:400px;}
+.rr-pkgs{display:flex;flex-direction:column;gap:var(--sp-list);margin:var(--sp-stack) 0;}
+.rr-pkg{display:flex;align-items:center;gap:var(--sp-inline);width:100%;text-align:left;padding:var(--sp-inline) var(--sp-stack);border:1px solid var(--line-soft);border-radius:var(--r1);background:var(--white);font-family:var(--font);color:var(--ink);cursor:pointer;}
+.rr-pkg.on{border:1.5px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,var(--spectrum) border-box;}
+.rr-pkg-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.rr-pkg-t{font-size:var(--fs-bodysm);font-weight:var(--w-label);line-height:1.35;}
+.rr-pkg-s{font-size:var(--fs-eyebrow);color:var(--muted);}
+.rr-price{font-size:var(--fs-bodysm);font-weight:var(--w-head);white-space:nowrap;}
+.rr-best{display:inline-block;font-size:11px;font-weight:var(--w-label);padding:1px 8px;border-radius:var(--rpill);background:var(--ink);color:var(--white);vertical-align:1px;}
+.rr-go{width:100%;display:flex;align-items:center;justify-content:center;gap:var(--sp-glue);text-decoration:none;}
+.rr-go .lucide{width:16px;height:16px;}
+.rr-note{font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.55;margin-top:var(--sp-inline);text-align:center;}
+.rr-mine{margin-top:var(--sp-stack);text-align:left;display:flex;flex-direction:column;gap:var(--sp-list);}
+.rr-mine .pq-lbl{text-align:center;}
+.rr-mine-row{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-list);align-items:start;padding:var(--sp-inline);border:1px solid var(--line-soft);border-radius:var(--r1);font-size:var(--fs-eyebrow);color:var(--muted);line-height:1.5;}
+.rr-mine-row>.lucide{width:18px;height:18px;color:var(--ink);margin-top:2px;}
+.rr-mine-row b{display:block;font-size:var(--fs-bodysm);color:var(--ink);}
+.rr-mine-row.pend{background:var(--amber-bg);border-color:var(--amber-border);}
+.rr-mine-foot{display:flex;justify-content:space-between;font-size:var(--fs-eyebrow);color:var(--muted);}
+.rr-mine .ag-more{margin-top:0;}
+.vid-preview{display:flex;align-items:center;gap:var(--sp-list);padding:var(--sp-inline);border-radius:var(--r1);background:var(--accent);font-size:var(--fs-eyebrow);color:var(--ink);line-height:1.5;margin-top:var(--sp-inline);}
+.vid-preview .lucide{width:16px;height:16px;flex:none;}
+.vid-preview span{flex:1;}
+.vid-preview .btn{flex:none;min-height:36px;padding:0 var(--sp-stack);font-size:var(--fs-eyebrow);}
+.vid-endcap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-list);background:rgba(17,19,24,.85);color:#fff;text-align:center;padding:var(--sp-stack);font-size:var(--fs-bodysm);}
+.vid-endcap .btn{min-height:40px;}
+.topbar .reg-cta.rr-hd-buy{flex:0 0 auto;min-height:38px;padding:0 var(--sp-stack);font-size:var(--fs-label);border:0;cursor:pointer;}
+.vid-frame{position:relative;aspect-ratio:16/9;margin-bottom:var(--sp-stack);border-radius:var(--r1);overflow:hidden;background:var(--ink);}
 .vid-frame iframe{display:block;width:100%;height:100%;border:0;}
 .vid-off{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-list);padding:var(--sp-stack);color:var(--white);font-size:var(--fs-bodysm);text-align:center;}
 .vid-off svg{width:var(--ic-lg);height:var(--ic-lg);}
@@ -4064,6 +4124,11 @@ html.pdfv-open,html.pdfv-open body{overflow:hidden;}
 /* .pcv-wrap/.pcv-hint/.pcv-ctas/.pcv-btn (the old drag-to-rotate viewer's hint pill + flip button)
    and .hero-cardwrap (its wrapping frame) removed 2026-08-30 along with คู่มือ 1 — see the removal
    note near BOOK2_TAB. */
+/* legend block (2026-11-04, product's identity tab): investor name in the card's serif, its Thai line, English line in caps */
+.hero-leg2{text-align:center;margin:var(--sp-stack) 0 var(--sp-list);}
+.hl-name{font-family:var(--serif);font-size:var(--fs-heading);font-weight:var(--w-label);line-height:1.15;color:var(--ink);}
+.hl-th{font-size:var(--fs-bodysm);font-weight:var(--w-label);color:var(--ink);line-height:1.45;margin-top:var(--sp-stack-tight);}
+.hl-en{font-family:var(--serif);font-size:var(--fs-meta);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);line-height:1.4;margin-top:2px;}
 .hero-sig-c{font-size:var(--fs-sub);font-weight:var(--w-body);color:var(--muted);line-height:1.55;text-align:center;max-width:32ch;margin:0 auto 20px;}
 /* 32ch is tuned to wrap cleanly on a real phone's narrow card; on tablet/pc the same card is ~670px+
    wide (see .toc/main.scroll's 760px reading column) so that cap forced most sig lines to wrap to 2
@@ -4628,7 +4693,7 @@ html.pbk main.scroll .bt-tabs .bt-tab[aria-selected="true"]{color:var(--ink);bor
 <symbol id="lc-file-x" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m14.5 12.5-5 5"/><path d="m9.5 12.5 5 5"/></symbol>
 <symbol id="lc-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
 <symbol id="lc-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
-<symbol id="lc-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<symbol id="lc-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol><symbol id="lc-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol><symbol id="lc-loader" viewBox="0 0 24 24"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></symbol><symbol id="lc-shopping-bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol><symbol id="lc-ticket" viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></symbol><symbol id="lc-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
 <!-- lc-key/lc-smartphone/lc-delete (2026-09-25, added for the PIN-lock + PWA-install home cards) —
      simplified hand-drawn shapes in the same stroke idiom as every symbol here (round joins, no
      fill, 24x24 box), not verbatim Lucide path data — close enough to read correctly at icon size,
@@ -4770,7 +4835,16 @@ var LOGO_IMG={aiSymbol:'assets/aiSymbol.png',efinAiIcon:'assets/efinAiIcon.png',
    generic Map.png mockup placeholder), base64-embedded like the other images so the app stays
    self-contained. Used in the booth map card + its fullscreen lightbox. */
 var MAP_IMG="assets/MAP_IMG.webp?v=3"; // 2026-10-28: "Floor Plan - Top View-03.webp" (white margin cropped, 2200px webp, 90 KB)
-var RADAR_AXES=['หุ้นไทย','ต่างปท.','กองทุน','คริปโต','ทอง','สุขภาพ'];
+var RADAR_AXES=['หุ้นไทย','ต่างปท.','กองทุน','คริปโต','ทอง','สุขภาพ']; // h.radar order — still what the booth route scores from
+/* Interest radar axes as in the real product (2026-11-04): 6 axes over its 10 asset types — หุ้น = Thai + foreign stocks,
+   อื่นๆ = insurance + crypto + collectibles + health. RADAR2_OF() derives a persona's values from h.radar + its asset list
+   (bonds / property have no h.radar axis of their own). */
+var RADAR2_AXES=['หุ้น','กองทุนรวม','ตราสารหนี้','ทองคำ','อสังหา','อื่นๆ'];
+var RADAR2_MEMBERS=['หุ้นไทย, หุ้นต่างประเทศ','กองทุนรวม','ตราสารหนี้','ทองคำ','อสังหาริมทรัพย์','ประกัน, คริปโต, ของสะสม, สุขภาพ'];
+function RADAR2_OF(h){
+  var r=h.radar,has=function(re){return h.assets.some(function(a){return re.test(a.t);});};
+  return [Math.max(r[0],r[1]),r[2],has(/ตราสารหนี้|เงินฝาก/)?70:25,r[4],has(/อสังหา|REIT/)?70:25,Math.round((r[3]+r[5])/2)];
+}
 /* Custom illustrated question/analyzing icons — replaces specific Lucide icons per direction; each compressed via in-browser canvas (no local image tool available) from a 1920x1920 source PNG down to 160x160, kept as PNG (not JPEG) to preserve alpha transparency. */
 var ICON_HOURGLASS_PNG='assets/ICON_HOURGLASS_PNG.png';
 var ICON_EFIN2_PNG='assets/efin-2.png'; // renderGames' efinLocked card icon (2026-09-17, per direction) — same .ev-empty-ic slot ICON_HOURGLASS_PNG fills on the pre-event card, swapped for this one instead
@@ -4958,6 +5032,25 @@ var HEROES={
    half-filled. */
 /* attach family display fields onto each persona (DRY: family visuals live in FAM only) */
 Object.keys(HEROES).forEach(function(k){var h=HEROES[k],f=FAM[h.fam];h.famTh=f.th;h.famIcon=f.icon;h.accent=f.accent;h.rgb=f.rgb;h.strengths=f.strengths;h.watchouts=f.watchouts;});
+/* Product data (2026-11-04, per direction "อัปเดตข้อมูลเพิ่มเติมอ้างอิงจากลิงค์นี้" — the real product's Playbook): per-persona
+   legend + Thai/English legend line, tagline, and per-persona strengths / watch-outs (were per family, FAM). Read from the
+   product's character records (archetype ids mapped to our slugs as in the HEROES note above); two typos in the source
+   corrected (Pual → Paul Tudor Jones, วัฎจัร → วัฏจักร). Overrides the family strengths/watch-outs attached just above. */
+var HERO_PB={
+ guardian:{legend:'Ray Dalio',legendTh:'ผู้บุกเบิกพอร์ตสมดุลทุกฤดู',legendEn:'Pioneer of the All-Weather Portfolio',tagline:'ทุนต้องไม่หาย ผลตอบแทนค่อยคิดทีหลัง',strengths:['ไม่เครียดกับตลาด','ทุนปลอดภัย','วางแผนชีวิตได้ชัดเจน'],watchouts:['เงินเฟ้ออาจกัดกร่อนความมั่งคั่งในระยะยาวถ้าไม่ปรับ strategy']},
+ harvester:{legend:'Benjamin Graham',legendTh:'บิดาแห่งการลงทุนเน้นคุณค่า',legendEn:'Father of Value Investing',tagline:'ปลูกต้นไม้วันนี้ เก็บผลทุกปี',strengths:['สร้าง cash flow สม่ำเสมอ','ไม่ต้องขายหุ้นตอนต้องการเงิน','compound จากการ reinvest'],watchouts:['อย่ายึดติดกับ yield สูงจนลืมดู fundamental ว่าบริษัทยังดีอยู่ไหม']},
+ steadyhand:{legend:'John Bogle',legendTh:'ผู้ให้กำเนิดกองทุนดัชนี',legendEn:'Father of the Index Fund',tagline:'น้ำหยดลงหินทุกวัน หินยังกร่อนได้',strengths:['วินัยสูงสุด','ไม่ตัดสินใจด้วยอารมณ์','ลดความเสี่ยงจาก timing'],watchouts:['อาจยึดติดกับแผนมากเกินไปจนไม่ปรับตามสถานการณ์ที่เปลี่ยน']},
+ diamondhand:{legend:'Warren Buffett',legendTh:'นักลงทุนหุ้นคุณค่า ถือยาวระดับตำนาน',legendEn:'The Legendary Long-Term Value Investor',tagline:'สะสมทุกอย่างที่มีคุณค่า ไม่ขายง่ายๆ',strengths:['อดทนสูงมาก','ไม่ตื่นตระหนกตอน crash','เชื่อใน fundamental'],watchouts:['อาจพลาดโอกาสขายที่ดี หรือถือสินทรัพย์ที่ไม่มีอนาคตนานเกินไป']},
+ analyst:{legend:'Peter Lynch',legendTh:'ลงทุนในสิ่งที่คุณรู้จักดี',legendEn:'Invest in What You Know',tagline:'มองไกล จับสัญญาณก่อนคนอื่น',strengths:['วิเคราะห์เชิงลึก','ตัดสินใจด้วยข้อมูล','เข้าใจ macro เศรษฐกิจ'],watchouts:['อาจ overanalyze จนไม่กล้าลงมือ หรือพลาดโอกาสที่ต้องตัดสินใจเร็ว']},
+ planner:{legend:'David Swensen',legendTh:'ผู้วางแผนกองทุน มหาวิทยาลัยเยล กระจายหลายสินทรัพย์',legendEn:'Architect of the Yale Endowment Model',tagline:'คิดล่วงหน้า 10 ก้าว วางแผนทุก scenario',strengths:['วางแผนระบบ','บริหารความเสี่ยงรอบด้าน','ใช้เครื่องมือหลากหลาย'],watchouts:['อาจซับซ้อนเกินจนยากต่อการ execute หรือ overthink จนพลาดจังหวะ']},
+ explorer:{legend:'Jim Rogers',legendTh:'นักลงทุนท่องโลก หาโอกาสข้ามประเทศ',legendEn:'The Globe-Trotting Investor',tagline:'โลกทั้งใบคือตลาดของฉัน',strengths:['diversify ข้ามประเทศ','ลด country risk','เข้าถึง sector ที่ไทยไม่มี'],watchouts:['ต้องเข้าใจ currency risk และกฎหมายภาษีการลงทุนต่างประเทศ']},
+ sage:{legend:'Naval Ravikant',legendTh:'นักลงทุนสตาร์ทอัพ ผู้สอนเรื่องอิสรภาพทางการเงิน',legendEn:'Angel Investor & Philosopher of Wealth',tagline:'เข้าใจเงินในมิติที่ลึกกว่าตัวเลข',strengths:['มองภาพรวมชีวิต','ลงทุนในตัวเองสูง','balance ระหว่างเงินและชีวิต'],watchouts:['อาจให้ความสำคัญกับสินทรัพย์ทางการเงินน้อยเกินไปจนพลาด financial security']},
+ maverick:{legend:'Cathie Wood',legendTh:'นักลงทุนสายนวัตกรรมพลิกโลก',legendEn:'Champion of Disruptive Innovation',tagline:'ขึ้นให้สูง เร็วที่สุด ไม่กลัวตก',strengths:['กล้าเสี่ยงในสิ่งที่เชื่อ','รับ volatility ได้สูง','มองเห็นอนาคต'],watchouts:['ต้องมีวินัย cut loss ที่เข้มแข็ง มิฉะนั้นจรวดอาจพุ่งลงดินแทนขึ้นฟ้า']},
+ waverider:{legend:'Paul Tudor Jones',legendTh:'เทรดเดอร์ตามเทรนด์ ระดับตำนาน',legendEn:'Legendary Trend-Following Trader',tagline:'คลื่นมา ขึ้นก่อน ลงได้ทัน',strengths:['จับ momentum ได้เร็ว','ใช้ technical analysis','ยืดหยุ่นตามตลาด'],watchouts:['ต้องมีวินัย stop loss เด็ดขาด เพราะคลื่นเปลี่ยนทิศได้ทุกเมื่อ']},
+ contrarian:{legend:'Howard Marks',legendTh:'ซื้อตอนคนอื่นกลัว อ่านวัฏจักรตลาด',legendEn:'Master of Market Cycles',tagline:'เมื่อทุกคนกลัว ฉันกล้า เมื่อทุกคนกล้า ฉันระวัง',strengths:['ซื้อในราคาถูกที่สุด','ไม่ถูกกระแสสังคมครอบงำ','ผลตอบแทนสูงในระยะยาว'],watchouts:['ต้องแน่ใจว่า "ถูกกว่า" ไม่ใช่ "กำลังจะเป็น 0" — value trap เป็นอันตราย']},
+ collector:{legend:'นักสะสมผู้เชี่ยวชาญ',legendTh:'',legendEn:'',tagline:'เปลี่ยนทุกอย่างให้เป็นทองได้',strengths:['ความรู้เฉพาะทางลึกมาก','เห็นโอกาสที่คนอื่นมองข้าม','portfolio ไม่ correlate กับตลาด'],watchouts:['สินทรัพย์ทางเลือกขาย liquidity ต่ำ อาจขายไม่ได้ตอนต้องการเงินด่วน']}
+};
+Object.keys(HERO_PB).forEach(function(k){Object.assign(HEROES[k],HERO_PB[k]);});
 
 /* ── COLLECTIBLE PERSONA CARD ──────────────────────────────────────
    Card art is a design MOCKUP (per project note): a family-tinted panel + a
@@ -5003,7 +5096,7 @@ function cardStats(h){
    pink for การรับความเสี่ยง (same hue confRow's own 'ความเสี่ยง' row uses), yellow for
    วินัยการลงทุน (same hue confRow's own 'วินัย' row uses), violet for การกระจายลงทุน (no direct
    confRow counterpart — the one palette color left over). */
-var SKC_ROWS=['การรับความเสี่ยง','วินัยการลงทุน','การกระจายลงทุน'];
+var SKC_ROWS=['ความเสี่ยง','ความสม่ำเสมอ','การกระจาย']; // labels as in the real product (2026-11-04); values = HEROES[].skills, fixed per persona
 var SKC_COLORS=['var(--pink)','var(--yellow)','var(--violet)'];
 function skillCardHTML(h){
   var rows=SKC_ROWS.map(function(l,i){var v=h.skills[i];
@@ -5743,7 +5836,8 @@ function render(){
      this screen on demand (see buildDemo()) without needing a real PIN set first — checkPin() itself
      already knows to accept anything when there's no stored hash to check against. */
   if((hasPin()||DEMO.forceLock)&&!PIN_UNLOCKED){renderLock();return;}
-  if(DEMO.eventPhase==='on'&&['splash','consent','quiz','reveal','cardreveal'].indexOf(st.phase)>-1)st.phase=RESULT?'book':'home';
+  if(DEMO.eventPhase!=='pre'&&['splash','consent','quiz','reveal','cardreveal'].indexOf(st.phase)>-1)st.phase=RESULT?'book':'home';
+  if(DEMO.eventPhase==='post'&&(st.phase==='passport'||st.phase==='games'))st.phase='home'; // post-event (2026-11-11): no booth walk / games after the event
   if(st.phase!=='splash')stopSplashTimer();
   if(st.phase!=='reveal')clearRevealTimer(); // don't force-advance to Book if the user left the analyzing screen
   if(st.phase!=='cardreveal')clearCardRevealTimer(); // cancel any pending character-reveal steps once we've left that scene
@@ -6220,7 +6314,8 @@ function compute(){
   RESULT={hero:hero,heroKey:winner,declared:declared,revealed:revealed,gap:gap,conf:conf,confLevel:confLevel,subs:{identity:identity,behavior:behavior,riskAlign:riskAlign,discipline:discipline},knowledge:knowledge,horizon:horizon,votes:scores,interests:st.s3.slice()};
 }
 
-function radarSVG(vals,hue){
+function radarSVG(vals,hue,axes){
+  axes=axes||RADAR_AXES; // product axes passed by the interest tab (2026-11-04)
   var R=90,cx=170,cy=122,pts=[];
   for(var k=0;k<6;k++){var a=(-90+60*k)*Math.PI/180;var r=R*vals[k]/100;pts.push([Math.cos(a)*r,Math.sin(a)*r]);}
   function ring(s){var o='';for(var k=0;k<6;k++){var a=(-90+60*k)*Math.PI/180;o+=(k?' ':'')+(Math.cos(a)*R*s).toFixed(1)+','+(Math.sin(a)*R*s).toFixed(1);}return o;}
@@ -6229,11 +6324,11 @@ function radarSVG(vals,hue){
   /* data-i (2026-08-29, per direction "ให้มี Interaction") — lets bindRadarTap() (near
      bindAllocHover()) pair each dot with its matching label by index, same convention
      alloc-bar/alloc-row already use for their own hover pairing. */
-  var dots='';pts.forEach(function(p,k){dots+='<circle class="rk-dot" data-i="'+k+'" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3"><title>'+RADAR_AXES[k]+' '+vals[k]+'</title></circle>';});
+  var dots='';pts.forEach(function(p,k){dots+='<circle class="rk-dot" data-i="'+k+'" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3"><title>'+axes[k]+' '+vals[k]+'</title></circle>';});
   var lab=[[0,-104,'middle'],[104,-52,'start'],[104,60,'start'],[0,116,'middle'],[-104,60,'end'],[-104,-52,'end']];
   /* font-size bumped 10.5->14 (2026-08-29, per direction "text size เท่ากับ" .int-bar-note's own
      --fs-eyebrow/14px) — was noticeably smaller than every other piece of copy on the page. */
-  var labels='';for(var k=0;k<6;k++){labels+='<text class="rk-lab" data-i="'+k+'" x="'+lab[k][0]+'" y="'+lab[k][1]+'" text-anchor="'+lab[k][2]+'" font-family="'+SVGFONT+'" font-size="14" font-weight="500">'+RADAR_AXES[k]+' '+vals[k]+'</text>';}
+  var labels='';for(var k=0;k<6;k++){labels+='<text class="rk-lab" data-i="'+k+'" x="'+lab[k][0]+'" y="'+lab[k][1]+'" text-anchor="'+lab[k][2]+'" font-family="'+SVGFONT+'" font-size="14" font-weight="500">'+axes[k]+' '+(vals[k]||'–')+'</text>';}
   return '<svg width="340" height="244" viewBox="0 0 340 244" style="max-width:100%" role="img" aria-label="พอร์ตลงทุน '+RESULT.hero.th+'"><title>พอร์ตลงทุน '+RESULT.hero.th+'</title><g transform="translate('+cx+','+cy+')">'+
     '<polygon class="rk-grid" points="'+ring(1)+'"/><polygon class="rk-grid" points="'+ring(.75)+'"/><polygon class="rk-grid" points="'+ring(.5)+'"/><polygon class="rk-grid" points="'+ring(.25)+'"/>'+
     axis(0)+axis(1)+axis(2)+axis(3)+axis(4)+axis(5)+
@@ -6366,14 +6461,18 @@ function heroDetailBody(hero,previewOnly){
      section no longer signals family at all. Both the chips below AND .ast-block's own wash/border
      right after (previously the same hero.accent) switched together — they're one visual unit. */
   var chips=hero.assets.map(function(a){return '<span class="chip" style="background:color-mix(in srgb,var(--violet) 26%,var(--white));color:var(--violet)">'+ic(a.icon)+a.t+'</span>';}).join('');
-  var body='<div class="hero-sig-c">'+hero.sig+'</div>'+
+  /* legend + tagline (2026-11-04, per direction — the real product's identity tab): the persona's legendary investor (name,
+     Thai line, English line) and its tagline replace the definition line here; reverses the 2026-08-19 removal of .hero-leg */
+  var body='<div class="hero-leg2"><div class="hl-name">'+hero.legend+'</div>'+(hero.legendTh?'<div class="hl-th">'+hero.legendTh+'</div>':'')+
+      (hero.legendEn?'<div class="hl-en">'+hero.legendEn+'</div>':'')+'</div>'+
+    '<div class="hero-sig-c">'+(hero.tagline||hero.sig)+'</div>'+
     /* Revised (2026-08-15, per direction "border card สีอิงตาม สีสินทรัพย์ แต่ title เป็นสีดำ และ bg
        เป็นสีอิงตามสินทรัพย์ แต่ soft") — the neutral --paper/--line-soft version from the same day's
        earlier pass read as TOO flat next to .str-box/.str-box.wn once those went neutral too; this
        card gets its color signal back (a soft accent wash + accent border), but the title itself
        goes to plain --ink instead of hero.accent — color lives in the surface now, not the text. */
     '<div class="ast-block" style="background:color-mix(in srgb,var(--violet) 8%,var(--white));border:1px solid color-mix(in srgb,var(--violet) 24%,transparent)">'+
-      '<div class="ast-lbl">สินทรัพย์ที่ถนัด</div><div class="ast-chips">'+chips+'</div></div>'+
+      '<div class="ast-lbl">สินทรัพย์ที่เหมาะสมกับ Investor DNA ของคุณ</div><div class="ast-chips">'+chips+'</div></div>'+
     '<div class="str-grid" style="margin-top:var(--sp-stack)"><div class="str-box"><div class="str-hd">'+ic('lc-check-circle')+'ความแข็งแกร่ง</div>'+strengths+'</div><div class="str-box wn"><div class="str-hd">'+ic('lc-alert-triangle')+'สิ่งที่ต้องระวัง</div>'+watch+'</div></div>';
   /* previewOnly (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้
      ลงทะเบียน...เห็นแค่ preview card ลงมาจนถึง จุดแข็ง/จุดที่ต้องระวัง เนื้อหาด้านล่างอื่นๆจะไม่แสดง") —
@@ -6450,12 +6549,12 @@ function efinBannerHTML(h){
    the separate (differently-sourced) ranked-interest list below it. Tinted with the persona's own
    accent (h.rgb/h.accent), same convention heroDetailBody's asset chips already use for persona color. */
 function radarInsight(h){
-  var vals=h.radar,maxV=-1,maxI=0;
+  var vals=RADAR2_OF(h),maxV=-1,maxI=0;
   for(var i=0;i<vals.length;i++){if(vals[i]>maxV){maxV=vals[i];maxI=i;}}
-  return '<div class="radar-insight" style="background:rgba('+h.rgb+',0.08);border-color:rgba('+h.rgb+',0.28)"><span class="radar-insight-ic" style="color:'+h.accent+'">'+ic('lc-sparkles')+'</span><span>จุดที่คุณถนัดที่สุดคือ <b>'+RADAR_AXES[maxI]+'</b> ('+maxV+'/100) — ลองแวะโซนนี้ในบูธเป็นจุดแรก</span></div>';
+  return '<div class="radar-insight" style="background:rgba('+h.rgb+',0.08);border-color:rgba('+h.rgb+',0.28)"><span class="radar-insight-ic" style="color:'+h.accent+'">'+ic('lc-sparkles')+'</span><span>จุดที่คุณถนัดที่สุดคือ <b>'+RADAR2_MEMBERS[maxI]+'</b> ('+maxV+'/100) — ลองแวะโซนนี้ในบูธเป็นจุดแรก</span></div>';
 }
 function radarInterestHTML(h,r){
-  return '<div class="radar-sec"><div class="trait-hd"><div class="s-h" style="margin-bottom:0">เรดาร์ความสนใจ</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">ความถนัดต่อสินทรัพย์แต่ละประเภท และ 3 อันดับที่คุณสนใจ จากคำตอบ DNA Quiz ✦ ยิ่งเล่นกิจกรรมในงานครบ ยิ่งแม่นขึ้น</p><div class="radar-ww">'+radarSVG(h.radar,h.rgb)+'</div>'+radarInsight(h)+interestsHTML(r)+'</div>';
+  return '<div class="radar-sec"><div class="trait-hd"><div class="s-h" style="margin-bottom:0">เรดาร์ความสนใจ</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">ความถนัดต่อสินทรัพย์แต่ละประเภท และ 3 อันดับที่คุณสนใจ จากคำตอบ DNA Quiz ✦ ยิ่งเล่นกิจกรรมในงานครบ ยิ่งแม่นขึ้น</p><div class="radar-ww">'+radarSVG(RADAR2_OF(h),h.rgb,RADAR2_AXES)+'</div>'+radarInsight(h)+interestsHTML(r)+'</div>';
 }
 /* efin-banner's 2 CTAs (2026-08-19, per direction — previously plain buttons with no onclick at
    all). "คัดลอกคำถาม" copies a persona-flavored prompt to the clipboard and flips its own label to
@@ -6482,11 +6581,16 @@ var REDEEM_TOTAL=800,REDEEM_LEFT=250; // demo quota numbers for the "แลก�
    digital-vs-physical-card explainer, and the SKILL-value disclaimer underneath it. Was shared by
    Book v1 and Book v2's identity panel (renderBook, which had no redeem-card at all before this). */
 function redeemCardHTML(isUltimate){
-  var msg=isUltimate
+  /* received state (2026-11-04, as in the real product: "รับการ์ดแล้ว" + when) — demo panel "การ์ดตัวจริง"; the quota line goes
+     away once the card is in hand */
+  var got=isUltimate&&DEMO.cardClaimed;
+  var msg=got
+    ? '<div class="redeem-card on"><div class="redeem-t"><img class="redeem-t-ic" src="'+ICON_CARD_PNG+'" alt="">รับการ์ดแล้ว</div><div class="redeem-s">5 ต.ค. 2569 · 11:53</div></div>'
+    : isUltimate
     ? '<div class="redeem-card on"><div class="redeem-t"><img class="redeem-t-ic" src="'+ICON_CARD_PNG+'" alt="">พร้อมแลกรับการ์ดตัวจริงแล้ว</div><div class="redeem-s">แลกได้ที่จุดแลกรับการ์ดตัวจริง ✦ Samyan Mitrtown ชั้น 5</div></div>'
     : '<div class="redeem-card locked"><div class="redeem-t"><img class="redeem-t-ic" src="'+ICON_GIFT_PNG+'" alt="">แลกรับการ์ดตัวจริง</div><div class="redeem-s">รับการ์ดกระดาษใบที่ตรงกับตัวตนคุณ ที่จุดแลกรับการ์ดตัวจริง (สิทธิบัตร Ultimate) · 1 คน = 1 ใบ</div></div>';
   return msg+
-    '<div class="redeem-quota"><span>ผลิตจำกัด '+REDEEM_TOTAL+' ใบ · เหลือ '+REDEEM_LEFT+' ใบ</span>'+(isUltimate?'':'<span class="redeem-tier">'+ic('lc-lock')+'Ultimate</span>')+'</div>'+
+    (got?'':'<div class="redeem-quota"><span>ผลิตจำกัด '+REDEEM_TOTAL+' ใบ · เหลือ '+REDEEM_LEFT+' ใบ</span>'+(isUltimate?'':'<span class="redeem-tier">'+ic('lc-lock')+'Ultimate</span>')+'</div>')+
     /* 2 fixes (2026-08-19, per direction): the digital-card line bumped to --w-label (700) — it's
        the actual headline claim of this banner, the physical-redemption line underneath is the
        supporting detail; and that second line now starts on its own line (<br>) instead of running
@@ -6503,7 +6607,7 @@ function redeemCardHTML(isUltimate){
        game-stat UIs conventionally mark a skill rating. Title <b> colored ink to match .redeem-note's
        own bold lead line (its color:var(--ink) is inherited from the block; this one sits inside
        .hero-note's own color:var(--muted), so needs the override explicit). */
-    '<div class="hero-note skill-note">'+ic('lc-zap')+'<span><b style="font-weight:var(--w-label);color:var(--ink)">ค่า SKILL บนการ์ด</b><br>สะท้อนความถนัดในแต่ละสไตล์ ไม่ใช่คำแนะนำการลงทุน</span></div>';
+    '<div class="hero-note skill-note">'+ic('lc-zap')+'<span><b style="font-weight:var(--w-label);color:var(--ink)">ค่า SKILL สะท้อนความถนัดในแต่ละสไตล์ · ไม่ใช่คำแนะนำการลงทุน</b><br>ทีมออกแบบกำหนดและผู้เชี่ยวชาญสอบทาน ไม่ใช่ค่าที่วัดจากการเล่นของคุณ · ตัวตนจริงของคุณดูได้จาก Playbook ทั้งหมด</span></div>';
 }
 /* PLAY BOOK PDF download (2026-08-19, per direction — also present in the mockup, absent from the
    app). Shown in the post-event ("หลังงาน") view of both Book versions — locked behind Ultimate,
@@ -6781,6 +6885,8 @@ function book2Subnav(active){
     return '<button class="bt-tab" type="button" role="tab" aria-selected="'+(t.k===active?'true':'false')+'" data-b2="'+t.k+'"><span class="bt-tab-icon">'+ic(t.icon)+'</span><span class="bt-tab-label">'+t.label+'</span></button>';
   }).join('')+'</nav>';
 }
+/* Confidence footer (2026-11-11): it used to say the score completes at 6 sides even when all 6 were done (contradicting Home's 'ครบ 6 ด้าน'), and after the event there's no game left to play. */
+function confFootHTML(){var done=gamesPlayedCount()>=SIDES.length;if(DEMO.eventPhase==='post')return '<div class="conf-foot"><p class="conf-note">'+(done?'สรุปจากกิจกรรมครบ 6 ด้านที่คุณทำในงาน':'สรุปจากกิจกรรมที่คุณทำในงาน ('+gamesPlayedCount()+'/'+SIDES.length+' ด้าน)')+'</p></div>';return '<div class="conf-foot"><p class="conf-note">'+(done?'ครบ 6 ด้านแล้ว คะแนนนี้สมบูรณ์':'คะแนนจะสมบูรณ์เมื่อทำครบ 6 ด้านในงาน')+'</p>'+(done?'':'<button class="btn btn-primary" id="confPlayBtn" type="button">'+ic('lc-gamepad-2')+'เล่นเกม 6 ด้าน</button>')+'</div>';}
 function bindBook2Nav(){
   root.querySelectorAll('.toc .bt-tab').forEach(function(b){b.onclick=function(){
     var k=b.dataset.b2;BOOK2_TAB=k;
@@ -6880,7 +6986,7 @@ function insightHTML(r,h,matchOk){
       '<div class="risk-row"><span class="risk-rl" style="color:var(--ink)">ความเสี่ยงจริง</span><div class="risk-tr"><div class="risk-fi viz-bar" style="--tw:'+(r.revealed*10)+'%"></div></div><span class="risk-vl">'+vcHTML(r.revealed)+'</span></div></div></div>'+
     '<div class="conf-box"><div class="conf-glow"></div><div class="conf-hd"><div><div class="conf-ml">Confidence Score</div><div class="conf-mv">'+C.level+'</div></div><div class="conf-sc">'+vcHTML(C.total,true)+'<span class="conf-su">/100</span></div></div>'+
       '<div class="conf-bars">'+confRow('ความรู้',C.know,35)+confRow('รู้จักตัวเอง',C.self,25)+confRow('ลงมือ',C.act,25)+confRow('เปิดโลก',C.open,15)+'</div>'+
-      '<div class="conf-foot"><p class="conf-note">คะแนนจะสมบูรณ์เมื่อทำครบ 6 ด้านในงาน</p><button class="btn btn-primary" id="confPlayBtn" type="button">'+ic('lc-gamepad-2')+'เล่นเกม 6 ด้าน</button></div></div>'+
+      ''+confFootHTML()+'</div>'+
     '</div></section>';
 }
 /* Compare-reveal (adapted from compare-reveal.html, skinned to DNA) — pointer drag + keyboard slider +
@@ -6955,14 +7061,13 @@ function initCompareReveal(opts){
    its own swappable block (id="b2ident-detail") separate from the compare-reveal markup itself, so
    swapping personas only replaces this innerHTML — the slider's own drag state/DOM is untouched. */
 function book2IdentityDetail(hero,previewOnly){
-  // .hero-leg ("แรงบันดาลใจจาก") removed 2026-08-19, per direction — applies to both sides of the
-  // compare-reveal (this same function renders both the pre-event and post-event detail block).
+  // This same function renders both the pre-event and post-event detail block of the compare-reveal. Since 2026-11-04 the
+  // legend + tagline lead the body (heroDetailBody) and the gradient family badge is gone, as in the real product.
   /* book style (2026-10-26): the book's identity page title — English persona name in the silver serif, Thai name under
      it, family as a small line — in place of the gradient family badge */
   if(DEMO.pbStyle==='book')return '<div class="pbk-id"><div class="pbk-id-en"><span>'+hero.en+'</span></div><div class="pbk-id-th">'+hero.th+'</div>'+
     '<div class="pbk-id-fam">'+hero.famTh+'</div></div>'+heroDetailBody(hero,previewOnly);
-  return '<div class="fam-badge" style="'+famBadgeStyle(hero)+'"><span>'+hero.famTh+'</span></div>'+
-    heroDetailBody(hero,previewOnly);
+  return heroDetailBody(hero,previewOnly);
 }
 /* Unregistered-quiz-taker CTA (2026-09-04, per direction — see renderBook's `unreg` branch) — takes
    over right where the identity tab gets cut short (after จุดแข็ง/จุดที่ต้องระวัง), reusing Games'
@@ -7079,7 +7184,7 @@ function renderBook(){
      the 2026-09-04 "no escape hatch but the register CTA" design; see the bottom-tabbar comment below
      for the other half of this reversal), so the old inline cursor:default override (which existed
      only to keep the logo's look honest while its click WAS disabled) is gone too. */
-  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="BetterTrade — กลับหน้าหลัก" style="margin-right:auto">'+(unreg?'':REG_CTA_HTML+'<div id="qr-cta-slot"></div>')+'</header>'+
+  '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="BetterTrade — กลับหน้าหลัก" style="margin-right:auto">'+(unreg?'':hdRightHTML())+'</header>'+
   /* unreg also drops the ตัวตน subnav pill entirely (2026-09-04, per direction "เอา tab ตัวตน
      ออก...ไม่มีข้อมูล tab อื่นให้เลือกอยู่แล้ว") — book2Tabs() already resolves to a single-item list
      for this case, but a 1-choice tab bar has nothing left to switch between, so skip rendering it. */
@@ -7101,6 +7206,7 @@ function renderBook(){
           '<button class="ag-more" id="shareCardBtn" style="font-size:var(--fs-sub);border-radius:var(--rpill)">'+ic('lc-upload')+'แชร์ภาพการ์ด</button>'
         ))+
       '</div></div></section>'+
+      (DEMO.eventPhase==='post'?rrPicksHTML('rr-in-book'):'')+ // post-event (2026-11-11): the identity tab leads into the rerun sessions that fit this persona
     '</div>'+
     (unreg?'':(
     '<div class="b2-panel'+(tab==='analysis'?' show':'')+'" data-panel="analysis">'+
@@ -7114,7 +7220,7 @@ function renderBook(){
          already null-safe when the banner isn't in the DOM. */
       /* Tab Header first (2026-10-09); the efin AI banner moved below the AI Insight card so two tinted cards don't
          stack at the top — it's the "take this further" CTA after reading the result. */
-      tabHeadHTML({icon:ICON_DIAMOND_PNG,ey:'สำหรับ '+h.th,title:'ผลวิเคราะห์ของคุณ',desc:'เทียบความเสี่ยงที่คุณบอกกับพฤติกรรมจริง และดูว่าผลนี้มั่นใจได้แค่ไหน'})+
+      tabHeadHTML({icon:ICON_DIAMOND_PNG,ey:'สำหรับ '+h.en+' ('+h.th+')',title:'ผลวิเคราะห์ของคุณ',desc:'เทียบความเสี่ยงที่คุณบอกกับพฤติกรรมจริง และดูว่าผลนี้มั่นใจได้แค่ไหน'})+
       insightHTML(r,h,matchOk)+
       (pre?'':efinBannerHTML(h))+
     '</div>'+
@@ -7122,15 +7228,15 @@ function renderBook(){
        below, 2026-08-19 per direction — the "วิเคราะห์" tab now ends with just AI Insight. */
     (pre?'':(
     '<div class="b2-panel'+(tab==='interest'?' show':'')+'" data-panel="interest">'+
-      tabHeadHTML({tone:'interest',icon:ICON_STOCK_INTL_PNG,ey:'สำหรับ '+h.th,title:'ความสนใจของคุณ',desc:'สินทรัพย์ที่คุณถนัด คะแนนพฤติกรรม และสิ่งที่คุณดูก่อนตัดสินใจ'})+
+      tabHeadHTML({tone:'interest',icon:ICON_STOCK_INTL_PNG,ey:'สำหรับ '+h.en+' ('+h.th+')',title:'ความสนใจของคุณ',desc:'สินทรัพย์ที่คุณถนัด คะแนนพฤติกรรม และสิ่งที่คุณดูก่อนตัดสินใจ'})+
       '<section class="card scroll-reveal">'+radarInterestHTML(h,r)+
         '<div class="trait-sec"><div class="trait-hd"><div class="s-h" style="margin-bottom:0">คะแนนพฤติกรรม</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">วัดจากกิจกรรมในงาน</p>'+traitBars()+'</div>'+
-        '<div class="alloc-sec"><div class="trait-hd"><div class="s-h" style="margin-bottom:0">เวลาตัดสินใจคุณดูอะไรก่อน</div><span class="ex-tag">ตัวอย่าง</span></div><p class="s-sub" style="margin:4px 0 0">สัดส่วนเริ่มต้นที่เหมาะกับ '+h.th+'</p>'+allocBars()+'</div></section>'+
-      '<section class="card scroll-reveal"><div class="s-pad"><div class="s-ey" style="display:flex;justify-content:space-between;align-items:center"><span style="display:inline-flex;align-items:center;gap:var(--sp-glue)">สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div><h2 class="s-h" style="margin-bottom:var(--sp-stack)">เจาะรายสินทรัพย์</h2>'+ddTabs(h)+'</div></section>'+
+        '<div class="alloc-sec"><div class="trait-hd"><div class="s-h" style="margin-bottom:0">เวลาตัดสินใจคุณดูอะไรก่อน</div>'+(allocMode()==='dynamic'?'<span class="ex-tag">ตัวอย่าง</span>':'')+'</div><p class="s-sub" style="margin:4px 0 0">'+(allocMode()==='dynamic'?'คะแนนความสนใจจากกิจกรรมของคุณในงาน':'สัดส่วนเริ่มต้นที่เหมาะกับ '+h.en+' ('+h.th+')')+'</p>'+allocBars(h)+'</div></section>'+
+      '<section class="card scroll-reveal"><div class="s-pad"><div class="s-ey" style="display:flex;justify-content:space-between;align-items:center"><span style="display:inline-flex;align-items:center;gap:var(--sp-glue)">สรุปไว้คุยกับผู้แนะนำการลงทุน</span><span class="ex-tag">ตัวอย่าง</span></div>'+advisorHTML(h)+'</div></section>'+
     '</div>'+
     '<div class="b2-panel'+(tab==='port'?' show':'')+'" data-panel="port"><div id="portEdu">'+portEduShellHTML()+'</div></div>'+
     '<div class="b2-panel'+(tab==='journey'?' show':'')+'" data-panel="journey">'+
-      tabHeadHTML({tone:'journey',icon:ICON_COMPASS_PNG,ey:'สำหรับ '+h.th,title:'เส้นทางในงานของคุณ',desc:'ด้านที่วัดได้แล้ว ขั้นต่อไป และเรื่องที่คุณเข้าใจจากการเล่นเกม'})+
+      tabHeadHTML({tone:'journey',icon:ICON_COMPASS_PNG,ey:'สำหรับ '+h.en+' ('+h.th+')',title:'เส้นทางในงานของคุณ',desc:'ด้านที่วัดได้แล้ว ขั้นต่อไป และเรื่องที่คุณเข้าใจจากการเล่นเกม'})+
       sidesHTML(r)+
       '<section class="card scroll-reveal"><div class="s-pad" style="padding-bottom:0;border-bottom:1px solid var(--line-soft)"><div class="s-ey">เฉพาะสำหรับ '+h.th+'</div><h2 class="s-h">เส้นทางฮีโร่ของคุณ</h2></div>'+
         '<div class="route-steps">'+routeStep('done','','ทำ DNA Quiz','ตอบครบ 10 ข้อ เสร็จแล้ว — ได้ตัวตน '+h.th)+routeStep('act','2','ทำครบ 6 ด้าน','เสร็จแล้ว 2 จาก 6 — เหลืออีก 4 ด้านในบูธ')+routeStep('fut','3','รับ Playbook ส่วนตัวสมบูรณ์','เมื่อครบ 6 ด้าน รับกลยุทธ์เฉพาะตัวตน')+routeStep('fut','4','ติดตามบน efin.finance','Playbook sync ขึ้นแอปหลังงาน')+'</div></section>'+
@@ -7165,6 +7271,7 @@ function renderBook(){
      button still exists further down but this one binding now covers both, so nothing there needs
      to duplicate it. */
   var scBtn=root.querySelector('#shareCardBtn');if(scBtn)scBtn.onclick=openShare;
+  if(DEMO.eventPhase==='post')bindVideoCards(); // the rerun picks under the identity card (both unreg + registered)
   /* One-time staged reveal after the Character Card animation handed off to us (see PB_INTRO). Placed
      BEFORE the `if(unreg)return;` below so both the registered and unregistered identity panels get it.
      Opacity-only cascade (never transform) so it can't fight the .scroll-reveal engine, which owns
@@ -7270,27 +7377,47 @@ var APP_TABS=[
    pill — see REG_CTA_HTML, near mountHeaderQR(). REG_URL stays a top-level const since that markup
    is the only consumer now. */
 var REG_URL='https://dc1hw.efin.finance/events/better-trade/better-trade2026';
-function appTabbar(active){return '<nav class="book-tabbar">'+APP_TABS.map(function(t){return '<button class="tab-item'+(t.k===active?' active':'')+'" data-tab="'+t.k+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>';}).join('')+'</nav>';}
+function appTabbar(active){return '<nav class="book-tabbar">'+APP_TABS.filter(function(t){return DEMO.eventPhase!=='post'||(t.k!=='passport'&&t.k!=='games');}).map(function(t){return '<button class="tab-item'+(t.k===active?' active':'')+'" data-tab="'+t.k+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>';}).join('')+'</nav>';}
 function bindTabbar(){root.querySelectorAll('.book-tabbar .tab-item[data-tab]').forEach(function(b){b.onclick=function(){var k=b.dataset.tab;if(k===st.phase)return;st.phase=k;render();};});}
 /* ── deferred Book sections — all populated with EXAMPLE data (booth games + analysis engine
    don't exist yet); each carries an .ex-tag in the UI so nothing here reads as a real measurement. ── */
 function traitBars(){
   var rows=[{l:'เก็บข้อมูลก่อนตัดสินใจ',v:31,m:35},{l:'ความมีวินัยการลงทุน',v:25,m:25},{l:'การกระจายความเสี่ยง',v:10,m:25},{l:'รับความผันผวนได้',v:11,m:15}];
   var bars='<div class="trait-list">'+rows.map(function(t){return '<div class="trait-row"><span class="trait-l">'+t.l+'</span><span class="trait-v"><b>'+vcHTML(t.v)+'</b>/'+t.m+'</span><div class="trait-tr"><div class="trait-fi viz-bar" style="--tw:'+Math.round(t.v/t.m*100)+'%"></div></div></div>';}).join('')+'</div>';
-  /* Which data sources feed the 4 bars above — 3 chips, all "ตัวอย่าง" (example) collected state
-     like the bars themselves (2026-08-26, per direction — this row was missing entirely before). */
-  var chips=[{t:'แบบทดสอบตัวตน 7 ข้อ',done:true},{t:'เกมย้อนเวลาพอร์ต',done:true},{t:'เกมบูธ 5/10',done:true}];
-  var chipsHTML='<div class="trait-chips">'+chips.map(function(c){return '<span class="trait-chip'+(c.done?' done':'')+'">'+(c.done?ic('lc-check-circle'):'')+'<span>'+c.t+'</span></span>';}).join('')+'</div>';
-  var note='<p class="trait-note">สีเขียว = เก็บแล้ว · แตะชิปสีเทาเพื่อไปเก็บต่อ · บอกว่าเรารู้จักคุณแค่ไหน ไม่ใช่คำทำนายผลตอบแทน</p>';
-  return bars+chipsHTML+note;
+  return bars; // source chips + note dropped (2026-11-04) — the real product shows the 4 bars only
+}
+/* "สรุปไว้คุยกับผู้แนะนำการลงทุน" as in the real product (2026-11-04): one question per game whose result calls for it (the
+   product's rules A–F; here a played game stands in for its trigger), text verbatim from the product. With none played it
+   falls back to the asset drill-down (ddTabs), as before. ADVISOR_Q[].g = SIDES index; D (health) / E (alternative) come
+   from booths. */
+var ADVISOR_Q=[
+  {g:0,q:'พอร์ตที่นิ่งพอให้ถือผ่านการลดลงราว 10% ได้ หน้าตาเป็นยังไง'},
+  {g:2,q:'ถ้าอยากลองของที่กำลังฮิต ใส่ได้มากสุดกี่ % ของเงินลงทุนทั้งหมด'},
+  {g:4,q:'ถ้าจะเริ่มแบบตั้งอัตโนมัติ เริ่มจากอะไรดี ค่าธรรมเนียมอะไร'},
+  {b:9,q:'เงินสำรองและความคุ้มครองของฉันพอหรือยัง'},
+  {b:8,q:'ของสะสมหรือคริปโตแค่ไหน ถึงจะไม่ต้องขายของรักตอนต้องใช้เงิน'},
+  {g:3,q:'แผนของฉันต้องปรับยังไงเมื่ออายุเปลี่ยน'}
+];
+function advisorHTML(h){
+  var qs=ADVISOR_Q.filter(function(x){return x.g!=null?GAME_PLAYED[x.g]:BOOTH_ACT[x.b];});
+  if(!qs.length)return '<h2 class="s-h" style="margin-bottom:var(--sp-stack)">เจาะรายสินทรัพย์</h2>'+ddTabs(h);
+  return '<ol class="adv-q">'+qs.map(function(x){return '<li>'+x.q+'</li>';}).join('')+'</ol><p class="adv-note">* เนื้อหาปรับตามพฤติกรรมจริงของคุณในงาน</p>';
 }
 /* Bar segments now render in a softened tone of each color (2026-08-15, per Component System
    review "สีเป็น solid เลยค่อนข้างหนัก และสีดูจัดไป") — the thick 14px bar made a full-saturation
    fill read as loud in a way the same colors don't when they're just a small legend dot, so the
    dot stays solid (it needs to read clearly at that size) while the segment itself blends 45%
    toward white. */
-function allocBars(){
-  var segs=[{l:'สินทรัพย์แกนหลัก (กองทุน/หุ้นใหญ่)',p:40,c:'var(--violet)'},{l:'สินทรัพย์เติบโต',p:30,c:'var(--cyan)'},{l:'สินทรัพย์ทางเลือก / กระจาย',p:20,c:'var(--pink)'},{l:'เงินสด / สภาพคล่อง',p:10,c:'var(--yellow)'}];
+/* Two modes as in the real product (2026-11-04): before any in-event activity, the starting split of the persona's investor
+   type (its 3 types + splits, real product data: Guardian → conservative, Navigator → moderate, Visionary → aggressive);
+   once games/booths are played, the split from that activity (sample shares here — the product computes them from play;
+   empty groups drop out). allocMode() picks one; the panel's subtitle + ตัวอย่าง tag follow it. */
+var ALLOC_GROUPS=[{l:'สินทรัพย์แกนหลัก (กองทุน/หุ้นใหญ่)',c:'var(--violet)'},{l:'สินทรัพย์เติบโต',c:'var(--cyan)'},{l:'สินทรัพย์ทางเลือก / กระจาย',c:'var(--pink)'},{l:'เงินสด / สภาพคล่อง',c:'var(--yellow)'}];
+var ALLOC_TYPES={G:[30,0,0,70],N:[50,5,5,40],V:[70,5,5,20]},ALLOC_PLAYED=[74,0,4,22];
+function allocMode(){return gamesPlayedCount()+boothActivityCount()>0?'dynamic':'static';}
+function allocBars(h){
+  var ps=allocMode()==='dynamic'?ALLOC_PLAYED:ALLOC_TYPES[(h||RESULT.hero).fam];
+  var segs=ALLOC_GROUPS.map(function(g,i){return {l:g.l,c:g.c,p:ps[i]};}).filter(function(g){return g.p>0;});
   var bar=segs.map(function(s,i){return '<div class="alloc-seg viz-bar" data-i="'+i+'" style="--tw:'+s.p+'%;background:color-mix(in srgb,'+s.c+' 55%,var(--white))"></div>';}).join('');
   var legend=segs.map(function(s,i){return '<div class="alloc-row" data-i="'+i+'"><span class="alloc-dot" style="background:'+s.c+'"></span><span class="alloc-l">'+s.l+'</span><span class="alloc-p">'+s.p+'%</span></div>';}).join('');
   return '<div class="alloc-bar">'+bar+'</div><div class="alloc-legend">'+legend+'</div>';
@@ -7397,7 +7524,7 @@ function mountKnow(){
 function libraryCardHTML(){
   var h=RESULT.hero;
   var total=LIBRARY_CATS.reduce(function(n,c){return n+c.n;},0);
-  return tabHeadHTML({tone:'know',icon:ICON_COLLECTIBLE_PNG,ey:'สำหรับ '+h.th,num:total,title:'เรื่องที่คุณเก็บได้ตลอดงาน',
+  return tabHeadHTML({tone:'know',icon:ICON_COLLECTIBLE_PNG,ey:'สำหรับ '+h.en+' ('+h.th+')',num:total,title:'เรื่องที่คุณเก็บได้ตลอดงาน',
       desc:'แตะหมวดเพื่อดูรายการในแต่ละหมวด'})+
     '<section class="card scroll-reveal"><div class="s-pad">'+
       '<div class="lib-cats">'+LIBRARY_CATS.map(function(c,i){
@@ -8591,7 +8718,7 @@ function buildShareModal(){
 /* Short display labels for the 10 interest bars below — same order/index as S3_OPTS/BOOTHS (both
    already share one order), just trimmed to fit a "label ⋯ NN%" row (2026-08-26, per direction
    "อยากให้แสดงผลเป็น visualize + %"). */
-var INT_SHORT_L=['หุ้นไทย','ต่างประเทศ','กองทุน','ตราสารหนี้','ทอง','อสังหา','ประกัน','คริปโต','ทางเลือก','สุขภาพ'];
+var INT_SHORT_L=['หุ้นไทย','หุ้นต่างประเทศ','กองทุนรวม','ตราสารหนี้','ทองคำ','อสังหาริมทรัพย์','ประกัน','คริปโตเคอร์เรนซี','ของสะสมหายาก','สุขภาพ']; // the product's full asset names (2026-11-04)
 /* Largest-remainder rounding — turns an array of float shares (summing to ~100) into integer %
    that still sum to EXACTLY 100, so "รวมทุกแท่ง = 100%" in the caption below is always literally true. */
 function roundPct(arr){
@@ -8622,8 +8749,7 @@ function interestsHTML(r){
     return '<div class="int-bar-row'+(touched?'':' muted')+'"><span class="int-bar-l">'+INT_SHORT_L[i]+'</span><span class="int-bar-v">'+vcHTML(realPct[i])+'%</span>'+
       '<div class="int-bar-tr"><div class="int-bar-fi viz-bar" style="--tw:'+realPct[i]+'%;transition-delay:'+delay+'s"></div></div></div>';
   }).join('');
-  return '<div class="int-bar-list">'+rows+'</div>'+
-    '<p class="int-bar-note">จากเกมและบูธที่คุณทำจริง · รวมทุกแท่ง = 100% ของข้อมูลที่เรามี · แท่งสีจางคือหมวดที่คุณยังไม่ได้แตะวันนี้</p>';
+  return '<div class="int-bar-list">'+rows+'</div>'; // the footnote under the bars dropped (2026-11-04) — the real product has none
 }
 function routeStep(cls,n,t,d){var inner=cls==='done'?ic('lc-check'):n;return '<div class="list-row rs"><div class="rs-n '+cls+'">'+inner+'</div><div><div class="rs-t">'+t+'</div><div class="rs-d">'+d+'</div></div></div>';}
 
@@ -8661,7 +8787,7 @@ function resetQuiz(){st={phase:'splash',spidx:0,idx:0,s1:[null,null,null],s2:[nu
 /* ══ HOME TAB ══ content ported verbatim from Playbook Final's Home screen (see PLAYBOOK-2026-DATA-
    BASELINE.md §5). Progress values are mock and kept consistent with the Book page's own "2/6 ด้าน"
    example data so the whole app reads as one coherent (example-tagged) state, not real tracking. */
-var HOME_MST={agendaDay:1,agendaAll:false};
+var HOME_MST={agendaDay:1,agendaAll:false,rrRoom:'conf'};
 /* tier meta — the 3 tiers the demo panel exposes (from source tierMeta: Explorer/Master Class/
    Ultimate rungs; Visitor/Free omitted since the demo can't select them). Each tier now has its
    own distinct icon key (2026-08-26, per direction — "ประเภทของบัตร...3 ประเภท" — Ultimate=มงกุฎ/
@@ -8793,7 +8919,7 @@ function loadYtApi(){
   return YT_API;
 }
 function vidMsgHTML(icon,msg){return '<div class="vid-off">'+ic(icon)+'<span>'+msg+'</span><button class="ag-more" id="vidRetry" type="button">ลองอีกครั้ง</button></div>';}
-function mountReplayPlayer(v){
+function mountReplayPlayer(v,limit){
   var frame=root.querySelector('.vid-frame'),ready=false,tmo=0;
   var fail=function(){
     clearTimeout(tmo);if(!frame.isConnected)return;
@@ -8805,27 +8931,40 @@ function mountReplayPlayer(v){
     if(!frame.isConnected){clearTimeout(tmo);return;}
     new window.YT.Player(frame.querySelector('#vidPlayer'),{host:'https://www.youtube-nocookie.com',videoId:v.id,width:'100%',height:'100%',
       playerVars:{rel:0,iv_load_policy:3,playsinline:1,origin:location.origin},
-      events:{onReady:function(){ready=true;clearTimeout(tmo);},onError:fail}});
+      events:{onReady:function(e){ready=true;clearTimeout(tmo);if(limit)rrPreviewGuard(e.target,frame,limit);},onError:fail}});
   },fail);
+}
+/* 2-minute preview of a locked rerun session — demo-side only (the real cut belongs on the private video host) */
+function rrPreviewGuard(p,frame,limit){
+  var iv=setInterval(function(){
+    if(!frame.isConnected){clearInterval(iv);return;}
+    var t=0;try{t=p.getCurrentTime();}catch(e){}
+    if(t>=limit){clearInterval(iv);try{p.pauseVideo();}catch(e){}
+      frame.insertAdjacentHTML('beforeend','<div class="vid-endcap"><b>จบตัวอย่าง 2 นาที</b><span>ซื้อ Rerun เพื่อดูคลิปนี้เต็มเรื่อง</span><button class="btn btn-primary" id="vidEndBuy" type="button">ซื้อ Rerun</button></div>');
+      frame.querySelector('#vidEndBuy').onclick=function(){openRerunSheet(rrList()[VIDEO_CUR.i]);};}
+  },500);
 }
 function renderVideo(){
   var back=function(){st.phase=VIDEO_BACK.phase;render();window.scrollTo(0,VIDEO_BACK.y);requestRevealTick();};
-  var locked=VIDEO_CUR&&VIDEO_CUR.g==='replay'&&!isUltimate(); // the demo panel can change the ticket while this page is open
+  var rr=VIDEO_CUR&&VIDEO_CUR.g==='rerun'?rrList()[VIDEO_CUR.i]:null,rrS=rr?rrState(rr):'',preview=rrS==='locked'; // rerun: a locked session plays its first 2 minutes
+  var locked=VIDEO_CUR&&((VIDEO_CUR.g==='replay'&&!isUltimate())||(VIDEO_CUR.g==='rerun'&&(!rr||rrS==='soon'))); // the demo panel can change the ticket while this page is open
   if(!VIDEO_CUR||locked){back();return;}
   var g=VIDEO_CUR.g,v=VIDEOS[g][VIDEO_CUR.i],url='https://youtu.be/'+v.id,off=navigator.onLine===false;
   root.innerHTML='<header class="topbar"><button class="tb-ic" id="vidBack" type="button" aria-label="ย้อนกลับ">'+ic('lc-arrow-left')+'</button><div style="flex:1;min-width:0"><div class="tb-title apb-tbt">'+v.t+'</div><div class="tb-sub">'+(g==='howto'?'วิธีใช้งาน':'ดูย้อนหลัง')+'</div></div></header>'+
     '<main class="scroll fade"><section class="home-card vid-page"><div class="vid-frame">'+
-      (off?vidMsgHTML('lc-wifi-off','ไม่มีสัญญาณอินเทอร์เน็ต'):g==='replay'?'<div id="vidPlayer"></div>'
+      (off?vidMsgHTML('lc-wifi-off','ไม่มีสัญญาณอินเทอร์เน็ต'):g==='replay'||g==='rerun'?'<div id="vidPlayer"></div>'
         :'<iframe src="https://www.youtube-nocookie.com/embed/'+v.id+'?rel=0&amp;playsinline=1" title="'+v.t+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>')+
       '</div><div class="vid-hd"><div class="s-h">'+v.t+'</div>'+(v.sample?'<span class="ex-tag">คลิปตัวอย่าง</span>':'')+'</div><div class="hcard-s">'+v.s+'</div>'+
-      (g==='replay'?'':'<a class="ag-more vid-yt" href="'+url+'" target="_blank" rel="noopener">'+ic('lc-external-link')+'เปิดใน YouTube</a>')+'</section>'+
-      '<section class="home-card"><div class="hcard-hd"><div class="s-h">คลิปอื่น</div></div><div class="vid-rows">'+VIDEOS[g].map(function(_,i){return i===VIDEO_CUR.i?'':vidCardHTML(g,i,true);}).join('')+'</div></section>'+
+      (preview?'<div class="vid-preview">'+ic('lc-lock')+'<span>กำลังดูตัวอย่าง 2 นาทีแรก</span><button class="btn btn-primary" id="vidBuy" type="button">ซื้อเพื่อดูเต็ม</button></div>':'')+
+      (g==='replay'||g==='rerun'?'':'<a class="ag-more vid-yt" href="'+url+'" target="_blank" rel="noopener">'+ic('lc-external-link')+'เปิดใน YouTube</a>')+'</section>'+
+      '<section class="home-card"><div class="hcard-hd"><div class="s-h">คลิปอื่น</div></div><div class="vid-rows">'+(rr?rrList().map(function(it,i){return i===VIDEO_CUR.i||it.room!==rr.room?'':rrRowHTML(it,i);}).join(''):VIDEOS[g].map(function(_,i){return i===VIDEO_CUR.i?'':vidCardHTML(g,i,true);}).join(''))+'</div></section>'+
     '</main>'+appTabbar('home');
   bindTabbar();
   root.querySelector('#vidBack').onclick=back;
   var rt=root.querySelector('#vidRetry');if(rt)rt.onclick=function(){render();};
   bindVideoCards();
-  if(g==='replay'&&!off)mountReplayPlayer(v);
+  if((g==='replay'||g==='rerun')&&!off)mountReplayPlayer(v,preview?120:0);
+  var vb=root.querySelector('#vidBuy');if(vb)vb.onclick=function(){openRerunSheet(rr);};
 }
 function postEventHTML(){
   var s=postEventState();
@@ -8942,11 +9081,14 @@ function agendaHTML(){
    (unopened) venue to scan yet — so REG_CTA_HTML (already the last item before it) ends up flush
    right on its own, i.e. "pushed into the QR pill's position" per direction, with no layout change
    needed on either element. mountHeaderQR() below mirrors this by skipping its mount in that phase. */
-function appHeader(){return '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="BetterTrade — กลับหน้าหลัก" style="margin-right:auto">'+REG_CTA_HTML+(DEMO.eventPhase==='pre'?'':'<div id="qr-cta-slot"></div>')+'</header>';}
+function appHeader(){return '<header class="topbar"><img class="tb-logo hd-logo" id="hdLogo" src="'+LOGO_IMG.bt+'" alt="BetterTrade — กลับหน้าหลัก" style="margin-right:auto">'+hdRightHTML()+'</header>';}
+/* header right side by phase — post-event (2026-11-11) swaps register + QR for one "ซื้อ Rerun" button (nothing once every session is open) */
+function hdRightHTML(){if(DEMO.eventPhase==='post')return rrPkgsFor(rrRights()).length?'<button class="btn btn-primary reg-cta rr-hd-buy" id="rrHdBuy" type="button">'+ic('lc-play-circle')+'ซื้อ Rerun</button>':'';return REG_CTA_HTML+(DEMO.eventPhase==='pre'?'':'<div id="qr-cta-slot"></div>');}
 /* Header logo (left) is clickable system-wide → always routes to Home, same "brand mark = home"
    convention as most apps/sites. Bound once per render call right after appHeader()/renderBook's
    own header is injected — see mountHeaderQR's sibling calls and renderBook's own binding. */
-function bindHeaderLogo(){var el=root.querySelector('#hdLogo');if(el)el.onclick=function(){demoLogoTap();if(st.phase==='home')return;st.phase='home';render();};}
+function bindHeaderLogo(){var el=root.querySelector('#hdLogo');if(el)el.onclick=function(){demoLogoTap();if(st.phase==='home')return;st.phase='home';render();};
+  var hb=root.querySelector('#rrHdBuy');if(hb)hb.onclick=function(){openRerunSheet();};}
 /* Every screen that renders appHeader() calls this right after — same re-callable-mount pattern as
    mountSplashCTA(), just aimed at the 'compact' preset/slot instead of the hero one. Now opens the
    QR scan modal (generic — no specific booth) instead of being a no-op tap. */
@@ -8955,7 +9097,7 @@ function bindHeaderLogo(){var el=root.querySelector('#hdLogo');if(el)el.onclick=
    scan; everywhere else (and once checked in) it's unchanged. Chosen over a dedicated button on the
    games page itself, per direction "ใช้ปุ่ม สแกน QR ที่ header เดิม". */
 function mountHeaderQR(){
-  if(DEMO.eventPhase==='pre')return; // appHeader() didn't render the slot at all in this phase
+  if(DEMO.eventPhase!=='on')return; // appHeader() didn't render the slot at all in this phase (pre + post)
   if(!window.mountLiquidMetalButtonInto)return;
   window.mountLiquidMetalButtonInto('#qr-cta-slot','compact',{label:'สแกน QR',icon:ic('lc-qr-code'),onClick:function(){
     if(st.phase==='games'&&!EFIN_CHECKED_IN)openScan('efin',null);else openScan(null,null);
@@ -9010,7 +9152,227 @@ function passCardMultiHTML(){
   }).join('');
   return '<button class="pass-card scroll-reveal" id="homeTier">'+blocks+'</button>';
 }
+/* ══ RERUN — POST-EVENT (2026-11-11, per direction "งานจบแล้ว เน้นขาย rerun ดูย้อนหลัง ไม่ต้องนำเสนอสิ่งที่ต้องทำภายในงาน") ══
+   DEMO.eventPhase==='post'. Home becomes the rerun hub, the tabbar drops เดินบูธ/เกมหลัก, the header QR pill gives way to a
+   "ซื้อ Rerun" button and Profile's QR becomes "สิทธิ์ของฉัน". Rules from efin.finance/events/better-trade/better-trade2026:
+   Ultimate watches Conference + Workshop of the day(s) on the ticket, Master Class watches its own class, anyone else buys a
+   rerun ticket through the registration system (paid outside this app) and comes back here to watch. Prices + the 1-year
+   window are MOCK until confirmed (direction 2026-11-11): Ultimate Rerun 490/day, 790 for both; Master Class at its own price.
+   Sessions come from BT_AGENDA (the synced registration agenda); clip ids are the 2 sample clips standing in. */
+var RERUN_FROM='13 พ.ย. 2569',RERUN_UNTIL='12 พ.ย. 2570';
+var RR_ROOMS=[{k:'conf',l:'Conference'},{k:'ws',l:'Workshop'},{k:'mc',l:'Master Class'}];
+var RR_SKIP=/registration|welcome speech|lucky draw|break|closing/i;
+var RR_SAMPLE=['lCxDvl37jl4','JnR_6d10750'];
+var RR_LIST=null;
+function rrMins(time){var m=(time||'').match(/(\d+):(\d+)\s*[–-]\s*(\d+):(\d+)/);if(!m)return 0;return (+m[3]*60+ +m[4])-(+m[1]*60+ +m[2]);}
+function rrList(){
+  if(RR_LIST)return RR_LIST;
+  var A=agData(),out=[],mc=0;if(!A)return [];
+  A.days.forEach(function(d){d.rooms.forEach(function(r){
+    if(r.key!=='conf'&&r.key!=='ws'&&r.key!=='mc')return;
+    r.tables.forEach(function(tb){tb.rows.forEach(function(x){
+      if(!x.time||RR_SKIP.test(x.t))return;
+      var by=x.by&&x.by!=='รอประกาศ'?x.by:'';
+      var it={room:r.key,d:d.d,date:d.date.replace(/ 25\d\d$/,''),t:x.t,by:by,min:rrMins(x.time),id:RR_SAMPLE[out.length%2],sample:true};
+      if(r.key==='mc')it.mc=mc++;
+      out.push(it);
+    });});
+  });});
+  var dur=function(m){if(!m)return '';if(m<60)return m+' นาที';var h=Math.floor(m/60),r=m%60;return h+' ชม.'+(r?' '+r+' นาที':'');};
+  out.forEach(function(it){it.s=(it.by?it.by+' · ':'')+dur(it.min);});
+  VIDEOS.rerun=out; // so the shared player page (renderVideo) + bindVideoCards can address them as 'rerun:i'
+  return RR_LIST=out;
+}
+/* mock packages; MC prices = the Master Class ticket prices on the registration site */
+var RR_PKGS=[
+  {k:'ult2',t:'Ultimate Rerun 2 วัน',p:790,days:[1,2],note:'Conference + Workshop ทั้ง 2 วัน',best:true},
+  {k:'ult1',t:'Ultimate Rerun วันที่ 1',p:490,days:[1],note:'Conference + Workshop · 31 ต.ค.'},
+  {k:'ult1b',t:'Ultimate Rerun วันที่ 2',p:490,days:[2],note:'Conference + Workshop · 1 พ.ย.'},
+  {k:'mc0',t:'RADIANCE RIFT RUMBLE (R.R.R)',p:490,mc:0,note:'Master Class · 31 ต.ค.'},
+  {k:'mc1',t:'VALUE MEETS MOMENTUM',p:990,mc:1,note:'Master Class · 1 พ.ย.'},
+  {k:'mc2',t:'MONEY MAKEOVER 40+',p:1190,mc:2,note:'Master Class · 1 พ.ย.'}
+];
+function rrBaht(n){return n.toLocaleString('en-US')+' บาท';}
+/* what the visitor holds: ticket (demo tier + its days) plus any rerun bought after the event */
+function rrRights(){
+  var t=curTier().name,r={days:{},mc:{},src:[]};
+  if(t==='Ultimate'){var dd=DEMO.ticketDays==='d1'?[1]:DEMO.ticketDays==='d2'?[2]:[1,2];dd.forEach(function(d){r.days[d]='ticket';});
+    r.src.push({t:'บัตร Ultimate '+(dd.length===2?'2 วัน':'วันที่ '+dd[0]),s:'Conference + Workshop '+(dd.length===2?'ทั้ง 2 วัน':'ของวันที่ '+dd[0])+' · ดูฟรีตามสิทธิ์บัตร'});}
+  if(t==='Master Class'){r.mc[0]='ticket';r.src.push({t:'บัตร Master Class',s:'RADIANCE RIFT RUMBLE (R.R.R) · ดูฟรีตามสิทธิ์บัตร'});}
+  if(DEMO.rerunBuy==='ult2'){[1,2].forEach(function(d){if(!r.days[d])r.days[d]='bought';});r.src.push({t:'Ultimate Rerun 2 วัน',s:'ซื้อหลังงาน · '+rrBaht(790)+' (ตัวอย่าง)',bought:true});}
+  return r;
+}
+function rrHas(it,r){r=r||rrRights();return it.room==='mc'?!!r.mc[it.mc]:!!r.days[it.d];}
+/* 'open' | 'locked' | 'soon' (sale/viewing window not open yet — demo switch, real date is 13 พ.ย. 2569) */
+function rrState(it,r){if(DEMO.rerunWhen==='before')return 'soon';return rrHas(it,r)?'open':'locked';}
+function rrPkgsFor(r){
+  return RR_PKGS.filter(function(p){
+    if(p.mc!=null)return !r.mc[p.mc];
+    var miss=p.days.filter(function(d){return !r.days[d];});
+    if(!miss.length)return false;
+    if(p.k==='ult2')return miss.length===2; // with one day already held, offer just the missing day
+    return true;
+  });
+}
+function rrLockLine(it){return it.room==='mc'?'ดูได้เมื่อซื้อคลาสนี้':'ดูได้เมื่อซื้อ Ultimate Rerun';}
+function rrRowHTML(it,i,r){
+  var s=rrState(it,r);
+  var badge=s==='open'?'<span class="rr-st open">'+ic('lc-play')+'ดูได้</span>'
+    :s==='soon'?'<span class="rr-st">'+ic('lc-clock')+'เริ่ม '+RERUN_FROM+'</span>'
+    :'<span class="rr-st lock">'+ic('lc-lock')+'ตัวอย่าง 2 นาที</span>';
+  return '<button class="vid-card row rr-row'+(s!=='open'?' is-locked':'')+'" type="button" data-vid="rerun:'+i+'"'+(s==='soon'?' disabled':'')+'>'+
+    '<span class="vid-thumb">'+vidThumbHTML(it.id)+(s==='open'?VID_PLAY:'<span class="rr-lockic" aria-hidden="true">'+ic(s==='soon'?'lc-clock':'lc-lock')+'</span>')+'</span>'+
+    '<span class="vid-tx"><span class="vid-t">'+apbEsc(it.t)+'</span><span class="vid-s">'+apbEsc(it.s)+'</span>'+badge+'</span></button>';
+}
+/* persona → 3 sessions worth rewatching (mock pairing by topic, for the design team to review) */
+var RR_PICKS={
+  guardian:['WEALTH, AFTER TAX','THE 100-YEAR PLAN','HOW MUCH RETURN IS ENOUGH ?'],
+  harvester:['MUST-HAVE THAI STOCKS','HOW MUCH RETURN IS ENOUGH ?','THE FREEDOM PLAN'],
+  steadyhand:['TRANSFORM TO AUTO WORKFLOW','THE 100-YEAR PLAN','ALL-WEATHER TRADING AND LONG-TERM PORTFOLIO WORKSHOP'],
+  diamondhand:['BEYOND Wealth','MUST-HAVE THAI STOCKS','VALUE MEETS MOMENTUM'],
+  analyst:['DECODING FOREIGN FLOWS','MARKET INTELLIGENCE','AI FOR INVESTING'],
+  planner:['IF YOU HAD ฿1 MILLION TODAY','THE FREEDOM PLAN','MONEY MAKEOVER 40+'],
+  explorer:['WHERE THE MONEY GOES NEXT','CRYPTO : SPECULATION OR ALLOCATION ?','GOLD OR PROPERTY ?'],
+  sage:['BEYOND Wealth','THE 100-YEAR PLAN','MONEY IS CHANGING'],
+  maverick:['BTC 0%','BITCOIN ซื้อ ถือ หาย!','RADIANCE RIFT RUMBLE (R.R.R)'],
+  waverider:['MARKET INTELLIGENCE','DECODING FOREIGN FLOWS','RADIANCE RIFT RUMBLE (R.R.R)'],
+  contrarian:['WHERE THE MONEY GOES NEXT','DECODING FOREIGN FLOWS','VALUE MEETS MOMENTUM'],
+  collector:['LOVE IT. KNOW IT','WHY IS THIS CARD WORTH ฿100,000 ?','VALUE OF ART']
+};
+function rrPicksHTML(cls){
+  if(!RESULT||!RESULT.heroKey)return '';
+  var L=rrList(),h=HEROES[RESULT.heroKey],want=RR_PICKS[RESULT.heroKey]||[],r=rrRights();
+  var rows=want.map(function(t){for(var i=0;i<L.length;i++)if(L[i].t===t)return rrRowHTML(L[i],i,r);return '';}).join('');
+  if(!rows)return '';
+  return '<section class="home-card rr-picks scroll-reveal'+(cls?' '+cls:'')+'"><div class="hcard-hd"><div class="s-h">คลิปที่เหมาะกับคุณ</div><div class="hcard-s">คัดจาก Session ทั้งหมดให้ตรงกับสไตล์ '+h.en+' ('+h.th+')</div></div>'+
+    '<div class="vid-rows">'+rows+'</div><span class="ex-tag" style="margin-top:var(--sp-inline)">การจับคู่ตัวอย่าง</span></section>';
+}
+function rrCountHTML(){
+  var L=rrList(),r=rrRights(),n=L.filter(function(it){return rrHas(it,r);}).length;
+  return {n:n,all:L.length,pct:L.length?Math.round(n/L.length*100):0};
+}
+function rrRightsCardHTML(){
+  var r=rrRights(),c=rrCountHTML(),pk=rrPkgsFor(r),before=DEMO.rerunWhen==='before',pend=DEMO.rerunBuy==='pending';
+  var min=pk.length?Math.min.apply(null,pk.map(function(p){return p.p;})):0;
+  var head=c.n?('ดูได้ '+c.n+' จาก '+c.all+' Session'):'ยังไม่มีสิทธิ์ดูย้อนหลัง';
+  var sub=r.src.length?r.src.map(function(s){return s.t;}).join(' + '):'ซื้อ Rerun เพื่อดู Conference, Workshop และ Master Class ย้อนหลัง';
+  return '<section class="rr-card scroll-reveal">'+
+    '<div class="rr-ey">'+ic('lc-play-circle')+'สิทธิ์ดูย้อนหลังของคุณ</div>'+
+    '<div class="rr-name">'+head+'</div><div class="rr-sub">'+sub+'</div>'+
+    '<div class="rr-meter" role="img" aria-label="'+head+'"><span style="width:'+c.pct+'%"></span></div>'+
+    '<div class="rr-win">'+ic('lc-calendar')+(before?'เปิดให้ดูและเปิดขาย '+RERUN_FROM:'ดูได้ถึง '+RERUN_UNTIL)+'</div>'+
+    (pend?'<div class="rr-pending">'+ic('lc-loader')+'<div><b>กำลังยืนยันการชำระเงิน</b><span>ชำระผ่านระบบลงทะเบียนแล้ว สิทธิ์จะขึ้นที่นี่เมื่อยืนยันเสร็จ</span></div><button class="ag-more" id="rrRefresh" type="button">รีเฟรชสิทธิ์</button></div>':'')+
+    (pk.length?'<button class="btn btn-primary rr-buy" id="rrBuy" type="button"'+(before?' disabled':'')+'>'+(before?'เปิดขาย '+RERUN_FROM:'ซื้อ Rerun · เริ่ม '+rrBaht(min))+'</button>'
+      :'<div class="rr-full">'+ic('lc-check-circle')+'คุณดูได้ครบทุก Session แล้ว</div>')+
+  '</section>';
+}
+function rrListHTML(){
+  var L=rrList(),r=rrRights(),room=HOME_MST.rrRoom||'conf';
+  var tabs='<div class="bt-tabs bt-tabs--primary" id="rrTabs" role="tablist" aria-label="เลือกห้อง">'+RR_ROOMS.map(function(x){
+    return '<button class="bt-tab" type="button" role="tab" aria-selected="'+(x.k===room)+'" data-value="'+x.k+'"><span class="bt-tab-label">'+x.l+'</span></button>';}).join('')+'</div>';
+  var body=[1,2].map(function(d){
+    var rows=L.map(function(it,i){return it.room===room&&it.d===d?rrRowHTML(it,i,r):'';}).join('');
+    if(!rows)return '';
+    var any=L.filter(function(it){return it.room===room&&it.d===d;})[0];
+    return '<div class="rr-day">วันที่ '+d+' ✦ '+any.date+'</div><div class="vid-rows">'+rows+'</div>';
+  }).join('');
+  return '<section class="home-card scroll-reveal"><div class="hcard-hd"><div class="s-h">ทุก Session ย้อนหลัง</div><div class="hcard-s">แตะคลิปที่ล็อกเพื่อดูตัวอย่าง 2 นาทีแรก</div></div>'+tabs+body+'</section>';
+}
+function rrSheetHTML(){
+  return '<div class="howto-modal" id="rrSheet"><div class="howto-scrim" data-rr-close></div><div class="howto-card rr-sheet"><button class="howto-x" data-rr-close aria-label="ปิด">'+ic('lc-x')+'</button>'+
+    '<div class="howto-hd"><div class="howto-t">ซื้อ Rerun ดูย้อนหลัง</div><div class="howto-s">ดูได้ '+RERUN_FROM+' – '+RERUN_UNTIL+' · ราคาตัวอย่าง</div></div>'+
+    '<div class="rr-pkgs" id="rrPkgs" role="radiogroup" aria-label="เลือกแพ็กเกจ"></div>'+
+    '<a class="btn btn-primary rr-go" id="rrGo" href="'+REG_URL+'" target="_blank" rel="noopener">ซื้อผ่านระบบลงทะเบียน '+ic('lc-external-link')+'</a>'+
+    '<p class="rr-note">ชำระเงินผ่านระบบลงทะเบียน เมื่อชำระสำเร็จ กลับมาดูได้ที่หน้านี้ทันที · มีบัตร Ultimate หรือ Master Class อยู่แล้ว ดูฟรีตามสิทธิ์บัตร</p>'+
+  '</div></div>';
+}
+var RR_PICK=null;
+function openRerunSheet(focusIt){
+  var m=document.getElementById('rrSheet');
+  if(!m){document.body.insertAdjacentHTML('beforeend',rrSheetHTML());m=document.getElementById('rrSheet');
+    m.querySelectorAll('[data-rr-close]').forEach(function(b){b.onclick=closeRerunSheet;});
+    m.querySelector('#rrGo').addEventListener('click',function(){if(DEMO.rerunBuy==='none'){DEMO.rerunBuy='pending';syncRerunDemo();}setTimeout(function(){closeRerunSheet();render();},300);});}
+  var r=rrRights(),pk=rrPkgsFor(r);
+  if(focusIt)RR_PICK=(focusIt.room==='mc'?pk.filter(function(p){return p.mc===focusIt.mc;}):pk.filter(function(p){return p.days&&p.days.indexOf(focusIt.d)>-1;}))[0];
+  if(!RR_PICK||pk.indexOf(RR_PICK)<0)RR_PICK=pk[0];
+  var box=m.querySelector('#rrPkgs');
+  var paint=function(){
+    box.innerHTML=pk.map(function(p,i){
+      var on=p===RR_PICK;
+      return '<button class="rr-pkg'+(on?' on':'')+'" type="button" role="radio" aria-checked="'+on+'" data-i="'+i+'"><span class="rr-pkg-tx"><span class="rr-pkg-t">'+p.t+(p.best&&pk.length>1?' <span class="rr-best">คุ้มที่สุด</span>':'')+'</span><span class="rr-pkg-s">'+p.note+'</span></span><span class="rr-price">'+rrBaht(p.p)+'</span></button>';
+    }).join('');
+    box.querySelectorAll('.rr-pkg').forEach(function(b){b.onclick=function(){RR_PICK=pk[+b.dataset.i];paint();};});
+  };
+  paint();
+  m.classList.add('show');
+}
+function closeRerunSheet(){var m=document.getElementById('rrSheet');if(m)m.classList.remove('show');}
+/* keep the demo panel's own "ซื้อ Rerun" segment in step when the page itself changes the purchase state */
+function syncRerunDemo(){document.querySelectorAll('#segRrBuy button').forEach(function(x){x.classList.toggle('on',x.dataset.v===DEMO.rerunBuy);});}
+function renderRerunHome(){
+  rrList();
+  root.innerHTML=appHeader()+
+  '<main class="scroll fade">'+
+    '<section class="home-hero scroll-reveal v3 rr-hero'+(DEMO.heroProps?'':' sky-only')+'"><img class="hh-bg" src="'+HERO_BG+'" alt="">'+
+      '<div class="hh-top">'+
+        (DEMO.heroProps?'<img class="hh-prop hh-prop-efin" src="'+HERO_PROP.efin+'" alt="" aria-hidden="true">':'')+
+        (DEMO.heroProps?'<img class="hh-prop hh-prop-gold" src="'+HERO_PROP.gold+'" alt="" aria-hidden="true">':'')+
+        '<img class="hh-logo" src="'+LOGO_IMG.nwnp+'" alt="New World New Playbook">'+
+      '</div>'+
+      '<div class="hh-headline"><span>RERUN ดูย้อนหลัง</span><span>ทุก Session กลับมาให้ดูอีกครั้ง</span></div>'+
+      '<div class="hh-bot">'+
+      (DEMO.heroProps?'<img class="hh-prop hh-prop-heart" src="'+HERO_PROP.heart+'" alt="" aria-hidden="true">':'')+
+      (DEMO.heroProps?'<img class="hh-prop hh-prop-stock" src="'+HERO_PROP.stock+'" alt="" aria-hidden="true">':'')+
+      '<p class="hh-sub"><span>Conference · Workshop · Master Class</span><span>วิทยากร 30+ ท่าน ดูซ้ำได้ตลอด 1 ปี</span></p>'+
+      '</div>'+
+    '</section>'+
+    rrRightsCardHTML()+
+    rrPicksHTML()+
+    rrListHTML()+
+    (RESULT?'<div class="list-row book-teaser" id="homeBook"><div class="klib-tx"><div class="bt-t"><img class="bt-t-ic" src="'+ICON_BOOK_PNG+'" alt="">Playbook ลงทุนของคุณ</div><div class="bt-s">ผลวิเคราะห์ตัวตนและสรุปจากงาน ดูได้ทุกเมื่อ</div></div>'+ic('lc-chevron-right','bt-cv')+'</div>':'')+
+    pinCardHTML()+installCardHTML()+pinModalHTML()+
+  '</main>'+
+  appTabbar('home');
+  bindTabbar();
+  bindRerun();
+  var homeBook=root.querySelector('#homeBook');if(homeBook)homeBook.onclick=function(){st.phase='book';render();};
+  initBtTabs(root.querySelector('#rrTabs'),function(value){
+    HOME_MST.rrRoom=value;var y=window.scrollY;renderHome();window.scrollTo(0,y);
+    var fresh=root.querySelector('#rrTabs [aria-selected="true"]');if(fresh)fresh.focus({preventScroll:true});
+  });
+  mountHeaderQR();
+  bindHeaderLogo();
+  root.querySelector('#pinCardBtn').onclick=hasPin()?openPinChangeFlow:openPinSetupModal;
+  var pinOff=root.querySelector('#pinCardOff');if(pinOff)pinOff.onclick=openPinDisableFlow;
+  var installCard=root.querySelector('#installCard');
+  if(installCard){
+    installCard.querySelector('#installCardBtn').onclick=triggerInstall;
+    installCard.querySelector('#installCardX').onclick=dismissInstallCard;
+    installCard.querySelector('#installCardDismiss').onclick=dismissInstallCard;
+  }
+}
+/* shared by Home + the Playbook's "คลิปที่เหมาะกับคุณ" + the player page */
+function bindRerun(){
+  bindVideoCards();
+  var b=root.querySelector('#rrBuy');if(b)b.onclick=function(){openRerunSheet();};
+  var rf=root.querySelector('#rrRefresh');if(rf)rf.onclick=function(){
+    rf.disabled=true;rf.textContent='กำลังตรวจสอบ…';
+    setTimeout(function(){DEMO.rerunBuy='ult2';syncRerunDemo();render();},700); // demo: the payment clears
+  };
+}
+/* Profile's "สิทธิ์ของฉัน" — replaces the in-event QR once the event is over */
+function rrMyRightsHTML(){
+  var r=rrRights(),c=rrCountHTML(),pend=DEMO.rerunBuy==='pending';
+  var rows=r.src.map(function(s){return '<div class="rr-mine-row">'+ic(s.bought?'lc-shopping-bag':'lc-ticket')+'<div><b>'+s.t+'</b><span>'+s.s+'</span></div></div>';}).join('');
+  if(pend)rows+='<div class="rr-mine-row pend">'+ic('lc-loader')+'<div><b>รอยืนยันการชำระเงิน</b><span>Ultimate Rerun · ชำระผ่านระบบลงทะเบียน</span></div></div>';
+  if(!rows)rows='<div class="rr-mine-row">'+ic('lc-info')+'<div><b>ยังไม่มีสิทธิ์ดูย้อนหลัง</b><span>ซื้อ Rerun ผ่านระบบลงทะเบียน แล้วกลับมาดูที่นี่</span></div></div>';
+  return '<div class="rr-mine"><div class="pq-lbl">สิทธิ์ของฉัน</div>'+rows+
+    '<div class="rr-mine-foot"><span>ดูได้ '+c.n+'/'+c.all+' Session</span><span>'+(DEMO.rerunWhen==='before'?'เริ่ม '+RERUN_FROM:'ถึง '+RERUN_UNTIL)+'</span></div>'+
+    (rrPkgsFor(r).length?'<button class="ag-more" id="rrBuy" type="button" style="font-size:var(--fs-sub);border-radius:var(--rpill)"'+(DEMO.rerunWhen==='before'?' disabled':'')+'>'+ic('lc-shopping-bag')+'ซื้อ Rerun เพิ่ม</button>':'')+
+  '</div>';
+}
 function renderHome(){
+  if(DEMO.eventPhase==='post'){renderRerunHome();return;}
   // Pre-Event (2026-08-28, per direction "หน้าหลัก...Pre-Event: poster, ประกาศจากงาน, บัตรของคุณ,
   // เวทีห้องใหญ่") — "ขั้นต่อไป"/home-counters/book-teaser all reason about real in-event progress
   // (booth check-ins, games played, an opened Book) that doesn't exist yet before doors open, and
@@ -11033,7 +11395,8 @@ function renderProfile(){
     :'<span class="prof-tier">'+ic(t.meta.icon)+t.name+'</span>';
   // "สิทธิ" row becomes "บัตรที่ถือ" : "Explorer + Master Class" when multiTicket — same PROFILE_ROWS
   // shape/order otherwise, just this one row's label+value swapped.
-  var rows=PROFILE_ROWS.map(function(r){
+  var post=DEMO.eventPhase==='post';
+  var rows=PROFILE_ROWS.filter(function(r){return !post||(r.k!=='วันที่'&&r.k!=='สถานที่');}).map(function(r){
     if(r.k==='สิทธิ')return m?{k:'บัตรที่ถือ',v:MULTI_TICKET_DEMO.tickets.map(function(x){return x.name;}).join(' + ')}:{k:r.k,v:t.name};
     return r;
   });
@@ -11044,7 +11407,7 @@ function renderProfile(){
       '<div class="prof-name">ออนไลน์ แอสเซ็ท</div>'+
       '<div class="prof-org">บริษัทตัวอย่าง จำกัด (ข้อมูลจำลอง)</div>'+
       '<div class="prof-chips"><span class="prof-vf">'+ic('lc-check-circle')+'ยืนยันแล้ว</span>'+tierChips+'</div>'+
-      '<div class="prof-qr"><div class="pq-lbl">QR ประจำตัว</div><div class="pq-box">'+ic('lc-qr-code')+'</div><div class="pq-note">เปิดหน้านี้ให้เจ้าหน้าที่สแกน เพื่อเช็คอินบูธ แลกการ์ดตัวจริง หรือส่งสรุปให้ผู้แนะนำการลงทุน · จะสแกน QR ที่จุดนั้นเองก็ได้ผลเหมือนกัน</div></div>'+
+      (post?rrMyRightsHTML():'<div class="prof-qr"><div class="pq-lbl">QR ประจำตัว</div><div class="pq-box">'+ic('lc-qr-code')+'</div><div class="pq-note">เปิดหน้านี้ให้เจ้าหน้าที่สแกน เพื่อเช็คอินบูธ แลกการ์ดตัวจริง หรือส่งสรุปให้ผู้แนะนำการลงทุน · จะสแกน QR ที่จุดนั้นเองก็ได้ผลเหมือนกัน</div></div>')+
     '</section>'+
     (m?ticketHistoryHTML():'')+
     '<section class="prof-rows scroll-reveal">'+rows.map(function(r){return '<div class="pr-row"><span class="pr-k">'+r.k+'</span><span class="pr-v">'+r.v+'</span></div>';}).join('')+'</section>'+
@@ -11058,6 +11421,7 @@ function renderProfile(){
   bindTabbar();
   mountHeaderQR();
   bindHeaderLogo();
+  if(post)bindRerun();
 }
 
 /* ── RESPONSIVE VIEW (mobile | tablet | pc) ── driven by window, overridable via demo panel ── */
@@ -11083,7 +11447,8 @@ function renderProfile(){
    direction restored). Switching the ช่วงงาน segment to Pre-Event is the one way back to the
    splash/quiz flow (RESULT/quizDone/boothVer aren't touched by that switch, same as before). */
 // registered:false by default since 2026-10-26 (per direction "หน้าตัวตน อยากให้ default ที่ยังไม่ลงทะเบียน (การ์ดแสดงหน้าเดียว)")
-var DEMO={view:'auto',quizDone:true,draw:'auto',eventPhase:'on',multiTicket:false,heroProps:true,boothVer:'v2',pbStyle:'app',registered:false,forceLock:false,forceInstall:false,pdfCase:'auto'}; // forceLock/forceInstall (2026-09-25) — demo-panel-only previews for the PIN lock screen and the install card, see buildDemo()'s own "ล็อก PIN / ติดตั้งแอป" section. draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. (splashVer removed 2026-09-18, per direction "preview card เอา v1 ออก" — the splash fan carousel's "การ์ดมีชีวิต" build (added 2026-09-09, promoted to shipped default 2026-09-11) is now the only splash preview; v1 the plain static carousel, v3/v5 the "3D Character Card Flow" field and its living-card variant, were all removed the same day/session — see renderSplash's own comment for that full history.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO. (sumTitleVer — a brief demo-panel toggle comparing 2 title treatments for renderPlaySummary's game-name — removed 2026-09-11, per direction "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย": v2, the DNA quiz's .q-icon-bare + .q-title header, is now just how renderPlaySummary always renders — see its own comment there.)
+/* eventPhase 'post' (2026-11-11, per direction "งานจบแล้ว เน้นขาย rerun") is the default now; ticketDays/rerunWhen/rerunBuy drive the RERUN block (see rrRights) */
+var DEMO={ticketDays:'both',rerunWhen:'open',rerunBuy:'none',view:'auto',quizDone:true,draw:'auto',eventPhase:'post',multiTicket:false,heroProps:true,boothVer:'v2',pbStyle:'app',cardClaimed:false,registered:false,forceLock:false,forceInstall:false,pdfCase:'auto'}; // forceLock/forceInstall (2026-09-25) — demo-panel-only previews for the PIN lock screen and the install card, see buildDemo()'s own "ล็อก PIN / ติดตั้งแอป" section. draw: 'auto' (default, real boothCheckinCount()/boothActivityCount() math) | 'ok' (force eligible) | 'need' (force not-eligible) — see renderBooth. registered (2026-09-04, per direction "จำลองเคส...ลูกค้าที่เข้ามาเล่น quiz dna โดยที่ยังไม่ได้ลงทะเบียน"): true (default, the real/active state) = the normal full Book; false previews a quiz-taker who never went through the registration site — renderBook locks to just the ตัวตน tab, truncates it at จุดแข็ง/จุดที่ต้องระวัง, and drops the bottom app-tabbar (see renderBook's `unreg` branches + book2Tabs()). boothVer (2026-09-03, per direction "อยากเพิ่ม หน้าเดินบูธ อีกเวอร์ชัน แยก preview ในเดโม"): 'v1' = the shipped booth page (static map image + separate route list, unchanged); 'v2' = a UX-enhancement preview per the Booth Journey spec — the SAME sections/layout/content, but the map gets numbered semantic markers synced 1:1 with the route steps, plus two-way Step↔Map focus. Everything v2 adds is gated on this flag so v1 stays byte-identical. (splashVer removed 2026-09-18, per direction "preview card เอา v1 ออก" — the splash fan carousel's "การ์ดมีชีวิต" build (added 2026-09-09, promoted to shipped default 2026-09-11) is now the only splash preview; v1 the plain static carousel, v3/v5 the "3D Character Card Flow" field and its living-card variant, were all removed the same day/session — see renderSplash's own comment for that full history.) eventPhase default flipped 'on'->'pre' (2026-08-28, per follow-up direction "จำลองเคส...อยากให้ preview default ที่ Pre-Event ก่อน") — see the comment above. multiTicket: false by default (2026-09-02) — the single-ticket case stays the active/real state; see MULTI_TICKET_DEMO. (sumTitleVer — a brief demo-panel toggle comparing 2 title treatments for renderPlaySummary's game-name — removed 2026-09-11, per direction "เลือกแบบ v2 และเอาแบบ v1 ออกได้เลย": v2, the DNA quiz's .q-icon-bare + .q-title header, is now just how renderPlaySummary always renders — see its own comment there.)
 /* 'auto' resolves from real window.innerWidth again (2026-09-10 responsive audit — the 2026-08-26
    "always resolve to mobile" change meant a real event-tablet visitor (768–1024px wide) never got
    data-view="tablet": the .shell/topbar/book-tabbar all clamped to the 400px phone-frame width,
@@ -11150,7 +11515,12 @@ function buildDemo(){
     /* ช่วงงาน (2026-08-28) — Pre-Event hides the header QR pill (register takes its slot) and leaves
        RESULT/booth progress untouched; On-Event shows the QR pill and resets booth/game progress to
        empty (see the handler below) so the sections meant to start locked at On-Event actually do. */
-    '<div class="demo-lbl">ช่วงงาน</div>'+seg('segPhase',[{v:'pre',t:'Pre-Event'},{v:'on',t:'On-Event'}],DEMO.eventPhase)+
+    '<div class="demo-lbl">ช่วงงาน</div>'+seg('segPhase',[{v:'pre',t:'Pre-Event'},{v:'on',t:'On-Event'},{v:'post',t:'หลังงาน'}],DEMO.eventPhase)+
+    '<div id="demoRr"'+(DEMO.eventPhase==='post'?'':' hidden')+'>'+
+      '<div class="demo-lbl">Rerun · ช่วงเวลา</div>'+seg('segRrWhen',[{v:'before',t:'ก่อน 13 พ.ย.'},{v:'open',t:'เปิดแล้ว'}],DEMO.rerunWhen)+
+      '<div class="demo-lbl">Rerun · วันบนบัตร Ultimate</div>'+seg('segTkDays',[{v:'both',t:'2 วัน'},{v:'d1',t:'วันที่ 1'},{v:'d2',t:'วันที่ 2'}],DEMO.ticketDays)+
+      '<div class="demo-lbl">Rerun · ซื้อหลังงาน</div>'+seg('segRrBuy',[{v:'none',t:'ยังไม่ซื้อ'},{v:'pending',t:'รอยืนยัน'},{v:'ult2',t:'ซื้อแล้ว'}],DEMO.rerunBuy)+
+    '</div>'+
     '<div class="demo-lbl">มุมมอง</div>'+seg('segView',[{v:'auto',t:'อัตโนมัติ'},{v:'pc',t:'PC'},{v:'tablet',t:'แท็บเล็ต'},{v:'mobile',t:'มือถือ'}],DEMO.view)+
     /* "พรีวิวคู่มือ" (Book version switch, คู่มือ 1 vs คู่มือ 2) removed 2026-08-30, per direction
        "ลบ คู่มือ 1 ออก" — see the removal note near BOOK2_TAB — same reasoning as the "Poster
@@ -11177,6 +11547,8 @@ function buildDemo(){
        persona first (or leave the seeded default) to actually see the locked tab. */
     '<div class="demo-lbl">การลงทะเบียน</div>'+seg('segRegistered',[{v:'yes',t:'ลงทะเบียนแล้ว'},{v:'no',t:'ยังไม่ได้ลงทะเบียน'}],DEMO.registered?'yes':'no')+
     /* สไตล์ Playbook (2026-10-26) — the PDF book's DNA on the Playbook screens, as a side-by-side sample (html.pbk) */
+    /* การ์ดตัวจริง (2026-11-04) — the redeem block's received state (Ultimate only) */
+    '<div class="demo-lbl">การ์ดตัวจริง (Ultimate)</div>'+seg('segClaim',[{v:'no',t:'ยังไม่รับ'},{v:'yes',t:'รับแล้ว'}],DEMO.cardClaimed?'yes':'no')+
     '<div class="demo-lbl">สไตล์ Playbook</div>'+seg('segPbStyle',[{v:'app',t:'แอป (เดิม)'},{v:'book',t:'หนังสือ (PDF)'}],DEMO.pbStyle)+
     '<div class="demo-stub">* ยังไม่ได้ลงทะเบียน = Playbook เห็นแค่ tab ตัวตน ตัดจบที่จุดแข็ง/จุดที่ต้องระวัง + CTA ชวนลงทะเบียน (bottom nav ยังกดออกไปหน้าอื่นได้ตามปกติ)</div>'+
     /* Force the "เดินบูธ ✦ ลุ้นรางวัล" draw-status card's eligible/not-eligible state for preview
@@ -11245,11 +11617,16 @@ function buildDemo(){
     // demo panel should land you at its real starting point, not leave you stranded on whatever
     // On-Event tab happened to be open. Doesn't touch RESULT/quizDone (same as before).
     if(v==='pre')st.phase='splash';
+    if(v==='post')st.phase='home';
+    document.getElementById('demoRr').hidden=v!=='post';
     render();
   };});
+  [['segRrWhen','rerunWhen'],['segTkDays','ticketDays'],['segRrBuy','rerunBuy']].forEach(function(p){document.getElementById(p[0]).querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO[p[1]]=b.dataset.v;document.querySelectorAll('#'+p[0]+' button').forEach(function(x){x.classList.toggle('on',x===b);});closeRerunSheet();render();};});});
+  document.getElementById('demoTier').onchange=function(){closeRerunSheet();render();};
   document.getElementById('segView').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.view=b.dataset.v;document.querySelectorAll('#segView button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');applyView();};});
   document.getElementById('segDraw').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.draw=b.dataset.v;document.querySelectorAll('#segDraw button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segTicketCount').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.multiTicket=(b.dataset.v==='2');document.querySelectorAll('#segTicketCount button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
+  document.getElementById('segClaim').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.cardClaimed=b.dataset.v==='yes';document.querySelectorAll('#segClaim button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');render();};});
   document.getElementById('segPbStyle').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.pbStyle=b.dataset.v;document.querySelectorAll('#segPbStyle button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(['home','passport','games','profile'].indexOf(st.phase)>-1)st.phase='book';render();};});
   document.getElementById('segRegistered').querySelectorAll('button').forEach(function(b){b.onclick=function(){DEMO.registered=(b.dataset.v==='yes');document.querySelectorAll('#segRegistered button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='book')render();};});
   document.getElementById('segEfin').querySelectorAll('button').forEach(function(b){b.onclick=function(){EFIN_CHECKED_IN=(b.dataset.v==='yes');document.querySelectorAll('#segEfin button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');if(st.phase==='games')render();};});
