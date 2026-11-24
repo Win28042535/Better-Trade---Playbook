@@ -1,6 +1,8 @@
 # E-BOOK sections — efin.finance Better Trade 2026 page (mockup)
 
 Preview: `node proxy.js` (or the `efin-ebook-mock` launch config) → http://localhost:8740/
+Online: https://better-trade-playbook-git-ver3-on-event-win999.vercel.app/ebook-mockup (Vercel, branch Ver.3-On-Event) — vercel.json routes
+/events/* through api/efin-proxy.js (efin's nginx 404s a plain external rewrite because of X-Forwarded-Host); analytics configs return {}.
 The proxy serves the live page with the two sections injected and passes every other request to www.efin.finance,
 so fonts, CSS and the Liquid Metal button run exactly as on the live site.
 
