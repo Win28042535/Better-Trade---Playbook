@@ -11,7 +11,7 @@
     },
     {
       "src": "/events/better-trade/better-trade2026/?",
-      "dest": "/mockup/efin-ebook/index.html"
+      "dest": "/mockup/efin-ebook"
     },
     {
       "src": "/events/better-trade/better-trade2026/mock-ebook/(.*)",
@@ -23,7 +23,7 @@
     },
     {
       "src": "/events/(.*)",
-      "dest": "https://www.efin.finance/events/$1"
+      "dest": "/api/efin-proxy?p=$1"
     },
     {
       "src": "/",
