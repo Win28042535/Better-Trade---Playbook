@@ -2,8 +2,43 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "routes": [
-    { "src": "/", "status": 302, "headers": { "Location": "/dna-quiz-flow.html" } },
-    { "src": "/quiz", "dest": "/dna-quiz-flow.html" },
-    { "src": "/playbook", "dest": "/Digital Playbook v8 standalone.html" }
+    {
+      "src": "/ebook-mockup/?",
+      "status": 302,
+      "headers": {
+        "Location": "/events/better-trade/better-trade2026"
+      }
+    },
+    {
+      "src": "/events/better-trade/better-trade2026/?",
+      "dest": "/mockup/efin-ebook/index.html"
+    },
+    {
+      "src": "/events/better-trade/better-trade2026/mock-ebook/(.*)",
+      "dest": "/mockup/efin-ebook/$1"
+    },
+    {
+      "src": "/events/api/(gtm|hotjar|posthog)-config",
+      "dest": "/mockup/efin-ebook/no-analytics.json"
+    },
+    {
+      "src": "/events/(.*)",
+      "dest": "https://www.efin.finance/events/$1"
+    },
+    {
+      "src": "/",
+      "status": 302,
+      "headers": {
+        "Location": "/dna-quiz-flow.html"
+      }
+    },
+    {
+      "src": "/quiz",
+      "dest": "/dna-quiz-flow.html"
+    },
+    {
+      "src": "/playbook",
+      "dest": "/Digital Playbook v8 standalone.html"
+    }
   ]
 }

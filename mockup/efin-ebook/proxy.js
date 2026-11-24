@@ -24,6 +24,8 @@ function fetchUp(url, redirects = 5) {
 http.createServer(async (req, res) => {
   const u = new URL(req.url, 'http://localhost');
   const p = decodeURIComponent(u.pathname);
+  // analytics off for the mockup — GTM/Hotjar/PostHog skip themselves on an empty config (same rule as vercel.json)
+  if (/^\/events\/api\/(gtm|hotjar|posthog)-config$/.test(p)) { res.writeHead(200, { 'Content-Type': 'application/json' }); return res.end('{}'); }
   if (p === '/' || p === PAGE || p === PAGE + '/') {
     if (p === '/') { res.writeHead(302, { Location: PAGE }); return res.end(); }
     res.writeHead(200, { 'Content-Type': TYPES['.html'], 'Cache-Control': 'no-store' });
