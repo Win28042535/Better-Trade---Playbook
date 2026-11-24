@@ -97,7 +97,7 @@ function get(url) {
   one(/<section id="cta" class="cta"/, () => '<section id="cta" class="cta cta--ebook"', 'cta open');
   one(/(<\/div>\s*)<h2 id="cta-title"[\s\S]*?<div id="cta-ticket-slot" class="cta__action"><\/div>/, (m, a) => a + CTA_INNER.trimStart(), 'cta body');
   // styles + script
-  one(/<\/head>/, () => '    <link rel="stylesheet" href="mock-ebook/ebook.css?v=12">\n</head>', 'head');
+  one(/<\/head>/, () => '    <link rel="stylesheet" href="mock-ebook/ebook.css?v=13">\n</head>', 'head');
   one(/<\/body>/, () => '    <script type="module" src="mock-ebook/ebook.js?v=4"></script>\n</body>', 'body');
 
   fs.writeFileSync(path.join(dir, 'index.html'), s);

@@ -130,7 +130,7 @@
 .ebook__prop--gold { --w: 46px; --r: -20deg; --t: 6s; bottom: -44px; left: 3%; }
 
 .ebook__media { position: relative; z-index: 1; }
-.ebook__stage { max-width: 440px; margin: 0 auto; }
+.ebook__stage { max-width: 340px; margin: 0 auto; /* was 440 — gave the copy column room to breathe (2026-11-24) */ }
 .ebook__stage .ebook__cover { transform: rotate(-3deg); } /* static — no hover/tap interaction on the cover */
 
 .ebook__body { display: flex; flex-direction: column; align-items: flex-start; }
@@ -255,7 +255,7 @@
 
 /* stacked below lg (at md a 7/12 text column was too narrow for the 40–48px title) */
 @media (max-width: 991px) {
-    .ebook__stage { max-width: 320px; margin-bottom: var(--space-8); }
+    .ebook__stage { max-width: 260px; margin-bottom: var(--space-8); }
     .ebook__body { align-items: center; text-align: center; }
     .ebook .ebook__title, .ebook .ebook__label { text-align: center; }
     .ebook .ebook__label { justify-content: center; }
@@ -271,7 +271,7 @@
 @media (max-width: 767px) {
     .ebook__panel { padding: var(--space-10) var(--space-5) 0; }
     .ebook__hero { --bs-gutter-x: 0; }
-    .ebook__stage { max-width: 230px; }
+    .ebook__stage { max-width: 190px; }
     .ebook__lead, .ebook__quote { font-size: var(--font-size-16); }
     .ebook__action { min-height: 46px; }
     .ebook__prop--bitcoin { --w: 72px; top: -34px; left: -38px; }
